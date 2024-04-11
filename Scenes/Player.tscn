@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://tgxbmj8j2fvt"]
+
+[ext_resource type="Script" path="res://Scripts/PokerPlayer.cs" id="1_phr45"]
+[ext_resource type="Script" path="res://Scripts/Brain/PlayerBrain.cs" id="2_ya2pr"]
+
+[node name="Player" type="Node"]
+script = ExtResource("1_phr45")
+
+[node name="Brain" type="Node" parent="."]
+script = ExtResource("2_ya2pr")

@@ -1,0 +1,101 @@
+[gd_scene load_steps=3 format=3 uid="uid://wdmxn3vw3x5h"]
+
+[ext_resource type="Script" path="res://Scripts/Ui/RaiseUi.cs" id="1_vtx4f"]
+[ext_resource type="Script" path="res://Scripts/Ui/NumberLineEdit.cs" id="2_q04do"]
+
+[node name="RaiseUi" type="MarginContainer" node_paths=PackedStringArray("AmountLineEdit", "AmountBar", "AllInButton", "BetButtons", "TwoPointFiveBigBlindButton", "ThreeBigBlindButton", "FourBigBlindButton", "FiveBigBlindButton", "OneFourthPotButton", "HalfPotButton", "TwoThirdsPotButton", "OnePotButton")]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -31.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_bottom = 16
+script = ExtResource("1_vtx4f")
+AmountLineEdit = NodePath("HBoxContainer/ValueDisplay/LineEdit")
+AmountBar = NodePath("HBoxContainer/ValueDisplay/HScrollBar")
+AllInButton = NodePath("HBoxContainer/Buttons/AllIn")
+BetButtons = NodePath("HBoxContainer/Buttons")
+TwoPointFiveBigBlindButton = NodePath("HBoxContainer/Buttons/TwoPointFiveBB")
+ThreeBigBlindButton = NodePath("HBoxContainer/Buttons/ThreeBB")
+FourBigBlindButton = NodePath("HBoxContainer/Buttons/FourBB")
+FiveBigBlindButton = NodePath("HBoxContainer/Buttons/FiveBB")
+OneFourthPotButton = NodePath("HBoxContainer/Buttons/OneFourthPot")
+HalfPotButton = NodePath("HBoxContainer/Buttons/HalfPot")
+TwoThirdsPotButton = NodePath("HBoxContainer/Buttons/TwoThirdsPot")
+OnePotButton = NodePath("HBoxContainer/Buttons/OnePot")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 64
+alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="TwoPointFiveBB" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "2.5 BB
+"
+
+[node name="ThreeBB" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "3 BB"
+
+[node name="FourBB" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "4 BB"
+
+[node name="FiveBB" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "5 BB"
+
+[node name="OneFourthPot" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "1/4 Pot"
+
+[node name="HalfPot" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "1/2 Pot"
+
+[node name="TwoThirdsPot" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "2/3 Pot"
+
+[node name="OnePot" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "1 Pot"
+
+[node name="AllIn" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "All In"
+
+[node name="ValueDisplay" type="HBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="HScrollBar" type="HScrollBar" parent="HBoxContainer/ValueDisplay"]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 1
+rounded = true
+
+[node name="LineEdit" type="LineEdit" parent="HBoxContainer/ValueDisplay"]
+layout_mode = 2
+script = ExtResource("2_q04do")

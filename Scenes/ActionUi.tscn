@@ -1,0 +1,76 @@
+[gd_scene load_steps=4 format=3 uid="uid://2riiblfao2ni"]
+
+[ext_resource type="Script" path="res://Scripts/Ui/ActionUi.cs" id="1_uf4i7"]
+[ext_resource type="PackedScene" uid="uid://wdmxn3vw3x5h" path="res://Scenes/RaiseUi.tscn" id="2_5hovg"]
+
+[sub_resource type="Theme" id="Theme_as6wb"]
+
+[node name="ActionUi" type="Control" node_paths=PackedStringArray("RaiseUi", "FoldButton", "CheckButton", "CallButton", "RaiseButton")]
+layout_mode = 3
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("1_uf4i7")
+RaiseUi = NodePath("VBoxContainer/RaiseUiContainer/RaiseUi")
+FoldButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/Fold")
+CheckButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/Check")
+CallButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/Call")
+RaiseButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/Raise")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -31.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 2
+
+[node name="RaiseUiContainer" type="MarginContainer" parent="VBoxContainer"]
+clip_contents = true
+layout_mode = 2
+
+[node name="RaiseUi" parent="VBoxContainer/RaiseUiContainer" instance=ExtResource("2_5hovg")]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 200
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 200
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer"]
+layout_mode = 2
+theme = SubResource("Theme_as6wb")
+theme_override_constants/separation = 100
+alignment = 1
+
+[node name="Fold" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+text = "Fold"
+
+[node name="Check" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+text = "Check"
+
+[node name="Call" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+text = "Call"
+
+[node name="Raise" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+text = "Raise"

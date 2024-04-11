@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
@@ -5,37 +6,47 @@ using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Cards;
 
-public class BaseCard 
+public class BaseCard: IComparable<BaseCard>
 {
-	public ObservableProperty<Enums.Suit> Suit;
-	public Enums.Color Color;
-	public Enums.Rank Rank;
+	public ObservableProperty<Enums.CardSuit> Suit;
+	public Enums.CardColor CardColor;
+	public Enums.CardRank Rank;
 	public Enums.CardFace Face;
 
-	public BaseCard(Enums.Suit suit, Enums.Rank rank, Enums.CardFace face)
+	public BaseCard(Enums.CardSuit cardSuit, Enums.CardRank rank, Enums.CardFace face)
 	{
-		Suit = new ObservableProperty<Enums.Suit>(nameof(Suit), suit);
+		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), cardSuit);
 		Suit.DetailedValueChanged += OnSuitChanged;
 		Suit.FireValueChangeEvents();
 		Rank = rank;
 		Face = face;
 	}
 
-	private void OnSuitChanged(object o, ValueChangedEventDetailedArgs<Enums.Suit> args)
+	private void OnSuitChanged(object o, ValueChangedEventDetailedArgs<Enums.CardSuit> args)
 	{
 		switch (Suit.Value)
 		{
-			case Enums.Suit.Clubs:
-			case Enums.Suit.Spades:
-				Color = Enums.Color.Black;
+			case Enums.CardSuit.Clubs:
+			case Enums.CardSuit.Spades:
+				CardColor = Enums.CardColor.Black;
 				break;
-			case Enums.Suit.Hearts:
-			case Enums.Suit.Diamonds:
-				Color = Enums.Color.Red;
+			case Enums.CardSuit.Hearts:
+			case Enums.CardSuit.Diamonds:
+				CardColor = Enums.CardColor.Red;
 				break;
 			default:
-				Color = Enums.Color.None;
+				CardColor = Enums.CardColor.None;
 				break;
 		}
+	}
+
+	public virtual int CompareTo(BaseCard other)
+	{
+		return 0;
+	}
+
+	public override string ToString()
+	{
+		return $"{Rank} of {Suit.Value}, faced {Face}";
 	}
 }

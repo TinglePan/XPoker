@@ -1,8 +1,8 @@
 [gd_scene load_steps=2 format=3 uid="uid://nko5a5mn6ufg"]
 
-[ext_resource type="PackedScene" uid="uid://2riiblfao2ni" path="res://Scenes/BetUi.tscn" id="1_4ijci"]
+[ext_resource type="PackedScene" uid="uid://2riiblfao2ni" path="res://Scenes/ActionUi.tscn" id="1_4ijci"]
 
-[node name="Control" type="Control"]
+[node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,5 +10,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="BetUi" parent="." instance=ExtResource("1_4ijci")]
+[node name="ActionUi" parent="." instance=ExtResource("1_4ijci")]
 layout_mode = 1
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Dbg"

@@ -1,15 +1,20 @@
 using System.Collections.Generic;
 using Godot;
+using XCardGame.Scripts.Common;
+using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts;
 
 public partial class GameMgr : Node
 {
 	[Export] public PackedScene MainScene;
+	[Export] public PackedScene PlayerPrefab;
 	
-	public Player MainPlayer;
+	public PokerPlayer PlayerControlledPlayer;
+	
 	public Node CurrentScene;
-	public Match CurrentMatch;
+	public Hand CurrentHand;
+	public ActionUi ActionUi;
 
 	private bool IsGameStarted;
 	
@@ -32,22 +37,50 @@ public partial class GameMgr : Node
 	public void StartGame()
 	{
 		ChangeScene(MainScene);
+		ActionUi = GetNode<ActionUi>("/root/Main/ActionUi");
+		ActionUi.Hide();
+		ActionUi.SetProcess(false);
+		StartHand();
+		var dbgButton = GetNode<Button>("/root/Main/Button");
+		dbgButton.Pressed += () => CurrentHand.Start();
 	}
 
-	public void StartMatch()
+	public void StartHand()
 	{
-		CurrentMatch = new Match();
-		CurrentMatch.Setup(new Dictionary<string, object>()
+		CurrentHand = new Hand();
+		AddChild(CurrentHand);
+		
+		PlayerControlledPlayer = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as PokerPlayer;
+		PlayerControlledPlayer?.Setup(new Dictionary<string, object>()
 		{
-			{ "players", new List<Player> { MainPlayer } }
+			{ "creature", new Creature("you", 100) },
+			{ "hand", CurrentHand },
+			{ "brainScriptPath", "res://Scripts/Brain/PlayerBrain.cs" }
 		});
+		var opponent = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as PokerPlayer;
+		opponent?.Setup(new Dictionary<string, object>()
+		{
+			{ "creature", new Creature("cpu", 100) },
+			{ "hand", CurrentHand },
+			{ "brainScriptPath", "res://Scripts/Brain/Ai/BaseAi.cs" }
+		});
+		
+		CurrentHand.Setup(new Dictionary<string, object>()
+		{
+			{ "players", new List<PokerPlayer>
+				{
+					PlayerControlledPlayer,
+					opponent
+				} 
+			}
+		});
+		// CurrentMatch.Run();
 	}
 
 	public void ChangeScene(PackedScene scene)
 	{
-		var node = scene.Instantiate<Node>();
 		var root = GetTree().Root;
-		root.AddChild(node);
+		var node = Utils.InstantiatePrefab(scene, root);
 		if (CurrentScene != null)
 		{
 			root.RemoveChild(CurrentScene);
@@ -55,5 +88,24 @@ public partial class GameMgr : Node
 		}
 		CurrentScene = node;
 	}
+
+	public ActionUi OpenActionUi(Dictionary<string, object> context, ActionUi.ConfirmActionEventHandler onConfirmAction)
+	{
+		ActionUi.SetProcess(true);
+		ActionUi.Show();
+		ActionUi.Setup(context);
+		ActionUi.ConfirmAction += onConfirmAction;
+		return ActionUi;
+	}
 	
+	public void CloseActionUi()
+	{
+		ActionUi.Hide();
+		ActionUi.SetProcess(false);
+	}
+
+	public void RunMatch()
+	{
+		CurrentHand.Start();
+	}
 }

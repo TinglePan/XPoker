@@ -2,26 +2,25 @@
 
 public static class Enums
 {
-    public enum Suit
+    public enum CardSuit
     {
         None,
-        Spades,
-        Hearts,
         Diamonds,
         Clubs,
+        Hearts,
+        Spades,
     }
 
-    public enum Color
+    public enum CardColor
     {
         None,
         Red,
         Black,
     }
     
-    public enum Rank
+    public enum CardRank
     {
         None,
-        Ace = 1,
         Two = 2,
         Three = 3,
         Four = 4,
@@ -34,13 +33,37 @@ public static class Enums
         Jack = 11,
         Queen = 12,
         King = 13,
-        BlackJoker = 14,
-        RedJoker = 15,
+        Ace = 14,
+        BlackJoker = 15,
+        RedJoker = 16,
     }
 
     public enum CardFace
     {
         Up,
         Down
+    }
+    
+    public enum HandRank
+    {
+        HighCard,
+        Pair,
+        TwoPair,
+        ThreeOfAKind,
+        Straight,
+        Flush,
+        FullHouse,
+        FourOfAKind,
+        StraightFlush,
+        RoyalFlush
+    }
+    
+    public enum PlayerAction
+    {
+        None,
+        Fold,
+        Check,
+        Call,
+        Raise
     }
 }

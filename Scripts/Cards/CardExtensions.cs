@@ -5,55 +5,55 @@ namespace XCardGame.Scripts.Cards;
 
 public static class CardExtensions
 {
-    public static string ToFriendlyString(this Enums.Suit cardSuit)
+    public static string ToFriendlyString(this Enums.CardSuit cardCardSuit)
     {
-        switch (cardSuit)
+        switch (cardCardSuit)
         {
-            case Enums.Suit.Clubs:
+            case Enums.CardSuit.Clubs:
                 return "\u2663"; // ♣
-            case Enums.Suit.Diamonds:
+            case Enums.CardSuit.Diamonds:
                 return "\u2666"; // ♦
-            case Enums.Suit.Hearts:
+            case Enums.CardSuit.Hearts:
                 return "\u2665"; // ♥
-            case Enums.Suit.Spades:
+            case Enums.CardSuit.Spades:
                 return "\u2660"; // ♠
             default:
                 return "\u0000"; // �
         }
     }
     
-    public static string ToFriendlyString(this Enums.Rank cardRank)
+    public static string ToFriendlyString(this Enums.CardRank cardCardRank)
     {
-        switch (cardRank)
+        switch (cardCardRank)
         {
-            case Enums.Rank.Two:
+            case Enums.CardRank.Two:
                 return "2";
-            case Enums.Rank.Three:
+            case Enums.CardRank.Three:
                 return "3";
-            case Enums.Rank.Four:
+            case Enums.CardRank.Four:
                 return "4";
-            case Enums.Rank.Five:
+            case Enums.CardRank.Five:
                 return "5";
-            case Enums.Rank.Six:
+            case Enums.CardRank.Six:
                 return "6";
-            case Enums.Rank.Seven:
+            case Enums.CardRank.Seven:
                 return "7";
-            case Enums.Rank.Eight:
+            case Enums.CardRank.Eight:
                 return "8";
-            case Enums.Rank.Nine:
+            case Enums.CardRank.Nine:
                 return "9";
-            case Enums.Rank.Ten:
+            case Enums.CardRank.Ten:
                 return "10";
-            case Enums.Rank.Jack:
+            case Enums.CardRank.Jack:
                 return "J";
-            case Enums.Rank.Queen:
+            case Enums.CardRank.Queen:
                 return "Q";
-            case Enums.Rank.King:
+            case Enums.CardRank.King:
                 return "K";
-            case Enums.Rank.Ace:
+            case Enums.CardRank.Ace:
                 return "A";
-            case Enums.Rank.BlackJoker:
-            case Enums.Rank.RedJoker:
+            case Enums.CardRank.BlackJoker:
+            case Enums.CardRank.RedJoker:
                 return "Joker";
             default:
                 throw new ArgumentException("Invalid cardRank");

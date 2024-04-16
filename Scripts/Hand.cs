@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
@@ -30,13 +33,14 @@ public partial class Hand: Node, ISetup
     public int CreateSidePotAtAmount;
     public int RoundCount;
     public Pot Pot;
-    public List<BaseCard> CommunityCards;
+    public ObservableCollection<BaseCard> CommunityCards;
     
     public bool IsHeadUp => Players.Count <= 2;
     
     public int ActingPlayerCount => Players.Count(p => p.CanAct);
+    public int InHandPlayerCount => Players.Count(p => p.IsInHand);
     public int RoundStartPlayerIndex => NextNActingPlayerFrom(ButtonPlayerIndex, 1);
-    public int RoundMinRaiseToAmount => RoundCallAmount + RoundPreviousRaiseAmount; 
+    public int RoundMinRaiseToAmount => Mathf.Max(RoundCallAmount + RoundPreviousRaiseAmount, BigBlindAmount); 
 
     public override void _Ready()
     {
@@ -55,7 +59,7 @@ public partial class Hand: Node, ISetup
         CreateSidePotAtAmount = 0;
         RoundCount = 0;
         Pot = new Pot(this);
-        CommunityCards = new List<BaseCard>();
+        CommunityCards = new ObservableCollection<BaseCard>();
     }
 
     public virtual void Setup(Dictionary<string, object> args)
@@ -76,26 +80,23 @@ public partial class Hand: Node, ISetup
     public async void Start()
     {
         Reset();
+        foreach (var player in Players)
+        {
+            player.Reset();
+        }
 
-        while (RoundCount <= Configuration.RiverRoundIndex && ActingPlayerCount > 1)
+        while (RoundCount <= Configuration.RiverRoundIndex && InHandPlayerCount > 1)
         {
             await StartBettingRound(RoundCount);
             RoundCount++;
         }
-        if (RoundCount > Configuration.RiverRoundIndex)
-        {
-            ShowDown();
-        }
-        else
-        {
-            GD.Print($"Win by {NextNActingPlayerFrom(ButtonPlayerIndex, 0)}");
-        }
+
+        HandDone();
         EmitSignal(SignalName.Finished);
     }
     
     public void Reset()
     {
-        
         foreach (var player in Players)
         {
             player.Reset();
@@ -127,8 +128,9 @@ public partial class Hand: Node, ISetup
             {
                 for (int j = 0; j < Players.Count; j++)
                 {
-                    var card = DealingDeck.Deal();
                     var player = Players[ButtonPlayerIndex + j];
+                    bool isFaceDown = player != _gameMgr.PlayerControlledPlayer; 
+                    var card = DealingDeck.Deal(isFaceDown);
                     player.AddHoleCard(card);
                     GD.Print($"Dealt hole card {card} to player {player}.");
                 }
@@ -166,8 +168,8 @@ public partial class Hand: Node, ISetup
             ActionPlayerIndex = RoundStartPlayerIndex;
         }
         
-        while (true) {
-            if (Players[ActionPlayerIndex].RoundBetAmount < RoundCallAmount || RoundCallAmount == 0)
+        while (ActingPlayerCount > 0) {
+            if (Players[ActionPlayerIndex].RoundBetAmount.Value < RoundCallAmount || RoundCallAmount == 0)
             {
                 await AskForPlayerAction(Players[ActionPlayerIndex]);
             }
@@ -175,8 +177,24 @@ public partial class Hand: Node, ISetup
             if (ActionPlayerIndex == LastBetPlayerIndex) break;
         }
     }
+
+    public void HandDone()
+    {
+        if (RoundCount > Configuration.RiverRoundIndex)
+        {
+            var handStrengths = ShowDown();
+            Pot.Settlement(handStrengths);
+        }
+        else
+        {
+            Pot.Settlement(new Dictionary<PokerPlayer, HandStrength>()
+            {
+                { Players[NextNActingPlayerFrom(ButtonPlayerIndex, 0)], null }
+            });
+        }
+    }
     
-    public void ShowDown()
+    public Dictionary<PokerPlayer, HandStrength> ShowDown()
     {
         // Play game
         // GD.Print("Showdown:");
@@ -190,25 +208,18 @@ public partial class Hand: Node, ISetup
         //     GD.Print($"{player} holds: {string.Join(", ", player.HoleCards)}");
         // }
         
-        var playerEvaluator = new HandEvaluator(Players[0].HoleCards, CommunityCards, 5, 0, 2);
+        var playerEvaluator = new HandEvaluator(Players[0].HoleCards.ToList(), CommunityCards.ToList(), 5, 0, 2);
         var playerBestHand = playerEvaluator.EvaluateBestHand();
-        var opponentEvaluator = new HandEvaluator(Players[1].HoleCards, CommunityCards, 5, 0, 2);
+        var opponentEvaluator = new HandEvaluator(Players[1].HoleCards.ToList(), CommunityCards.ToList(), 5, 0, 2);
         var opponentBestHand = opponentEvaluator.EvaluateBestHand();
         GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
         GD.Print($"{Players[1]} Best Hand: {opponentBestHand.Rank}, {string.Join(",", opponentBestHand.PrimaryCards)}, Kickers: {string.Join(",", opponentBestHand.Kickers)}");
-        var compareRes = playerBestHand.CompareTo(opponentBestHand);
-        if (compareRes > 0)
+        Dictionary<PokerPlayer, HandStrength> handStrengths = new Dictionary<PokerPlayer, HandStrength>
         {
-            GD.Print($"{Players[0]} wins.");
-        }
-        else if (compareRes < 0)
-        {
-            GD.Print($"{Players[0]} wins.");
-        }
-        else
-        {
-            GD.Print("Draw.");
-        }
+            { Players[0], playerBestHand },
+            { Players[1], opponentBestHand }
+        };
+        return handStrengths;
     }
 
 
@@ -220,7 +231,7 @@ public partial class Hand: Node, ISetup
     public void OnPlayerRaise(PokerPlayer p, int amountToRaise)
     {
         Pot.AddBet(p, amountToRaise);
-        RoundCallAmount += amountToRaise;
+        RoundCallAmount = p.RoundBetAmount.Value;
         RoundPreviousRaiseAmount = amountToRaise;
         LastBetPlayerIndex = Players.IndexOf(p);
     }
@@ -231,7 +242,11 @@ public partial class Hand: Node, ISetup
         {
             RoundHasShortAllIn = true;
         }
-        Pot.CreateSidePot(allInAmount);
+        Pot.CreateSidePot(p.NChipsInPot.Value);
+    }
+
+    public void OnPlayerWin(PokerPlayer p)
+    {
     }
 
     public int NextNActingPlayerFrom(int fromIndex, int n)
@@ -250,7 +265,6 @@ public partial class Hand: Node, ISetup
             offset++;
             if (offset >= Players.Count && i == 0)
             {
-                GD.PrintErr("No acting player found.");
                 break;
             }
         }

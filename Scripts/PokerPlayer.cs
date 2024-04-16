@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Brain;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts;
 
@@ -40,17 +42,16 @@ public partial class PokerPlayer: Node, ISetup
     private BaseBrain _brain;
     public Creature Creature;
     public int PositionIndex;
-    public int HandBetAmount;
-    public int RoundBetAmount;
+    public ObservableProperty<int> RoundBetAmount;
     public int RoundLastBetAmount;
     public Enums.PlayerAction RoundLastAction;
-    public int NChipsInHand;
-    public int NChipsInPot;
-    public List<BaseCard> HoleCards;
+    public ObservableProperty<int> NChipsInHand;
+    public ObservableProperty<int> NChipsInPot;
+    public ObservableCollection<BaseCard> HoleCards;
     
     public bool IsInHand => RoundLastAction != Enums.PlayerAction.Fold;
-    public bool HasAllIn => NChipsInHand == 0 && RoundBetAmount > 0;
-    public bool CanAct => NChipsInHand > 0 && IsInHand;
+    public bool HasAllIn => NChipsInHand.Value == 0 && RoundBetAmount.Value > 0;
+    public bool CanAct => NChipsInHand.Value > 0 && IsInHand;
 
     public void Setup(Dictionary<string, object> args)
     {
@@ -72,44 +73,42 @@ public partial class PokerPlayer: Node, ISetup
         
         PositionIndex = _hand.Players.IndexOf(this);
         
-        HandBetAmount = 0;
-        RoundBetAmount = 0;
+        RoundBetAmount = new ObservableProperty<int>(nameof(RoundBetAmount), 0);
         RoundLastBetAmount = 0;
         RoundLastAction = Enums.PlayerAction.None;
         
-        NChipsInHand = Creature.NChips;
-        NChipsInPot = 0;
-        HoleCards = new List<BaseCard>();
+        NChipsInHand = new ObservableProperty<int>(nameof(NChipsInHand), Creature.NChips);
+        NChipsInPot = new ObservableProperty<int>(nameof(NChipsInPot), 0);
+        HoleCards = new ObservableCollection<BaseCard>();
     }
     
     public void Reset()
     {
         ResetRoundState();
-        HandBetAmount = 0;
         HoleCards.Clear();
+        NChipsInPot.Value = 0;
     }
     
     public void ResetRoundState()
     {
-        RoundBetAmount = 0;
+        RoundBetAmount.Value = 0;
         RoundLastBetAmount = 0;
         RoundLastAction = Enums.PlayerAction.None;
-        NChipsInPot = 0;
     }
     
     public void Call()
     {
         RoundLastAction = Enums.PlayerAction.Call;
-        var amountToCall = _hand.RoundCallAmount - RoundBetAmount;
-        if (amountToCall >= NChipsInHand)
+        var amountToCall = _hand.RoundCallAmount - RoundBetAmount.Value;
+        if (amountToCall >= NChipsInHand.Value)
         {
-            amountToCall = NChipsInHand;
+            amountToCall = NChipsInHand.Value;
             EmitSignal(SignalName.AfterAllIn, this);
         }
-        NChipsInHand -= amountToCall;
-        RoundBetAmount = amountToCall;
+        NChipsInHand.Value -= amountToCall;
+        RoundBetAmount.Value = amountToCall;
         RoundLastBetAmount = amountToCall;
-        NChipsInPot += amountToCall;
+        NChipsInPot.Value += amountToCall;
         OnCall?.Invoke(this, amountToCall);
         EmitSignal(SignalName.AfterCall, this, amountToCall);
         EmitSignal(SignalName.AfterAction, this);
@@ -124,35 +123,37 @@ public partial class PokerPlayer: Node, ISetup
         else
         {
             RoundLastAction = Enums.PlayerAction.None;
-            var amountToBet = amount - RoundBetAmount;
-            if (amountToBet >= NChipsInHand)
+            var amountToBet = amount - RoundBetAmount.Value;
+            if (amountToBet >= NChipsInHand.Value)
             {
-                amountToBet = NChipsInHand;
+                amountToBet = NChipsInHand.Value;
             }
-            NChipsInHand -= amountToBet;
-            RoundBetAmount += amountToBet;
+            NChipsInHand.Value -= amountToBet;
+            RoundBetAmount.Value += amountToBet;
             RoundLastBetAmount = amountToBet;
-            NChipsInPot += amountToBet;
+            NChipsInPot.Value += amountToBet;
+            OnRaise?.Invoke(this, amountToBet);
+            EmitSignal(SignalName.AfterRaise, this);
         }
     }
     
     public void RaiseTo(int raiseTo)
     {
         RoundLastAction = Enums.PlayerAction.Raise;
-        var amountToRaise = raiseTo - RoundBetAmount;
-        if (amountToRaise >= NChipsInHand)
+        var amountToRaise = raiseTo - RoundBetAmount.Value;
+        if (amountToRaise >= NChipsInHand.Value)
         {
-            amountToRaise = NChipsInHand;
-            OnAllIn?.Invoke(this, NChipsInHand);
+            amountToRaise = NChipsInHand.Value;
+            OnAllIn?.Invoke(this, NChipsInHand.Value);
             EmitSignal(SignalName.AfterAllIn, this);
-        } else if (amountToRaise > NChipsInHand)
+        } else if (amountToRaise > NChipsInHand.Value)
         {
             GD.PrintErr("Raise amount exceeds player's chip count. This case should be filtered out by ui.");
         }
-        NChipsInHand -= amountToRaise;
-        RoundBetAmount += amountToRaise;
+        NChipsInHand.Value -= amountToRaise;
+        RoundBetAmount.Value += amountToRaise;
         RoundLastBetAmount = amountToRaise;
-        NChipsInPot += amountToRaise;
+        NChipsInPot.Value += amountToRaise;
         OnRaise?.Invoke(this, amountToRaise);
         EmitSignal(SignalName.AfterRaise, this);
         EmitSignal(SignalName.AfterAction, this);
@@ -199,7 +200,7 @@ public partial class PokerPlayer: Node, ISetup
 
     public bool WillBeAllIn(int amount)
     {
-        return amount >= NChipsInHand;
+        return amount >= NChipsInHand.Value;
     }
 
     public override string ToString()

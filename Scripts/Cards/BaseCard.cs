@@ -11,7 +11,7 @@ public class BaseCard: IComparable<BaseCard>
 	public ObservableProperty<Enums.CardSuit> Suit;
 	public Enums.CardColor CardColor;
 	public Enums.CardRank Rank;
-	public Enums.CardFace Face;
+	public ObservableProperty<Enums.CardFace> Face;
 
 	public BaseCard(Enums.CardSuit cardSuit, Enums.CardRank rank, Enums.CardFace face)
 	{
@@ -19,7 +19,7 @@ public class BaseCard: IComparable<BaseCard>
 		Suit.DetailedValueChanged += OnSuitChanged;
 		Suit.FireValueChangeEvents();
 		Rank = rank;
-		Face = face;
+		Face = new ObservableProperty<Enums.CardFace>(nameof(Face), face);
 	}
 
 	private void OnSuitChanged(object o, ValueChangedEventDetailedArgs<Enums.CardSuit> args)
@@ -47,6 +47,6 @@ public class BaseCard: IComparable<BaseCard>
 
 	public override string ToString()
 	{
-		return $"{Rank} of {Suit.Value}, faced {Face}";
+		return $"{Rank} of {Suit.Value}, faced {Face.Value}";
 	}
 }

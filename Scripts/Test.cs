@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using Godot;
+using Godot.Collections;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts;
+
+
 
 public partial class Test : Node
 {

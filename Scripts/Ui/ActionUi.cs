@@ -20,6 +20,7 @@ public partial class ActionUi: BaseUi, ISetup
     [Export] public Button RaiseButton;
 
     private GameMgr _gameMgr;
+    private Dictionary<string, object> _args;
     
 
 
@@ -29,6 +30,11 @@ public partial class ActionUi: BaseUi, ISetup
         CheckButton.Pressed += Check;
         CallButton.Pressed += Call;
         RaiseButton.Pressed += Raise;
+        RaiseUi.Exit += amount =>
+        {
+            EmitSignal(SignalName.ConfirmAction, (int)Enums.PlayerAction.Raise, amount);
+            RaiseUi.Hide();
+        };
         _gameMgr = GetNode<GameMgr>("/root/GameMgr");
     }
 
@@ -47,14 +53,15 @@ public partial class ActionUi: BaseUi, ISetup
         EmitSignal(SignalName.ConfirmAction, (int)Enums.PlayerAction.Call, 0);
     }
 
-    public async void Raise()
+    public void Raise()
     {
-        EmitSignal(SignalName.ConfirmAction, (int)Enums.PlayerAction.Raise, RaiseUi.Amount);
+        RaiseUi.Setup(_args);
+        RaiseUi.Show();
     }
 
     public void Setup(Dictionary<string, object> args)
     {
-        RaiseUi.Setup(args);
+        _args = args;
         var hand = (Hand)args["hand"];
         var player = (PokerPlayer)args["player"];
         var callAmount = hand.RoundCallAmount;
@@ -68,7 +75,8 @@ public partial class ActionUi: BaseUi, ISetup
         else
         {
             CallButton.Show();
-            CallButton.Text = player.WillBeAllIn(callAmount) ? "All in to call": $"{callAmount} to call";
+            var toCallAmount = callAmount - player.RoundBetAmount.Value;
+            CallButton.Text = player.WillBeAllIn(toCallAmount) ? "All in to call": $"{toCallAmount} to call";
             CheckButton.Hide();
         }
 
@@ -87,5 +95,6 @@ public partial class ActionUi: BaseUi, ISetup
                 RaiseButton.Text = "All In to " + RaiseButton.Text;
             }
         }
+        RaiseUi.Hide();
     }
 }

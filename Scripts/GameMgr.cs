@@ -37,7 +37,7 @@ public partial class GameMgr : Node
 	public void StartGame()
 	{
 		ChangeScene(MainScene);
-		ActionUi = GetNode<ActionUi>("/root/Main/ActionUi");
+		ActionUi = GetNode<ActionUi>("/root/Main/BottomBoxUi/ActionUi");
 		ActionUi.Hide();
 		ActionUi.SetProcess(false);
 		StartHand();
@@ -50,12 +50,22 @@ public partial class GameMgr : Node
 		CurrentHand = new Hand();
 		AddChild(CurrentHand);
 		
+		var communityCardContainer = GetNode<CommunityCardContainer>("/root/Main/CommunityCardContainer");
+		communityCardContainer.Setup(new Dictionary<string, object>
+		{
+			{ "hand", CurrentHand }
+		});
 		PlayerControlledPlayer = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as PokerPlayer;
 		PlayerControlledPlayer?.Setup(new Dictionary<string, object>()
 		{
 			{ "creature", new Creature("you", 100) },
 			{ "hand", CurrentHand },
 			{ "brainScriptPath", "res://Scripts/Brain/PlayerBrain.cs" }
+		});
+		var playerTab = GetNode<PlayerTab>("/root/Main/Player");
+		playerTab.Setup(new Dictionary<string, object>()
+		{
+			{ "player", PlayerControlledPlayer }
 		});
 		var opponent = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as PokerPlayer;
 		opponent?.Setup(new Dictionary<string, object>()
@@ -64,7 +74,11 @@ public partial class GameMgr : Node
 			{ "hand", CurrentHand },
 			{ "brainScriptPath", "res://Scripts/Brain/Ai/BaseAi.cs" }
 		});
-		
+		var opponentTab = GetNode<PlayerTab>("/root/Main/Opponent");
+		opponentTab.Setup(new Dictionary<string, object>()
+		{
+			{ "player", opponent }
+		});
 		CurrentHand.Setup(new Dictionary<string, object>()
 		{
 			{ "players", new List<PokerPlayer>
@@ -74,6 +88,12 @@ public partial class GameMgr : Node
 				} 
 			}
 		});
+		CurrentHand.Finished += () =>
+		{
+			PlayerControlledPlayer?.Reset();
+			CurrentHand.Reset();
+			opponent?.Reset();
+		};
 		// CurrentMatch.Run();
 	}
 
@@ -89,13 +109,11 @@ public partial class GameMgr : Node
 		CurrentScene = node;
 	}
 
-	public ActionUi OpenActionUi(Dictionary<string, object> context, ActionUi.ConfirmActionEventHandler onConfirmAction)
+	public void OpenActionUi(Dictionary<string, object> context)
 	{
 		ActionUi.SetProcess(true);
 		ActionUi.Show();
 		ActionUi.Setup(context);
-		ActionUi.ConfirmAction += onConfirmAction;
-		return ActionUi;
 	}
 	
 	public void CloseActionUi()
@@ -104,7 +122,7 @@ public partial class GameMgr : Node
 		ActionUi.SetProcess(false);
 	}
 
-	public void RunMatch()
+	public void Run()
 	{
 		CurrentHand.Start();
 	}

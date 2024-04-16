@@ -8,6 +8,9 @@ namespace XCardGame.Scripts.Ui;
 
 public partial class RaiseUi: BaseUi, ISetup
 {
+    [Signal]
+    public delegate void ExitEventHandler(int amount);
+    
     [Export] public NumberLineEdit AmountLineEdit;
     [Export] public HScrollBar AmountBar;
     
@@ -26,6 +29,9 @@ public partial class RaiseUi: BaseUi, ISetup
     [Export] public BaseButton HalfPotButton;
     [Export] public BaseButton TwoThirdsPotButton;
     [Export] public BaseButton OnePotButton;
+    
+    [Export] public BaseButton ConfirmButton;
+    [Export] public BaseButton CancelButton;
 
     private int _startAmount;
     // private int _potAmount;
@@ -35,6 +41,7 @@ public partial class RaiseUi: BaseUi, ISetup
     private int _actualLimit;
     
     private ObservableProperty<int> _amount;
+    private Hand _hand;
 
     private Dictionary<BaseButton, float> _unOpenedButtonsRatio;
     private Dictionary<BaseButton, float> _openedButtonsRatio;
@@ -68,36 +75,37 @@ public partial class RaiseUi: BaseUi, ISetup
             { OnePotButton, 1f }
         };
         _buttonPressedCallbacks = new Dictionary<BaseButton, Action>();
+        ConfirmButton.Pressed += () => EmitSignal(SignalName.Exit, _amount.Value);
+        CancelButton.Pressed += () => EmitSignal(SignalName.Exit, 0);
     }
 
     public void Setup(Dictionary<string, object> args)
     {
-        var hand = (Hand)args["hand"];
+        _hand = (Hand)args["hand"];
         var player = (PokerPlayer)args["player"];
-        var bigBlindAmount = hand.BigBlindAmount;
-        var potAmount = hand.Pot.Total;
-        var playerNChips = player.NChipsInHand;
+        var bigBlindAmount = _hand.BigBlindAmount;
+        var potAmount = _hand.Pot.Total;
+        var canRaiseToAmount = player.NChipsInHand.Value + player.RoundBetAmount.Value;
         var limit = args.TryGetValue("limit", out var arg) ? (int)arg : 0;
-        _startAmount = limit != 0 ?  Mathf.Min(hand.RoundMinRaiseToAmount, limit) : hand.RoundMinRaiseToAmount;
-        _actualLimit = limit != 0 ? Mathf.Min(playerNChips, limit) : playerNChips;
+        _startAmount = limit != 0 ? Mathf.Min(_hand.RoundMinRaiseToAmount, limit) : _hand.RoundMinRaiseToAmount;
+        _actualLimit = limit != 0 ? Mathf.Min(canRaiseToAmount, limit) : canRaiseToAmount;
         
-        var hasOpened = hand.RoundPreviousRaiseAmount > 0;
+        var hasOpened = _hand.RoundPreviousRaiseAmount > 0;
 
-        if (_startAmount >= playerNChips)
+        if (_startAmount >= canRaiseToAmount)
         {
-            _amount.Value = playerNChips;
+            _amount.Value = canRaiseToAmount;
             AmountLineEdit.Editable = false;
             AmountLineEdit.Setup(new Dictionary<string, object>()
             {
-                { "min", playerNChips },
-                { "max", playerNChips } 
+                { "min", canRaiseToAmount },
+                { "max", canRaiseToAmount } 
             });
             BetButtons.Hide();
             AmountBar.Hide();
         }
         else
         {
-            _amount.Value = _startAmount;
             AmountLineEdit.Editable = true;
             AmountLineEdit.Setup(new Dictionary<string, object>()
             {
@@ -108,6 +116,7 @@ public partial class RaiseUi: BaseUi, ISetup
             AmountBar.Show();
             AmountBar.MinValue = _startAmount;
             AmountBar.MaxValue = _actualLimit;
+            _amount.Value = _startAmount;
             if (hasOpened)
             {
                 foreach (var button in _unOpenedButtonsRatio.Keys)
@@ -132,27 +141,44 @@ public partial class RaiseUi: BaseUi, ISetup
                     button.Hide();
                 }
             }
-            SetupBetButton(AllInButton, _actualLimit);
-            AllInButton.Text = _actualLimit < playerNChips ? "Max" : "All In";
+            Action callback = () => _amount.Value = _actualLimit;
+            if (_buttonPressedCallbacks.TryGetValue(AllInButton, out var pressedCallback))
+            {
+                AllInButton.Pressed -= pressedCallback;
+            }
+            AllInButton.Pressed += callback;
+            AllInButton.Show();
+            AllInButton.Text = _actualLimit < canRaiseToAmount ? "Max" : "All In";
+            _buttonPressedCallbacks[AllInButton] = callback;
         }
     }
     
     private void OnAmountChanged(object sender, ValueChangedEventDetailedArgs<int> args)
     {
         AmountLineEdit.Value = args.NewValue;
-        AmountBar.Value = Mathf.Clamp(args.NewValue, _startAmount, _actualLimit);
+        AmountBar.Value = args.NewValue;
+        foreach (var button in _unOpenedButtonsRatio.Keys)
+        {
+            var betAmount = (int)(_hand.BigBlindAmount * _unOpenedButtonsRatio[button]);
+            button.Disabled = _amount.Value + betAmount > _actualLimit;
+        }
+        foreach (var button in _openedButtonsRatio.Keys)
+        {
+            var betAmount = (int)(_hand.Pot.Total * _openedButtonsRatio[button]);
+            button.Disabled = _amount.Value + betAmount > _actualLimit;
+        }
     }
 
     private void SetupBetButton(BaseButton button, int amount)
     {
-        Action callback = () => _amount.Value = amount;
+        Action callback = () => _amount.Value = Mathf.Min(amount + _amount.Value, _actualLimit);
         if (_buttonPressedCallbacks.TryGetValue(button, out var pressedCallback))
         {
             button.Pressed -= pressedCallback;
         }
         button.Pressed += callback;
         button.Show();
-        button.Disabled = amount > _actualLimit || amount < _startAmount;
+        button.Disabled = _amount.Value + amount > _actualLimit;
         _buttonPressedCallbacks[button] = callback;
     }
 }

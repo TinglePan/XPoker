@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
 
@@ -31,6 +32,7 @@ public class Deck
                 int k = rng.Next(n + 1);
                 (CardList[k], CardList[n]) = (CardList[n], CardList[k]);
             }
+
         }
         
         public void Reset()
@@ -42,7 +44,7 @@ public class Deck
         public BaseCard Deal(bool facedDown = true)
         {
             var card = CardList[CurrentTopIndex++];
-            card.Face = facedDown ? Enums.CardFace.Down : Enums.CardFace.Up;
+            card.Face.Value = facedDown ? Enums.CardFace.Down : Enums.CardFace.Up;
             return card;
         }
     

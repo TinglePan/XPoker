@@ -6,19 +6,28 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Brain;
 
-public partial class PlayerBrain: BaseBrain, ISetup
+public partial class PlayerBrain: BaseBrain
 {
     private GameMgr _gameMgr;
+    private ActionUi _actionUi;
 
     public override void _Ready()
     {
         _gameMgr = GetNode<GameMgr>("/root/GameMgr");
+        _actionUi = _gameMgr.ActionUi;
+        _actionUi.ConfirmAction += OnConfirmAction;
+    }
+
+    public override void _ExitTree()
+    {
+        base._ExitTree();
+        _actionUi.ConfirmAction -= OnConfirmAction;
     }
 
     public override async Task AskForAction(Dictionary<string, object> context)
     {
-        var actionUi = _gameMgr.OpenActionUi(context, OnConfirmAction);
-        await ToSignal(actionUi, ActionUi.SignalName.ConfirmAction);
+        _gameMgr.OpenActionUi(context);
+        await ToSignal(_actionUi, ActionUi.SignalName.ConfirmAction);
     }
     
     private void OnConfirmAction(Enums.PlayerAction action, int amount)

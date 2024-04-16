@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.Common;
 
@@ -59,5 +60,48 @@ public static class Utils
             res.AddRange(GetCombinationsWithXFromA(a, b, m, i));
         }
         return res;
+    }
+
+    public static string PrettyPrintCardSuit(Enums.CardSuit suit)
+    {
+        switch (suit)
+        {
+            case Enums.CardSuit.Clubs:
+                return "♣";
+            case Enums.CardSuit.Diamonds:
+                return "♦";
+            case Enums.CardSuit.Hearts:
+                return "♥";
+            case Enums.CardSuit.Spades:
+                return "♠";
+        }
+        return "";
+    }
+
+    public static string PrettyPrintCardRank(Enums.CardRank rank)
+    {
+        switch (rank)
+        {
+            case Enums.CardRank.Two:
+            case Enums.CardRank.Three:
+            case Enums.CardRank.Four:
+            case Enums.CardRank.Five:
+            case Enums.CardRank.Six:
+            case Enums.CardRank.Seven:
+            case Enums.CardRank.Eight:
+            case Enums.CardRank.Nine:
+            case Enums.CardRank.Ten:
+                return ((int)rank).ToString();
+            case Enums.CardRank.Jack:
+                return "J";
+            case Enums.CardRank.Queen:
+                return "Q";
+            case Enums.CardRank.King:
+                return "K";
+            case Enums.CardRank.Ace:
+                return "A";
+            default:
+                return "_";
+        }
     }
 }

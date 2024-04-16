@@ -1,0 +1,101 @@
+[gd_scene load_steps=4 format=3 uid="uid://cp0d1hoqmk0ia"]
+
+[ext_resource type="Texture2D" uid="uid://oldgvrsgrmpi" path="res://Sprites/GodotHead.svg" id="1_0h38m"]
+[ext_resource type="Script" path="res://Scripts/Ui/PlayerInfoTab.cs" id="1_qa3y0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3sa0w"]
+bg_color = Color(0.176471, 0.176471, 0.176471, 1)
+
+[node name="PlayerInfoTab" type="Control" node_paths=PackedStringArray("PlayerNameLabel", "PlayerCashLabel", "PlayerBetLabel")]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qa3y0")
+PlayerNameLabel = NodePath("Panel/Portrait/Label")
+PlayerCashLabel = NodePath("Panel/VBoxContainer/HBoxContainer/CashAmount")
+PlayerBetLabel = NodePath("Panel/VBoxContainer/HBoxContainer2/BetAmount")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -175.0
+offset_top = -64.0
+offset_right = 175.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_3sa0w")
+
+[node name="Portrait" type="TextureRect" parent="Panel"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 40.0
+offset_top = -40.0
+offset_right = 100.0
+offset_bottom = 20.0
+grow_vertical = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 10.0
+texture = ExtResource("1_0h38m")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="Panel/Portrait"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = 64.0
+offset_right = 20.0
+offset_bottom = 88.0
+grow_horizontal = 2
+text = "You"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 128.0
+offset_top = -40.0
+offset_right = 328.0
+offset_bottom = 40.0
+grow_vertical = 2
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Cash" type="Label" parent="Panel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Cash: "
+
+[node name="CashAmount" type="Label" parent="Panel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "X"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="TotalBet" type="Label" parent="Panel/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Total bet:
+"
+
+[node name="BetAmount" type="Label" parent="Panel/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Y"

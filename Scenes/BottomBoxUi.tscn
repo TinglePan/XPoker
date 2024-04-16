@@ -1,0 +1,53 @@
+[gd_scene load_steps=4 format=3 uid="uid://v2imuunecdm"]
+
+[ext_resource type="PackedScene" uid="uid://wdmxn3vw3x5h" path="res://Scenes/RaiseUi.tscn" id="1_o80pc"]
+[ext_resource type="PackedScene" uid="uid://cu8cytigbn45" path="res://Scenes/DialogueBoxUi.tscn" id="1_y15pg"]
+[ext_resource type="PackedScene" uid="uid://dmephq0a8yma1" path="res://Scenes/ActionUi2.tscn" id="2_3jigs"]
+
+[node name="BottomBoxUi" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DialogueBoxUi" parent="." instance=ExtResource("1_y15pg")]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_right = 0.0
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = 188.0
+offset_right = 444.0
+offset_bottom = 324.0
+grow_horizontal = 1
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 8.0
+
+[node name="ActionUi" parent="." node_paths=PackedStringArray("RaiseUi") instance=ExtResource("2_3jigs")]
+layout_mode = 2
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 444.0
+offset_top = 188.0
+offset_right = 576.0
+offset_bottom = 324.0
+size_flags_horizontal = 3
+RaiseUi = NodePath("RaiseUi")
+
+[node name="RaiseUi" parent="ActionUi" instance=ExtResource("1_o80pc")]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -954.0
+offset_top = -200.0
+offset_right = 65.0
+offset_bottom = -136.0
+grow_horizontal = 2

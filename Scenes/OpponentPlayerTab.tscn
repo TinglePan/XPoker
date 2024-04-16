@@ -1,0 +1,43 @@
+[gd_scene load_steps=4 format=3 uid="uid://c784ingom61r1"]
+
+[ext_resource type="Script" path="res://Scripts/Ui/PlayerTab.cs" id="1_de3aw"]
+[ext_resource type="PackedScene" uid="uid://cp0d1hoqmk0ia" path="res://Scenes/PlayerInfoTab.tscn" id="1_flybr"]
+[ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="2_7tkm6"]
+
+[node name="PlayerTab" type="Control" node_paths=PackedStringArray("PlayerInfoTab", "CardContainer")]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_de3aw")
+PlayerInfoTab = NodePath("PlayerInfoTab")
+CardContainer = NodePath("PlayerInfoTab/HBoxContainer")
+CardPrefab = ExtResource("2_7tkm6")
+
+[node name="PlayerInfoTab" parent="." instance=ExtResource("1_flybr")]
+layout_mode = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerInfoTab"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -72.0
+offset_top = 106.0
+offset_right = 72.0
+offset_bottom = 190.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 32
+
+[node name="Card" parent="PlayerInfoTab/HBoxContainer" instance=ExtResource("2_7tkm6")]
+layout_mode = 2
+
+[node name="Card2" parent="PlayerInfoTab/HBoxContainer" instance=ExtResource("2_7tkm6")]
+layout_mode = 2

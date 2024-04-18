@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.HandEvaluateRules;
@@ -39,14 +40,14 @@ public class StraightRule: BaseHandEvaluateRule
         AllowAceLowStraight = canWrap || allowAceLowStraight;
     }
     
-    protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
+    protected override List<List<BasePokerCard>> Pick(List<BasePokerCard> cards)
     {
-        List<List<BaseCard>> picks = new List<List<BaseCard>>();
-        List<BaseCard> currPick = new List<BaseCard>();
-        var cardsByRank = new Dictionary<Enums.CardRank, List<BaseCard>>();
+        List<List<BasePokerCard>> picks = new List<List<BasePokerCard>>();
+        List<BasePokerCard> currPick = new List<BasePokerCard>();
+        var cardsByRank = new Dictionary<Enums.CardRank, List<BasePokerCard>>();
         foreach (var card in cards)
         {
-            if (!cardsByRank.ContainsKey(card.Rank)) cardsByRank[card.Rank] = new List<BaseCard>();
+            if (!cardsByRank.ContainsKey(card.Rank)) cardsByRank[card.Rank] = new List<BasePokerCard>();
             cardsByRank[card.Rank].Add(card);
         }
         
@@ -54,7 +55,7 @@ public class StraightRule: BaseHandEvaluateRule
         {
             if (currPick.Count == CardCount)
             {
-                picks.Add(new List<BaseCard>(currPick));
+                picks.Add(new List<BasePokerCard>(currPick));
                 return;
             }
             var currRank = Range[currentRankIndexInRange];
@@ -94,11 +95,11 @@ public class StraightRule: BaseHandEvaluateRule
         return picks;
     }
 
-    protected override List<BaseCard> GetPrimaryComparerCards(List<BaseCard> pick, List<BaseCard> cards)
+    protected override List<BasePokerCard> GetPrimaryComparerCards(List<BasePokerCard> pick, List<BasePokerCard> cards)
     {
         if (!AllowAceLowStraight && !CanWrap) return base.GetPrimaryComparerCards(pick, cards);
         var pickCardByRank = pick.ToDictionary(card => card.Rank);
-        BaseCard endAtCard = null;
+        BasePokerCard endAtPokerCard = null;
         for (int i = 0; i < Range.Count; i++)
         {
             bool found = true;
@@ -113,9 +114,9 @@ public class StraightRule: BaseHandEvaluateRule
             }
             if (found)
             {
-                endAtCard = pickCardByRank[Range[(i + CardCount - 1) % Range.Count]];
+                endAtPokerCard = pickCardByRank[Range[(i + CardCount - 1) % Range.Count]];
             } 
         }
-        return new List<BaseCard>() { endAtCard };
+        return new List<BasePokerCard>() { endAtPokerCard };
     }
 }

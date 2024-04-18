@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts;
@@ -9,12 +10,12 @@ namespace XCardGame.Scripts;
 public class HandStrength: IComparable<HandStrength>
 {
     public Enums.HandRank Rank;
-    public List<BaseCard> PrimaryCards;
-    public List<BaseCard> PrimaryComparerCards;
-    public List<BaseCard> Kickers;
+    public List<BasePokerCard> PrimaryCards;
+    public List<BasePokerCard> PrimaryComparerCards;
+    public List<BasePokerCard> Kickers;
     
-    public HandStrength(Enums.HandRank rank, List<BaseCard> primaryCards, List<BaseCard> primaryComparerCards,
-        List<BaseCard> kickers)
+    public HandStrength(Enums.HandRank rank, List<BasePokerCard> primaryCards, List<BasePokerCard> primaryComparerCards,
+        List<BasePokerCard> kickers)
     {
         Rank = rank;
         PrimaryCards = primaryCards;

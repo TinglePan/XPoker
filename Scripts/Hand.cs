@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Ui;
 
@@ -33,7 +34,7 @@ public partial class Hand: Node, ISetup
     public int CreateSidePotAtAmount;
     public int RoundCount;
     public Pot Pot;
-    public ObservableCollection<BaseCard> CommunityCards;
+    public ObservableCollection<BasePokerCard> CommunityCards;
     
     public bool IsHeadUp => Players.Count <= 2;
     
@@ -46,7 +47,7 @@ public partial class Hand: Node, ISetup
     {
         _gameMgr = GetNode<GameMgr>("/root/GameMgr");
         Players = new List<PokerPlayer>();
-        Deck = new Deck();
+        Deck = new Deck(_gameMgr);
         DealingDeck = null;
         ButtonPlayerIndex = 0;
         ActionPlayerIndex = 0;
@@ -59,7 +60,7 @@ public partial class Hand: Node, ISetup
         CreateSidePotAtAmount = 0;
         RoundCount = 0;
         Pot = new Pot(this);
-        CommunityCards = new ObservableCollection<BaseCard>();
+        CommunityCards = new ObservableCollection<BasePokerCard>();
     }
 
     public virtual void Setup(Dictionary<string, object> args)
@@ -82,7 +83,7 @@ public partial class Hand: Node, ISetup
         Reset();
         foreach (var player in Players)
         {
-            player.Reset();
+            player.ResetHandState();
         }
 
         while (RoundCount <= Configuration.RiverRoundIndex && InHandPlayerCount > 1)
@@ -99,7 +100,7 @@ public partial class Hand: Node, ISetup
     {
         foreach (var player in Players)
         {
-            player.Reset();
+            player.ResetHandState();
         }
         DealingDeck = Deck.Deal();
         ButtonPlayerIndex = 0;
@@ -131,7 +132,7 @@ public partial class Hand: Node, ISetup
                     var player = Players[ButtonPlayerIndex + j];
                     bool isFaceDown = player != _gameMgr.PlayerControlledPlayer; 
                     var card = DealingDeck.Deal(isFaceDown);
-                    player.AddHoleCard(card);
+                    player.HoleCards.Add(card);
                     GD.Print($"Dealt hole card {card} to player {player}.");
                 }
             }
@@ -143,11 +144,11 @@ public partial class Hand: Node, ISetup
 
             int smallBlindIndexShift = IsHeadUp ? 0 : 1;
             var smallBlindPlayerIndex = NextNActingPlayerFrom(ButtonPlayerIndex, smallBlindIndexShift);
-            var bigBlindPlayerIndex = NextNActingPlayerFrom(ButtonPlayerIndex, smallBlindIndexShift + 1);
+            var bigBlindPlayerIndex = NextNActingPlayerFrom(smallBlindPlayerIndex, 1);
 
             Players[smallBlindPlayerIndex].BetBlind(BigBlindAmount / 2, true);
             Players[bigBlindPlayerIndex].BetBlind(BigBlindAmount, false);
-            ActionPlayerIndex = NextNActingPlayerFrom(ButtonPlayerIndex, smallBlindIndexShift + 2);
+            ActionPlayerIndex = NextNActingPlayerFrom(bigBlindPlayerIndex, 1);
         }
         else
         {

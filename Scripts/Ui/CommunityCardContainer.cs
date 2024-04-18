@@ -17,7 +17,7 @@ public partial class CommunityCardContainer: HBoxContainer, ISetup
     {
         foreach (var child in GetChildren())
         {
-            if (child is CardNode cardNode)
+            if (child is PokerCardNode cardNode)
             {
                 cardNode.QueueFree();
             }
@@ -42,7 +42,7 @@ public partial class CommunityCardContainer: HBoxContainer, ISetup
                 if (args.NewItems != null)
                     foreach (var t in args.NewItems)
                     {
-                        var cardNode = CardPrefab.Instantiate<CardNode>();
+                        var cardNode = CardPrefab.Instantiate<PokerCardNode>();
                         cardNode.Setup(new Dictionary<string, object>()
                         {
                             { "card", t },
@@ -55,7 +55,7 @@ public partial class CommunityCardContainer: HBoxContainer, ISetup
 				
                 foreach (var child in GetChildren())
                 {
-                    if (args.OldItems != null && child is CardNode cardNode && args.OldItems.Contains(cardNode.Card))
+                    if (args.OldItems != null && child is PokerCardNode cardNode && args.OldItems.Contains(cardNode.Card))
                     {
                         cardNode.QueueFree();
                     }

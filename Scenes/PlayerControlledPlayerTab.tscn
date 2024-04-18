@@ -1,10 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://1o86goic10u7"]
+[gd_scene load_steps=5 format=3 uid="uid://1o86goic10u7"]
 
 [ext_resource type="PackedScene" uid="uid://cp0d1hoqmk0ia" path="res://Scenes/PlayerInfoTab.tscn" id="1_lrvlm"]
 [ext_resource type="Script" path="res://Scripts/Ui/PlayerTab.cs" id="1_wly6o"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="2_ve2nv"]
+[ext_resource type="PackedScene" uid="uid://bl1uj0dhj1s0r" path="res://Scenes/TextureCard.tscn" id="3_vacfl"]
 
-[node name="PlayerTab" type="Control" node_paths=PackedStringArray("PlayerInfoTab", "CardContainer")]
+[node name="PlayerTab" type="Control" node_paths=PackedStringArray("PlayerInfoTab", "HoleCardContainer", "SpecialCardContainer")]
 layout_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
@@ -15,13 +16,17 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_wly6o")
 PlayerInfoTab = NodePath("PlayerInfoTab")
-CardContainer = NodePath("PlayerInfoTab/HBoxContainer")
+HoleCardContainer = NodePath("PlayerInfoTab/HoleCards")
+SpecialCardContainer = NodePath("PlayerInfoTab/SpecialCards")
 CardPrefab = ExtResource("2_ve2nv")
+SpecialCardPrefab = ExtResource("3_vacfl")
 
 [node name="PlayerInfoTab" parent="." instance=ExtResource("1_lrvlm")]
 layout_mode = 1
+offset_top = -1.0
+offset_bottom = -1.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PlayerInfoTab"]
+[node name="HoleCards" type="HBoxContainer" parent="PlayerInfoTab"]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -36,8 +41,25 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 32
 
-[node name="Card" parent="PlayerInfoTab/HBoxContainer" instance=ExtResource("2_ve2nv")]
+[node name="Card" parent="PlayerInfoTab/HoleCards" instance=ExtResource("2_ve2nv")]
 layout_mode = 2
 
-[node name="Card2" parent="PlayerInfoTab/HBoxContainer" instance=ExtResource("2_ve2nv")]
+[node name="Card2" parent="PlayerInfoTab/HoleCards" instance=ExtResource("2_ve2nv")]
 layout_mode = 2
+
+[node name="SpecialCards" type="HBoxContainer" parent="PlayerInfoTab"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 220.0
+offset_top = -42.0
+offset_right = 276.0
+offset_bottom = 42.0
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Card" parent="PlayerInfoTab/SpecialCards" node_paths=PackedStringArray("Front", "Back") instance=ExtResource("2_ve2nv")]
+layout_mode = 2
+Front = NodePath("../../HoleCards/Card/Front")
+Back = NodePath("../../HoleCards/Card/Back")

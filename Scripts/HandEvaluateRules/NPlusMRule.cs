@@ -2,6 +2,7 @@
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 
@@ -16,14 +17,14 @@ public class NPlusMRule: NOfAKindRule
         M = m;
     }
 
-    protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
+    protected override List<List<BasePokerCard>> Pick(List<BasePokerCard> cards)
     {
-        var res = new List<List<BaseCard>>();
+        var res = new List<List<BasePokerCard>>();
         var nPicks = base.Pick(cards);
-        var cardsByRank = new Dictionary<Enums.CardRank, List<BaseCard>>();
+        var cardsByRank = new Dictionary<Enums.CardRank, List<BasePokerCard>>();
         foreach (var card in cards)
         {
-            if (!cardsByRank.ContainsKey(card.Rank)) cardsByRank[card.Rank] = new List<BaseCard>();
+            if (!cardsByRank.ContainsKey(card.Rank)) cardsByRank[card.Rank] = new List<BasePokerCard>();
             cardsByRank[card.Rank].Add(card);
         }
         foreach (var nPick in nPicks)
@@ -41,7 +42,7 @@ public class NPlusMRule: NOfAKindRule
         return res;
     }
 
-    protected override List<BaseCard> GetPrimaryComparerCards(List<BaseCard> pick, List<BaseCard> cards)
+    protected override List<BasePokerCard> GetPrimaryComparerCards(List<BasePokerCard> pick, List<BasePokerCard> cards)
     {
         return pick.GroupBy(card => card.Rank, (rank, groupCards) => new
             {

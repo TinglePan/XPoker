@@ -36,14 +36,14 @@ public class ObservableProperty<T>: IObservableProperty<T>
         }
     }
 
-    public void FireValueChangeEvents()
+    public void FireValueChangeEventsOnInit()
     {
         ValueChanged?.Invoke(this, new ValueChangedEventArgs {PropertyName = Name});
         DetailedValueChanged?.Invoke(this, new ValueChangedEventDetailedArgs<T>
         {
             PropertyOwner = this,
             PropertyName = Name,
-            OldValue = Value,
+            OldValue = default,
             NewValue = Value
         });
     }

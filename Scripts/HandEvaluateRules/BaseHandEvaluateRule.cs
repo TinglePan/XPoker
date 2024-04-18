@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.HandEvaluateRules;
 
 public class BaseHandEvaluateRule
 {
-    public virtual void EvaluateAndRecord(List<BaseCard> cards,
+    public virtual void EvaluateAndRecord(List<BasePokerCard> cards,
         Dictionary<Enums.HandRank,List<HandStrength>> calculatedHandStrengths, Enums.HandRank? forRank=null)
     {
         forRank ??= Rank;
@@ -17,7 +18,7 @@ public class BaseHandEvaluateRule
         if (calculatedHandStrengths!= null) calculatedHandStrengths[forRank.Value] = res;
     }
     
-    protected virtual List<HandStrength> Evaluate(List<BaseCard> cards, Enums.HandRank? forRank=null)
+    protected virtual List<HandStrength> Evaluate(List<BasePokerCard> cards, Enums.HandRank? forRank=null)
     {
         forRank ??= Rank;
         var picks = Pick(cards);
@@ -36,18 +37,18 @@ public class BaseHandEvaluateRule
     
     public virtual Enums.HandRank Rank => Enums.HandRank.HighCard;
     
-    protected virtual List<List<BaseCard>> Pick(List<BaseCard> cards)
+    protected virtual List<List<BasePokerCard>> Pick(List<BasePokerCard> cards)
     {
-        var res = new List<List<BaseCard>>();
+        var res = new List<List<BasePokerCard>>();
         return res;
     }
     
-    protected virtual List<BaseCard> GetPrimaryComparerCards(List<BaseCard> pick, List<BaseCard> cards)
+    protected virtual List<BasePokerCard> GetPrimaryComparerCards(List<BasePokerCard> pick, List<BasePokerCard> cards)
     {
-        return new List<BaseCard> { pick.Max() };
+        return new List<BasePokerCard> { pick.Max() };
     }
     
-    protected virtual List<BaseCard> GetKickers(List<BaseCard> pick, List<BaseCard> cards)
+    protected virtual List<BasePokerCard> GetKickers(List<BasePokerCard> pick, List<BasePokerCard> cards)
     {
         var res = cards.Except(pick).OrderByDescending(c => c).ToList();
         return res;

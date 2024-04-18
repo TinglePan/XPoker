@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.HandEvaluateRules;
@@ -52,8 +53,8 @@ public class HandEvaluator
     };
     
     public List<BaseHandEvaluateRule> Rules;
-    public List<BaseCard> PlayerHoleCards;
-    public List<BaseCard> CommunityCards;
+    public List<BasePokerCard> PlayerHoleCards;
+    public List<BasePokerCard> CommunityCards;
     public int CardCount;
     public int RequiredHoleCardCountMin;
     public int RequiredHoleCardCountMax;
@@ -61,7 +62,7 @@ public class HandEvaluator
     
     public Dictionary<Enums.HandRank, List<HandStrength>> CalculatedHands;
 
-    public HandEvaluator(List<BaseCard> playerHoleCards, List<BaseCard> communityCards, int cardCount,
+    public HandEvaluator(List<BasePokerCard> playerHoleCards, List<BasePokerCard> communityCards, int cardCount,
         int requiredHoleCardCountMin, int requiredHoleCardCountMax, List<BaseHandEvaluateRule> rules = null)
     {
         Rules = rules ?? FiveCardHRules;

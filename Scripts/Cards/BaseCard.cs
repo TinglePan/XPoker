@@ -1,52 +1,41 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards;
 
-public class BaseCard: IComparable<BaseCard>
+public class BaseCard
 {
-	public ObservableProperty<Enums.CardSuit> Suit;
-	public Enums.CardColor CardColor;
-	public Enums.CardRank Rank;
-	public ObservableProperty<Enums.CardFace> Face;
+    public string Name;
+    public string Description;
+    public ObservableProperty<Enums.CardFace> Face;
+    
+    public CardNode Node;
 
-	public BaseCard(Enums.CardSuit cardSuit, Enums.CardRank rank, Enums.CardFace face)
-	{
-		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), cardSuit);
-		Suit.DetailedValueChanged += OnSuitChanged;
-		Suit.FireValueChangeEvents();
-		Rank = rank;
-		Face = new ObservableProperty<Enums.CardFace>(nameof(Face), face);
-	}
-
-	private void OnSuitChanged(object o, ValueChangedEventDetailedArgs<Enums.CardSuit> args)
-	{
-		switch (Suit.Value)
-		{
-			case Enums.CardSuit.Clubs:
-			case Enums.CardSuit.Spades:
-				CardColor = Enums.CardColor.Black;
-				break;
-			case Enums.CardSuit.Hearts:
-			case Enums.CardSuit.Diamonds:
-				CardColor = Enums.CardColor.Red;
-				break;
-			default:
-				CardColor = Enums.CardColor.None;
-				break;
-		}
-	}
-
-	public virtual int CompareTo(BaseCard other)
-	{
-		return 0;
-	}
-
-	public override string ToString()
-	{
-		return $"{Rank} of {Suit.Value}, faced {Face.Value}";
-	}
+    protected GameMgr GameMgr;
+    
+    public BaseCard(GameMgr gameMgr, string name, string description, Enums.CardFace face)
+    {
+        GameMgr = gameMgr;
+        Name = name;
+        Description = description;
+        Face = new ObservableProperty<Enums.CardFace>(nameof(Face), face);
+    }
+    
+    public override string ToString()
+    {
+        return $"{Description}({Face.Value})";
+    }
+    
+    public virtual void OnFocused()
+    {
+        GD.Print($"{this} focused");
+    }
+    
+    public virtual void OnLoseFocus()
+    {
+        GD.Print($"{this} lose focus");
+    }
 }

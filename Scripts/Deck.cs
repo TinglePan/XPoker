@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts;
@@ -10,12 +11,12 @@ public class Deck
 {
     public class DealingDeck
     {
-        public List<BaseCard> CardList;
+        public List<BasePokerCard> CardList;
         public int CurrentTopIndex;
         public DealingDeck(Deck deck)
         {
-            CardList = new List<BaseCard>();
-            foreach (BaseCard card in deck.CardList)
+            CardList = new List<BasePokerCard>();
+            foreach (BasePokerCard card in deck.CardList)
             {
                 CardList.Add(card);
             }
@@ -41,25 +42,27 @@ public class Deck
             Shuffle();
         }
         
-        public BaseCard Deal(bool facedDown = true)
+        public BasePokerCard Deal(bool facedDown = true)
         {
             var card = CardList[CurrentTopIndex++];
             card.Face.Value = facedDown ? Enums.CardFace.Down : Enums.CardFace.Up;
             return card;
         }
     
-        public BaseCard Peek()
+        public BasePokerCard Peek()
         {
             return CardList[CurrentTopIndex];
         }
 
     }
     
-    public List<BaseCard> CardList;
+    public List<BasePokerCard> CardList;
+    protected GameMgr GameMgr;
 
-    public Deck()
+    public Deck(GameMgr gameMgr)
     {
-        CardList = new List<BaseCard>();
+        GameMgr = gameMgr;
+        CardList = new List<BasePokerCard>();
         HashSet<Enums.CardRank> excludedRanks = new HashSet<Enums.CardRank>()
         {
             Enums.CardRank.None,
@@ -79,8 +82,8 @@ public class Deck
                     continue;
                 }
 
-                BaseCard card = new BaseCard((Enums.CardSuit)suit, (Enums.CardRank)rank, Enums.CardFace.Down);
-                CardList.Add(card);
+                BasePokerCard pokerCard = new BasePokerCard(GameMgr, (Enums.CardSuit)suit, (Enums.CardRank)rank, Enums.CardFace.Down);
+                CardList.Add(pokerCard);
             }
         }
     }

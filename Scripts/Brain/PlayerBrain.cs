@@ -26,7 +26,7 @@ public partial class PlayerBrain: BaseBrain
 
     public override async Task AskForAction(Dictionary<string, object> context)
     {
-        _gameMgr.OpenActionUi(context);
+        _gameMgr.OpenUi(_gameMgr.ActionUi, context);
         await ToSignal(_actionUi, ActionUi.SignalName.ConfirmAction);
     }
     
@@ -47,6 +47,6 @@ public partial class PlayerBrain: BaseBrain
                 Player.RaiseTo(amount);
                 break;
         }
-        _gameMgr.CloseActionUi();
+        _gameMgr.CloseUi(_gameMgr.ActionUi);
     }
 }

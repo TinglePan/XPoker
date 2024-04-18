@@ -12,6 +12,5 @@ public partial class TestRes : Resource
         TestResType3
     }
     
-    
     [Export] public Array<TestResType> ResTypes;
 }

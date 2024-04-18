@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Brain;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
+using XCardGame.Scripts.Cards.SpecialCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 
@@ -14,9 +16,11 @@ namespace XCardGame.Scripts;
 public partial class PokerPlayer: Node, ISetup
 {
     
-    public Action<PokerPlayer, BaseCard> OnAddHoleCard;
-    public Action<PokerPlayer, BaseCard> OnRemoveHoleCard;
-    public Action<PokerPlayer, BaseCard, BaseCard> OnSwapHoleCard;
+    public Action<PokerPlayer, BasePokerCard> OnAddHoleCard;
+    public Action<PokerPlayer, BasePokerCard> OnRemoveHoleCard;
+    public Action<PokerPlayer, BasePokerCard, BasePokerCard> OnSwapHoleCard;
+    public Action<PokerPlayer, BaseSpecialCard> OnAddSpecialCard;
+    public Action<PokerPlayer, BaseSpecialCard> OnRemoveSpecialCard;
     public Action<PokerPlayer> OnFold;
     public Action<PokerPlayer> OnCheck;
     public Action<PokerPlayer, int> OnCall;
@@ -47,7 +51,8 @@ public partial class PokerPlayer: Node, ISetup
     public Enums.PlayerAction RoundLastAction;
     public ObservableProperty<int> NChipsInHand;
     public ObservableProperty<int> NChipsInPot;
-    public ObservableCollection<BaseCard> HoleCards;
+    public ObservableCollection<BasePokerCard> HoleCards;
+    public ObservableCollection<BaseSpecialCard> SpecialCards;
     
     public bool IsInHand => RoundLastAction != Enums.PlayerAction.Fold;
     public bool HasAllIn => NChipsInHand.Value == 0 && RoundBetAmount.Value > 0;
@@ -79,10 +84,11 @@ public partial class PokerPlayer: Node, ISetup
         
         NChipsInHand = new ObservableProperty<int>(nameof(NChipsInHand), Creature.NChips);
         NChipsInPot = new ObservableProperty<int>(nameof(NChipsInPot), 0);
-        HoleCards = new ObservableCollection<BaseCard>();
+        HoleCards = new ObservableCollection<BasePokerCard>();
+        SpecialCards = new ObservableCollection<BaseSpecialCard>();
     }
     
-    public void Reset()
+    public void ResetHandState()
     {
         ResetRoundState();
         HoleCards.Clear();
@@ -172,24 +178,12 @@ public partial class PokerPlayer: Node, ISetup
         OnCheck?.Invoke(this);
         EmitSignal(SignalName.AfterAction, this);
     }
-    
-    public void AddHoleCard(BaseCard card)
-    {
-        HoleCards.Add(card);
-        OnAddHoleCard?.Invoke(this, card);
-    }
-    
-    public void RemoveHoleCard(BaseCard card)
-    {
-        HoleCards.Remove(card);
-        OnRemoveHoleCard?.Invoke(this, card);
-    }
 
-    public void SwapHoleCard(BaseCard src, BaseCard dst)
+    public void SwapHoleCard(BasePokerCard src, BasePokerCard dst)
     {
+        GD.Print($"Swap hold card: {src} for {dst}");
         var srcIndex = HoleCards.IndexOf(src);
         HoleCards[srcIndex] = dst;
-        OnSwapHoleCard?.Invoke(this, src, dst);
     }
     
     public async Task AskForAction(Dictionary<string, object> context)

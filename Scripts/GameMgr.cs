@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Godot;
+using XCardGame.Scripts.Cards.SpecialCards;
 using XCardGame.Scripts.Common;
+using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts;
@@ -15,6 +17,7 @@ public partial class GameMgr : Node
 	public Node CurrentScene;
 	public Hand CurrentHand;
 	public ActionUi ActionUi;
+	public InputMgr InputMgr;
 
 	private bool IsGameStarted;
 	
@@ -37,6 +40,7 @@ public partial class GameMgr : Node
 	public void StartGame()
 	{
 		ChangeScene(MainScene);
+		InputMgr = GetNode<InputMgr>("/root/InputMgr");
 		ActionUi = GetNode<ActionUi>("/root/Main/BottomBoxUi/ActionUi");
 		ActionUi.Hide();
 		ActionUi.SetProcess(false);
@@ -67,6 +71,8 @@ public partial class GameMgr : Node
 		{
 			{ "player", PlayerControlledPlayer }
 		});
+		if (PlayerControlledPlayer != null) PlayerControlledPlayer.SpecialCards.Add(
+			new D6Card(this, playerTab.HoleCardContainer, PlayerControlledPlayer, Enums.CardFace.Up, "res://Sprites/Cards/D6.png"));
 		var opponent = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as PokerPlayer;
 		opponent?.Setup(new Dictionary<string, object>()
 		{
@@ -90,9 +96,9 @@ public partial class GameMgr : Node
 		});
 		CurrentHand.Finished += () =>
 		{
-			PlayerControlledPlayer?.Reset();
+			PlayerControlledPlayer?.ResetHandState();
 			CurrentHand.Reset();
-			opponent?.Reset();
+			opponent?.ResetHandState();
 		};
 		// CurrentMatch.Run();
 	}
@@ -109,21 +115,16 @@ public partial class GameMgr : Node
 		CurrentScene = node;
 	}
 
-	public void OpenActionUi(Dictionary<string, object> context)
+	public void OpenUi<T>(T target, Dictionary<string, object> context) where T: Control, ISetup
 	{
-		ActionUi.SetProcess(true);
-		ActionUi.Show();
-		ActionUi.Setup(context);
+		target.SetProcess(true);
+		target.Show();
+		target.Setup(context);
 	}
 	
-	public void CloseActionUi()
+	public void CloseUi(Control target)
 	{
-		ActionUi.Hide();
-		ActionUi.SetProcess(false);
-	}
-
-	public void Run()
-	{
-		CurrentHand.Start();
+		target.Hide();
+		target.SetProcess(false);
 	}
 }

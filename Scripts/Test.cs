@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts;
@@ -14,18 +15,19 @@ public partial class Test : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		var playerHoldCards = new List<BaseCard>()
+		var gameMgr = GetNode<GameMgr>("/root/GameMgr");
+		var playerHoldCards = new List<BasePokerCard>()
 		{
-			new NumericCard(Enums.CardSuit.Diamonds, Enums.CardRank.Ace, Enums.CardFace.Down),
-			new NumericCard(Enums.CardSuit.Clubs, Enums.CardRank.King, Enums.CardFace.Down)
+			new (gameMgr, Enums.CardSuit.Diamonds, Enums.CardRank.Ace, Enums.CardFace.Down),
+			new (gameMgr, Enums.CardSuit.Clubs, Enums.CardRank.King, Enums.CardFace.Down)
 		};
-		var communityCards = new List<BaseCard>()
+		var communityCards = new List<BasePokerCard>()
 		{
-			new NumericCard(Enums.CardSuit.Spades, Enums.CardRank.Seven, Enums.CardFace.Up),
-			new NumericCard(Enums.CardSuit.Clubs, Enums.CardRank.Two, Enums.CardFace.Up),
-			new NumericCard(Enums.CardSuit.Clubs, Enums.CardRank.Six, Enums.CardFace.Up),
-			new NumericCard(Enums.CardSuit.Hearts, Enums.CardRank.Four, Enums.CardFace.Up),
-			new NumericCard(Enums.CardSuit.Clubs, Enums.CardRank.Three, Enums.CardFace.Up),
+			new (gameMgr, Enums.CardSuit.Spades, Enums.CardRank.Seven, Enums.CardFace.Up),
+			new (gameMgr, Enums.CardSuit.Clubs, Enums.CardRank.Two, Enums.CardFace.Up),
+			new (gameMgr, Enums.CardSuit.Clubs, Enums.CardRank.Six, Enums.CardFace.Up),
+			new (gameMgr, Enums.CardSuit.Hearts, Enums.CardRank.Four, Enums.CardFace.Up),
+			new (gameMgr, Enums.CardSuit.Clubs, Enums.CardRank.Three, Enums.CardFace.Up),
 		};
 		var evaluator = new HandEvaluator(playerHoldCards, communityCards, 5, 0,
 			2);

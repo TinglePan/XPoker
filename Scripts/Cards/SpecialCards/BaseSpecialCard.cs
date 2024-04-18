@@ -9,9 +9,9 @@ public class BaseSpecialCard: BaseCard
     
     public string IconPath;
     
-    public BaseSpecialCard(GameMgr gameMgr, string name, string description, PokerPlayer player, Enums.CardFace face, string iconPath) : base(gameMgr, name, description, face)
+    public BaseSpecialCard(GameMgr gameMgr, string name, string description, PokerPlayer owner, Enums.CardFace face, string iconPath) : base(gameMgr, name, description, face)
     {
-        Owner = player;
+        Owner = owner;
         IconPath = iconPath;
     }
 

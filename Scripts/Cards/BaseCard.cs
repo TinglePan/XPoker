@@ -24,9 +24,22 @@ public class BaseCard
         Face = new ObservableProperty<Enums.CardFace>(nameof(Face), face);
     }
     
+    public BaseCard(BaseCard card)
+    {
+        GameMgr = card.GameMgr;
+        Name = card.Name;
+        Description = card.Description;
+        Face = new ObservableProperty<Enums.CardFace>(nameof(Face), card.Face.Value);
+    }
+    
     public override string ToString()
     {
         return $"{Description}({Face.Value})";
+    }
+
+    public void Flip()
+    {
+        Face.Value = Face.Value == Enums.CardFace.Up ? Enums.CardFace.Down : Enums.CardFace.Up;
     }
     
     public virtual void OnFocused()

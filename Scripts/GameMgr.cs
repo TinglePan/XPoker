@@ -71,8 +71,6 @@ public partial class GameMgr : Node
 		{
 			{ "player", PlayerControlledPlayer }
 		});
-		if (PlayerControlledPlayer != null) PlayerControlledPlayer.SpecialCards.Add(
-			new D6Card(this, playerTab.HoleCardContainer, PlayerControlledPlayer, Enums.CardFace.Up, "res://Sprites/Cards/D6.png"));
 		var opponent = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as PokerPlayer;
 		opponent?.Setup(new Dictionary<string, object>()
 		{
@@ -85,6 +83,13 @@ public partial class GameMgr : Node
 		{
 			{ "player", opponent }
 		});
+		if (PlayerControlledPlayer != null) {
+			PlayerControlledPlayer.SpecialCards.Add(
+				new D6Card(this, playerTab.HoleCardContainer, PlayerControlledPlayer, Enums.CardFace.Up));
+			PlayerControlledPlayer.SpecialCards.Add(
+				new NetherSwapCard(this, playerTab.HoleCardContainer, opponentTab.HoleCardContainer, 
+					communityCardContainer, PlayerControlledPlayer, Enums.CardFace.Up));
+		}
 		CurrentHand.Setup(new Dictionary<string, object>()
 		{
 			{ "players", new List<PokerPlayer>

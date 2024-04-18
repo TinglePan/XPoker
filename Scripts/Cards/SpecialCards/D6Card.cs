@@ -82,11 +82,14 @@ public class D6Card: BaseSpecialCard
             }
         }
     }
+    
     private Container _holeCardContainer;
     
-    public D6Card(GameMgr gameMgr, Container holeCardContainer, PokerPlayer player, Enums.CardFace face, string iconPath) : base(gameMgr, "Dice 6", "Reroll one of your hole card", player, face, iconPath)
+    public D6Card(GameMgr gameMgr, Container holeCardContainer, PokerPlayer player, Enums.CardFace face) : base(gameMgr, "Dice 6", "Reroll one of your hole card", player, face, 
+        "res://Sprites/Cards/D6.png")
     {
         _holeCardContainer = holeCardContainer;
+        
     }
 
     public override void Activate()

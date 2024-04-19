@@ -11,28 +11,52 @@ public class NetherSwapCard: BaseSpecialCard
     
     public class NetherSwapCardInputHandler : BaseInputHandler
     {
-        private PokerPlayer _player;
-        private Container _playerHoleCardContainer;
-        private Container _opponentHoleCardContainer;
-        private Container _communityCardContainer;
-        private CardNode _selectedCardNode;
-        private SpecialCardNode _cardNode; 
+
+        private NetherSwapCard _card;
         
-        public NetherSwapCardInputHandler(GameMgr gameMgr, PokerPlayer player, Container playerHoleCardContainer, 
-            Container opponentHoleCardContainer, Container communityHoleCardContainer, SpecialCardNode cardNode) : base(gameMgr)
+        private CardNode _selectedCardNode;
+        
+        public NetherSwapCardInputHandler(GameMgr gameMgr, NetherSwapCard card) : base(gameMgr)
         {
-            _player = player;
-            _playerHoleCardContainer = playerHoleCardContainer;
-            _opponentHoleCardContainer = opponentHoleCardContainer;
-            _communityCardContainer = communityHoleCardContainer;
-            _cardNode = cardNode;
+            _card = card;
         }
         
-        protected override void OnLeftMouseButtonPressed(Vector2 position)
+        public override void OnEnter()
         {
-            GD.Print("Left Mouse Button Pressed handled by NetherSwapCardInputHandler");
-            CheckClickOnHoleCardNodes(position);
-            CheckClickOnSelf(position);
+            base.OnEnter();
+            foreach (var holeCard in _card.PlayerHoleCardContainer.Cards)
+            {
+                holeCard.Node.OnPressed += ClickHoleCard;
+            }
+            foreach (var holeCard in _card.OpponentHoleCardContainer.Cards)
+            {
+                holeCard.Node.OnPressed += ClickHoleCard;
+            }
+            
+            foreach (var holeCard in _card.CommunityCardContainer.Cards)
+            {
+                holeCard.Node.OnPressed += ClickHoleCard;
+            }
+            _card.Node.OnPressed += ClickSelf;
+            GD.Print("Enter NetherSwapCardInputHandler");
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            foreach (var holeCard in _card.PlayerHoleCardContainer.Cards)
+            {
+                holeCard.Node.OnPressed -= ClickHoleCard;
+            }
+            foreach (var holeCard in _card.OpponentHoleCardContainer.Cards)
+            {
+                holeCard.Node.OnPressed -= ClickHoleCard;
+            }
+            foreach (var holeCard in _card.CommunityCardContainer.Cards)
+            {
+                holeCard.Node.OnPressed -= ClickHoleCard;
+            }
+            _card.Node.OnPressed -= ClickSelf;
         }
         
         protected override void OnRightMouseButtonPressed(Vector2 position)
@@ -55,77 +79,61 @@ public class NetherSwapCard: BaseSpecialCard
                 GameMgr.InputMgr.QuitCurrentInputHandler();
             }
         }
-
-        public void CheckClickOnHoleCardNodes(Vector2 position)
+        
+        protected void ClickSelf(CardNode node)
         {
-            CheckClickOnHoleCardContainer(_playerHoleCardContainer, position);
-            CheckClickOnHoleCardContainer(_opponentHoleCardContainer, position);
-            CheckClickOnHoleCardContainer(_communityCardContainer, position);
+            GameMgr.InputMgr.QuitCurrentInputHandler();
         }
         
-        public void CheckClickOnSelf(Vector2 position)
+        protected void ClickHoleCard(CardNode node)
         {
-            if (_cardNode.GetGlobalRect().HasPoint(position))
+            if (_selectedCardNode is { Card.Value: BasePokerCard fromCard})
             {
-                GameMgr.InputMgr.QuitCurrentInputHandler();
-            }
-        }
-
-        protected void CheckClickOnHoleCardContainer(Container container, Vector2 position)
-        {
-            foreach (var child in container.GetChildren())
-            {
-                if (child is not PokerCardNode cardNode) continue;
-                if (cardNode.GetGlobalRect().HasPoint(position))
+                if (node != _selectedCardNode)
                 {
-                    if (_selectedCardNode is { Card.Value: BasePokerCard pokerCard})
+                    var toCard = node.Card.Value;
+                    var fromContainer = _selectedCardNode.Container;
+                    var toContainer = node.Container;
+                    var fromIndex = fromContainer.Cards.IndexOf(fromCard);
+                    var toIndex = toContainer.Cards.IndexOf(toCard);
+                    toContainer.Cards[toIndex] = fromCard;
+                    fromContainer.Cards[fromIndex] = toCard;
+                    
+                    // keep face value in sync with their target container
+                    if (fromCard.Face.Value != toCard.Face.Value)
                     {
-                        if (pokerCard != cardNode.Card.Value)
-                        {
-                            // swap cards
-                            var tmpCard = new BasePokerCard(_selectedCardNode.Card.Value as BasePokerCard);
-                            _selectedCardNode.Card.Value = cardNode.Card.Value;
-                            cardNode.Card.Value = tmpCard;
-                            // (_selectedCardNode.Card.Value, cardNode.Card.Value) = (cardNode.Card.Value, _selectedCardNode.Card.Value);
-                            // keep the face direction of the swapped card
-                            if (_selectedCardNode.Card.Value.Face.Value != cardNode.Card.Value.Face.Value)
-                            {
-                                _selectedCardNode.Card.Value.Flip();
-                                cardNode.Card.Value.Flip();
-                            }
-                        }
-                        _selectedCardNode.Card.Value.OnLoseFocus();
-                        _selectedCardNode = null;
-                    }
-                    else
-                    {
-                        cardNode.Card.Value.OnFocused();
-                        _selectedCardNode = cardNode;
+                        (fromCard.Face.Value, toCard.Face.Value) = (toCard.Face.Value, fromCard.Face.Value);
                     }
                 }
+                _selectedCardNode.Card.Value.OnLoseFocus();
+                _selectedCardNode = null;
+            }
+            else
+            {
+                node.Card.Value.OnFocused();
+                _selectedCardNode = node;
             }
         }
     }
     
+    public CardContainer PlayerHoleCardContainer;
+    public CardContainer OpponentHoleCardContainer;
+    public CardContainer CommunityCardContainer;
     
-    private Container _playerHoleCardContainer;
-    private Container _opponentHoleCardContainer;
-    private Container _communityCardContainer;
-    
-    public NetherSwapCard(GameMgr gameMgr, Container playerHoleCardContainer, Container opponentHoleCardContainer, 
-        Container communityCardContainer, PokerPlayer owner, Enums.CardFace face) : base(gameMgr, "Nether swap",
+    public NetherSwapCard(GameMgr gameMgr, CardContainer playerHoleCardContainer, CardContainer opponentHoleCardContainer, 
+        CardContainer communityCardContainer, PokerPlayer owner, Enums.CardFace face) : base(gameMgr, "Nether swap",
         "Swap any two card in your hand, your opponent's hand or community cards.", owner, face,
         "res://Sprites/Cards/NetherSwap.png")
     {
-        _playerHoleCardContainer = playerHoleCardContainer;
-        _opponentHoleCardContainer = opponentHoleCardContainer;
-        _communityCardContainer = communityCardContainer;
+        PlayerHoleCardContainer = playerHoleCardContainer;
+        OpponentHoleCardContainer = opponentHoleCardContainer;
+        CommunityCardContainer = communityCardContainer;
     }
 
     public override void Activate()
     {
         var inputHandler =
-            new NetherSwapCardInputHandler(GameMgr, Owner, _playerHoleCardContainer, _opponentHoleCardContainer, _communityCardContainer, Node as SpecialCardNode);
+            new NetherSwapCardInputHandler(GameMgr, this);
         GameMgr.InputMgr.SwitchToInputHandler(inputHandler);
     }
 }

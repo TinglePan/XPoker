@@ -47,8 +47,8 @@ public class StraightRule: BaseHandEvaluateRule
         var cardsByRank = new Dictionary<Enums.CardRank, List<BasePokerCard>>();
         foreach (var card in cards)
         {
-            if (!cardsByRank.ContainsKey(card.Rank)) cardsByRank[card.Rank] = new List<BasePokerCard>();
-            cardsByRank[card.Rank].Add(card);
+            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<BasePokerCard>();
+            cardsByRank[card.Rank.Value].Add(card);
         }
         
         void Helper(int currentRankIndexInRange)
@@ -98,7 +98,7 @@ public class StraightRule: BaseHandEvaluateRule
     protected override List<BasePokerCard> GetPrimaryComparerCards(List<BasePokerCard> pick, List<BasePokerCard> cards)
     {
         if (!AllowAceLowStraight && !CanWrap) return base.GetPrimaryComparerCards(pick, cards);
-        var pickCardByRank = pick.ToDictionary(card => card.Rank);
+        var pickCardByRank = pick.ToDictionary(card => card.Rank.Value);
         BasePokerCard endAtPokerCard = null;
         for (int i = 0; i < Range.Count; i++)
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
@@ -11,24 +12,58 @@ public class D6Card: BaseSpecialCard
 {
     public class D6CardInputHandler : BaseInputHandler
     {
-        private PokerPlayer _player;
-        private Container _holeCardContainer;
         private CardNode _selectedCardNode;
-        private SpecialCardNode _cardNode; 
         
-        public D6CardInputHandler(GameMgr gameMgr, PokerPlayer player, Container holeCardContainer, SpecialCardNode cardNode) : base(gameMgr)
+        private D6Card _card;
+        
+        public D6CardInputHandler(GameMgr gameMgr, D6Card card) : base(gameMgr)
         {
-            _player = player;
-            _holeCardContainer = holeCardContainer;
-            _cardNode = cardNode;
+            _card = card;
+        }
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            foreach (var holeCard in _card.HoleCardContainer.Cards)
+            {
+                holeCard.Node.OnPressed += ClickHoleCard;
+            }
+
+            _card.Node.OnPressed += ClickSelf;
+            GD.Print("Enter D6CardInputHandler");
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            foreach (var holeCard in _card.HoleCardContainer.Cards)
+            {
+                holeCard.Node.OnPressed -= ClickHoleCard;
+            }
+            _card.Node.OnPressed -= ClickSelf;
+        }
+
+        protected void ClickHoleCard(CardNode node)
+        {
+            if (_selectedCardNode is { Card.Value: BasePokerCard pokerCard})
+            {
+                var newCard = GameMgr.CurrentHand.DealingDeck.Deal(
+                    facedDown: _selectedCardNode.Card.Value.Face.Value == Enums.CardFace.Down);
+                _card.HoleCardContainer.Cards[_card.HoleCardContainer.Cards.IndexOf(pokerCard)] = newCard;
+                _selectedCardNode = null;
+            }
+            else
+            {
+                node.Card.Value.OnFocused();
+                _selectedCardNode = node;
+            }
+        }
+
+        protected void ClickSelf(CardNode node)
+        {
+            GameMgr.InputMgr.QuitCurrentInputHandler();
         }
         
-        protected override void OnLeftMouseButtonPressed(Vector2 position)
-        {
-            GD.Print("Left Mouse Button Pressed handled by D6CardInputHandler");
-            CheckClickOnHoleCardNodes(position);
-            CheckClickOnSelf(position);
-        }
         
         protected override void OnRightMouseButtonPressed(Vector2 position)
         {
@@ -50,52 +85,20 @@ public class D6Card: BaseSpecialCard
                 GameMgr.InputMgr.QuitCurrentInputHandler();
             }
         }
-
-        public void CheckClickOnHoleCardNodes(Vector2 position)
-        {
-            foreach (var child in _holeCardContainer.GetChildren())
-            {
-                if (child is not CardNode cardNode) continue;
-                if (cardNode.GetGlobalRect().HasPoint(position))
-                {
-                    if (_selectedCardNode is { Card.Value: BasePokerCard pokerCard})
-                    {
-                        var newCard = GameMgr.CurrentHand.DealingDeck.Deal(
-                            facedDown: _selectedCardNode.Card.Value.Face.Value == Enums.CardFace.Down);
-                        _player.SwapHoleCard(pokerCard, newCard);
-                        _selectedCardNode = null;
-                    }
-                    else
-                    {
-                        cardNode.Card.Value.OnFocused();
-                        _selectedCardNode = cardNode;
-                    }
-                }
-            }
-        }
-        
-        public void CheckClickOnSelf(Vector2 position)
-        {
-            if (_cardNode.GetGlobalRect().HasPoint(position))
-            {
-                GameMgr.InputMgr.QuitCurrentInputHandler();
-            }
-        }
     }
     
-    private Container _holeCardContainer;
+    public CardContainer HoleCardContainer;
     
-    public D6Card(GameMgr gameMgr, Container holeCardContainer, PokerPlayer player, Enums.CardFace face) : base(gameMgr, "Dice 6", "Reroll one of your hole card", player, face, 
+    public D6Card(GameMgr gameMgr, CardContainer holeCardContainer, PokerPlayer owner, Enums.CardFace face) : base(gameMgr, "Dice 6", "Reroll one of your hole card", owner, face, 
         "res://Sprites/Cards/D6.png")
     {
-        _holeCardContainer = holeCardContainer;
-        
+        HoleCardContainer = holeCardContainer;
     }
 
     public override void Activate()
     {
         D6CardInputHandler inputHandler =
-            new D6CardInputHandler(GameMgr, Owner, _holeCardContainer, Node as SpecialCardNode);
+            new D6CardInputHandler(GameMgr, this);
         GameMgr.InputMgr.SwitchToInputHandler(inputHandler);
     }
 }

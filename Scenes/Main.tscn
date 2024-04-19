@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://v2imuunecdm" path="res://Scenes/BottomBoxUi.tscn" id="1_m812y"]
 [ext_resource type="PackedScene" uid="uid://1o86goic10u7" path="res://Scenes/PlayerControlledPlayerTab.tscn" id="2_1et4y"]
 [ext_resource type="PackedScene" uid="uid://c784ingom61r1" path="res://Scenes/OpponentPlayerTab.tscn" id="3_lvu8r"]
-[ext_resource type="Script" path="res://Scripts/Ui/CommunityCardContainer.cs" id="4_ddjib"]
+[ext_resource type="Script" path="res://Scripts/Ui/CardContainer.cs" id="4_ddjib"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="4_y43ou"]
 
 [node name="Main" type="Control"]

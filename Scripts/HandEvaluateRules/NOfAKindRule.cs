@@ -28,8 +28,8 @@ public class NOfAKindRule: BaseHandEvaluateRule
         var cardsByRank = new Dictionary<Enums.CardRank, List<BasePokerCard>>();
         foreach (var card in cards)
         {
-            if (!cardsByRank.ContainsKey(card.Rank)) cardsByRank[card.Rank] = new List<BasePokerCard>();
-            cardsByRank[card.Rank].Add(card);
+            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<BasePokerCard>();
+            cardsByRank[card.Rank.Value].Add(card);
         }
         foreach (var rank in ValidRanks)
         {

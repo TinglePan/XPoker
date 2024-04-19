@@ -8,6 +8,9 @@ public class BasePokerCard: BaseCard, IComparable<BasePokerCard>
 {
 	public ObservableProperty<Enums.CardSuit> Suit;
 
+	public ObservableProperty<Enums.CardRank> Rank;
+	public bool SuitAsSecondComparer;
+
 	public Enums.CardColor CardColor => Suit.Value switch
 	{
 		Enums.CardSuit.Spades => Enums.CardColor.Black,
@@ -16,26 +19,24 @@ public class BasePokerCard: BaseCard, IComparable<BasePokerCard>
 		Enums.CardSuit.Diamonds => Enums.CardColor.Red,
 		_ => Enums.CardColor.None
 	};
-	public Enums.CardRank Rank;
-	public bool SuitAsSecondComparer;
-
+	
 	public BasePokerCard(GameMgr gameMgr, Enums.CardSuit cardSuit, Enums.CardRank rank, Enums.CardFace face, bool suitAsSecondComparer=false): base(gameMgr, GetCardName(rank, cardSuit), GetCardName(rank, cardSuit), face)
 	{
-		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), cardSuit);
-		Rank = rank;
+		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, cardSuit);
+		Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);
 		SuitAsSecondComparer = suitAsSecondComparer;
 	}
 	
 	public BasePokerCard(BasePokerCard card): base(card)
 	{
-		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), card.Suit.Value);
+		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, card.Suit.Value);
 		Rank = card.Rank;
 		SuitAsSecondComparer = card.SuitAsSecondComparer;
 	}
 	
 	public int CompareTo(BasePokerCard other)
 	{
-		var res = Rank.CompareTo(other.Rank);
+		var res = Rank.Value.CompareTo(other.Rank.Value);
 		if (res == 0 && SuitAsSecondComparer)
 		{
 			res = Suit.Value.CompareTo(other.Suit.Value);
@@ -45,7 +46,7 @@ public class BasePokerCard: BaseCard, IComparable<BasePokerCard>
 
 	public override string ToString()
 	{
-		return $"{Rank} of {Suit.Value}(faced {Face.Value})";
+		return $"{Rank.Value} of {Suit.Value}(faced {Face.Value})";
 	}
 
 	protected static string GetCardName(Enums.CardRank rank, Enums.CardSuit suit)

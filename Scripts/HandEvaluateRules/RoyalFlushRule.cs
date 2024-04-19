@@ -24,7 +24,7 @@ public class RoyalFlushRule: StraightFlushRule
         {
             foreach (var handStrength in calculatedHandStrengths[base.Rank])
             {
-                if (handStrength.PrimaryCards.Min().Rank == Enums.CardRank.Ten)
+                if (handStrength.PrimaryCards.Min().Rank.Value == Enums.CardRank.Ten)
                 {
                     UpgradeHandRank(handStrength, forRank.Value, calculatedHandStrengths);
                 }

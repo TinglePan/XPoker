@@ -56,7 +56,7 @@ public partial class RaiseUi: BaseUi, ISetup
         // _potAmount = 0;
         // _playerNChips = 0;
         // _limit = 0;
-        _amount = new ObservableProperty<int>(nameof(_amount), 0);
+        _amount = new ObservableProperty<int>(nameof(_amount), this, 0);
         _amount.DetailedValueChanged += OnAmountChanged;
         AmountLineEdit.ValueChanged += (from, to) => _amount.Value = AmountLineEdit.Value;
         AmountBar.ValueChanged += to => _amount.Value = (int)to;

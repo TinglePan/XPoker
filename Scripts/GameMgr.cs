@@ -3,6 +3,7 @@ using Godot;
 using XCardGame.Scripts.Cards.SpecialCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts;
@@ -54,10 +55,10 @@ public partial class GameMgr : Node
 		CurrentHand = new Hand();
 		AddChild(CurrentHand);
 		
-		var communityCardContainer = GetNode<CommunityCardContainer>("/root/Main/CommunityCardContainer");
+		var communityCardContainer = GetNode<CardContainer>("/root/Main/CommunityCardContainer");
 		communityCardContainer.Setup(new Dictionary<string, object>
 		{
-			{ "hand", CurrentHand }
+			{ "cards", CurrentHand.CommunityCards }
 		});
 		PlayerControlledPlayer = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as PokerPlayer;
 		PlayerControlledPlayer?.Setup(new Dictionary<string, object>()
@@ -83,6 +84,7 @@ public partial class GameMgr : Node
 		{
 			{ "player", opponent }
 		});
+		InputMgr.SwitchToInputHandler(new MainInputHandler(this, playerTab.SpecialCardContainer));
 		if (PlayerControlledPlayer != null) {
 			PlayerControlledPlayer.SpecialCards.Add(
 				new D6Card(this, playerTab.HoleCardContainer, PlayerControlledPlayer, Enums.CardFace.Up));

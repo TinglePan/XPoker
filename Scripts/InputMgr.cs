@@ -28,8 +28,10 @@ public partial class InputMgr: Node
         if (CurrentInputHandler != null)
         {
             InputHandlerStack.Add(CurrentInputHandler);
+            CurrentInputHandler.OnExit();
         }
         CurrentInputHandler = inputHandler;
+        inputHandler.OnEnter();
     }
     
     public void QuitCurrentInputHandler()
@@ -37,8 +39,10 @@ public partial class InputMgr: Node
         GD.Print($"Quit input handler {CurrentInputHandler}");
         if (InputHandlerStack.Count > 0)
         {
+            CurrentInputHandler.OnExit();
             CurrentInputHandler = InputHandlerStack[^1];
             InputHandlerStack.RemoveAt(InputHandlerStack.Count - 1);
+            CurrentInputHandler.OnEnter();
         }
     }
     

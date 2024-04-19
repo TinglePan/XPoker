@@ -18,7 +18,7 @@ public partial class PokerPlayer: Node, ISetup
     
     public Action<PokerPlayer, BasePokerCard> OnAddHoleCard;
     public Action<PokerPlayer, BasePokerCard> OnRemoveHoleCard;
-    public Action<PokerPlayer, BasePokerCard, BasePokerCard> OnSwapHoleCard;
+    public Action<PokerPlayer, BasePokerCard, BasePokerCard> OnChangeHoleCard;
     public Action<PokerPlayer, BaseSpecialCard> OnAddSpecialCard;
     public Action<PokerPlayer, BaseSpecialCard> OnRemoveSpecialCard;
     public Action<PokerPlayer> OnFold;
@@ -51,8 +51,8 @@ public partial class PokerPlayer: Node, ISetup
     public Enums.PlayerAction RoundLastAction;
     public ObservableProperty<int> NChipsInHand;
     public ObservableProperty<int> NChipsInPot;
-    public ObservableCollection<BasePokerCard> HoleCards;
-    public ObservableCollection<BaseSpecialCard> SpecialCards;
+    public ObservableCollection<BaseCard> HoleCards;
+    public ObservableCollection<BaseCard> SpecialCards;
     
     public bool IsInHand => RoundLastAction != Enums.PlayerAction.Fold;
     public bool HasAllIn => NChipsInHand.Value == 0 && RoundBetAmount.Value > 0;
@@ -78,14 +78,14 @@ public partial class PokerPlayer: Node, ISetup
         
         PositionIndex = _hand.Players.IndexOf(this);
         
-        RoundBetAmount = new ObservableProperty<int>(nameof(RoundBetAmount), 0);
+        RoundBetAmount = new ObservableProperty<int>(nameof(RoundBetAmount), this, 0);
         RoundLastBetAmount = 0;
         RoundLastAction = Enums.PlayerAction.None;
         
-        NChipsInHand = new ObservableProperty<int>(nameof(NChipsInHand), Creature.NChips);
-        NChipsInPot = new ObservableProperty<int>(nameof(NChipsInPot), 0);
-        HoleCards = new ObservableCollection<BasePokerCard>();
-        SpecialCards = new ObservableCollection<BaseSpecialCard>();
+        NChipsInHand = new ObservableProperty<int>(nameof(NChipsInHand), this, Creature.NChips);
+        NChipsInPot = new ObservableProperty<int>(nameof(NChipsInPot), this, 0);
+        HoleCards = new ObservableCollection<BaseCard>();
+        SpecialCards = new ObservableCollection<BaseCard>();
     }
     
     public void ResetHandState()
@@ -179,11 +179,9 @@ public partial class PokerPlayer: Node, ISetup
         EmitSignal(SignalName.AfterAction, this);
     }
 
-    public void SwapHoleCard(BasePokerCard src, BasePokerCard dst)
+    public void ChangeHoleCard(int index, BasePokerCard dst)
     {
-        GD.Print($"Swap hold card: {src} for {dst}");
-        var srcIndex = HoleCards.IndexOf(src);
-        HoleCards[srcIndex] = dst;
+        HoleCards[index] = dst;
     }
     
     public async Task AskForAction(Dictionary<string, object> context)

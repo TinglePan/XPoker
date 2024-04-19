@@ -34,7 +34,7 @@ public partial class Hand: Node, ISetup
     public int CreateSidePotAtAmount;
     public int RoundCount;
     public Pot Pot;
-    public ObservableCollection<BasePokerCard> CommunityCards;
+    public ObservableCollection<BaseCard> CommunityCards;
     
     public bool IsHeadUp => Players.Count <= 2;
     
@@ -60,7 +60,7 @@ public partial class Hand: Node, ISetup
         CreateSidePotAtAmount = 0;
         RoundCount = 0;
         Pot = new Pot(this);
-        CommunityCards = new ObservableCollection<BasePokerCard>();
+        CommunityCards = new ObservableCollection<BaseCard>();
     }
 
     public virtual void Setup(Dictionary<string, object> args)
@@ -208,10 +208,11 @@ public partial class Hand: Node, ISetup
         // {
         //     GD.Print($"{player} holds: {string.Join(", ", player.HoleCards)}");
         // }
+        var communityCards = CommunityCards.OfType<BasePokerCard>().ToList();
         
-        var playerEvaluator = new HandEvaluator(Players[0].HoleCards.ToList(), CommunityCards.ToList(), 5, 0, 2);
+        var playerEvaluator = new HandEvaluator(Players[0].HoleCards.OfType<BasePokerCard>().ToList(), communityCards, 5, 0, 2);
         var playerBestHand = playerEvaluator.EvaluateBestHand();
-        var opponentEvaluator = new HandEvaluator(Players[1].HoleCards.ToList(), CommunityCards.ToList(), 5, 0, 2);
+        var opponentEvaluator = new HandEvaluator(Players[1].HoleCards.OfType<BasePokerCard>().ToList(), communityCards, 5, 0, 2);
         var opponentBestHand = opponentEvaluator.EvaluateBestHand();
         GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
         GD.Print($"{Players[1]} Best Hand: {opponentBestHand.Rank}, {string.Join(",", opponentBestHand.PrimaryCards)}, Kickers: {string.Join(",", opponentBestHand.Kickers)}");
@@ -270,6 +271,11 @@ public partial class Hand: Node, ISetup
             }
         }
         return recordIndex;
+    }
+    
+    public void ChangeCommunityCard(int index, BasePokerCard dst)
+    {
+        CommunityCards[index] = dst;
     }
     
     protected async Task AskForPlayerAction(PokerPlayer p)

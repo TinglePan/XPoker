@@ -24,14 +24,14 @@ public class NPlusMRule: NOfAKindRule
         var cardsByRank = new Dictionary<Enums.CardRank, List<BasePokerCard>>();
         foreach (var card in cards)
         {
-            if (!cardsByRank.ContainsKey(card.Rank)) cardsByRank[card.Rank] = new List<BasePokerCard>();
-            cardsByRank[card.Rank].Add(card);
+            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<BasePokerCard>();
+            cardsByRank[card.Rank.Value].Add(card);
         }
         foreach (var nPick in nPicks)
         {
             foreach (var rank in cardsByRank.Keys)
             {
-                if (rank == nPick[0].Rank || cardsByRank[rank].Count < M) continue;
+                if (rank == nPick[0].Rank.Value || cardsByRank[rank].Count < M) continue;
                 var mPicks = Utils.GetCombinations(cardsByRank[rank], M);
                 foreach (var mPick in mPicks)
                 {

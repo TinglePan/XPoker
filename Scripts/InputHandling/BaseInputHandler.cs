@@ -33,10 +33,19 @@ public class BaseInputHandler: IHandleInput
             }
         }
     }
+
+    public virtual void OnEnter()
+    {
+        
+    }
+
+    public virtual void OnExit()
+    {
+        
+    }
     
     protected virtual void OnLeftMouseButtonPressed(Vector2 position)
     {
-        GD.Print("Left Mouse Button Pressed handled by BaseInputHandler");
         OnLMouseButtonPressed?.Invoke(position);
     }
     

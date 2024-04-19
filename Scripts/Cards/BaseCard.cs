@@ -21,7 +21,7 @@ public class BaseCard
         GameMgr = gameMgr;
         Name = name;
         Description = description;
-        Face = new ObservableProperty<Enums.CardFace>(nameof(Face), face);
+        Face = new ObservableProperty<Enums.CardFace>(nameof(Face), this, face);
     }
     
     public BaseCard(BaseCard card)
@@ -29,7 +29,7 @@ public class BaseCard
         GameMgr = card.GameMgr;
         Name = card.Name;
         Description = card.Description;
-        Face = new ObservableProperty<Enums.CardFace>(nameof(Face), card.Face.Value);
+        Face = new ObservableProperty<Enums.CardFace>(nameof(Face), this, card.Face.Value);
     }
     
     public override string ToString()

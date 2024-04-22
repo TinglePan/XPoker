@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Brain;
@@ -11,7 +10,7 @@ using XCardGame.Scripts.Cards.SpecialCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 
-namespace XCardGame.Scripts;
+namespace XCardGame.Scripts.GameLogic;
 
 public partial class PokerPlayer: Node, ISetup
 {
@@ -58,7 +57,7 @@ public partial class PokerPlayer: Node, ISetup
     public bool HasAllIn => NChipsInHand.Value == 0 && RoundBetAmount.Value > 0;
     public bool CanAct => NChipsInHand.Value > 0 && IsInHand;
 
-    public void Setup(Dictionary<string, object> args)
+    public virtual void Setup(Dictionary<string, object> args)
     {
         Creature = (Creature)args["creature"];
         _hand = (Hand)args["hand"];
@@ -177,11 +176,6 @@ public partial class PokerPlayer: Node, ISetup
         RoundLastAction = Enums.PlayerAction.Check;
         OnCheck?.Invoke(this);
         EmitSignal(SignalName.AfterAction, this);
-    }
-
-    public void ChangeHoleCard(int index, BasePokerCard dst)
-    {
-        HoleCards[index] = dst;
     }
     
     public async Task AskForAction(Dictionary<string, object> context)

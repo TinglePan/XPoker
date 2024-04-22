@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Godot;
-using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.HandEvaluateRules;
+using XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
-namespace XCardGame.Scripts;
+namespace XCardGame.Scripts.HandEvaluate;
 
 public class HandEvaluator
 {
@@ -53,33 +51,31 @@ public class HandEvaluator
     };
     
     public List<BaseHandEvaluateRule> Rules;
-    public List<BasePokerCard> PlayerHoleCards;
     public List<BasePokerCard> CommunityCards;
     public int CardCount;
     public int RequiredHoleCardCountMin;
     public int RequiredHoleCardCountMax;
     // public Dictionary<string, object> Context;
     
-    public Dictionary<Enums.HandRank, List<HandStrength>> CalculatedHands;
+    public Dictionary<Enums.HandRank, List<CompletedHandStrength>> CalculatedHands;
 
-    public HandEvaluator(List<BasePokerCard> playerHoleCards, List<BasePokerCard> communityCards, int cardCount,
+    public HandEvaluator(List<BasePokerCard> communityCards, int cardCount,
         int requiredHoleCardCountMin, int requiredHoleCardCountMax, List<BaseHandEvaluateRule> rules = null)
     {
         Rules = rules ?? FiveCardHRules;
-        PlayerHoleCards = playerHoleCards;
         CommunityCards = communityCards;
         CardCount = cardCount;
         RequiredHoleCardCountMin = requiredHoleCardCountMin;
         RequiredHoleCardCountMax = requiredHoleCardCountMax;
-        CalculatedHands = new Dictionary<Enums.HandRank, List<HandStrength>>();
+        CalculatedHands = new Dictionary<Enums.HandRank, List<CompletedHandStrength>>();
     }
     
-    public HandStrength EvaluateBestHand()
+    public CompletedHandStrength EvaluateBestHand(List<BasePokerCard> holeCards)
     {
-        foreach (var cards in Utils.GetCombinationsWithXToYFromA(PlayerHoleCards, CommunityCards, 
+        foreach (var cards in Utils.GetCombinationsWithXToYFromA(holeCards, CommunityCards, 
                      CardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
         {
-            Dictionary<Enums.HandRank, List<HandStrength>> calculatedHandStrengths = new();
+            Dictionary<Enums.HandRank, List<CompletedHandStrength>> calculatedHandStrengths = new();
             foreach (var rule in Rules)
             {
                 if (calculatedHandStrengths.TryGetValue(rule.Rank, out var handStrengths) && handStrengths.Count > 0) continue;
@@ -88,7 +84,7 @@ public class HandEvaluator
 
             foreach (var (handRank, handStrengths) in calculatedHandStrengths)
             {
-                if (!CalculatedHands.ContainsKey(handRank)) CalculatedHands[handRank] = new List<HandStrength>();
+                if (!CalculatedHands.ContainsKey(handRank)) CalculatedHands[handRank] = new List<CompletedHandStrength>();
                 CalculatedHands[handRank].AddRange(handStrengths);
             }
         }
@@ -104,5 +100,10 @@ public class HandEvaluator
         }
         GD.PrintErr("No hand rank rule matched. Not supposed to happen.");
         return null;
+    }
+
+    public List<float> CompareDrawingHands(List<List<BasePokerCard>> holeCards)
+    {
+        throw new NotImplementedException();
     }
 }

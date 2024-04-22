@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Godot;
-using XCardGame.Scripts.Brain;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Ui;
-
-namespace XCardGame.Scripts;
+﻿namespace XCardGame.Scripts.GameLogic;
 
 public class Creature
 {

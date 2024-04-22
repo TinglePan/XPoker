@@ -2,7 +2,7 @@
 using System.Linq;
 using XCardGame.Scripts.Common.Constants;
 
-namespace XCardGame.Scripts.HandEvaluateRules;
+namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 public class StraightGraph
 {

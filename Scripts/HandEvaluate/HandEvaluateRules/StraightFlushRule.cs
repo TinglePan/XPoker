@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
-namespace XCardGame.Scripts.HandEvaluateRules;
+namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 public class StraightFlushRule: StraightRule
 {
@@ -15,7 +14,7 @@ public class StraightFlushRule: StraightRule
     }
     
     public override void EvaluateAndRecord(List<BasePokerCard> cards,
-        Dictionary<Enums.HandRank,List<HandStrength>> calculatedHandStrengths, Enums.HandRank? forRank=null)
+        Dictionary<Enums.HandRank,List<CompletedHandStrength>> calculatedHandStrengths, Enums.HandRank? forRank=null)
     {
         forRank ??= Rank;
         if (calculatedHandStrengths.TryGetValue(forRank.Value, out var calculatedHandStrength)) return;

@@ -62,8 +62,8 @@ public partial class ActionUi: BaseUi, ISetup
     public void Setup(Dictionary<string, object> args)
     {
         _args = args;
-        var hand = (Hand)args["hand"];
-        var player = (PokerPlayer)args["player"];
+        var hand = (GameLogic.Hand)args["hand"];
+        var player = (GameLogic.PokerPlayer)args["player"];
         var callAmount = hand.RoundCallAmount;
         var canBet = !hand.RoundHasShortAllIn;
         

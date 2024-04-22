@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.HandEvaluate;
 
-namespace XCardGame.Scripts;
+namespace XCardGame.Scripts.GameLogic;
 
 public partial class Hand: Node, ISetup
 {
@@ -37,6 +35,7 @@ public partial class Hand: Node, ISetup
     public ObservableCollection<BaseCard> CommunityCards;
     
     public bool IsHeadUp => Players.Count <= 2;
+    public bool HasOpened => RoundCallAmount > 0;
     
     public int ActingPlayerCount => Players.Count(p => p.CanAct);
     public int InHandPlayerCount => Players.Count(p => p.IsInHand);
@@ -61,6 +60,19 @@ public partial class Hand: Node, ISetup
         RoundCount = 0;
         Pot = new Pot(this);
         CommunityCards = new ObservableCollection<BaseCard>();
+    }
+
+    public override void _ExitTree()
+    {
+        if (Players != null)
+        {
+            foreach (var player in Players)
+            {
+                player.OnCall -= OnPlayerCall;
+                player.OnRaise -= OnPlayerRaise;
+                player.OnAllIn -= OnPlayerAllIn;
+            }
+        }
     }
 
     public virtual void Setup(Dictionary<string, object> args)
@@ -188,14 +200,14 @@ public partial class Hand: Node, ISetup
         }
         else
         {
-            Pot.Settlement(new Dictionary<PokerPlayer, HandStrength>()
+            Pot.Settlement(new Dictionary<PokerPlayer, CompletedHandStrength>()
             {
                 { Players[NextNActingPlayerFrom(ButtonPlayerIndex, 0)], null }
             });
         }
     }
     
-    public Dictionary<PokerPlayer, HandStrength> ShowDown()
+    public Dictionary<PokerPlayer, CompletedHandStrength> ShowDown()
     {
         // Play game
         // GD.Print("Showdown:");
@@ -209,14 +221,15 @@ public partial class Hand: Node, ISetup
         //     GD.Print($"{player} holds: {string.Join(", ", player.HoleCards)}");
         // }
         var communityCards = CommunityCards.OfType<BasePokerCard>().ToList();
-        
-        var playerEvaluator = new HandEvaluator(Players[0].HoleCards.OfType<BasePokerCard>().ToList(), communityCards, 5, 0, 2);
-        var playerBestHand = playerEvaluator.EvaluateBestHand();
-        var opponentEvaluator = new HandEvaluator(Players[1].HoleCards.OfType<BasePokerCard>().ToList(), communityCards, 5, 0, 2);
-        var opponentBestHand = opponentEvaluator.EvaluateBestHand();
+        var startTime = Time.GetTicksUsec();
+        var evaluator = new HandEvaluator(communityCards, 5, 0, 2);
+        var playerBestHand = evaluator.EvaluateBestHand(Players[0].HoleCards.OfType<BasePokerCard>().ToList());
+        var opponentBestHand = evaluator.EvaluateBestHand(Players[1].HoleCards.OfType<BasePokerCard>().ToList());
+        var endTime = Time.GetTicksUsec();
+        GD.Print($"Hand evaluation time: {endTime - startTime} us");
         GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
         GD.Print($"{Players[1]} Best Hand: {opponentBestHand.Rank}, {string.Join(",", opponentBestHand.PrimaryCards)}, Kickers: {string.Join(",", opponentBestHand.Kickers)}");
-        Dictionary<PokerPlayer, HandStrength> handStrengths = new Dictionary<PokerPlayer, HandStrength>
+        Dictionary<PokerPlayer, CompletedHandStrength> handStrengths = new Dictionary<PokerPlayer, CompletedHandStrength>
         {
             { Players[0], playerBestHand },
             { Players[1], opponentBestHand }

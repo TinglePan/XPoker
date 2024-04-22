@@ -8,7 +8,13 @@ namespace XCardGame.Scripts.Brain;
 
 public partial class BaseBrain: Node, ISetup
 {
-    protected PokerPlayer Player;
+    public GameLogic.PokerPlayer Player;
+    protected GameMgr GameMgr;
+    
+    public override void _Ready()
+    {
+        GameMgr = GetNode<GameMgr>("/root/GameMgr");
+    }
     
     public virtual Task AskForAction(Dictionary<string, object> context)
     {
@@ -16,8 +22,8 @@ public partial class BaseBrain: Node, ISetup
         return Task.CompletedTask;
     }
 
-    public void Setup(Dictionary<string, object> args)
+    public virtual void Setup(Dictionary<string, object> args)
     {
-        Player = (PokerPlayer)args["player"];
+        Player = (GameLogic.PokerPlayer)args["player"];
     }
 }

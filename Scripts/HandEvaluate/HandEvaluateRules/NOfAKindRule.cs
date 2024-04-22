@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using Microsoft.VisualBasic.CompilerServices;
-using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using Utils = XCardGame.Scripts.Common.Utils;
 
-namespace XCardGame.Scripts.HandEvaluateRules;
+namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 public class NOfAKindRule: BaseHandEvaluateRule
 {

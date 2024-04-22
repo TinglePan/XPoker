@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://tgxbmj8j2fvt"]
 
-[ext_resource type="Script" path="res://Scripts/PokerPlayer.cs" id="1_phr45"]
+[ext_resource type="Script" path="res://Scripts/GameLogic/PokerPlayer.cs" id="1_j31je"]
 
 [node name="Player" type="Node"]
-script = ExtResource("1_phr45")
+script = ExtResource("1_j31je")

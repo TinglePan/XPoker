@@ -42,11 +42,11 @@ public static class Utils
         var picksFromA = Utils.GetCombinations(a, x);
         var picksFromB = Utils.GetCombinations(b, m - x);
         var res = new List<List<T>>();
-        foreach (var pickHoleCards in picksFromA)
+        foreach (var aPicks in picksFromA)
         {
-            foreach (var pickCommunityCards in picksFromB)
+            foreach (var bPicks in picksFromB)
             {
-                res.Add(pickHoleCards.Concat(pickCommunityCards).ToList());
+                res.Add(aPicks.Concat(bPicks).ToList());
             }
         }
         return res;

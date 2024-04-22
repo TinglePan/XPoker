@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using XCardGame.Scripts.HandEvaluate;
 
-namespace XCardGame.Scripts;
+namespace XCardGame.Scripts.GameLogic;
 
 public class Pot
 {
@@ -62,7 +62,7 @@ public class Pot
         }
     }
     
-    public void Settlement(Dictionary<PokerPlayer, HandStrength> handStrengths)
+    public void Settlement(Dictionary<PokerPlayer, CompletedHandStrength> handStrengths)
     {
         SplitPot();
         var orderedHandStrengths = handStrengths.OrderByDescending(pair => pair.Value).ToList();

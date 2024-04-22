@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
-namespace XCardGame.Scripts.HandEvaluateRules;
+namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 public class BaseHandEvaluateRule
 {
     public virtual void EvaluateAndRecord(List<BasePokerCard> cards,
-        Dictionary<Enums.HandRank,List<HandStrength>> calculatedHandStrengths, Enums.HandRank? forRank=null)
+        Dictionary<Enums.HandRank,List<CompletedHandStrength>> calculatedHandStrengths, Enums.HandRank? forRank=null)
     {
         forRank ??= Rank;
         if (calculatedHandStrengths != null &&
@@ -18,17 +17,17 @@ public class BaseHandEvaluateRule
         if (calculatedHandStrengths!= null) calculatedHandStrengths[forRank.Value] = res;
     }
     
-    protected virtual List<HandStrength> Evaluate(List<BasePokerCard> cards, Enums.HandRank? forRank=null)
+    protected virtual List<CompletedHandStrength> Evaluate(List<BasePokerCard> cards, Enums.HandRank? forRank=null)
     {
         forRank ??= Rank;
         var picks = Pick(cards);
-        List<HandStrength> result = null;
+        List<CompletedHandStrength> result = null;
         if (picks != null)
         {
-            result = new List<HandStrength>();
+            result = new List<CompletedHandStrength>();
             foreach (var pick in picks)
             {
-                result.Add(new HandStrength(forRank.Value, pick,
+                result.Add(new CompletedHandStrength(forRank.Value, pick,
                     GetPrimaryComparerCards(pick, cards), GetKickers(pick, cards)));
             }
         }
@@ -54,15 +53,15 @@ public class BaseHandEvaluateRule
         return res;
     }
 
-    protected virtual void UpgradeHandRank(HandStrength target, Enums.HandRank toRank,
-        Dictionary<Enums.HandRank, List<HandStrength>> calculatedHandStrengths)
+    protected virtual void UpgradeHandRank(CompletedHandStrength target, Enums.HandRank toRank,
+        Dictionary<Enums.HandRank, List<CompletedHandStrength>> calculatedHandStrengths)
     {
         if (target.Rank != Rank) return;
         calculatedHandStrengths[target.Rank].Remove(target);
         target.Rank = toRank;
         if (!calculatedHandStrengths.ContainsKey(toRank))
         {
-            calculatedHandStrengths[toRank] = new List<HandStrength>();
+            calculatedHandStrengths[toRank] = new List<CompletedHandStrength>();
         }
         calculatedHandStrengths[toRank].Add(target);
     }

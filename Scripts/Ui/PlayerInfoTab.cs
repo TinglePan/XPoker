@@ -10,7 +10,7 @@ public partial class PlayerInfoTab : Node, ISetup
 	[Export] public Label PlayerCashLabel;
 	[Export] public Label PlayerBetLabel;
 	
-	public PokerPlayer Player;
+	public GameLogic.PokerPlayer Player;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -34,7 +34,7 @@ public partial class PlayerInfoTab : Node, ISetup
 
 	public void Setup(Dictionary<string, object> args)
 	{
-		Player = args["player"] as PokerPlayer;
+		Player = args["player"] as GameLogic.PokerPlayer;
 		if (Player != null)
 		{
 			PlayerNameLabel.Text = Player.Creature.Name;

@@ -89,7 +89,7 @@ public class D6Card: BaseSpecialCard
     
     public CardContainer HoleCardContainer;
     
-    public D6Card(GameMgr gameMgr, CardContainer holeCardContainer, PokerPlayer owner, Enums.CardFace face) : base(gameMgr, "Dice 6", "Reroll one of your hole card", owner, face, 
+    public D6Card(GameMgr gameMgr, CardContainer holeCardContainer, GameLogic.PokerPlayer owner, Enums.CardFace face) : base(gameMgr, "Dice 6", "Reroll one of your hole card", owner, face, 
         "res://Sprites/Cards/D6.png")
     {
         HoleCardContainer = holeCardContainer;

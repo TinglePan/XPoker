@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
-namespace XCardGame.Scripts;
+namespace XCardGame.Scripts.HandEvaluate;
 
-public class HandStrength: IComparable<HandStrength>
+public class CompletedHandStrength: IComparable<CompletedHandStrength>
 {
     public Enums.HandRank Rank;
     public List<BasePokerCard> PrimaryCards;
     public List<BasePokerCard> PrimaryComparerCards;
     public List<BasePokerCard> Kickers;
     
-    public HandStrength(Enums.HandRank rank, List<BasePokerCard> primaryCards, List<BasePokerCard> primaryComparerCards,
+    public CompletedHandStrength(Enums.HandRank rank, List<BasePokerCard> primaryCards, List<BasePokerCard> primaryComparerCards,
         List<BasePokerCard> kickers)
     {
         Rank = rank;
@@ -24,7 +22,7 @@ public class HandStrength: IComparable<HandStrength>
     }
 
 
-    public int CompareTo(HandStrength other)
+    public int CompareTo(CompletedHandStrength other)
     {
         if (Rank > other.Rank) return 1;
         if (Rank < other.Rank) return -1;

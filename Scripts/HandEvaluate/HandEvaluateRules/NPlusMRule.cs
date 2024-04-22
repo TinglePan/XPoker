@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Godot;
-using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 
-namespace XCardGame.Scripts.HandEvaluateRules;
+namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 public class NPlusMRule: NOfAKindRule
 {

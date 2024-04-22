@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards.SpecialCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Ui;
 
@@ -13,12 +15,14 @@ public partial class GameMgr : Node
 	[Export] public PackedScene MainScene;
 	[Export] public PackedScene PlayerPrefab;
 	
-	public PokerPlayer PlayerControlledPlayer;
+	public GameLogic.PokerPlayer PlayerControlledPlayer;
 	
 	public Node CurrentScene;
-	public Hand CurrentHand;
+	public GameLogic.Hand CurrentHand;
 	public ActionUi ActionUi;
 	public InputMgr InputMgr;
+
+	public Random Rand;
 
 	private bool IsGameStarted;
 	
@@ -26,6 +30,7 @@ public partial class GameMgr : Node
 	public override void _Ready()
 	{
 		IsGameStarted = false;
+		Rand = new Random();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -52,7 +57,7 @@ public partial class GameMgr : Node
 
 	public void StartHand()
 	{
-		CurrentHand = new Hand();
+		CurrentHand = new GameLogic.Hand();
 		AddChild(CurrentHand);
 		
 		var communityCardContainer = GetNode<CardContainer>("/root/Main/CommunityCardContainer");
@@ -60,7 +65,7 @@ public partial class GameMgr : Node
 		{
 			{ "cards", CurrentHand.CommunityCards }
 		});
-		PlayerControlledPlayer = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as PokerPlayer;
+		PlayerControlledPlayer = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as GameLogic.PokerPlayer;
 		PlayerControlledPlayer?.Setup(new Dictionary<string, object>()
 		{
 			{ "creature", new Creature("you", 100) },
@@ -72,7 +77,7 @@ public partial class GameMgr : Node
 		{
 			{ "player", PlayerControlledPlayer }
 		});
-		var opponent = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as PokerPlayer;
+		var opponent = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as GameLogic.PokerPlayer;
 		opponent?.Setup(new Dictionary<string, object>()
 		{
 			{ "creature", new Creature("cpu", 100) },
@@ -94,7 +99,7 @@ public partial class GameMgr : Node
 		}
 		CurrentHand.Setup(new Dictionary<string, object>()
 		{
-			{ "players", new List<PokerPlayer>
+			{ "players", new List<GameLogic.PokerPlayer>
 				{
 					PlayerControlledPlayer,
 					opponent

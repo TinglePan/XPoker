@@ -121,7 +121,7 @@ public class NetherSwapCard: BaseSpecialCard
     public CardContainer CommunityCardContainer;
     
     public NetherSwapCard(GameMgr gameMgr, CardContainer playerHoleCardContainer, CardContainer opponentHoleCardContainer, 
-        CardContainer communityCardContainer, PokerPlayer owner, Enums.CardFace face) : base(gameMgr, "Nether swap",
+        CardContainer communityCardContainer, GameLogic.PokerPlayer owner, Enums.CardFace face) : base(gameMgr, "Nether swap",
         "Swap any two card in your hand, your opponent's hand or community cards.", owner, face,
         "res://Sprites/Cards/NetherSwap.png")
     {

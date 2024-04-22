@@ -41,7 +41,7 @@ public partial class RaiseUi: BaseUi, ISetup
     private int _actualLimit;
     
     private ObservableProperty<int> _amount;
-    private Hand _hand;
+    private GameLogic.Hand _hand;
 
     private Dictionary<BaseButton, float> _unOpenedButtonsRatio;
     private Dictionary<BaseButton, float> _openedButtonsRatio;
@@ -81,8 +81,8 @@ public partial class RaiseUi: BaseUi, ISetup
 
     public void Setup(Dictionary<string, object> args)
     {
-        _hand = (Hand)args["hand"];
-        var player = (PokerPlayer)args["player"];
+        _hand = (GameLogic.Hand)args["hand"];
+        var player = (GameLogic.PokerPlayer)args["player"];
         var bigBlindAmount = _hand.BigBlindAmount;
         var potAmount = _hand.Pot.Total;
         var canRaiseToAmount = player.NChipsInHand.Value + player.RoundBetAmount.Value;

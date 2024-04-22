@@ -14,7 +14,7 @@ public partial class PlayerTab : Node, ISetup
 	[Export] public PackedScene CardPrefab;
 	[Export] public PackedScene SpecialCardPrefab;
 	
-	public PokerPlayer Player;
+	public GameLogic.PokerPlayer Player;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -28,7 +28,7 @@ public partial class PlayerTab : Node, ISetup
 
 	public void Setup(Dictionary<string, object> args)
 	{
-		Player = args["player"] as PokerPlayer;
+		Player = args["player"] as GameLogic.PokerPlayer;
 		if (Player != null)
 		{
 			// Player.OnAddHoleCard += OnAddHoleCard;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace XCardGame.Scripts;
+namespace XCardGame.Scripts.GameLogic;
 
 class SidePot
 {

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://boojksbjrbva"]
 
-[ext_resource type="Script" path="res://Scripts/PokerPlayer.cs" id="1_oxpem"]
+[ext_resource type="Script" path="res://Scripts/GameLogic/PokerPlayer.cs" id="1_oxpem"]
 [ext_resource type="Script" path="res://Scripts/Brain/Ai/BaseAi.cs" id="2_agrao"]
 
 [node name="Player" type="Node"]

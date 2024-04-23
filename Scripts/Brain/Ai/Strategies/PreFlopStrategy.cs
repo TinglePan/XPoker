@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
@@ -23,12 +24,13 @@ public class PreFlopStrategy: BaseStrategy
         { 49, 67, 77, 86, 92, 96, 98, 93, 81, 72, 76, 23, 46 },
         { 54, 69, 79, 87, 94, 97, 99, 100, 95, 84, 86, 91, 24 }
     };
+
+    protected static Curve RaiseMultiplierCurve = GD.Load<Curve>("res://Resources/RaiseMult2HandTier.tres");
+    protected static Curve CheckMultiplierCurve = GD.Load<Curve>("res://Resources/CheckMult2HandTier.tres");
+    protected static Curve FoldMultiplierCurve = GD.Load<Curve>("res://Resources/FoldMult2HandTier.tres");
     
-    public float Factor;
-    
-    public PreFlopStrategy(ProbabilityActionAi ai, float factor) : base(ai)
+    public PreFlopStrategy(ProbabilityActionAi ai, int weightBaseline) : base(ai, weightBaseline)
     {
-        Factor = factor;
     }
     
     public override bool CanTrigger()
@@ -50,20 +52,13 @@ public class PreFlopStrategy: BaseStrategy
         var card1Index = CardRankToIndex(sortedHoleCards[0].Rank.Value);
         var card2Index = CardRankToIndex(sortedHoleCards[1].Rank.Value);
         var handTier = isOffSuit ? PreFlopHandTier[card2Index, card1Index] : PreFlopHandTier[card1Index, card2Index];
-
-        switch (handTier)
-        {
-            case < 33:
-                Ai.RaiseWeight += (int)((33 - handTier) * 100 * Factor);
-                Ai.CheckOrCallWeight += (int)(handTier * 100 * Factor);
-                break;
-            case < 66:
-                Ai.CheckOrCallWeight += (int)((66 - handTier) * 100 * Factor);
-                break;
-            case < 100:
-                Ai.FoldWeight += (int)((handTier - 66) * 100 * Factor);
-                break;
-        }
+        
+        var checkOrCallMultiplier = CheckMultiplierCurve.SampleBaked(handTier / 100.0f);
+        var raiseMultiplier = RaiseMultiplierCurve.SampleBaked(handTier / 100.0f);
+        var foldMultiplier = FoldMultiplierCurve.SampleBaked(handTier / 100.0f);
+        Ai.CheckOrCallWeight += (int)(WeightBaseline * checkOrCallMultiplier);
+        Ai.RaiseWeight += (int)(WeightBaseline * raiseMultiplier);
+        Ai.FoldWeight += (int)(WeightBaseline * foldMultiplier);
     }
 
     protected int CardRankToIndex(Enums.CardRank rank)

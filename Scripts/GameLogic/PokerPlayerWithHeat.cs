@@ -7,34 +7,34 @@ using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public partial class PokerPlayerWithTemperature: PokerPlayer
+public partial class PokerPlayerWithHeat: PokerPlayer
 {
     public Action OnOverheat;
     
-    public ObservableProperty<int> Temperature;
-    public ObservableProperty<int> TemperatureThreshold;
+    public ObservableProperty<int> Heat;
+    public ObservableProperty<int> HeatThreshold;
     public Dictionary<Enums.HandRank, int> HandRankTemperatureMap;
 
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
         HandRankTemperatureMap = args["handRankTemperatureMap"] as Dictionary<Enums.HandRank, int>;
-        Temperature = new ObservableProperty<int>(nameof(Temperature), this, 0);
-        TemperatureThreshold = new ObservableProperty<int>(nameof(TemperatureThreshold), this, args.TryGetValue("temperatureThreshold", out var arg) ? (int)arg : 100);
-        Temperature.DetailedValueChanged += OnTemperatureChanged;
+        Heat = new ObservableProperty<int>(nameof(Heat), this, 0);
+        HeatThreshold = new ObservableProperty<int>(nameof(HeatThreshold), this, args.TryGetValue("temperatureThreshold", out var arg) ? (int)arg : 100);
+        Heat.DetailedValueChanged += OnHeatChanged;
     }
     
-    public void OnWinHand(CompletedHandStrength completedHandStrength, PokerPlayerWithTemperature opponent)
+    public void OnWinHand(CompletedHandStrength completedHandStrength, PokerPlayerWithHeat opponent)
     {
         if (HandRankTemperatureMap.TryGetValue(completedHandStrength.Rank, out var temperature))
         {
-            opponent.Temperature.Value += temperature;
+            opponent.Heat.Value += temperature;
         }
     }
     
-    protected void OnTemperatureChanged(object sender, ValueChangedEventDetailedArgs<int> args)
+    protected void OnHeatChanged(object sender, ValueChangedEventDetailedArgs<int> args)
     {
-        if (args.NewValue >= TemperatureThreshold.Value)
+        if (args.NewValue >= HeatThreshold.Value)
         {
             OnOverheat?.Invoke();
             GD.Print($"{Creature.Name} is overheating");

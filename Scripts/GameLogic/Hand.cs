@@ -114,7 +114,7 @@ public partial class Hand: Node, ISetup
         {
             player.ResetHandState();
         }
-        DealingDeck = Deck.Deal();
+        DealingDeck = Deck.CreateDealingDeck();
         ButtonPlayerIndex = 0;
         CreateSidePotAtAmount = 0;
         RoundCount = 0;
@@ -176,10 +176,19 @@ public partial class Hand: Node, ISetup
             {
                 GD.Print($"{card}");
             }
-
             LastBetPlayerIndex = RoundStartPlayerIndex;
             ActionPlayerIndex = RoundStartPlayerIndex;
         }
+        
+        // DBG: test drawing hand evaluator performance
+        var startTime = Time.GetTicksUsec();
+        var evaluator = new DrawingHandEvaluator(CommunityCards.OfType<BasePokerCard>().ToList(), 5, Deck, 5, 0, 2);
+        var odd0 = evaluator.EvaluateAverageOdd(Players[0].HoleCards.OfType<BasePokerCard>().ToList(), 100);
+        var odd1 = evaluator.EvaluateAverageOdd(Players[1].HoleCards.OfType<BasePokerCard>().ToList(), 100);
+        var endTime = Time.GetTicksUsec();
+        GD.Print($"Hand evaluation time: {endTime - startTime} us");
+        GD.Print($"{Players[0]} estimated odd: {odd0}");
+        GD.Print($"{Players[1]} estimated odd: {odd1}");
         
         while (ActingPlayerCount > 0) {
             if (Players[ActionPlayerIndex].RoundBetAmount.Value < RoundCallAmount || RoundCallAmount == 0)
@@ -222,8 +231,9 @@ public partial class Hand: Node, ISetup
         // }
         var communityCards = CommunityCards.OfType<BasePokerCard>().ToList();
         var startTime = Time.GetTicksUsec();
-        var evaluator = new HandEvaluator(communityCards, 5, 0, 2);
+        var evaluator = new CompletedHandEvaluator(communityCards, 5, 0, 2);
         var playerBestHand = evaluator.EvaluateBestHand(Players[0].HoleCards.OfType<BasePokerCard>().ToList());
+        evaluator.Clear();
         var opponentBestHand = evaluator.EvaluateBestHand(Players[1].HoleCards.OfType<BasePokerCard>().ToList());
         var endTime = Time.GetTicksUsec();
         GD.Print($"Hand evaluation time: {endTime - startTime} us");

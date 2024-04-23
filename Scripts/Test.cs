@@ -30,7 +30,7 @@ public partial class Test : Node
 			new (gameMgr, Enums.CardSuit.Hearts, Enums.CardRank.Four, Enums.CardFace.Up),
 			new (gameMgr, Enums.CardSuit.Clubs, Enums.CardRank.Three, Enums.CardFace.Up),
 		};
-		var evaluator = new HandEvaluator(communityCards, 5, 0,
+		var evaluator = new CompletedHandEvaluator(communityCards, 5, 0,
 			2);
 		var bestHand = evaluator.EvaluateBestHand(playerHoldCards);
 		GD.Print($"Best Hand: {bestHand.Rank}, {string.Join(",", bestHand.PrimaryCards)} / {string.Join(",", bestHand.Kickers)}");

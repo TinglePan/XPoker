@@ -30,7 +30,7 @@ public class BasePokerCard: BaseCard, IComparable<BasePokerCard>
 	public BasePokerCard(BasePokerCard card): base(card)
 	{
 		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, card.Suit.Value);
-		Rank = card.Rank;
+		Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, card.Rank.Value);
 		SuitAsSecondComparer = card.SuitAsSecondComparer;
 	}
 	

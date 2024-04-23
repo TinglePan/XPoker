@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using Godot;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
@@ -11,12 +13,16 @@ public class Deck
     {
         public List<BasePokerCard> CardList;
         public int CurrentTopIndex;
-        public DealingDeck(Deck deck)
+        public DealingDeck(Deck deck, List<BasePokerCard> excludedCards=null, bool deepCopy=false)
         {
             CardList = new List<BasePokerCard>();
-            foreach (BasePokerCard card in deck.CardList)
+            foreach (var card in deck.CardList)
             {
-                CardList.Add(card);
+                if (excludedCards != null && excludedCards.Contains(card))
+                {
+                    continue;
+                }
+                CardList.Add(deepCopy ? new BasePokerCard(card) : card);
             }
             CurrentTopIndex = 0;
         }
@@ -43,6 +49,7 @@ public class Deck
         public BasePokerCard Deal(bool facedDown = true)
         {
             var card = CardList[CurrentTopIndex++];
+            Debug.Assert(card.Node == null);
             card.Face.Value = facedDown ? Enums.CardFace.Down : Enums.CardFace.Up;
             return card;
         }
@@ -86,9 +93,9 @@ public class Deck
         }
     }
     
-    public DealingDeck Deal()
+    public DealingDeck CreateDealingDeck(List<BasePokerCard> excludedCards=null, bool deepCopy=false)
     {
-        var dealingDeck = new DealingDeck(this);
+        var dealingDeck = new DealingDeck(this, excludedCards, deepCopy);
         dealingDeck.Shuffle();
         return dealingDeck;
     }

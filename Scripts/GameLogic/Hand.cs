@@ -296,9 +296,21 @@ public partial class Hand: Node, ISetup
         return recordIndex;
     }
     
-    public void ChangeCommunityCard(int index, BasePokerCard dst)
+    public int RoundActingOrder(int playerIndex)
     {
-        CommunityCards[index] = dst;
+        var i = 0;
+        for (int j = 0; j < Players.Count; j++)
+        {
+            var index = NextNActingPlayerFrom(ButtonPlayerIndex, j);
+            if (index == playerIndex)
+            {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
     }
     
     protected async Task AskForPlayerAction(PokerPlayer p)

@@ -312,6 +312,20 @@ public partial class Hand: Node, ISetup
 
         return -1;
     }
+
+    public int ValidStackAmount()
+    {
+        var amount = 0;
+        foreach (var player in Players)
+        {
+            if (!player.CanAct) continue;
+            if (amount <= 0 || player.NChipsInHand.Value < amount)
+            {
+                amount = player.NChipsInHand.Value;
+            }
+        }
+        return amount;
+    }
     
     protected async Task AskForPlayerAction(PokerPlayer p)
     {

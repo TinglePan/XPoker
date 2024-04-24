@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Godot;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Brain.Ai;
@@ -9,12 +10,23 @@ public partial class ProbabilityActionAi: BaseAi
     public int FoldWeight;
     public int CheckOrCallWeight;
     public int RaiseWeight;
-    public int RaiseToAmount;
+    public float RaiseAmountMultiplier;
+    public (int, int) OpenRange;
+    public (float, float) RaisePercentageRange;
     
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        RaiseToAmount = Hand.RoundMinRaiseToAmount;
+        FoldWeight = args.TryGetValue("foldWeight", out var arg) ? (int)arg : 1000;
+        CheckOrCallWeight = args.TryGetValue("checkOrCallWeight", out arg) ? (int)arg : 1000;
+        RaiseWeight = args.TryGetValue("raiseWeight", out arg) ? (int)arg : 1000;
+        RaiseAmountMultiplier = 1.0f;
+        var openRangeMin = (int)args["openRangeMin"];
+        var openRangeMax = (int)args["openRangeMax"];
+        OpenRange = (openRangeMin, openRangeMax);
+        var raisePercentageRangeMin = (float)args["raisePercentageRangeMin"];
+        var raisePercentageRangeMax = (float)args["raisePercentageRangeMax"];
+        RaisePercentageRange = (raisePercentageRangeMin, raisePercentageRangeMax);
     }
     
     public override Task AskForAction(Dictionary<string, object> context)
@@ -52,7 +64,19 @@ public partial class ProbabilityActionAi: BaseAi
         }
         else
         {
-            Player.RaiseTo(RaiseToAmount);
+            int raiseToAmount;
+            if (Hand.HasOpened)
+            {
+                var raisePercentage = GameMgr.Rand.NextSingle() * (RaisePercentageRange.Item2 - RaisePercentageRange.Item1) + RaisePercentageRange.Item1;
+                var raiseAmount = (int)(Hand.Pot.Total * raisePercentage);
+                raiseToAmount = Mathf.Clamp(raiseAmount + Hand.RoundCallAmount, Hand.RoundMinRaiseToAmount, Player.NChipsInHand.Value + Hand.RoundCallAmount);
+            }
+            else
+            {
+                var raiseAmount = GameMgr.Rand.Next(OpenRange.Item1, OpenRange.Item2);
+                raiseToAmount = Mathf.Clamp(raiseAmount, Hand.RoundMinRaiseToAmount, Player.NChipsInHand.Value);
+            }
+            Player.RaiseTo(raiseToAmount);
         }
     }
 }

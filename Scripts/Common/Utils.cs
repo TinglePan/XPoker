@@ -104,4 +104,9 @@ public static class Utils
                 return "_";
         }
     }
+    
+    public static int RoundToNearest(int number, int n)
+    {
+        return (int)Mathf.Round((float)number / n) * n;
+    }
 }

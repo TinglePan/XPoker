@@ -142,7 +142,8 @@ public partial class Hand: Node, ISetup
                 for (int j = 0; j < Players.Count; j++)
                 {
                     var player = Players[ButtonPlayerIndex + j];
-                    bool isFaceDown = player != _gameMgr.PlayerControlledPlayer; 
+                    bool isFaceDown = player != _gameMgr.PlayerControlledPlayer;
+                    isFaceDown = false;
                     var card = DealingDeck.Deal(isFaceDown);
                     player.HoleCards.Add(card);
                     GD.Print($"Dealt hole card {card} to player {player}.");
@@ -168,6 +169,7 @@ public partial class Hand: Node, ISetup
             for (int i = 0; i < dealCardCount; i++)
             {
                 var card = DealingDeck.Deal(false);
+                
                 CommunityCards.Add(card);
             }
 
@@ -189,8 +191,9 @@ public partial class Hand: Node, ISetup
         GD.Print($"Hand evaluation time: {endTime - startTime} us");
         GD.Print($"{Players[0]} estimated odd: {odd0}");
         GD.Print($"{Players[1]} estimated odd: {odd1}");
-        
-        while (ActingPlayerCount > 0) {
+        while (ActingPlayerCount > 0 && InHandPlayerCount > 1)
+        {
+            if (ActingPlayerCount == 1 && RoundCallAmount == 0) break;
             if (Players[ActionPlayerIndex].RoundBetAmount.Value < RoundCallAmount || RoundCallAmount == 0)
             {
                 await AskForPlayerAction(Players[ActionPlayerIndex]);
@@ -219,26 +222,16 @@ public partial class Hand: Node, ISetup
     public Dictionary<PokerPlayer, CompletedHandStrength> ShowDown()
     {
         // Play game
-        // GD.Print("Showdown:");
-        // GD.Print($"CurrentCommunityCards are:");
-        // foreach (var card in CommunityCards)
-        // {
-        //     GD.Print($"{card}");
-        // }
-        // foreach (var player in Players)
-        // {
-        //     GD.Print($"{player} holds: {string.Join(", ", player.HoleCards)}");
-        // }
         var communityCards = CommunityCards.OfType<BasePokerCard>().ToList();
-        var startTime = Time.GetTicksUsec();
+        // var startTime = Time.GetTicksUsec();
         var evaluator = new CompletedHandEvaluator(communityCards, 5, 0, 2);
         var playerBestHand = evaluator.EvaluateBestHand(Players[0].HoleCards.OfType<BasePokerCard>().ToList());
         evaluator.Clear();
         var opponentBestHand = evaluator.EvaluateBestHand(Players[1].HoleCards.OfType<BasePokerCard>().ToList());
-        var endTime = Time.GetTicksUsec();
-        GD.Print($"Hand evaluation time: {endTime - startTime} us");
-        GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
-        GD.Print($"{Players[1]} Best Hand: {opponentBestHand.Rank}, {string.Join(",", opponentBestHand.PrimaryCards)}, Kickers: {string.Join(",", opponentBestHand.Kickers)}");
+        // var endTime = Time.GetTicksUsec();
+        // GD.Print($"Hand evaluation time: {endTime - startTime} us");
+        // GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
+        // GD.Print($"{Players[1]} Best Hand: {opponentBestHand.Rank}, {string.Join(",", opponentBestHand.PrimaryCards)}, Kickers: {string.Join(",", opponentBestHand.Kickers)}");
         Dictionary<PokerPlayer, CompletedHandStrength> handStrengths = new Dictionary<PokerPlayer, CompletedHandStrength>
         {
             { Players[0], playerBestHand },

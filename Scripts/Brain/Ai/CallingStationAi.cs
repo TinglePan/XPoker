@@ -8,7 +8,10 @@ public partial class CallingStationAi: ProbabilityActionAi
     {
         base.Setup(args);
         FoldWeight = 0;
+        BaseFoldWeight = 0;
         RaiseWeight = 0;
+        BaseRaiseWeight = 0;
         CheckOrCallWeight = 1000;
+        BaseCheckOrCallWeight = 1000;
     }
 }

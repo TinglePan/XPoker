@@ -68,7 +68,7 @@ public partial class GameMgr : Node
 		PlayerControlledPlayer = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as GameLogic.PokerPlayer;
 		PlayerControlledPlayer?.Setup(new Dictionary<string, object>()
 		{
-			{ "creature", new Creature("you", 100) },
+			{ "creature", new Creature("you", 1000) },
 			{ "hand", CurrentHand },
 			{ "brainScriptPath", "res://Scripts/Brain/PlayerBrain.cs" }
 		});
@@ -80,9 +80,13 @@ public partial class GameMgr : Node
 		var opponent = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as GameLogic.PokerPlayer;
 		opponent?.Setup(new Dictionary<string, object>()
 		{
-			{ "creature", new Creature("cpu", 100) },
+			{ "creature", new Creature("cpu", 1000) },
 			{ "hand", CurrentHand },
-			{ "brainScriptPath", "res://Scripts/Brain/Ai/BaseAi.cs" }
+			{ "brainScriptPath", "res://Scripts/Brain/Ai/AllStrategyAi.cs" },
+			{ "openRangeMin", CurrentHand.BigBlindAmount * 2 },
+			{ "openRangeMax", CurrentHand.BigBlindAmount * 4 },
+			{ "raisePercentageRangeMin", 0.33f },
+			{ "raisePercentageRangeMax", 1.5f },
 		});
 		var opponentTab = GetNode<PlayerTab>("/root/Main/Opponent");
 		opponentTab.Setup(new Dictionary<string, object>()

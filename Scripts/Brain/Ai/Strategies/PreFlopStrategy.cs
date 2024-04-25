@@ -47,7 +47,7 @@ public class PreFlopStrategy: BaseStrategy
     {
         var player = Ai.Player;
         var hand = Ai.Hand;
-        var sortedHoleCards = player.HoleCards.OrderByDescending(x => x).OfType<BasePokerCard>().ToList();
+        var sortedHoleCards = player.HoleCards.OfType<BasePokerCard>().OrderByDescending(x => x).ToList();
         var isOffSuit = sortedHoleCards[0].Suit != sortedHoleCards[1].Suit;
         var card1Index = CardRankToIndex(sortedHoleCards[0].Rank.Value);
         var card2Index = CardRankToIndex(sortedHoleCards[1].Rank.Value);
@@ -56,6 +56,7 @@ public class PreFlopStrategy: BaseStrategy
         var checkOrCallMultiplier = CheckMultiplierCurve.SampleBaked(handTier / 100.0f);
         var raiseMultiplier = RaiseMultiplierCurve.SampleBaked(handTier / 100.0f);
         var foldMultiplier = FoldMultiplierCurve.SampleBaked(handTier / 100.0f);
+        GD.Print($"{this} change weights: {WeightBaseline * foldMultiplier}, {WeightBaseline * checkOrCallMultiplier}, {WeightBaseline * raiseMultiplier}");
         Ai.CheckOrCallWeight += (int)(WeightBaseline * checkOrCallMultiplier);
         Ai.RaiseWeight += (int)(WeightBaseline * raiseMultiplier);
         Ai.FoldWeight += (int)(WeightBaseline * foldMultiplier);

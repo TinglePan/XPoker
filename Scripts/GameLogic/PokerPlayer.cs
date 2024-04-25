@@ -69,11 +69,9 @@ public partial class PokerPlayer: Node, ISetup
         brainNode.SetScript(brainScript);
         brainNode = InstanceFromId(objId) as Node;
         AddChild(brainNode);
+        args["player"] = this;
         _brain = brainNode as BaseBrain;
-        _brain?.Setup(new Dictionary<string, object>()
-        {
-            {"player", this},
-        });
+        _brain?.Setup(args);
         
         PositionIndex = _hand.Players.IndexOf(this);
         

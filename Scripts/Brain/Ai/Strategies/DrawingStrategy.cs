@@ -9,9 +9,9 @@ namespace XCardGame.Scripts.Brain.Ai.Strategies;
 public class DrawingStrategy: BaseStrategy
 {
     
-    protected static Curve RaiseMultiplierCurve = GD.Load<Curve>("res://Resources/RaiseMult2HandTier.tres");
-    protected static Curve CheckMultiplierCurve = GD.Load<Curve>("res://Resources/CheckMult2HandTier.tres");
-    protected static Curve FoldMultiplierCurve = GD.Load<Curve>("res://Resources/FoldMult2HandTier.tres");
+    protected static Curve RaiseMultiplierCurve = GD.Load<Curve>("res://Resources/RaiseMult2DrawingOdd.tres");
+    protected static Curve CheckMultiplierCurve = GD.Load<Curve>("res://Resources/CheckMult2DrawingOdd.tres");
+    protected static Curve FoldMultiplierCurve = GD.Load<Curve>("res://Resources/FoldMult2DrawingOdd.tres");
     
     public DrawingStrategy(ProbabilityActionAi ai, int weightBaseline) : base(ai, weightBaseline)
     {
@@ -34,9 +34,11 @@ public class DrawingStrategy: BaseStrategy
         var holeCards = player.HoleCards.OfType<BasePokerCard>().ToList();
         var communityCards = hand.CommunityCards.OfType<BasePokerCard>().ToList();
 
-        var evaluator = new CompletedHandEvaluator(communityCards, 5,
+        var evaluator = new DrawingHandEvaluator(communityCards, 5, hand.Deck, 5,
             0, 2);
         var avgOdd = evaluator.EvaluateAverageOdd(holeCards, 100);
+        
+        GD.Print($"{this} change weights: {WeightBaseline * FoldMultiplierCurve.Sample(avgOdd)}, {WeightBaseline * CheckMultiplierCurve.Sample(avgOdd)}, {WeightBaseline * RaiseMultiplierCurve.Sample(avgOdd)}");
         Ai.CheckOrCallWeight += (int)(WeightBaseline * CheckMultiplierCurve.Sample(avgOdd));
         Ai.RaiseWeight += (int)(WeightBaseline * RaiseMultiplierCurve.Sample(avgOdd));
         Ai.FoldWeight += (int)(WeightBaseline * FoldMultiplierCurve.Sample(avgOdd));

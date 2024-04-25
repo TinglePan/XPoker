@@ -131,6 +131,7 @@ public partial class CardNode: Control, ISetup
 
 	protected void OnCardAttached(BaseCard card)
 	{
+		GD.Print($"On card attached {card}");
 		card.Node = this;
 		card.Face.DetailedValueChanged += OnCardFaceChanged;
 		card.Face.FireValueChangeEventsOnInit();
@@ -149,6 +150,7 @@ public partial class CardNode: Control, ISetup
 
 	protected void OnCardDetached(BaseCard card)
 	{
+		GD.Print($"On card detached {card}");
 		if (card != null)
 		{
 			card.Face.DetailedValueChanged -= OnCardFaceChanged;
@@ -160,6 +162,7 @@ public partial class CardNode: Control, ISetup
 			{
 				Icon.Texture = null;
 			}
+			card.Node = null;
 		}
 	}
 }

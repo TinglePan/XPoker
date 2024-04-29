@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://coqodjd1u0uy2"
-path.s3tc="res://.godot/imported/diamond.png-3495d910e6637d14cff9f43d23b86dc4.s3tc.ctex"
+uid="uid://bdbxa032ie7jy"
+path.s3tc="res://.godot/imported/flame.png-2be794463a969f547927375b290b6958.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Sprites/diamond.png"
-dest_files=["res://.godot/imported/diamond.png-3495d910e6637d14cff9f43d23b86dc4.s3tc.ctex"]
+source_file="res://Sprites/flame.png"
+dest_files=["res://.godot/imported/flame.png-2be794463a969f547927375b290b6958.s3tc.ctex"]
 
 [params]
 

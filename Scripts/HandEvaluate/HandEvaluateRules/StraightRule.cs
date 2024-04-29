@@ -12,7 +12,7 @@ public class StraightRule: BaseHandEvaluateRule
     protected bool AllowAceLowStraight;
     protected List<Enums.CardRank> Range;
     
-    public override Enums.HandRank Rank => Enums.HandRank.Straight;
+    public override Enums.HandTier Tier => Enums.HandTier.Straight;
     
     public static List<Enums.CardRank> DefaultRange = new()
     {

@@ -10,7 +10,7 @@ public class FlushRule: BaseHandEvaluateRule
     protected int CardCount;
     protected List<Enums.CardSuit> ValidSuits;
 
-    public override Enums.HandRank Rank => Enums.HandRank.Flush;
+    public override Enums.HandTier Tier => Enums.HandTier.Flush;
     
     public FlushRule(int cardCount, List<Enums.CardSuit> validSuits)
     {

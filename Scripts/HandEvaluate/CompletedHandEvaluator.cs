@@ -12,7 +12,7 @@ namespace XCardGame.Scripts.HandEvaluate;
 public class CompletedHandEvaluator: BaseHandEvaluator
 {
     // public Dictionary<string, object> Context;
-    public Dictionary<Enums.HandRank, List<CompletedHandStrength>> CalculatedHands;
+    public Dictionary<Enums.HandTier, List<CompletedHand>> CalculatedHands;
 
     public CompletedHandEvaluator(List<BasePokerCard> communityCards, int cardCount,
         int requiredHoleCardCountMin, int requiredHoleCardCountMax, List<BaseHandEvaluateRule> rules = null): base(communityCards, cardCount, requiredHoleCardCountMin, requiredHoleCardCountMax, rules)
@@ -22,29 +22,29 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         CardCount = cardCount;
         RequiredHoleCardCountMin = requiredHoleCardCountMin;
         RequiredHoleCardCountMax = requiredHoleCardCountMax;
-        CalculatedHands = new Dictionary<Enums.HandRank, List<CompletedHandStrength>>();
+        CalculatedHands = new Dictionary<Enums.HandTier, List<CompletedHand>>();
     }
     
-    public CompletedHandStrength EvaluateBestHand(List<BasePokerCard> holeCards)
+    public CompletedHand EvaluateBestHand(List<BasePokerCard> holeCards)
     {
         foreach (var cards in Utils.GetCombinationsWithXToYFromA(holeCards, CommunityCards, 
                      CardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
         {
-            Dictionary<Enums.HandRank, List<CompletedHandStrength>> calculatedHandStrengths = new();
+            Dictionary<Enums.HandTier, List<CompletedHand>> calculatedHandStrengths = new();
             foreach (var rule in Rules)
             {
-                if (calculatedHandStrengths.TryGetValue(rule.Rank, out var handStrengths) && handStrengths.Count > 0) continue;
+                if (calculatedHandStrengths.TryGetValue(rule.Tier, out var handStrengths) && handStrengths.Count > 0) continue;
                 rule.EvaluateAndRecord(cards, calculatedHandStrengths);
             }
 
             foreach (var (handRank, handStrengths) in calculatedHandStrengths)
             {
-                if (!CalculatedHands.ContainsKey(handRank)) CalculatedHands[handRank] = new List<CompletedHandStrength>();
+                if (!CalculatedHands.ContainsKey(handRank)) CalculatedHands[handRank] = new List<CompletedHand>();
                 CalculatedHands[handRank].AddRange(handStrengths);
             }
         }
 
-        var handRanksInDescendingOrder = ((Enums.HandRank[])Enum.GetValues(typeof(Enums.HandRank))).
+        var handRanksInDescendingOrder = ((Enums.HandTier[])Enum.GetValues(typeof(Enums.HandTier))).
             OrderByDescending(x => x);
         foreach (var handRank in handRanksInDescendingOrder)
         {
@@ -57,7 +57,7 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         return null;
     }
 
-    public void Clear()
+    public void Reset()
     {
         CalculatedHands.Clear();
     }

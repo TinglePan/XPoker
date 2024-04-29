@@ -1,14 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using Godot;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.SpecialCards;
+namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class D6Card: BaseSpecialCard
+public class D6Card: BaseAbilityCard
 {
     public class D6CardInputHandler : BaseInputHandler
     {
@@ -47,8 +46,8 @@ public class D6Card: BaseSpecialCard
         {
             if (_selectedCardNode is { Card.Value: BasePokerCard pokerCard})
             {
-                var newCard = GameMgr.CurrentHand.DealingDeck.Deal(
-                    facedDown: _selectedCardNode.Card.Value.Face.Value == Enums.CardFace.Down);
+                var newCard = GameMgr.CurrentBattle.DealingDeck.Deal();
+                newCard.Face.Value = _selectedCardNode.Card.Value.Face.Value;
                 _card.HoleCardContainer.Cards[_card.HoleCardContainer.Cards.IndexOf(pokerCard)] = newCard;
                 _selectedCardNode = null;
             }
@@ -89,10 +88,10 @@ public class D6Card: BaseSpecialCard
     
     public CardContainer HoleCardContainer;
     
-    public D6Card(GameMgr gameMgr, CardContainer holeCardContainer, GameLogic.PokerPlayer owner, Enums.CardFace face) : base(gameMgr, "Dice 6", "Reroll one of your hole card", owner, face, 
+    public D6Card(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Dice 6", "Reroll one of your hole card", face, owner,
         "res://Sprites/Cards/D6.png")
     {
-        HoleCardContainer = holeCardContainer;
+        throw new NotImplementedException();
     }
 
     public override void Activate()

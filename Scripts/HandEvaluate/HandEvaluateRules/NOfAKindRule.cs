@@ -7,15 +7,15 @@ namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 public class NOfAKindRule: BaseHandEvaluateRule
 {
-    protected Enums.HandRank ConcreteHandRank;
+    protected Enums.HandTier ConcreteHandTier;
     protected int N;
     protected List<Enums.CardRank> ValidRanks;
     
-    public override Enums.HandRank Rank => ConcreteHandRank;
+    public override Enums.HandTier Tier => ConcreteHandTier;
 
-    public NOfAKindRule(Enums.HandRank handRank, int n, List<Enums.CardRank> validRanks)
+    public NOfAKindRule(Enums.HandTier handTier, int n, List<Enums.CardRank> validRanks)
     {
-        ConcreteHandRank = handRank;
+        ConcreteHandTier = handTier;
         N = n;
         ValidRanks = validRanks;
     }

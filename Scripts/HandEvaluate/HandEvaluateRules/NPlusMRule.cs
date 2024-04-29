@@ -10,7 +10,7 @@ public class NPlusMRule: NOfAKindRule
 {
     public int M;
     
-    public NPlusMRule(Enums.HandRank handRank, int n, int m, List<Enums.CardRank> validRanks): base(handRank, n, validRanks)
+    public NPlusMRule(Enums.HandTier handTier, int n, int m, List<Enums.CardRank> validRanks): base(handTier, n, validRanks)
     {
         M = m;
     }

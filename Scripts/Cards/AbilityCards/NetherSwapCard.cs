@@ -1,12 +1,13 @@
-﻿using Godot;
+﻿using System;
+using Godot;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.SpecialCards;
+namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class NetherSwapCard: BaseSpecialCard
+public class NetherSwapCard: BaseAbilityCard
 {
     
     public class NetherSwapCardInputHandler : BaseInputHandler
@@ -120,14 +121,11 @@ public class NetherSwapCard: BaseSpecialCard
     public CardContainer OpponentHoleCardContainer;
     public CardContainer CommunityCardContainer;
     
-    public NetherSwapCard(GameMgr gameMgr, CardContainer playerHoleCardContainer, CardContainer opponentHoleCardContainer, 
-        CardContainer communityCardContainer, GameLogic.PokerPlayer owner, Enums.CardFace face) : base(gameMgr, "Nether swap",
-        "Swap any two card in your hand, your opponent's hand or community cards.", owner, face,
+    public NetherSwapCard(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Nether swap",
+        "Swap any two card in your hand, your opponent's hand or community cards.", face, owner, 
         "res://Sprites/Cards/NetherSwap.png")
     {
-        PlayerHoleCardContainer = playerHoleCardContainer;
-        OpponentHoleCardContainer = opponentHoleCardContainer;
-        CommunityCardContainer = communityCardContainer;
+        throw new NotImplementedException();
     }
 
     public override void Activate()

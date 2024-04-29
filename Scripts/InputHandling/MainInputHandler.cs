@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.SpecialCards;
+using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.InputHandling;
@@ -11,9 +11,9 @@ public class MainInputHandler: BaseInputHandler
     
     private CardContainer _playerSpecialCardContainer;
     
-    public MainInputHandler(GameMgr gameMgr, CardContainer playerSpecialCardContainer) : base(gameMgr)
+    public MainInputHandler(GameMgr gameMgr) : base(gameMgr)
     {
-        _playerSpecialCardContainer = playerSpecialCardContainer;
+        _playerSpecialCardContainer = GameMgr.UiMgr.AbilityCardContainer;
     }
     
     public override void OnEnter()
@@ -39,7 +39,7 @@ public class MainInputHandler: BaseInputHandler
     protected void ClickCard(CardNode node)
     {
         GD.Print($"ClickCard {node.Card.Value}");
-        if (node.Card.Value is BaseSpecialCard specialCard)
+        if (node.Card.Value is BaseAbilityCard specialCard)
         {
             specialCard.Activate();
         }

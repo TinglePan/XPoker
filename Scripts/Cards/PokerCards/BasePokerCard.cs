@@ -20,7 +20,7 @@ public class BasePokerCard: BaseCard, IComparable<BasePokerCard>
 		_ => Enums.CardColor.None
 	};
 	
-	public BasePokerCard(GameMgr gameMgr, Enums.CardSuit cardSuit, Enums.CardRank rank, Enums.CardFace face, bool suitAsSecondComparer=false): base(gameMgr, GetCardName(rank, cardSuit), GetCardName(rank, cardSuit), face)
+	public BasePokerCard(Enums.CardSuit cardSuit, Enums.CardRank rank, Enums.CardFace face, bool suitAsSecondComparer=false): base(GetCardName(rank, cardSuit), GetCardName(rank, cardSuit), face)
 	{
 		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, cardSuit);
 		Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);

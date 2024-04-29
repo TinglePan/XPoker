@@ -7,14 +7,16 @@ namespace XCardGame.Scripts;
 
 public partial class InputMgr: Node
 {
+    private GameMgr _gameMgr;
+    
     public List<BaseInputHandler> InputHandlerStack;
     public BaseInputHandler CurrentInputHandler;
     
     public override void _Ready()
     {
-        var gameMgr = GetNode<GameMgr>("/root/GameMgr");
+        _gameMgr = GetNode<GameMgr>("/root/GameMgr");
         InputHandlerStack = new List<BaseInputHandler>();
-        CurrentInputHandler = new BaseInputHandler(gameMgr);
+        CurrentInputHandler = new BaseInputHandler(_gameMgr);
     }
     
     public override void _Input(InputEvent @event)

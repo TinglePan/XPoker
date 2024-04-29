@@ -44,7 +44,7 @@ public static class Enums
         Down
     }
     
-    public enum HandRank
+    public enum HandTier
     {
         HighCard,
         Pair,
@@ -65,5 +65,11 @@ public static class Enums
         Check,
         Call,
         Raise
+    }
+
+    public enum FactionId
+    {
+        Player,
+        Opponent
     }
 }

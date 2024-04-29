@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Cards.PokerCards;
-using XCardGame.Scripts.Cards.SpecialCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
@@ -142,9 +142,9 @@ public partial class CardNode: Control, ISetup
 			pokerCard.Suit.DetailedValueChanged += OnCardSuitChanged;
 			pokerCard.Suit.FireValueChangeEventsOnInit();
 		}
-		else if (card is BaseSpecialCard specialCard)
+		else if (card is BaseAbilityCard abilityCard)
 		{
-			Icon.Texture = GD.Load<Texture2D>(specialCard.IconPath);
+			Icon.Texture = GD.Load<Texture2D>(abilityCard.IconPath);
 		}
 	}
 
@@ -158,7 +158,7 @@ public partial class CardNode: Control, ISetup
 			{
 				pokerCard.Rank.DetailedValueChanged -= OnCardRankChanged;
 				pokerCard.Suit.DetailedValueChanged -= OnCardSuitChanged;
-			} else if (card is BaseSpecialCard specialCard)
+			} else if (card is BaseAbilityCard _)
 			{
 				Icon.Texture = null;
 			}

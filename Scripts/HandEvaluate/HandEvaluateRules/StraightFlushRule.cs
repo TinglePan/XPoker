@@ -7,21 +7,21 @@ namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 public class StraightFlushRule: StraightRule
 {
-    public override Enums.HandRank Rank => Enums.HandRank.StraightFlush;
+    public override Enums.HandTier Tier => Enums.HandTier.StraightFlush;
     
     public StraightFlushRule(int cardCount, bool canWrap, bool allowAceLowStraight) : base(cardCount, canWrap, allowAceLowStraight)
     {
     }
     
     public override void EvaluateAndRecord(List<BasePokerCard> cards,
-        Dictionary<Enums.HandRank,List<CompletedHandStrength>> calculatedHandStrengths, Enums.HandRank? forRank=null)
+        Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHandStrengths, Enums.HandTier? forRank=null)
     {
-        forRank ??= Rank;
+        forRank ??= Tier;
         if (calculatedHandStrengths.TryGetValue(forRank.Value, out var calculatedHandStrength)) return;
-        base.EvaluateAndRecord(cards, calculatedHandStrengths, base.Rank);
-        if (calculatedHandStrengths.ContainsKey(base.Rank))
+        base.EvaluateAndRecord(cards, calculatedHandStrengths, base.Tier);
+        if (calculatedHandStrengths.ContainsKey(base.Tier))
         {
-            foreach (var handStrength in calculatedHandStrengths[base.Rank])
+            foreach (var handStrength in calculatedHandStrengths[base.Tier])
             {
                 if (handStrength.PrimaryCards.Select(card => card.Suit).Distinct().Count() == 1)
                 {

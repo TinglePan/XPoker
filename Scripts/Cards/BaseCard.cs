@@ -2,6 +2,7 @@
 using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards;
@@ -11,22 +12,20 @@ public class BaseCard
     public string Name;
     public string Description;
     public ObservableProperty<Enums.CardFace> Face;
+    public BattleEntity Owner;
     
     public CardNode Node;
-
-    protected GameMgr GameMgr;
     
-    public BaseCard(GameMgr gameMgr, string name, string description, Enums.CardFace face)
+    public BaseCard(string name, string description, Enums.CardFace face, BattleEntity owner=null)
     {
-        GameMgr = gameMgr;
         Name = name;
         Description = description;
         Face = new ObservableProperty<Enums.CardFace>(nameof(Face), this, face);
+        Owner = owner;
     }
     
     public BaseCard(BaseCard card)
     {
-        GameMgr = card.GameMgr;
         Name = card.Name;
         Description = card.Description;
         Face = new ObservableProperty<Enums.CardFace>(nameof(Face), this, card.Face.Value);

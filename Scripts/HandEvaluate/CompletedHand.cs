@@ -5,27 +5,27 @@ using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.HandEvaluate;
 
-public class CompletedHandStrength: IComparable<CompletedHandStrength>
+public class CompletedHand: IComparable<CompletedHand>
 {
-    public Enums.HandRank Rank;
+    public Enums.HandTier Tier;
     public List<BasePokerCard> PrimaryCards;
     public List<BasePokerCard> PrimaryComparerCards;
     public List<BasePokerCard> Kickers;
     
-    public CompletedHandStrength(Enums.HandRank rank, List<BasePokerCard> primaryCards, List<BasePokerCard> primaryComparerCards,
+    public CompletedHand(Enums.HandTier tier, List<BasePokerCard> primaryCards, List<BasePokerCard> primaryComparerCards,
         List<BasePokerCard> kickers)
     {
-        Rank = rank;
+        Tier = tier;
         PrimaryCards = primaryCards;
         PrimaryComparerCards = primaryComparerCards;
         Kickers = kickers;
     }
 
 
-    public int CompareTo(CompletedHandStrength other)
+    public int CompareTo(CompletedHand other)
     {
-        if (Rank > other.Rank) return 1;
-        if (Rank < other.Rank) return -1;
+        if (Tier > other.Tier) return 1;
+        if (Tier < other.Tier) return -1;
         for (var i = 0; i < PrimaryCards.Count; i++)
         {
             if (PrimaryCards[i].Rank.Value > other.PrimaryCards[i].Rank.Value) return 1;

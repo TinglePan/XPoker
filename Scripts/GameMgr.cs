@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Godot;
-using XCardGame.Scripts.Cards.SpecialCards;
+using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
@@ -14,16 +15,14 @@ public partial class GameMgr : Node
 {
 	[Export] public PackedScene MainScene;
 	[Export] public PackedScene PlayerPrefab;
+	[Export] public PackedScene OpponentPrefab;
 	
-	public GameLogic.PokerPlayer PlayerControlledPlayer;
-	
-	public Node CurrentScene;
-	public GameLogic.Hand CurrentHand;
-	public ActionUi ActionUi;
 	public InputMgr InputMgr;
+	public UiMgr UiMgr;
+	public Node CurrentScene;
+	public Battle CurrentBattle;
 
 	public Random Rand;
-
 	private bool IsGameStarted;
 	
 	// Called when the node enters the scene tree for the first time.
@@ -46,76 +45,66 @@ public partial class GameMgr : Node
 	public void StartGame()
 	{
 		ChangeScene(MainScene);
-		InputMgr = GetNode<InputMgr>("/root/InputMgr");
-		ActionUi = GetNode<ActionUi>("/root/Main/BottomBoxUi/ActionUi");
-		ActionUi.Hide();
-		ActionUi.SetProcess(false);
-		StartHand();
+		InputMgr ??= GetNode<InputMgr>("/root/InputMgr");
+		UiMgr ??= GetNode<UiMgr>("/root/UiMgr");
 		var dbgButton = GetNode<Button>("/root/Main/Button");
-		dbgButton.Pressed += () => CurrentHand.Start();
+		dbgButton.Pressed += () => CurrentBattle.Start();
 	}
 
-	public void StartHand()
+	public void StartBattle()
 	{
-		CurrentHand = new GameLogic.Hand();
-		AddChild(CurrentHand);
+		void MockSetup()
+		{
+			var player = Utils.InstantiatePrefab(PlayerPrefab, CurrentBattle) as PlayerBattleEntity;
+			Debug.Assert(player != null);
+			player.Setup(new Dictionary<string, object>()
+			{
+				{ "name", "you" },
+				{ "battle", CurrentBattle },
+				{ "deck", Decks.PlayerInitialDeck }
+			});
+			player.AbilityCards.Add(new D6Card(this, Enums.CardFace.Up, player));
+			player.AbilityCards.Add(new NetherSwapCard(this, Enums.CardFace.Up, player));
 		
-		var communityCardContainer = GetNode<CardContainer>("/root/Main/CommunityCardContainer");
-		communityCardContainer.Setup(new Dictionary<string, object>
-		{
-			{ "cards", CurrentHand.CommunityCards }
-		});
-		PlayerControlledPlayer = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as GameLogic.PokerPlayer;
-		PlayerControlledPlayer?.Setup(new Dictionary<string, object>()
-		{
-			{ "creature", new Creature("you", 1000) },
-			{ "hand", CurrentHand },
-			{ "brainScriptPath", "res://Scripts/Brain/PlayerBrain.cs" }
-		});
-		var playerTab = GetNode<PlayerTab>("/root/Main/Player");
-		playerTab.Setup(new Dictionary<string, object>()
-		{
-			{ "player", PlayerControlledPlayer }
-		});
-		var opponent = Utils.InstantiatePrefab(PlayerPrefab, CurrentHand) as GameLogic.PokerPlayer;
-		opponent?.Setup(new Dictionary<string, object>()
-		{
-			{ "creature", new Creature("cpu", 1000) },
-			{ "hand", CurrentHand },
-			{ "brainScriptPath", "res://Scripts/Brain/Ai/AllStrategyAi.cs" },
-			{ "openRangeMin", CurrentHand.BigBlindAmount * 2 },
-			{ "openRangeMax", CurrentHand.BigBlindAmount * 4 },
-			{ "raisePercentageRangeMin", 0.33f },
-			{ "raisePercentageRangeMax", 1.5f },
-		});
-		var opponentTab = GetNode<PlayerTab>("/root/Main/Opponent");
-		opponentTab.Setup(new Dictionary<string, object>()
-		{
-			{ "player", opponent }
-		});
-		InputMgr.SwitchToInputHandler(new MainInputHandler(this, playerTab.SpecialCardContainer));
-		if (PlayerControlledPlayer != null) {
-			PlayerControlledPlayer.SpecialCards.Add(
-				new D6Card(this, playerTab.HoleCardContainer, PlayerControlledPlayer, Enums.CardFace.Up));
-			PlayerControlledPlayer.SpecialCards.Add(
-				new NetherSwapCard(this, playerTab.HoleCardContainer, opponentTab.HoleCardContainer, 
-					communityCardContainer, PlayerControlledPlayer, Enums.CardFace.Up));
+		
+			var opponent = Utils.InstantiatePrefab(OpponentPrefab, CurrentBattle) as BattleEntity;
+			Debug.Assert(opponent != null);
+			opponent.Setup(new Dictionary<string, object>()
+			{
+				{ "name", "cpu"},
+				{ "battle", CurrentBattle },
+				{ "deck", Decks.OpponentInitialDeck },
+				{ "factionId", Enums.FactionId.Opponent },
+			
+			});
+
+			UiMgr.OpenCommunityCardContainer(CurrentBattle.CommunityCards);
+			UiMgr.OpenBattleEntityUiCollection(player);
+			UiMgr.OpenBattleEntityUiCollection(opponent);
+			UiMgr.OpenAbilityCardUi(player.AbilityCards);
+		
+			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
+		
+			CurrentBattle.Setup(new Dictionary<string, object>()
+			{
+				{ "entities", new List<BattleEntity>
+					{
+						player,
+						opponent
+					}
+				},
+				{ "player", player }
+			});
 		}
-		CurrentHand.Setup(new Dictionary<string, object>()
+		
+		if (CurrentBattle == null)
 		{
-			{ "players", new List<GameLogic.PokerPlayer>
-				{
-					PlayerControlledPlayer,
-					opponent
-				} 
-			}
-		});
-		CurrentHand.Finished += () =>
-		{
-			PlayerControlledPlayer?.ResetHandState();
-			CurrentHand.Reset();
-			opponent?.ResetHandState();
-		};
+			CurrentBattle = new Battle();
+			AddChild(CurrentBattle);
+		}
+		MockSetup();
+		CurrentBattle.Start();
+		
 		// CurrentMatch.Run();
 	}
 
@@ -129,18 +118,5 @@ public partial class GameMgr : Node
 			CurrentScene.QueueFree();
 		}
 		CurrentScene = node;
-	}
-
-	public void OpenUi<T>(T target, Dictionary<string, object> context) where T: Control, ISetup
-	{
-		target.SetProcess(true);
-		target.Show();
-		target.Setup(context);
-	}
-	
-	public void CloseUi(Control target)
-	{
-		target.Hide();
-		target.SetProcess(false);
 	}
 }

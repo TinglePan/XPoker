@@ -13,9 +13,9 @@ public partial class PlayerBattleEntityUiCollection: BattleEntityUiCollection
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        GD.Print($"Self is {this}");
-        GD.Print($"BattleEntityInfoUi2 is {BattleEntityInfoUi}");
-        GD.Print($"HoleCardContainer2 is {HoleCardContainer}");
+        // GD.Print($"Self is {this}");
+        // GD.Print($"BattleEntityInfoUi2 is {BattleEntityInfoUi}");
+        // GD.Print($"HoleCardContainer2 is {HoleCardContainer}");
         var playerEntity = Entity as PlayerBattleEntity;
         Debug.Assert(playerEntity != null);
         AbilityCardContainer.Setup(new Dictionary<string, object>()

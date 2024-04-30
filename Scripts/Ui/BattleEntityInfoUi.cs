@@ -48,7 +48,7 @@ public partial class BattleEntityInfoUi : Control, ISetup, IManagedUi
 		Entity = (BattleEntity)args["entity"];
 		if (Entity != null)
 		{
-			GD.Print($"BattleEntityInfoUi Setup {NameLabel} to text {Entity.DisplayName}");
+			// GD.Print($"BattleEntityInfoUi Setup {NameLabel} to text {Entity.DisplayName}");
 			NameLabel.Text = Entity.DisplayName;
 			Entity.Morale.DetailedValueChanged += OnMoraleChanged;
 			Entity.Morale.FireValueChangeEventsOnInit();

@@ -26,9 +26,9 @@ public partial class BattleEntityUiCollection : Control, ISetup, IManagedUi
 		GameMgr = GetNode<GameMgr>("/root/GameMgr");
 		UiMgr = GetNode<UiMgr>("/root/UiMgr");
 		UiMgr.Register(this);
-		GD.Print($"self is {this}");
-		GD.Print($"BattleEntityInfoUi is {BattleEntityInfoUi}");
-		GD.Print($"HoleCardContainer is {HoleCardContainer}");
+		// GD.Print($"self is {this}");
+		// GD.Print($"BattleEntityInfoUi is {BattleEntityInfoUi}");
+		// GD.Print($"HoleCardContainer is {HoleCardContainer}");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -39,9 +39,9 @@ public partial class BattleEntityUiCollection : Control, ISetup, IManagedUi
 	public virtual void Setup(Dictionary<string, object> args)
 	{
 		Entity = (BattleEntity)args["entity"];
-		GD.Print($"BattleEntityUiCollection Setup {this}");
-		GD.Print($"BattleEntityUiCollection Setup BattleEntityInfoUi is {BattleEntityInfoUi}");
-		GD.Print($"BattleEntityUiCollection Setup HoleCardContainer is {HoleCardContainer}");
+		// GD.Print($"BattleEntityUiCollection Setup {this}");
+		// GD.Print($"BattleEntityUiCollection Setup BattleEntityInfoUi is {BattleEntityInfoUi}");
+		// GD.Print($"BattleEntityUiCollection Setup HoleCardContainer is {HoleCardContainer}");
 		if (Entity != null)
 		{
 			HoleCardContainer.Setup(new Dictionary<string, object>()

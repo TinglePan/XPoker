@@ -48,13 +48,25 @@ public partial class GameMgr : Node
 		ChangeScene(MainScene);
 		InputMgr ??= GetNode<InputMgr>("/root/InputMgr");
 		UiMgr ??= GetNode<UiMgr>("/root/UiMgr");
+		var setupButton = GetNode<Button>("/root/Main/SetupButton");
+		setupButton.Pressed += SetupBattle;
 		var startButton = GetNode<Button>("/root/Main/StartButton");
-		startButton.Pressed += () => StartBattle();
+		startButton.Pressed += () => CurrentBattle.Start();
+		var nextRoundButton = GetNode<Button>("/root/Main/NextRoundButton");
+		nextRoundButton.Pressed += () =>
+		{
+			CurrentBattle.NextRound();
+			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
+		};
 		var proceedButton = GetNode<Button>("/root/Main/ProceedButton");
-		proceedButton.Pressed += () => CurrentBattle.ShowDown();
+		proceedButton.Pressed += () =>
+		{
+			CurrentBattle.ShowDown();
+			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
+		};
 	}
 
-	public void StartBattle()
+	public void SetupBattle()
 	{
 		void MockSetup()
 		{
@@ -87,9 +99,9 @@ public partial class GameMgr : Node
 				},
 				{ "player", player }
 			});
-			GD.Print("open player");
+			// GD.Print("open player");
 			UiMgr.OpenBattleEntityUiCollection(player);
-			GD.Print("open enemy");
+			// GD.Print("open enemy");
 			UiMgr.OpenBattleEntityUiCollection(enemy);
 			UiMgr.OpenCommunityCardContainer(CurrentBattle.CommunityCards);
 		

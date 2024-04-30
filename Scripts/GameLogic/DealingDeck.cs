@@ -66,7 +66,7 @@ public class DealingDeck
     {
         if (DealingCards.Count == 0)
         {
-            return null;
+            Shuffle();
         }
         var card = DealingCards[0];
         DealingCards.RemoveAt(0);

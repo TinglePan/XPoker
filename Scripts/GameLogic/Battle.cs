@@ -46,6 +46,17 @@ public partial class Battle: Node, ISetup
         DealCards();
     }
     
+    public void NextRound()
+    {
+        RoundCount++;
+        foreach (var entity in Entities)
+        {
+            entity.RoundReset();
+        }
+        CommunityCards.Clear();
+        DealCards();
+    }
+    
     public void Reset()
     {
         DealingDeck = new DealingDeck();
@@ -79,7 +90,25 @@ public partial class Battle: Node, ISetup
     
     public void ShowDown()
     {
+        void FlipFaceDownCards(IEnumerable<BaseCard> cards)
+        {
+            foreach (var card in cards)
+            {
+                if (card.Face.Value == Enums.CardFace.Down)
+                {
+                    card.Flip();
+                }
+            }
+        }
+        
         // var startTime = Time.GetTicksUsec();
+
+        foreach (var entity in Entities)
+        {
+            FlipFaceDownCards(entity.HoleCards);
+        }
+        FlipFaceDownCards(CommunityCards);
+        
         var evaluator = new CompletedHandEvaluator(CommunityCards.OfType<BasePokerCard>().ToList(), 5, 0, 2);
         var handStrengths = new Dictionary<BattleEntity, CompletedHand>();
         foreach (var entity in Entities)

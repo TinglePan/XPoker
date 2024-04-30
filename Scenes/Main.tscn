@@ -16,16 +16,32 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="StartButton" type="Button" parent="."]
+[node name="SetupButton" type="Button" parent="."]
 layout_mode = 0
 offset_right = 8.0
 offset_bottom = 8.0
+text = "Setup
+"
+
+[node name="StartButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 55.0
+offset_right = 101.0
+offset_bottom = 31.0
 text = "Start"
+
+[node name="NextRoundButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 103.0
+offset_right = 149.0
+offset_bottom = 31.0
+text = "NextRound
+"
 
 [node name="ProceedButton" type="Button" parent="."]
 layout_mode = 0
-offset_left = 46.0
-offset_right = 92.0
+offset_left = 201.0
+offset_right = 272.0
 offset_bottom = 31.0
 text = "Proceed"
 

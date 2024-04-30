@@ -75,7 +75,6 @@ public partial class CardNode: Control, ISetup
 	    if (args["card"] is BaseCard card)
      	{
 	        Card.Value = card;
-	        card.Node = this;
         }
 
 	    if (args.ContainsKey("container") && args["container"] is CardContainer container)
@@ -163,7 +162,10 @@ public partial class CardNode: Control, ISetup
 			{
 				Icon.Texture = null;
 			}
-			card.Node = null;
+			if (card.Node == this)
+			{
+				card.Node = null;
+			}
 		}
 	}
 }

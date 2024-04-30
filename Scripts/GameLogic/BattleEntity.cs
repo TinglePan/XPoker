@@ -47,9 +47,14 @@ public partial class BattleEntity: Node, ISetup
         HoleCards = new ObservableCollection<BaseCard>();
     }
     
-    public void Reset()
+    public virtual void Reset()
     {
         Morale.Value = MaxMorale.Value;
+        RoundReset();
+    }
+    
+    public void RoundReset()
+    {
         HoleCards.Clear();
     }
 

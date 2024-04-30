@@ -5,6 +5,7 @@ using Godot;
 using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Ui;
@@ -47,8 +48,10 @@ public partial class GameMgr : Node
 		ChangeScene(MainScene);
 		InputMgr ??= GetNode<InputMgr>("/root/InputMgr");
 		UiMgr ??= GetNode<UiMgr>("/root/UiMgr");
-		var dbgButton = GetNode<Button>("/root/Main/Button");
-		dbgButton.Pressed += () => CurrentBattle.Start();
+		var startButton = GetNode<Button>("/root/Main/StartButton");
+		startButton.Pressed += () => StartBattle();
+		var proceedButton = GetNode<Button>("/root/Main/ProceedButton");
+		proceedButton.Pressed += () => CurrentBattle.ShowDown();
 	}
 
 	public void StartBattle()
@@ -61,40 +64,41 @@ public partial class GameMgr : Node
 			{
 				{ "name", "you" },
 				{ "battle", CurrentBattle },
-				{ "deck", Decks.PlayerInitialDeck }
+				{ "deck", Decks.PlayerInitialDeck },
+				{ "damageTable", DamageTables.DefaultPlayerDamageTable }
 			});
-			player.AbilityCards.Add(new D6Card(this, Enums.CardFace.Up, player));
-			player.AbilityCards.Add(new NetherSwapCard(this, Enums.CardFace.Up, player));
-		
-		
-			var opponent = Utils.InstantiatePrefab(OpponentPrefab, CurrentBattle) as BattleEntity;
-			Debug.Assert(opponent != null);
-			opponent.Setup(new Dictionary<string, object>()
+			var enemy = Utils.InstantiatePrefab(OpponentPrefab, CurrentBattle) as BattleEntity;
+			Debug.Assert(enemy != null);
+			enemy.Setup(new Dictionary<string, object>()
 			{
 				{ "name", "cpu"},
 				{ "battle", CurrentBattle },
 				{ "deck", Decks.OpponentInitialDeck },
 				{ "factionId", Enums.FactionId.Opponent },
-			
+				{ "damageTable", DamageTables.DefaultOpponentDamageTable }
 			});
-
-			UiMgr.OpenCommunityCardContainer(CurrentBattle.CommunityCards);
-			UiMgr.OpenBattleEntityUiCollection(player);
-			UiMgr.OpenBattleEntityUiCollection(opponent);
-			UiMgr.OpenAbilityCardUi(player.AbilityCards);
-		
-			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
-		
 			CurrentBattle.Setup(new Dictionary<string, object>()
 			{
 				{ "entities", new List<BattleEntity>
 					{
 						player,
-						opponent
+						enemy
 					}
 				},
 				{ "player", player }
 			});
+			GD.Print("open player");
+			UiMgr.OpenBattleEntityUiCollection(player);
+			GD.Print("open enemy");
+			UiMgr.OpenBattleEntityUiCollection(enemy);
+			UiMgr.OpenCommunityCardContainer(CurrentBattle.CommunityCards);
+		
+			// Add ability cards after player ui collection is set up to avoid firing init event for observable collection.
+			player.AbilityCards.Add(new D6Card(this, Enums.CardFace.Up, player));
+			player.AbilityCards.Add(new NetherSwapCard(this, Enums.CardFace.Up, player));
+
+			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
+		
 		}
 		
 		if (CurrentBattle == null)
@@ -110,6 +114,7 @@ public partial class GameMgr : Node
 
 	public void ChangeScene(PackedScene scene)
 	{
+		GD.Print("Changing scene...");
 		var root = GetTree().Root;
 		var node = Utils.InstantiatePrefab(scene, root);
 		if (CurrentScene != null)

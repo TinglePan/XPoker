@@ -91,7 +91,7 @@ public class D6Card: BaseAbilityCard
     public D6Card(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Dice 6", "Reroll one of your hole card", face, owner,
         "res://Sprites/Cards/D6.png")
     {
-        throw new NotImplementedException();
+        HoleCardContainer = GameMgr.UiMgr.GetNodeById<CardContainer>("playerHoleCardContainer");
     }
 
     public override void Activate()

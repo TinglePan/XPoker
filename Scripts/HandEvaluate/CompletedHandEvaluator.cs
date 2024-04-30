@@ -61,14 +61,4 @@ public class CompletedHandEvaluator: BaseHandEvaluator
     {
         CalculatedHands.Clear();
     }
-    
-    public override List<float> EvaluateOdds(List<List<BasePokerCard>> holeCards)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override float EvaluateAverageOdd(List<BasePokerCard> holeCards, int nTrials)
-    {
-        throw new NotImplementedException();
-    }
 }

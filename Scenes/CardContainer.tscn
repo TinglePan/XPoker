@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/Ui/CardContainer.cs" id="1_7d008"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="2_8ajwj"]
 
-[node name="SpecialCards" type="HBoxContainer"]
+[node name="Cards" type="HBoxContainer" groups=["cardContainer"]]
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5

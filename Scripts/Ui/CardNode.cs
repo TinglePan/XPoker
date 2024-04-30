@@ -75,7 +75,8 @@ public partial class CardNode: Control, ISetup
 	    if (args["card"] is BaseCard card)
      	{
 	        Card.Value = card;
-     	}
+	        card.Node = this;
+        }
 
 	    if (args.ContainsKey("container") && args["container"] is CardContainer container)
 	    {

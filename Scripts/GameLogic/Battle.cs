@@ -19,7 +19,7 @@ public partial class Battle: Node, ISetup
     public PlayerBattleEntity Player;
     public List<BattleEntity> Entities;
     public DealingDeck DealingDeck;
-    public ObservableCollection<BasePokerCard> CommunityCards;
+    public ObservableCollection<BaseCard> CommunityCards;
     public int DealCommunityCardCount;
     public int FaceDownCommunityCardCount;
     
@@ -28,19 +28,21 @@ public partial class Battle: Node, ISetup
     public override void _Ready()
     {
         _gameMgr = GetNode<GameMgr>("/root/GameMgr");
-        CommunityCards = new ObservableCollection<BasePokerCard>();
+        CommunityCards = new ObservableCollection<BaseCard>();
     }
 
     public virtual void Setup(Dictionary<string, object> args)
     {
-        Entities = args["entities"] as List<BattleEntity> ?? new List<BattleEntity>();
         Player = args["player"] as PlayerBattleEntity;
-        
+        Entities = args["entities"] as List<BattleEntity> ?? new List<BattleEntity>();
+        DealCommunityCardCount = args.TryGetValue("dealCommunityCardCount", out var arg) ? (int)arg : Configuration.DefaultDealCommunityCardCount;
+        FaceDownCommunityCardCount = args.TryGetValue("faceDownCommunityCardCount", out arg) ? (int)arg : Configuration.DefaultFaceDownCommunityCardCount;
     }
     
     public void Start()
     {
         Reset();
+        DealingDeck.Shuffle();
         DealCards();
     }
     
@@ -78,11 +80,11 @@ public partial class Battle: Node, ISetup
     public void ShowDown()
     {
         // var startTime = Time.GetTicksUsec();
-        var evaluator = new CompletedHandEvaluator(CommunityCards.ToList(), 5, 0, 2);
+        var evaluator = new CompletedHandEvaluator(CommunityCards.OfType<BasePokerCard>().ToList(), 5, 0, 2);
         var handStrengths = new Dictionary<BattleEntity, CompletedHand>();
         foreach (var entity in Entities)
         {
-            handStrengths.Add(entity, evaluator.EvaluateBestHand(entity.HoleCards.ToList()));
+            handStrengths.Add(entity, evaluator.EvaluateBestHand(entity.HoleCards.OfType<BasePokerCard>().ToList()));
             evaluator.Reset();
         }
 
@@ -113,6 +115,11 @@ public partial class Battle: Node, ISetup
 
     public void OnEntityWin(BattleEntity e)
     {
+    }
+
+    public void OnEntityDefeated(BattleEntity e)
+    {
+        GD.Print($"{e} defeated");
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
@@ -25,18 +26,12 @@ public class NetherSwapCard: BaseAbilityCard
         public override void OnEnter()
         {
             base.OnEnter();
-            foreach (var holeCard in _card.PlayerHoleCardContainer.Cards)
+            foreach (var cardContainer in _card.CardContainers)
             {
-                holeCard.Node.OnPressed += ClickHoleCard;
-            }
-            foreach (var holeCard in _card.OpponentHoleCardContainer.Cards)
-            {
-                holeCard.Node.OnPressed += ClickHoleCard;
-            }
-            
-            foreach (var holeCard in _card.CommunityCardContainer.Cards)
-            {
-                holeCard.Node.OnPressed += ClickHoleCard;
+                foreach (var card in cardContainer.Cards)
+                {
+                    card.Node.OnPressed += ClickCard;
+                }
             }
             _card.Node.OnPressed += ClickSelf;
             GD.Print("Enter NetherSwapCardInputHandler");
@@ -45,17 +40,12 @@ public class NetherSwapCard: BaseAbilityCard
         public override void OnExit()
         {
             base.OnExit();
-            foreach (var holeCard in _card.PlayerHoleCardContainer.Cards)
+            foreach (var cardContainer in _card.CardContainers)
             {
-                holeCard.Node.OnPressed -= ClickHoleCard;
-            }
-            foreach (var holeCard in _card.OpponentHoleCardContainer.Cards)
-            {
-                holeCard.Node.OnPressed -= ClickHoleCard;
-            }
-            foreach (var holeCard in _card.CommunityCardContainer.Cards)
-            {
-                holeCard.Node.OnPressed -= ClickHoleCard;
+                foreach (var card in cardContainer.Cards)
+                {
+                    card.Node.OnPressed -= ClickCard;
+                }
             }
             _card.Node.OnPressed -= ClickSelf;
         }
@@ -86,7 +76,7 @@ public class NetherSwapCard: BaseAbilityCard
             GameMgr.InputMgr.QuitCurrentInputHandler();
         }
         
-        protected void ClickHoleCard(CardNode node)
+        protected void ClickCard(CardNode node)
         {
             if (_selectedCardNode is { Card.Value: BasePokerCard fromCard})
             {
@@ -117,15 +107,13 @@ public class NetherSwapCard: BaseAbilityCard
         }
     }
     
-    public CardContainer PlayerHoleCardContainer;
-    public CardContainer OpponentHoleCardContainer;
-    public CardContainer CommunityCardContainer;
+    public List<CardContainer> CardContainers;
     
     public NetherSwapCard(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Nether swap",
         "Swap any two card in your hand, your opponent's hand or community cards.", face, owner, 
         "res://Sprites/Cards/NetherSwap.png")
     {
-        throw new NotImplementedException();
+        CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }
 
     public override void Activate()

@@ -9,18 +9,18 @@ namespace XCardGame.Scripts.InputHandling;
 public class MainInputHandler: BaseInputHandler
 {
     
-    private CardContainer _playerSpecialCardContainer;
+    private CardContainer _abilityCardContainer;
     
     public MainInputHandler(GameMgr gameMgr) : base(gameMgr)
     {
-        _playerSpecialCardContainer = GameMgr.UiMgr.AbilityCardContainer;
+        _abilityCardContainer = GameMgr.UiMgr.GetNodeById<CardContainer>("abilityCardContainer");
     }
     
     public override void OnEnter()
     {
         base.OnEnter();
-        _playerSpecialCardContainer.Cards.CollectionChanged += OnSpecialCardCollectionChanged;
-        foreach (var card in _playerSpecialCardContainer.Cards)
+        _abilityCardContainer.Cards.CollectionChanged += OnSpecialCardCollectionChanged;
+        foreach (var card in _abilityCardContainer.Cards)
         {
             card.Node.OnPressed += ClickCard;
         }
@@ -29,8 +29,8 @@ public class MainInputHandler: BaseInputHandler
     public override void OnExit()
     {
         base.OnExit();
-        _playerSpecialCardContainer.Cards.CollectionChanged -= OnSpecialCardCollectionChanged;
-        foreach (var card in _playerSpecialCardContainer.Cards)
+        _abilityCardContainer.Cards.CollectionChanged -= OnSpecialCardCollectionChanged;
+        foreach (var card in _abilityCardContainer.Cards)
         {
             card.Node.OnPressed -= ClickCard;
         }

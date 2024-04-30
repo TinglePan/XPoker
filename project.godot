@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameMgr="*res://Scenes/GameMgr.tscn"
 InputMgr="*res://Scripts/InputMgr.cs"
+UiMgr="*res://Scripts/UiMgr.cs"
 
 [dotnet]
 

@@ -1,23 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Reflection;
 using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Ui;
 
-public partial class CardContainer: Container
+public partial class CardContainer: Container, IManagedUi
 {
+    [Export] public string Identifier { get; set; }
+    
     [Export]
     public PackedScene CardPrefab;
 
     public ObservableCollection<BaseCard> Cards;
+    public GameMgr GameMgr { get; private set; }
+    public UiMgr UiMgr { get; private set; }
     
     
     public override void _Ready()
     {
         ClearChildren();
+        GameMgr = GetNode<GameMgr>("/root/GameMgr");
+        UiMgr = GetNode<UiMgr>("/root/UiMgr");
+        UiMgr.Register(this);
     }
 
     public override void _ExitTree()
@@ -31,7 +41,7 @@ public partial class CardContainer: Container
 
     public void Setup(Dictionary<string, object> args)
     {
-        if (args["cards"] is ObservableCollection<BaseCard> cards)
+        if (args["cards"] is ObservableCollection<BaseCard> cards && cards != Cards)
         {
             Cards = cards;
             cards.CollectionChanged += OnCardsChanged;

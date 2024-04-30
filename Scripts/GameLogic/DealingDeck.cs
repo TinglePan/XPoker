@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
@@ -28,11 +29,12 @@ public class DealingDeck
         {
             MixIn(deck, excludedCards);
         }
+        Shuffle();
     }
     
     public void MixIn(Deck deck, List<BasePokerCard> excludedCards = null)
     {
-        foreach (var card in deck.CardList)
+        foreach (var card in deck.CardList.OfType<BasePokerCard>())
         {
             if (excludedCards != null && excludedCards.Contains(card))
             {

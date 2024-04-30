@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://nko5a5mn6ufg"]
+[gd_scene load_steps=8 format=3 uid="uid://nko5a5mn6ufg"]
 
-[ext_resource type="PackedScene" uid="uid://v2imuunecdm" path="res://Scenes/BottomBoxUi.tscn" id="1_m812y"]
-[ext_resource type="PackedScene" uid="uid://1o86goic10u7" path="res://Scenes/PlayerControlledPlayerTab.tscn" id="2_1et4y"]
-[ext_resource type="PackedScene" uid="uid://c784ingom61r1" path="res://Scenes/OpponentPlayerTab.tscn" id="3_lvu8r"]
+[ext_resource type="PackedScene" uid="uid://cu8cytigbn45" path="res://Scenes/DialogueBoxUi.tscn" id="1_ofsbe"]
+[ext_resource type="Script" path="res://Scripts/Ui/BattleEntityUiCollection.cs" id="4_545oh"]
 [ext_resource type="Script" path="res://Scripts/Ui/CardContainer.cs" id="4_ddjib"]
+[ext_resource type="Script" path="res://Scripts/Ui/PlayerBattleEntityUiCollection.cs" id="4_kno6j"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="4_y43ou"]
+[ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="5_k1xbh"]
+[ext_resource type="PackedScene" uid="uid://cp0d1hoqmk0ia" path="res://Scenes/InfoUi.tscn" id="6_j08d8"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -14,44 +16,27 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Button" type="Button" parent="."]
+[node name="StartButton" type="Button" parent="."]
 layout_mode = 0
 offset_right = 8.0
 offset_bottom = 8.0
-text = "Dbg"
+text = "Start"
 
-[node name="Player" parent="." instance=ExtResource("2_1et4y")]
+[node name="ProceedButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 46.0
+offset_right = 92.0
+offset_bottom = 31.0
+text = "Proceed"
+
+[node name="DialogueBoxUi" parent="." instance=ExtResource("1_ofsbe")]
 layout_mode = 1
-anchors_preset = 2
-anchor_left = 0.0
+anchors_preset = 12
 anchor_top = 1.0
-anchor_right = 0.0
-anchor_bottom = 1.0
-offset_left = 175.0
-offset_top = -200.0
-offset_right = 175.0
-offset_bottom = -200.0
-grow_horizontal = 1
+offset_top = -160.0
 grow_vertical = 0
 
-[node name="BottomBoxUi" parent="." instance=ExtResource("1_m812y")]
-layout_mode = 1
-
-[node name="Opponent" parent="." instance=ExtResource("3_lvu8r")]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_top = 0.0
-anchor_right = 1.0
-anchor_bottom = 0.0
-offset_left = -175.0
-offset_top = 64.0
-offset_right = -175.0
-offset_bottom = 64.0
-grow_horizontal = 0
-grow_vertical = 1
-
-[node name="CommunityCardContainer" type="HBoxContainer" parent="."]
+[node name="CommunityCardContainer" type="HBoxContainer" parent="." groups=["cardContainer", "pokerCardContainer"]]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -66,6 +51,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 16
 script = ExtResource("4_ddjib")
+Identifier = "communityCardContainer"
 CardPrefab = ExtResource("4_y43ou")
 
 [node name="Card" parent="CommunityCardContainer" instance=ExtResource("4_y43ou")]
@@ -82,3 +68,95 @@ layout_mode = 2
 
 [node name="Card5" parent="CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
+
+[node name="PlayerUiCollection" type="Control" parent="." node_paths=PackedStringArray("AbilityCardContainer", "BattleEntityInfoUi", "HoleCardContainer")]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -160.0
+offset_bottom = -160.0
+grow_vertical = 0
+script = ExtResource("4_kno6j")
+AbilityCardContainer = NodePath("AbilityCards")
+BattleEntityInfoUi = NodePath("InfoTab1")
+HoleCardContainer = NodePath("Cards1")
+Identifier = "playerUiCollection"
+
+[node name="Cards1" parent="PlayerUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 175.0
+offset_top = -174.0
+offset_right = 175.0
+offset_bottom = -174.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="InfoTab1" parent="PlayerUiCollection" instance=ExtResource("6_j08d8")]
+layout_mode = 1
+anchors_preset = 2
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = -128.0
+offset_right = 0.0
+offset_bottom = -128.0
+grow_horizontal = 1
+grow_vertical = 0
+
+[node name="AbilityCards" parent="PlayerUiCollection" instance=ExtResource("5_k1xbh")]
+layout_mode = 1
+offset_left = 376.0
+offset_top = -106.0
+offset_right = 432.0
+offset_bottom = -22.0
+Identifier = "abilityCardContainer"
+
+[node name="EnemyUiCollection" type="Control" parent="." node_paths=PackedStringArray("BattleEntityInfoUi", "HoleCardContainer")]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -350.0
+offset_right = -350.0
+grow_horizontal = 0
+script = ExtResource("4_545oh")
+BattleEntityInfoUi = NodePath("InfoTab2")
+HoleCardContainer = NodePath("Cards2")
+Identifier = "enemyUiCollection"
+
+[node name="Cards2" parent="EnemyUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = 179.0
+offset_top = 177.0
+offset_right = 179.0
+offset_bottom = 177.0
+grow_horizontal = 2
+grow_vertical = 1
+
+[node name="InfoTab2" parent="EnemyUiCollection" instance=ExtResource("6_j08d8")]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 0
+grow_vertical = 1

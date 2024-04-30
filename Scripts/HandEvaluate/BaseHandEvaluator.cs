@@ -63,14 +63,4 @@ public class BaseHandEvaluator
         RequiredHoleCardCountMin = requiredHoleCardCountMin;
         RequiredHoleCardCountMax = requiredHoleCardCountMax;
     }
-    
-    public virtual List<float> EvaluateOdds(List<List<BasePokerCard>> holeCards)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual float EvaluateAverageOdd(List<BasePokerCard> holeCards, int nTrials)
-    {
-        throw new NotImplementedException();
-    }
 }

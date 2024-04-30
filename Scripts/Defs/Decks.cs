@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 
-namespace XCardGame.Scripts;
+namespace XCardGame.Scripts.Defs;
 
 public static class Decks
 {

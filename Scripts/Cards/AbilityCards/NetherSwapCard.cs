@@ -8,7 +8,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class NetherSwapCard: BaseAbilityCard
+public class NetherSwapCard: BaseActiveAbilityCard
 {
     
     public class NetherSwapCardInputHandler : BaseInputHandler
@@ -111,7 +111,7 @@ public class NetherSwapCard: BaseAbilityCard
     
     public NetherSwapCard(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Nether swap",
         "Swap any two card in your hand, your opponent's hand or community cards.", face, owner, 
-        "res://Sprites/Cards/NetherSwap.png")
+        "res://Sprites/Cards/NetherSwap.png", 1, 0)
     {
         CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }

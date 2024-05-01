@@ -19,7 +19,7 @@ public class MainInputHandler: BaseInputHandler
     public override void OnEnter()
     {
         base.OnEnter();
-        _abilityCardContainer.Cards.CollectionChanged += OnSpecialCardCollectionChanged;
+        _abilityCardContainer.Cards.CollectionChanged += OnAbilityCardCollectionChanged;
         foreach (var card in _abilityCardContainer.Cards)
         {
             card.Node.OnPressed += ClickCard;
@@ -29,7 +29,7 @@ public class MainInputHandler: BaseInputHandler
     public override void OnExit()
     {
         base.OnExit();
-        _abilityCardContainer.Cards.CollectionChanged -= OnSpecialCardCollectionChanged;
+        _abilityCardContainer.Cards.CollectionChanged -= OnAbilityCardCollectionChanged;
         foreach (var card in _abilityCardContainer.Cards)
         {
             card.Node.OnPressed -= ClickCard;
@@ -39,13 +39,13 @@ public class MainInputHandler: BaseInputHandler
     protected void ClickCard(CardNode node)
     {
         GD.Print($"ClickCard {node.Card.Value}");
-        if (node.Card.Value is BaseAbilityCard specialCard)
+        if (node.Card.Value is BaseActiveAbilityCard card)
         {
-            specialCard.Activate();
+            card.Activate();
         }
     }
     
-    protected void OnSpecialCardCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+    protected void OnAbilityCardCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
     {
         switch (args.Action)
         {

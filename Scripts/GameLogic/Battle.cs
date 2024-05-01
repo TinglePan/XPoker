@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,9 +13,9 @@ namespace XCardGame.Scripts.GameLogic;
 
 public partial class Battle: Node, ISetup
 {
-    [Signal]
-    public delegate void FinishedEventHandler();
-
+    public Action OnNewRound;
+    public Action OnBattleFinished;
+    
     public int RoundCount;
     public PlayerBattleEntity Player;
     public List<BattleEntity> Entities;
@@ -46,7 +47,7 @@ public partial class Battle: Node, ISetup
         DealCards();
     }
     
-    public void NextRound()
+    public void NewRound()
     {
         RoundCount++;
         foreach (var entity in Entities)

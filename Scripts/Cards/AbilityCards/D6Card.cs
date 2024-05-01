@@ -8,11 +8,11 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class D6Card: BaseAbilityCard
+public class D6Card: BaseActiveAbilityCard
 {
     private List<CardContainer> _cardContainers;
     public D6Card(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Dice 6", "Reroll one of your hole card", face, owner,
-        "res://Sprites/Cards/D6.png")
+        "res://Sprites/Cards/D6.png", 1, 0)
     {
         _cardContainers = gameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }
@@ -31,6 +31,6 @@ public class D6Card: BaseAbilityCard
                 cardContainer.Cards[i] = newCard;
             }
         }
-        
+        AfterEffect?.Invoke();
     }
 }

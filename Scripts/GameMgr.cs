@@ -55,7 +55,7 @@ public partial class GameMgr : Node
 		var nextRoundButton = GetNode<Button>("/root/Main/NextRoundButton");
 		nextRoundButton.Pressed += () =>
 		{
-			CurrentBattle.NextRound();
+			CurrentBattle.NewRound();
 			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
 		};
 		var proceedButton = GetNode<Button>("/root/Main/ProceedButton");

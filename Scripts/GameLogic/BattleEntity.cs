@@ -53,7 +53,7 @@ public partial class BattleEntity: Node, ISetup
         RoundReset();
     }
     
-    public void RoundReset()
+    public virtual void RoundReset()
     {
         HoleCards.Clear();
     }

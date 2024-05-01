@@ -22,7 +22,7 @@ public class BaseAbilityCard: BaseCard
     
     public virtual void Activate()
     {
-        GD.Print($"Special Card {this} Activated");
+        GD.Print($"Ability Card {this} Activated");
     }
     
     

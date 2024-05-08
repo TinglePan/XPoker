@@ -48,6 +48,14 @@ public partial class CardContainer: Container, IManagedUi
         }
     }
     
+    public void ClearChildren()
+    {
+        foreach (var child in GetChildren())
+        {
+            child.QueueFree();
+        }
+    }
+    
     protected void OnCardsChanged(object sender, NotifyCollectionChangedEventArgs args)
     {
         switch (args.Action)
@@ -82,14 +90,6 @@ public partial class CardContainer: Container, IManagedUi
             case NotifyCollectionChangedAction.Reset:
                 ClearChildren();
                 break;
-        }
-    }
-    
-    protected void ClearChildren()
-    {
-        foreach (var child in GetChildren())
-        {
-            child.QueueFree();
         }
     }
 }

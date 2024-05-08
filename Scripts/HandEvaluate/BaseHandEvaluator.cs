@@ -49,16 +49,14 @@ public class BaseHandEvaluator
     
     
     public List<BaseHandEvaluateRule> Rules;
-    public List<BasePokerCard> CommunityCards;
     public int CardCount;
     public int RequiredHoleCardCountMin;
     public int RequiredHoleCardCountMax;
     
-    public BaseHandEvaluator(List<BasePokerCard> communityCards, int cardCount,
-        int requiredHoleCardCountMin, int requiredHoleCardCountMax, List<BaseHandEvaluateRule> rules = null)
+    public BaseHandEvaluator(int cardCount, int requiredHoleCardCountMin, int requiredHoleCardCountMax,
+        List<BaseHandEvaluateRule> rules = null)
     {
         Rules = rules ?? FiveCardHRules;
-        CommunityCards = communityCards;
         CardCount = cardCount;
         RequiredHoleCardCountMin = requiredHoleCardCountMin;
         RequiredHoleCardCountMax = requiredHoleCardCountMax;

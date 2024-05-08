@@ -8,7 +8,7 @@ public static class DamageTables
     
     private static Dictionary<Enums.HandTier, int> _defaultDamageTable = new()
     {
-        { Enums.HandTier.HighCard, 0 },
+        { Enums.HandTier.HighCard, 1 },
 
         { Enums.HandTier.Pair, 1 },
 

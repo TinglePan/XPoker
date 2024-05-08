@@ -16,11 +16,12 @@ public class NetherSwapCard: BaseActiveAbilityCard
 
         private NetherSwapCard _card;
         
-        private CardNode _selectedCardNode;
+        private List<CardNode> _selectedCardNodes;
         
         public NetherSwapCardInputHandler(GameMgr gameMgr, NetherSwapCard card) : base(gameMgr)
         {
             _card = card;
+            _selectedCardNodes = new List<CardNode>();
         }
         
         public override void OnEnter()
@@ -52,57 +53,61 @@ public class NetherSwapCard: BaseActiveAbilityCard
         
         protected override void OnRightMouseButtonPressed(Vector2 position)
         {
-            if (_selectedCardNode is { Card.Value: BasePokerCard pokerCard})
-            {
-                pokerCard.OnLoseFocus();
-                _selectedCardNode = null;
-            }
-            else
-            {
-                GameMgr.InputMgr.QuitCurrentInputHandler();
-            }
+            _card.AfterCanceled?.Invoke();
+            GameMgr.InputMgr.QuitCurrentInputHandler();
         }
         
         protected override void OnActionPressed(InputEventAction action)
         {
             if (action.Action == "ui_escape")
             {
+                _card.AfterCanceled?.Invoke();
                 GameMgr.InputMgr.QuitCurrentInputHandler();
             }
         }
         
         protected void ClickSelf(CardNode node)
         {
+            if (_selectedCardNodes.Count == 2)
+            {
+                var fromNode = _selectedCardNodes[0];
+                var toNode = _selectedCardNodes[1];
+                var fromCard = fromNode.Card.Value;
+                var toCard = toNode.Card.Value;
+                var fromContainer = fromNode.Container;
+                var toContainer = toNode.Container;
+                var fromIndex = fromContainer.Cards.IndexOf(fromCard);
+                var toIndex = toContainer.Cards.IndexOf(toCard);
+                toContainer.Cards[toIndex] = fromCard;
+                fromCard.IsSelected.Value = false;
+                fromContainer.Cards[fromIndex] = toCard;
+                toCard.IsSelected.Value = false;
+                // keep face value in sync with their target container
+                if (fromCard.Face.Value != toCard.Face.Value)
+                {
+                    (fromCard.Face.Value, toCard.Face.Value) = (toCard.Face.Value, fromCard.Face.Value);
+                }
+                _selectedCardNodes.Clear();
+                _card.AfterEffect?.Invoke();
+            }
+            else
+            {
+                _card.AfterCanceled?.Invoke();
+            }
             GameMgr.InputMgr.QuitCurrentInputHandler();
         }
         
         protected void ClickCard(CardNode node)
         {
-            if (_selectedCardNode is { Card.Value: BasePokerCard fromCard})
+            if (_selectedCardNodes.Contains(node))
             {
-                if (node != _selectedCardNode)
-                {
-                    var toCard = node.Card.Value;
-                    var fromContainer = _selectedCardNode.Container;
-                    var toContainer = node.Container;
-                    var fromIndex = fromContainer.Cards.IndexOf(fromCard);
-                    var toIndex = toContainer.Cards.IndexOf(toCard);
-                    toContainer.Cards[toIndex] = fromCard;
-                    fromContainer.Cards[fromIndex] = toCard;
-                    
-                    // keep face value in sync with their target container
-                    if (fromCard.Face.Value != toCard.Face.Value)
-                    {
-                        (fromCard.Face.Value, toCard.Face.Value) = (toCard.Face.Value, fromCard.Face.Value);
-                    }
-                }
-                _selectedCardNode.Card.Value.OnLoseFocus();
-                _selectedCardNode = null;
+                node.Card.Value.IsSelected.Value = false;
+                _selectedCardNodes.Remove(node);
             }
             else
             {
-                node.Card.Value.OnFocused();
-                _selectedCardNode = node;
+                _selectedCardNodes.Add(node);
+                node.Card.Value.IsSelected.Value = true;
             }
         }
     }
@@ -110,8 +115,8 @@ public class NetherSwapCard: BaseActiveAbilityCard
     public List<CardContainer> CardContainers;
     
     public NetherSwapCard(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Nether swap",
-        "Swap any two card in your hand, your opponent's hand or community cards.", face, owner, 
-        "res://Sprites/Cards/NetherSwap.png", 1, 0)
+        "Swap any two cards you can see.", face, owner, 
+        "res://Sprites/Cards/nether_swap.png", 1, 0)
     {
         CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }

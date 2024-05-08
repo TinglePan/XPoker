@@ -11,15 +11,14 @@ namespace XCardGame.Scripts.Cards.AbilityCards;
 public class D6Card: BaseActiveAbilityCard
 {
     private List<CardContainer> _cardContainers;
-    public D6Card(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Dice 6", "Reroll one of your hole card", face, owner,
-        "res://Sprites/Cards/D6.png", 1, 0)
+    public D6Card(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Dice 6", "Reroll your destiny", face, owner,
+        "res://Sprites/Cards/d6.png", 1, 0)
     {
         _cardContainers = gameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }
 
     public override void Activate()
     {
-        base.Activate();
         foreach (var cardContainer in _cardContainers)
         {
             for (var i = 0; i < cardContainer.Cards.Count; i++)

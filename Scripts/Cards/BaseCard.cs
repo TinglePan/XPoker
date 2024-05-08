@@ -15,6 +15,8 @@ public class BaseCard
     public BattleEntity Owner;
     
     public CardNode Node;
+    public ObservableProperty<bool> IsFocused;
+    public ObservableProperty<bool> IsSelected;
     
     public BaseCard(string name, string description, Enums.CardFace face, BattleEntity owner=null)
     {
@@ -22,6 +24,8 @@ public class BaseCard
         Description = description;
         Face = new ObservableProperty<Enums.CardFace>(nameof(Face), this, face);
         Owner = owner;
+        IsFocused = new ObservableProperty<bool>(nameof(IsFocused), this, false);
+        IsSelected = new ObservableProperty<bool>(nameof(IsSelected), this, false);
     }
     
     public BaseCard(BaseCard card)
@@ -41,13 +45,13 @@ public class BaseCard
         Face.Value = Face.Value == Enums.CardFace.Up ? Enums.CardFace.Down : Enums.CardFace.Up;
     }
     
-    public virtual void OnFocused()
-    {
-        GD.Print($"{this} focused");
-    }
-    
-    public virtual void OnLoseFocus()
-    {
-        GD.Print($"{this} lose focus");
-    }
+    // public virtual void OnFocused()
+    // {
+    //     GD.Print($"{this} focused");
+    // }
+    //
+    // public virtual void OnLoseFocus()
+    // {
+    //     GD.Print($"{this} lose focus");
+    // }
 }

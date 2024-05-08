@@ -112,6 +112,7 @@ offset_right = 175.0
 offset_bottom = -174.0
 grow_horizontal = 2
 grow_vertical = 0
+Identifier = "playerHoleCardContainer"
 
 [node name="InfoTab1" parent="PlayerUiCollection" instance=ExtResource("6_j08d8")]
 layout_mode = 1

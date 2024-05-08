@@ -39,9 +39,13 @@ public class MainInputHandler: BaseInputHandler
     protected void ClickCard(CardNode node)
     {
         GD.Print($"ClickCard {node.Card.Value}");
-        if (node.Card.Value is BaseActiveAbilityCard card)
+        if (node.Card.Value is BaseActiveAbilityCard card && card.CanActivate())
         {
             card.Activate();
+        } else if (node.Card.Value is BasePassiveAbilityCard baseCard && baseCard.CanFlip())
+        {
+            baseCard.Flip();
+            baseCard.OnFlip(GameMgr.CurrentBattle.Player);
         }
     }
     
@@ -69,6 +73,23 @@ public class MainInputHandler: BaseInputHandler
                             card.Node.OnPressed -= ClickCard;
                         }
                     }
+                break;
+            case NotifyCollectionChangedAction.Replace:
+                if (args.OldItems != null && args.OldItems[0] is BaseCard replacedCard && args.NewItems != null)
+                {
+                    var replacedCardNode = _abilityCardContainer.GetChild<CardNode>(args.OldStartingIndex);
+                    replacedCardNode.Card.Value = args.NewItems[0] as BaseCard;
+                }
+                break;
+            case NotifyCollectionChangedAction.Reset:
+                foreach (var node in _abilityCardContainer.GetChildren())
+                {
+                    if (node is CardNode card)
+                    {
+                        card.OnPressed -= ClickCard;
+                    }
+                }
+                _abilityCardContainer.ClearChildren();
                 break;
         }
     }

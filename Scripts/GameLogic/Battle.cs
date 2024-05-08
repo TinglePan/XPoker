@@ -23,6 +23,9 @@ public partial class Battle: Node, ISetup
     public ObservableCollection<BaseCard> CommunityCards;
     public int DealCommunityCardCount;
     public int FaceDownCommunityCardCount;
+    public CompletedHandEvaluator HandEvaluator;
+
+    public bool TurnedTables;
     
     private GameMgr _gameMgr;
     
@@ -38,6 +41,8 @@ public partial class Battle: Node, ISetup
         Entities = args["entities"] as List<BattleEntity> ?? new List<BattleEntity>();
         DealCommunityCardCount = args.TryGetValue("dealCommunityCardCount", out var arg) ? (int)arg : Configuration.DefaultDealCommunityCardCount;
         FaceDownCommunityCardCount = args.TryGetValue("faceDownCommunityCardCount", out arg) ? (int)arg : Configuration.DefaultFaceDownCommunityCardCount;
+        HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, Configuration.DefaultRequiredHoleCardCountMin, Configuration.DefaultRequiredHoleCardCountMax);
+        TurnedTables = false;
     }
     
     public void Start()
@@ -68,6 +73,7 @@ public partial class Battle: Node, ISetup
         }
         RoundCount = 0;
         CommunityCards.Clear();
+        TurnedTables = false;
     }
 
     public void DealCards()
@@ -110,12 +116,13 @@ public partial class Battle: Node, ISetup
         }
         FlipFaceDownCards(CommunityCards);
         
-        var evaluator = new CompletedHandEvaluator(CommunityCards.OfType<BasePokerCard>().ToList(), 5, 0, 2);
         var handStrengths = new Dictionary<BattleEntity, CompletedHand>();
         foreach (var entity in Entities)
         {
-            handStrengths.Add(entity, evaluator.EvaluateBestHand(entity.HoleCards.OfType<BasePokerCard>().ToList()));
-            evaluator.Reset();
+            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.OfType<BasePokerCard>().ToList(),
+                entity.HoleCards.OfType<BasePokerCard>().ToList());
+            handStrengths.Add(entity, bestHand);
+            HandEvaluator.Reset();
         }
 
         for (int i = 0; i < Entities.Count; i++)
@@ -125,14 +132,32 @@ public partial class Battle: Node, ISetup
             for (int j = i + 1; j < Entities.Count; j++)
             {
                 var otherEntity = Entities[j];
+                if (entity.FactionId == otherEntity.FactionId)
+                {
+                    continue;
+                }
                 var otherHandStr = handStrengths[otherEntity];
                 if (handStr.CompareTo(otherHandStr) >= 0)
                 {
-                    entity.Attack(otherEntity, handStr, otherHandStr);
+                    if (!TurnedTables)
+                    {
+                        entity.Attack(otherEntity, handStr, otherHandStr);
+                    }
+                    else
+                    {
+                        otherEntity.Attack(entity, handStr, otherHandStr);
+                    }
                 }
                 if (handStr.CompareTo(otherHandStr) <= 0)
                 {
-                    otherEntity.Attack(entity, otherHandStr, handStr);
+                    if (!TurnedTables)
+                    {
+                        otherEntity.Attack(entity, otherHandStr, handStr);
+                    }
+                    else
+                    {
+                        entity.Attack(otherEntity, otherHandStr, handStr);
+                    }
                 }
             }
         }

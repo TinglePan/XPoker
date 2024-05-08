@@ -28,8 +28,6 @@ public partial class CardNode: Control, ISetup
     public Action<CardNode> OnPressed;
 
     protected GameMgr GameMgr;
-    protected ObservableProperty<bool> IsFocused;
-    
     
     public override void _ExitTree()
 	{
@@ -42,21 +40,8 @@ public partial class CardNode: Control, ISetup
 		GameMgr = GetNode<GameMgr>("/root/GameMgr");
 		Card = new ObservableProperty<BaseCard>(nameof(Card), this, null);
 		Card.DetailedValueChanged += OnCardChanged;
-		IsFocused = new ObservableProperty<bool>(nameof(IsFocused), this, false);
-		IsFocused.DetailedValueChanged += (sender, args) =>
-		{
-			if (Card is { Value: { } card })
-			{
-				if (args.NewValue)
-				{
-					card.OnFocused();
-				}
-				else
-				{
-					card.OnLoseFocus();
-				}
-			}
-		};
+		MouseEntered += OnMouseEntered;
+		MouseExited += OnMouseExited;
 	}
 
 	public override void _GuiInput(InputEvent @event)
@@ -97,6 +82,46 @@ public partial class CardNode: Control, ISetup
 		}
 		Card.Value = otherCard;
 		other.Card.Value = card;
+	}
+
+	public async void Reveal(float duration = 0f, float delay = 0f)
+	{
+		if (Card.Value.Face.Value != Enums.CardFace.Down) return;
+		if (delay != 0f)
+		{
+			var timer = GetTree().CreateTimer(delay);
+			await ToSignal(timer, Timer.SignalName.Timeout);
+		}
+		Tween tween = GetTree().CreateTween();
+		var originalAlpha = Back.Modulate.A;
+		tween.TweenProperty(Back, "modulate:a", 0f, Configuration.RevealFadeInDuration);
+		await ToSignal(tween, Tween.SignalName.Finished);
+		if (duration != 0f)
+		{
+			var timer = GetTree().CreateTimer(duration);
+			await ToSignal(timer, Timer.SignalName.Timeout);
+			tween = GetTree().CreateTween();
+			tween.TweenProperty(Back, "modulate:a", originalAlpha, Configuration.RevealFadeOutDuration);
+			await ToSignal(tween, Tween.SignalName.Finished);
+		}
+	}
+
+	protected void OnMouseEntered()
+	{
+		GD.Print($"On mouse entered {Card.Value}");
+		if (Card is { Value: not null })
+		{
+			Card.Value.IsFocused.Value = true;
+		}
+	}
+
+	protected void OnMouseExited()
+	{
+		GD.Print($"On mouse exited {Card.Value}");
+		if (Card is { Value: not null })
+		{
+			Card.Value.IsFocused.Value = false;
+		}
 	}
     
     protected void OnCardFaceChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardFace> args)

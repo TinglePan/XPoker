@@ -14,20 +14,19 @@ public class CompletedHandEvaluator: BaseHandEvaluator
     // public Dictionary<string, object> Context;
     public Dictionary<Enums.HandTier, List<CompletedHand>> CalculatedHands;
 
-    public CompletedHandEvaluator(List<BasePokerCard> communityCards, int cardCount,
-        int requiredHoleCardCountMin, int requiredHoleCardCountMax, List<BaseHandEvaluateRule> rules = null): base(communityCards, cardCount, requiredHoleCardCountMin, requiredHoleCardCountMax, rules)
+    public CompletedHandEvaluator(int cardCount,
+        int requiredHoleCardCountMin, int requiredHoleCardCountMax, List<BaseHandEvaluateRule> rules = null): base(cardCount, requiredHoleCardCountMin, requiredHoleCardCountMax, rules)
     {
         Rules = rules ?? FiveCardHRules;
-        CommunityCards = communityCards;
         CardCount = cardCount;
         RequiredHoleCardCountMin = requiredHoleCardCountMin;
         RequiredHoleCardCountMax = requiredHoleCardCountMax;
         CalculatedHands = new Dictionary<Enums.HandTier, List<CompletedHand>>();
     }
     
-    public CompletedHand EvaluateBestHand(List<BasePokerCard> holeCards)
+    public CompletedHand EvaluateBestHand(List<BasePokerCard> communityCards, List<BasePokerCard> holeCards)
     {
-        foreach (var cards in Utils.GetCombinationsWithXToYFromA(holeCards, CommunityCards, 
+        foreach (var cards in Utils.GetCombinationsWithXToYFromA(holeCards, communityCards, 
                      CardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
         {
             Dictionary<Enums.HandTier, List<CompletedHand>> calculatedHandStrengths = new();

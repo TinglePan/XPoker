@@ -25,7 +25,8 @@ public partial class Battle: Node, ISetup
     public int FaceDownCommunityCardCount;
     public CompletedHandEvaluator HandEvaluator;
 
-    public bool TurnedTables;
+    public bool HasTurnedTables;
+    public bool ShouldCalculateOut;
     
     private GameMgr _gameMgr;
     
@@ -42,7 +43,7 @@ public partial class Battle: Node, ISetup
         DealCommunityCardCount = args.TryGetValue("dealCommunityCardCount", out var arg) ? (int)arg : Configuration.DefaultDealCommunityCardCount;
         FaceDownCommunityCardCount = args.TryGetValue("faceDownCommunityCardCount", out arg) ? (int)arg : Configuration.DefaultFaceDownCommunityCardCount;
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, Configuration.DefaultRequiredHoleCardCountMin, Configuration.DefaultRequiredHoleCardCountMax);
-        TurnedTables = false;
+        HasTurnedTables = false;
     }
     
     public void Start()
@@ -73,7 +74,7 @@ public partial class Battle: Node, ISetup
         }
         RoundCount = 0;
         CommunityCards.Clear();
-        TurnedTables = false;
+        HasTurnedTables = false;
     }
 
     public void DealCards()
@@ -103,18 +104,13 @@ public partial class Battle: Node, ISetup
             {
                 if (card.Face.Value == Enums.CardFace.Down)
                 {
-                    card.Flip();
+                    card.Flip(this, null);
                 }
             }
         }
         
         // var startTime = Time.GetTicksUsec();
 
-        foreach (var entity in Entities)
-        {
-            FlipFaceDownCards(entity.HoleCards);
-        }
-        FlipFaceDownCards(CommunityCards);
         
         var handStrengths = new Dictionary<BattleEntity, CompletedHand>();
         foreach (var entity in Entities)
@@ -122,13 +118,11 @@ public partial class Battle: Node, ISetup
             var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.OfType<BasePokerCard>().ToList(),
                 entity.HoleCards.OfType<BasePokerCard>().ToList());
             handStrengths.Add(entity, bestHand);
-            HandEvaluator.Reset();
         }
 
         for (int i = 0; i < Entities.Count; i++)
         {
             var entity = Entities[i];
-            var handStr = handStrengths[entity];
             for (int j = i + 1; j < Entities.Count; j++)
             {
                 var otherEntity = Entities[j];
@@ -136,31 +130,26 @@ public partial class Battle: Node, ISetup
                 {
                     continue;
                 }
+                var handStr = handStrengths[entity];
                 var otherHandStr = handStrengths[otherEntity];
+                if (HasTurnedTables) (handStr, otherHandStr) = (otherHandStr, handStr);
+                
                 if (handStr.CompareTo(otherHandStr) >= 0)
                 {
-                    if (!TurnedTables)
-                    {
-                        entity.Attack(otherEntity, handStr, otherHandStr);
-                    }
-                    else
-                    {
-                        otherEntity.Attack(entity, handStr, otherHandStr);
-                    }
+                    entity.Attack(otherEntity, handStr, otherHandStr);
                 }
                 if (handStr.CompareTo(otherHandStr) <= 0)
                 {
-                    if (!TurnedTables)
-                    {
-                        otherEntity.Attack(entity, otherHandStr, handStr);
-                    }
-                    else
-                    {
-                        entity.Attack(otherEntity, otherHandStr, handStr);
-                    }
+                    otherEntity.Attack(entity, otherHandStr, handStr);
                 }
             }
         }
+        
+        foreach (var entity in Entities)
+        {
+            FlipFaceDownCards(entity.HoleCards);
+        }
+        FlipFaceDownCards(CommunityCards);
         // var endTime = Time.GetTicksUsec();
         // GD.Print($"Hand evaluation time: {endTime - startTime} us");
         // GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");

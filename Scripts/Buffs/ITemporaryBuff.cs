@@ -5,5 +5,5 @@ namespace XCardGame.Scripts.Buffs;
 public interface ITemporaryBuff
 {
     public int Duration { get; }
-    public ObservableProperty<int> Counter { get; }
+    public ObservableProperty<int> DurationCounter { get; }
 }

@@ -1,14 +1,12 @@
-﻿using XCardGame.Scripts.Cards.PokerCards;
+﻿using System.Collections.Generic;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.HandEvaluate;
 using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public interface IGameEventTriggered
+public interface IGameEventTriggeredInBattle
 {
-
-    public void AfterAddedToContainer(Battle battle, CardContainer container);
-
     public void BeforeDealCard(Battle battle, BattleEntity entity);
 
     public void AfterDealCard(Battle battle, BattleEntity entity);
@@ -18,6 +16,8 @@ public interface IGameEventTriggered
     public void OnRoundEnd(Battle battle);
 
     public void BeforeShowDown(Battle battle);
+    
+    public void BeforeEngage(Battle battle, Dictionary<BattleEntity, CompletedHand> handStrengths);
 
     public void AfterShowDown(Battle battle);
     

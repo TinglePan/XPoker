@@ -7,7 +7,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class BalatrollCard: BaseActiveAbilityCard
+public class BalatrollCard: BaseActivatableAbilityCard
 {
 
     public class BalatrollCardInputHandler : BaseInputHandler
@@ -46,7 +46,7 @@ public class BalatrollCard: BaseActiveAbilityCard
         
         protected override void OnRightMouseButtonPressed(Vector2 position)
         {
-            _card.AfterCanceled?.Invoke();
+            _card.AfterCanceled();
             GameMgr.InputMgr.QuitCurrentInputHandler();
         }
         
@@ -54,7 +54,7 @@ public class BalatrollCard: BaseActiveAbilityCard
         {
             if (action.Action == "ui_escape")
             {
-                _card.AfterCanceled?.Invoke();
+                _card.AfterCanceled();
                 GameMgr.InputMgr.QuitCurrentInputHandler();
             }
         }
@@ -71,11 +71,11 @@ public class BalatrollCard: BaseActiveAbilityCard
                     selectedCardNode.Card.Value = newCard;
                 }
                 _selectedCardNodes.Clear();
-                _card.AfterEffect?.Invoke();
+                _card.AfterEffect();
             }
             else
             {
-                _card.AfterCanceled?.Invoke();
+                _card.AfterCanceled();
             }
             GameMgr.InputMgr.QuitCurrentInputHandler();
         }
@@ -97,10 +97,10 @@ public class BalatrollCard: BaseActiveAbilityCard
     
     public CardContainer PlayerCardContainer; 
     
-    public BalatrollCard(GameMgr gameMgr, string name, string description, Enums.CardFace face, BattleEntity owner,
-        int cost, int coolDown, bool isQuickAbility = false) : base(gameMgr, "Balatroll", 
-        "Troll version of Balatro.", face, owner, "res://Sprites/Cards/balatroll.png", cost, coolDown,
-        isQuickAbility)
+    public BalatrollCard(GameMgr gameMgr, Enums.CardFace face, Enums.CardSuit suit, BattleEntity owner,
+        int cost, int coolDown, bool isQuick = false) : base(gameMgr, "Balatroll", 
+        "Troll version of Balatro.", face, suit, "res://Sprites/Cards/balatroll.png", cost, coolDown,
+        isQuick, owner)
     {
         PlayerCardContainer = gameMgr.UiMgr.GetNodeById<CardContainer>("playerHoleCardContainer");
     }

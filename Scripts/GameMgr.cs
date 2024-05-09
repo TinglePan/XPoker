@@ -77,7 +77,8 @@ public partial class GameMgr : Node
 				{ "name", "you" },
 				{ "battle", CurrentBattle },
 				{ "deck", Decks.PlayerInitialDeck },
-				{ "damageTable", DamageTables.DefaultPlayerDamageTable }
+				{ "damageTable", DamageTables.DefaultPlayerDamageTable },
+				{ "maxMorale", 20 }
 			});
 			var enemy = Utils.InstantiatePrefab(OpponentPrefab, CurrentBattle) as BattleEntity;
 			Debug.Assert(enemy != null);
@@ -87,7 +88,8 @@ public partial class GameMgr : Node
 				{ "battle", CurrentBattle },
 				{ "deck", Decks.OpponentInitialDeck },
 				{ "factionId", Enums.FactionId.Opponent },
-				{ "damageTable", DamageTables.DefaultOpponentDamageTable }
+				{ "damageTable", DamageTables.DefaultOpponentDamageTable },
+				{ "maxMorale", 20 }
 			});
 			CurrentBattle.Setup(new Dictionary<string, object>()
 			{
@@ -106,8 +108,8 @@ public partial class GameMgr : Node
 			UiMgr.OpenCommunityCardContainer(CurrentBattle.CommunityCards);
 		
 			// Add ability cards after player ui collection is set up to avoid firing init event for observable collection.
-			player.AbilityCards.Add(new D6Card(this, Enums.CardFace.Up, player));
-			player.AbilityCards.Add(new NetherSwapCard(this, Enums.CardFace.Up, player));
+			player.AbilityCards.Add(new D6Card(this, Enums.CardFace.Up, Enums.CardSuit.Diamonds, player));
+			player.AbilityCards.Add(new NetherSwapCard(this, Enums.CardFace.Up, Enums.CardSuit.Spades, player));
 
 			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
 		

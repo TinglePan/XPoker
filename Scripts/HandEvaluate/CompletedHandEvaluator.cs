@@ -26,6 +26,7 @@ public class CompletedHandEvaluator: BaseHandEvaluator
     
     public CompletedHand EvaluateBestHand(List<BasePokerCard> communityCards, List<BasePokerCard> holeCards)
     {
+        CalculatedHands.Clear();
         foreach (var cards in Utils.GetCombinationsWithXToYFromA(holeCards, communityCards, 
                      CardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
         {
@@ -54,10 +55,5 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         }
         GD.PrintErr("No hand rank rule matched. Not supposed to happen.");
         return null;
-    }
-
-    public void Reset()
-    {
-        CalculatedHands.Clear();
     }
 }

@@ -13,7 +13,7 @@ namespace XCardGame.Scripts.GameLogic;
 public partial class PlayerBattleEntity: BattleEntity
 {
     public ObservableCollection<BaseCard> AbilityCards;
-    public int Fatigue;
+    public Dictionary<Enums.CardSuit, ObservableProperty<int>> Overload;
     public ObservableProperty<int> Cost;
     public ObservableProperty<int> MaxCost;
 
@@ -26,6 +26,13 @@ public partial class PlayerBattleEntity: BattleEntity
         MaxCost = new ObservableProperty<int>(nameof(MaxCost), this, maxCost);
         Cost = new ObservableProperty<int>(nameof(Cost), this, maxCost);
         AbilityCards = args.TryGetValue("abilityCards", out var arg) ? arg as ObservableCollection<BaseCard> : new ObservableCollection<BaseCard>();
+        Overload = new Dictionary<Enums.CardSuit, ObservableProperty<int>>()
+        {
+            { Enums.CardSuit.Clubs, new ObservableProperty<int>("Overload.Clubs", this, 0) },
+            { Enums.CardSuit.Diamonds, new ObservableProperty<int>("Overload.Diamonds", this, 0) },
+            { Enums.CardSuit.Hearts, new ObservableProperty<int>("Overload.Hearts", this, 0) },
+            { Enums.CardSuit.Spades, new ObservableProperty<int>("Overload.Spades", this, 0) }
+        };
         LevelUpTable = args["levelUpTable"] as Dictionary<int, LevelUpInfo>;
         Level.DetailedValueChanged += LevelChanged;
     }
@@ -33,7 +40,10 @@ public partial class PlayerBattleEntity: BattleEntity
     public override void RoundReset()
     {
         base.Reset();
-        Fatigue = 0;
+        foreach (var suit in Overload.Keys)
+        {
+            Overload[suit].Value = 0;
+        }
         Cost.Value = MaxCost.Value;
     }
 

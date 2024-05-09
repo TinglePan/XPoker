@@ -5,11 +5,13 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class MillenniumEyeCard: BaseActiveAbilityCard
+public class MillenniumEyeCard: BaseActivatableAbilityCard
 {
     private List<CardContainer> _cardContainers;
     
-    public MillenniumEyeCard(GameMgr gameMgr, Enums.CardFace face, BattleEntity owner, string iconPath, int cost, int coolDown, bool isQuickAbility = false) : base(gameMgr, "Millennium Eye", "I can see forever.", face, owner, iconPath, cost, coolDown, isQuickAbility)
+    public MillenniumEyeCard(GameMgr gameMgr, Enums.CardFace face, Enums.CardSuit suit, BattleEntity owner=null) : 
+        base(gameMgr, "Millennium Eye", "I can see forever.", face, suit, 
+            "res://Sprites/Cards/millennium_eye.png", 1, 2, false, owner)
     {
         _cardContainers = gameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }
@@ -26,6 +28,6 @@ public class MillenniumEyeCard: BaseActiveAbilityCard
                 card.Node.Reveal(Configuration.RevealDuration, delay);
             }
         }
-        AfterEffect?.Invoke();
+        AfterEffect();
     }
 }

@@ -1,32 +1,78 @@
-﻿using Godot;
+﻿using System.Collections.Generic;
+using Godot;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class BaseAbilityCard: BaseCard
+public class BaseAbilityCard: BaseCard, IGameEventTriggeredInBattle, ILifeCycleTriggeredInBattle
 {
     public string IconPath;
     
     protected GameMgr GameMgr;
     protected Battle Battle;
     
-    public BaseAbilityCard(GameMgr gameMgr, string name, string description, Enums.CardFace face, GameLogic.BattleEntity owner, string iconPath) : base(name, description, face, owner)
+    public BaseAbilityCard(GameMgr gameMgr, string name, string description, Enums.CardFace face, Enums.CardSuit suit, string iconPath, BattleEntity owner=null) : base(name, description, face, suit, owner)
     {
+        IconPath = iconPath;
         GameMgr = gameMgr;
         Battle = GameMgr.CurrentBattle;
-        IconPath = iconPath;
     }
 
-    public virtual bool CanActivate()
+    public virtual void BeforeDealCard(Battle battle, BattleEntity entity)
     {
-        return false;
+        
     }
-    
-    public virtual void Activate()
+
+    public virtual void AfterDealCard(Battle battle, BattleEntity entity)
     {
-        GD.Print($"Ability Card {this} Activated");
+        
     }
-    
-    
+
+    public virtual void OnRoundStart(Battle battle)
+    {
+        
+    }
+
+    public virtual void OnRoundEnd(Battle battle)
+    {
+        
+    }
+
+    public virtual void BeforeShowDown(Battle battle)
+    {
+        
+    }
+
+    public virtual void BeforeEngage(Battle battle, Dictionary<BattleEntity, CompletedHand> handStrengths)
+    {
+        
+    }
+
+    public virtual void AfterShowDown(Battle battle)
+    {
+        
+    }
+
+    public virtual void OnHoleCardChanged(Battle battle, BattleEntity entity, int index, BasePokerCard from, BasePokerCard to)
+    {
+        
+    }
+
+    public virtual void OnCommunityCardChanged(Battle battle, int index, BasePokerCard from, BasePokerCard to)
+    {
+        
+    }
+
+    public virtual void OnSpawn(Battle battle)
+    {
+        
+    }
+
+    public virtual void OnExhausted(Battle battle)
+    {
+        
+    }
 }

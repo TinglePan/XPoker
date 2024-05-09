@@ -25,7 +25,7 @@ public static class Decks
                 {
                     continue;
                 }
-                BasePokerCard pokerCard = new BasePokerCard((Enums.CardSuit)suit, (Enums.CardRank)rank, Enums.CardFace.Down);
+                BasePokerCard pokerCard = new BasePokerCard((Enums.CardSuit)suit, Enums.CardFace.Down, (Enums.CardRank)rank);
                 deck.CardList.Add(pokerCard);
             }
         }

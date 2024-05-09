@@ -8,7 +8,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class NetherSwapCard: BaseActiveAbilityCard
+public class NetherSwapCard: BaseActivatableAbilityCard
 {
     
     public class NetherSwapCardInputHandler : BaseInputHandler
@@ -53,7 +53,7 @@ public class NetherSwapCard: BaseActiveAbilityCard
         
         protected override void OnRightMouseButtonPressed(Vector2 position)
         {
-            _card.AfterCanceled?.Invoke();
+            _card.AfterCanceled();
             GameMgr.InputMgr.QuitCurrentInputHandler();
         }
         
@@ -61,7 +61,7 @@ public class NetherSwapCard: BaseActiveAbilityCard
         {
             if (action.Action == "ui_escape")
             {
-                _card.AfterCanceled?.Invoke();
+                _card.AfterCanceled();
                 GameMgr.InputMgr.QuitCurrentInputHandler();
             }
         }
@@ -88,11 +88,11 @@ public class NetherSwapCard: BaseActiveAbilityCard
                     (fromCard.Face.Value, toCard.Face.Value) = (toCard.Face.Value, fromCard.Face.Value);
                 }
                 _selectedCardNodes.Clear();
-                _card.AfterEffect?.Invoke();
+                _card.AfterEffect();
             }
             else
             {
-                _card.AfterCanceled?.Invoke();
+                _card.AfterCanceled();
             }
             GameMgr.InputMgr.QuitCurrentInputHandler();
         }
@@ -114,9 +114,9 @@ public class NetherSwapCard: BaseActiveAbilityCard
     
     public List<CardContainer> CardContainers;
     
-    public NetherSwapCard(GameMgr gameMgr, Enums.CardFace face, GameLogic.BattleEntity owner) : base(gameMgr, "Nether swap",
-        "Swap any two cards you can see.", face, owner, 
-        "res://Sprites/Cards/nether_swap.png", 1, 0)
+    public NetherSwapCard(GameMgr gameMgr, Enums.CardFace face, Enums.CardSuit suit, GameLogic.BattleEntity owner=null) : base(gameMgr, "Nether swap",
+        "Swap any two cards you can see.", face, suit, 
+        "res://Sprites/Cards/nether_swap.png", 1, 0, false, owner)
     {
         CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }

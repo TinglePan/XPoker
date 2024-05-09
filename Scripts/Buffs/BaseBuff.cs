@@ -1,4 +1,5 @@
-﻿using XCardGame.Scripts.Cards.PokerCards;
+﻿using System.Collections.Generic;
+using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.HandEvaluate;
@@ -6,7 +7,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Buffs;
 
-public class BaseBuff: IGameEventTriggered
+public class BaseBuff: IGameEventTriggeredInBattle
 {
     public string Name;
     public string Description;
@@ -29,7 +30,7 @@ public class BaseBuff: IGameEventTriggered
     {
     }
     
-    public virtual void OnExpired(Battle battle)
+    public virtual void OnExhausted(Battle battle)
     {
     }
 
@@ -54,6 +55,10 @@ public class BaseBuff: IGameEventTriggered
     }
 
     public virtual void BeforeShowDown(Battle battle)
+    {
+    }
+
+    public virtual void BeforeEngage(Battle battle, Dictionary<BattleEntity, CompletedHand> handStrengths)
     {
     }
 

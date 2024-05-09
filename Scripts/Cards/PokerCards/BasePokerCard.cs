@@ -1,28 +1,20 @@
 using System;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.PokerCards;
 
 public class BasePokerCard: BaseCard, IComparable<BasePokerCard>
 {
-	public ObservableProperty<Enums.CardSuit> Suit;
 
 	public ObservableProperty<Enums.CardRank> Rank;
 	public bool SuitAsSecondComparer;
 
-	public Enums.CardColor CardColor => Suit.Value switch
-	{
-		Enums.CardSuit.Spades => Enums.CardColor.Black,
-		Enums.CardSuit.Clubs => Enums.CardColor.Black,
-		Enums.CardSuit.Hearts => Enums.CardColor.Red,
-		Enums.CardSuit.Diamonds => Enums.CardColor.Red,
-		_ => Enums.CardColor.None
-	};
 	
-	public BasePokerCard(Enums.CardSuit cardSuit, Enums.CardRank rank, Enums.CardFace face, bool suitAsSecondComparer=false): base(GetCardName(rank, cardSuit), GetCardName(rank, cardSuit), face)
+	public BasePokerCard(Enums.CardSuit cardSuit, Enums.CardFace face, Enums.CardRank rank, 
+		BattleEntity owner=null, bool suitAsSecondComparer=false): base(GetCardName(rank, cardSuit), GetCardName(rank, cardSuit), face, cardSuit, owner)
 	{
-		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, cardSuit);
 		Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);
 		SuitAsSecondComparer = suitAsSecondComparer;
 	}

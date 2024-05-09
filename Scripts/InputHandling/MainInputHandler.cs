@@ -39,13 +39,9 @@ public class MainInputHandler: BaseInputHandler
     protected void ClickCard(CardNode node)
     {
         GD.Print($"ClickCard {node.Card.Value}");
-        if (node.Card.Value is BaseActiveAbilityCard card && card.CanActivate())
+        if (node.Card.Value is IActivatableCard card && card.CanActivate())
         {
             card.Activate();
-        } else if (node.Card.Value is BasePassiveAbilityCard baseCard && baseCard.CanFlip())
-        {
-            baseCard.Flip();
-            baseCard.OnFlip(GameMgr.CurrentBattle.Player);
         }
     }
     

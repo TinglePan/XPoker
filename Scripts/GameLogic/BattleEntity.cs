@@ -48,7 +48,7 @@ public partial class BattleEntity: Node, ISetup
         ShowDownHoleCardCountMin = args.TryGetValue("showDownHoleCardCountMin", out value) ? (int)value : Configuration.DefaultRequiredHoleCardCountMin;
         ShowDownHoleCardCountMax = args.TryGetValue("showDownHoleCardCountMax", out value) ? (int)value : Configuration.DefaultRequiredHoleCardCountMax;
         FactionId = args.TryGetValue("factionId", out value) ? (int)value : 0;
-        var maxMorale = args.TryGetValue("maxMorale", out value) ? (int)value : 50;
+        var maxMorale = args.TryGetValue("maxMorale", out value) ? (int)value : Configuration.DefaultMorale;
         Morale = new ObservableProperty<int>(nameof(Morale), this, maxMorale);
         MaxMorale = new ObservableProperty<int>(nameof(MaxMorale), this, maxMorale);
         DamageTable = (Dictionary<Enums.HandTier, int>)args["damageTable"];

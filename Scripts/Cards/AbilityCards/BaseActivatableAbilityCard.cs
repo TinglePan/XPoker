@@ -37,8 +37,9 @@ public class BaseActivatableAbilityCard: BaseAbilityCard, IActivatableCard, IWit
         
     }
 
-    public virtual void AfterEffect()
+    public override void AfterEffect()
     {
+        base.AfterEffect();
         CoolDownCounter.Value = CoolDown;
         Battle.Player.Cost.Value -= ActualCost;
     }

@@ -21,6 +21,16 @@ public class BaseAbilityCard: BaseCard, IGameEventTriggeredInBattle, ILifeCycleT
         Battle = GameMgr.CurrentBattle;
     }
 
+    public void Disposal()
+    {
+        OnExhausted(Battle);
+        Node.QueueFree();
+    }
+    
+    public virtual void AfterEffect()
+    {
+    }
+
     public virtual void BeforeDealCard(Battle battle, BattleEntity entity)
     {
         
@@ -46,7 +56,12 @@ public class BaseAbilityCard: BaseCard, IGameEventTriggeredInBattle, ILifeCycleT
         
     }
 
-    public virtual void BeforeEngage(Battle battle, Dictionary<BattleEntity, CompletedHand> handStrengths)
+    public virtual void BeforeEngage(Battle battle)
+    {
+        
+    }
+    
+    public virtual void BeforeApplyDamage(Battle battle, AttackObj attackObj)
     {
         
     }

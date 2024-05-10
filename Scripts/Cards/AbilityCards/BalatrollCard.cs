@@ -31,7 +31,7 @@ public class BalatrollCard: BaseActivatableAbilityCard
                 card.Node.OnPressed += ClickCard;
             }
             _card.Node.OnPressed += ClickSelf;
-            GD.Print("Enter BalatrollCardInputHandler");
+            // GD.Print("Enter BalatrollCardInputHandler");
         }
 
         public override void OnExit()

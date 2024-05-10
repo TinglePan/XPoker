@@ -56,4 +56,12 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         GD.PrintErr("No hand rank rule matched. Not supposed to happen.");
         return null;
     }
+    
+    public (CompletedHand, CompletedHand) EvaluateBestHandsWithAndWithoutFaceDownCards(List<BasePokerCard> communityCards, List<BasePokerCard> holeCards)
+    {
+        var bestHandWithFaceDownCard = EvaluateBestHand(communityCards, holeCards);
+        CalculatedHands.Clear();
+        var bestHandWithoutFaceDownCard = EvaluateBestHand(communityCards.Where(x => x.Face.Value == Enums.CardFace.Up).ToList(), holeCards);
+        return (bestHandWithFaceDownCard, bestHandWithoutFaceDownCard);
+    }
 }

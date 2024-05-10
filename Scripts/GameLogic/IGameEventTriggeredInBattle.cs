@@ -17,7 +17,9 @@ public interface IGameEventTriggeredInBattle
 
     public void BeforeShowDown(Battle battle);
     
-    public void BeforeEngage(Battle battle, Dictionary<BattleEntity, CompletedHand> handStrengths);
+    public void BeforeEngage(Battle battle);
+    
+    public void BeforeApplyDamage(Battle battle, AttackObj attackObj);
 
     public void AfterShowDown(Battle battle);
     

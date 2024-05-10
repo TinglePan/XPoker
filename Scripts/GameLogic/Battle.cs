@@ -24,9 +24,9 @@ public partial class Battle: Node, ISetup
     public int DealCommunityCardCount;
     public int FaceDownCommunityCardCount;
     public CompletedHandEvaluator HandEvaluator;
-
-    public bool HasTurnedTables;
-    public bool ShouldCalculateOut;
+    
+    public Dictionary<BattleEntity, CompletedHand> RoundHandStrengths;
+    public Dictionary<BattleEntity, CompletedHand> RoundHandStrengthsWithoutFaceDownCards;
     
     private GameMgr _gameMgr;
     
@@ -43,14 +43,15 @@ public partial class Battle: Node, ISetup
         DealCommunityCardCount = args.TryGetValue("dealCommunityCardCount", out var arg) ? (int)arg : Configuration.DefaultDealCommunityCardCount;
         FaceDownCommunityCardCount = args.TryGetValue("faceDownCommunityCardCount", out arg) ? (int)arg : Configuration.DefaultFaceDownCommunityCardCount;
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, Configuration.DefaultRequiredHoleCardCountMin, Configuration.DefaultRequiredHoleCardCountMax);
-        HasTurnedTables = false;
+        RoundHandStrengths = new Dictionary<BattleEntity, CompletedHand>();
+        RoundHandStrengthsWithoutFaceDownCards = new Dictionary<BattleEntity, CompletedHand>();
     }
     
     public void Start()
     {
         Reset();
         DealingDeck.Shuffle();
-        DealCards();
+        NewRound();
     }
     
     public void NewRound()
@@ -61,6 +62,8 @@ public partial class Battle: Node, ISetup
             entity.RoundReset();
         }
         CommunityCards.Clear();
+        RoundHandStrengths.Clear();
+        RoundHandStrengthsWithoutFaceDownCards.Clear();
         DealCards();
     }
     
@@ -74,7 +77,6 @@ public partial class Battle: Node, ISetup
         }
         RoundCount = 0;
         CommunityCards.Clear();
-        HasTurnedTables = false;
     }
 
     public void DealCards()
@@ -111,13 +113,24 @@ public partial class Battle: Node, ISetup
         
         // var startTime = Time.GetTicksUsec();
 
+        foreach (var entity in Entities)
+        {
+            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.OfType<BasePokerCard>().Where(x => x.Face.Value == Enums.CardFace.Up).ToList(),
+                entity.HoleCards.OfType<BasePokerCard>().ToList());
+            RoundHandStrengthsWithoutFaceDownCards.Add(entity, bestHand);
+        }
         
-        var handStrengths = new Dictionary<BattleEntity, CompletedHand>();
+        foreach (var entity in Entities)
+        {
+            FlipFaceDownCards(entity.HoleCards);
+        }
+        FlipFaceDownCards(CommunityCards);
+        
         foreach (var entity in Entities)
         {
             var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.OfType<BasePokerCard>().ToList(),
                 entity.HoleCards.OfType<BasePokerCard>().ToList());
-            handStrengths.Add(entity, bestHand);
+            RoundHandStrengths.Add(entity, bestHand);
         }
 
         for (int i = 0; i < Entities.Count; i++)
@@ -130,17 +143,23 @@ public partial class Battle: Node, ISetup
                 {
                     continue;
                 }
-                var handStr = handStrengths[entity];
-                var otherHandStr = handStrengths[otherEntity];
-                if (HasTurnedTables) (handStr, otherHandStr) = (otherHandStr, handStr);
+                var handStrength = RoundHandStrengths[entity];
+                var handStrengthWithoutFaceDownCard = RoundHandStrengthsWithoutFaceDownCards[entity];
+                var otherHandStrength = RoundHandStrengths[otherEntity];
+                var otherHandStrengthWithoutFaceDownCard = RoundHandStrengthsWithoutFaceDownCards[otherEntity];
                 
-                if (handStr.CompareTo(otherHandStr) >= 0)
+                if (handStrength.CompareTo(otherHandStrength) >= 0)
                 {
-                    entity.Attack(otherEntity, handStr, otherHandStr);
+                    AttackObj attack = new AttackObj(_gameMgr, entity, otherEntity, handStrength, 
+                        handStrengthWithoutFaceDownCard, otherHandStrength,
+                        otherHandStrengthWithoutFaceDownCard);
+                    //TODO: BeforeApplyDamage here
+                    attack.Apply();
+                    
                 }
-                if (handStr.CompareTo(otherHandStr) <= 0)
+                if (handStrength.CompareTo(otherHandStrength) <= 0)
                 {
-                    otherEntity.Attack(entity, otherHandStr, handStr);
+                    otherEntity.Attack(entity, otherHandStrength, handStrength);
                 }
             }
         }

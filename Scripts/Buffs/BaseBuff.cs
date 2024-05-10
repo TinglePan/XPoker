@@ -58,7 +58,11 @@ public class BaseBuff: IGameEventTriggeredInBattle
     {
     }
 
-    public virtual void BeforeEngage(Battle battle, Dictionary<BattleEntity, CompletedHand> handStrengths)
+    public virtual void BeforeEngage(Battle battle)
+    {
+    }
+    
+    public virtual void BeforeApplyDamage(Battle battle, AttackObj attackObj)
     {
     }
 

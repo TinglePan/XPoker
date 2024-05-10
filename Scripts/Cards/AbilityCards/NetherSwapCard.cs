@@ -35,7 +35,7 @@ public class NetherSwapCard: BaseActivatableAbilityCard
                 }
             }
             _card.Node.OnPressed += ClickSelf;
-            GD.Print("Enter NetherSwapCardInputHandler");
+            // GD.Print("Enter NetherSwapCardInputHandler");
         }
 
         public override void OnExit()

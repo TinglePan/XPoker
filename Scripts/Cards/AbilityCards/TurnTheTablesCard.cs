@@ -24,11 +24,25 @@ public class TurnTheTablesCard: BaseSealableAbilityCard
         Target = target;
     }
 
-    public override void BeforeEngage(Battle battle, Dictionary<BattleEntity, CompletedHand> handStrengths)
+    public override void BeforeEngage(Battle battle)
     {
-        if (Face.Value == Enums.CardFace.Up && handStrengths.ContainsKey(Source) && handStrengths.ContainsKey(Target))
+        if (Face.Value == Enums.CardFace.Up)
         {
-            (handStrengths[Source], handStrengths[Target]) = (handStrengths[Target], handStrengths[Source]);
+            if (battle.RoundHandStrengths.ContainsKey(Source) && battle.RoundHandStrengths.ContainsKey(Target))
+            {
+                (battle.RoundHandStrengths[Source], battle.RoundHandStrengths[Target]) = 
+                    (battle.RoundHandStrengths[Target], battle.RoundHandStrengths[Source]);
+            }
+            if (battle.RoundHandStrengthsWithoutFaceDownCards.ContainsKey(Source) && 
+                battle.RoundHandStrengthsWithoutFaceDownCards.ContainsKey(Target))
+            {
+                (battle.RoundHandStrengthsWithoutFaceDownCards[Source], 
+                    battle.RoundHandStrengthsWithoutFaceDownCards[Target]) = 
+                    (battle.RoundHandStrengthsWithoutFaceDownCards[Target], 
+                        battle.RoundHandStrengthsWithoutFaceDownCards[Source]);
+            }
+            AfterEffect();
+            Disposal();
         }
     }
 }

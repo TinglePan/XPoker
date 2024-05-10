@@ -19,13 +19,6 @@ public class BasePokerCard: BaseCard, IComparable<BasePokerCard>
 		SuitAsSecondComparer = suitAsSecondComparer;
 	}
 	
-	public BasePokerCard(BasePokerCard card): base(card)
-	{
-		Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, card.Suit.Value);
-		Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, card.Rank.Value);
-		SuitAsSecondComparer = card.SuitAsSecondComparer;
-	}
-	
 	public int CompareTo(BasePokerCard other)
 	{
 		var res = Rank.Value.CompareTo(other.Rank.Value);

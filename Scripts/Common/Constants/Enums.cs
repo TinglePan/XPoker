@@ -43,6 +43,13 @@ public static class Enums
         Up,
         Down
     }
+
+    public enum Direction1D
+    {
+        None,
+        Left,
+        Right
+    }
     
     public enum HandTier
     {

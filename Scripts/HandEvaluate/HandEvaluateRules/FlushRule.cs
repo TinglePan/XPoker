@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
@@ -18,13 +19,13 @@ public class FlushRule: BaseHandEvaluateRule
         ValidSuits = validSuits;
     }
     
-    protected override List<List<BasePokerCard>> Pick(List<BasePokerCard> cards)
+    protected override List<List<PokerCard>> Pick(List<PokerCard> cards)
     {
-        List<List<BasePokerCard>> picks = new List<List<BasePokerCard>>();
-        var cardsBySuit = new Dictionary<Enums.CardSuit, List<BasePokerCard>>();
+        List<List<PokerCard>> picks = new List<List<PokerCard>>();
+        var cardsBySuit = new Dictionary<Enums.CardSuit, List<PokerCard>>();
         foreach (var card in cards)
         {
-            if (!cardsBySuit.ContainsKey(card.Suit.Value)) cardsBySuit[card.Suit.Value] = new List<BasePokerCard>();
+            if (!cardsBySuit.ContainsKey(card.Suit.Value)) cardsBySuit[card.Suit.Value] = new List<PokerCard>();
             cardsBySuit[card.Suit.Value].Add(card);
         }
         foreach (var suit in ValidSuits)

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class NetherSwapCard: BaseActivatableAbilityCard
+public class NetherSwapCard: BaseActivatableCard
 {
-    
     public class NetherSwapCardInputHandler : BaseInputHandler
     {
 
@@ -79,9 +79,9 @@ public class NetherSwapCard: BaseActivatableAbilityCard
                 var fromIndex = fromContainer.Cards.IndexOf(fromCard);
                 var toIndex = toContainer.Cards.IndexOf(toCard);
                 toContainer.Cards[toIndex] = fromCard;
-                fromCard.IsSelected.Value = false;
+                fromCard.Node.IsSelected.Value = false;
                 fromContainer.Cards[fromIndex] = toCard;
-                toCard.IsSelected.Value = false;
+                toCard.Node.IsSelected.Value = false;
                 // keep face value in sync with their target container
                 if (fromCard.Face.Value != toCard.Face.Value)
                 {
@@ -101,23 +101,29 @@ public class NetherSwapCard: BaseActivatableAbilityCard
         {
             if (_selectedCardNodes.Contains(node))
             {
-                node.Card.Value.IsSelected.Value = false;
+                node.IsSelected.Value = false;
                 _selectedCardNodes.Remove(node);
             }
             else
             {
                 _selectedCardNodes.Add(node);
-                node.Card.Value.IsSelected.Value = true;
+                node.IsSelected.Value = true;
             }
         }
     }
     
     public List<CardContainer> CardContainers;
     
-    public NetherSwapCard(GameMgr gameMgr, Enums.CardFace face, Enums.CardSuit suit, GameLogic.BattleEntity owner=null) : base(gameMgr, "Nether swap",
-        "Swap any two cards you can see.", face, suit, 
-        "res://Sprites/Cards/nether_swap.png", 1, 0, false, owner)
+    public NetherSwapCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1,
+        int coolDown = 2, bool isQuick = false, BattleEntity owner = null) : base("Nether swap",
+        "Swap any two cards you can see.", "res://Sprites/Cards/nether_swap.png", face, suit, rank,
+        cost, coolDown, isQuick, owner)
     {
+    }
+
+    public override void Setup(Dictionary<string, object> args)
+    {
+        base.Setup(args);
         CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }
 

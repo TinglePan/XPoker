@@ -4,13 +4,13 @@ using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.PokerCards;
 
-public class ChangeNeighbourRankPokerCard: RevealTriggeredPokerCard
+public class ChangeNeighbourRankMarker: RevealTriggeredPokerCard
 {
     
     public Enums.Direction1D TargetDirection;
     public Func<Enums.CardRank, Enums.CardRank, Enums.CardRank> RankChangeFunc;
     
-    public ChangeNeighbourRankPokerCard(Enums.CardSuit cardSuit, Enums.CardFace face, Enums.CardRank rank,
+    public ChangeNeighbourRankMarker(Enums.CardSuit cardSuit, Enums.CardFace face, Enums.CardRank rank,
         Enums.Direction1D targetDirection, Func<Enums.CardRank, Enums.CardRank, Enums.CardRank> rankChangeFunc,
         BattleEntity owner = null, bool suitAsSecondComparer = false) : base(cardSuit, face, rank, owner, suitAsSecondComparer)
     {
@@ -40,7 +40,7 @@ public class ChangeNeighbourRankPokerCard: RevealTriggeredPokerCard
     {
         if (targetIndex >= 0 && targetIndex < Node.Container.Cards.Count)
         {
-            if (Node.Container.Cards[targetIndex] is BasePokerCard targetCard)
+            if (Node.Container.Cards[targetIndex] is PokerCard targetCard)
             {
                 targetCard.Rank.Value = RankChangeFunc(targetCard.Rank.Value, Rank.Value);
             }

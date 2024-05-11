@@ -1,30 +1,32 @@
-﻿using System;
-using Godot;
-using XCardGame.Scripts.Common.Constants;
+﻿using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.GameLogic;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards;
 
-public class BaseActivatableAbilityCard: BaseAbilityCard, IActivatableCard, IWithCost
+public class BaseActivatableCard: BaseCard
 {
     public int CoolDown;
     public ObservableProperty<int> CoolDownCounter;
-    public bool IsQuick { get; }
-
-    public int Cost { get; }
-
+    public bool IsQuick;
+    public int Cost;
     public int ActualCost =>
         IsQuick ? Cost : Cost + (Battle.Player.Overload.TryGetValue(Suit.Value, out var overload) ? overload.Value : 0);
     
-    public BaseActivatableAbilityCard(GameMgr gameMgr, string name, string description, Enums.CardFace face,
-        Enums.CardSuit suit, string iconPath, int cost, int coolDown, bool isQuick=false, BattleEntity owner=null) : 
-        base(gameMgr, name, description, face, suit, iconPath, owner)
+    public BaseActivatableCard(string name, string description, string iconPath, Enums.CardFace face,
+        Enums.CardSuit suit, Enums.CardRank rank, int cost, int coolDown, bool isQuick = false, BattleEntity owner = null) : 
+        base(name, description, iconPath, face, suit, rank, owner)
     {
         Cost = cost;
         CoolDown = coolDown;
         CoolDownCounter = new ObservableProperty<int>(nameof(CoolDownCounter), this, 0);
         IsQuick = isQuick;
+        Battle.OnRoundEnd += OnRoundEnd;
+    }
+    
+    ~BaseActivatableCard()
+    {
+        Battle.OnRoundEnd -= OnRoundEnd;
     }
 
     public virtual bool CanActivate()
@@ -37,9 +39,8 @@ public class BaseActivatableAbilityCard: BaseAbilityCard, IActivatableCard, IWit
         
     }
 
-    public override void AfterEffect()
+    public virtual void AfterEffect()
     {
-        base.AfterEffect();
         CoolDownCounter.Value = CoolDown;
         Battle.Player.Cost.Value -= ActualCost;
     }
@@ -49,7 +50,7 @@ public class BaseActivatableAbilityCard: BaseAbilityCard, IActivatableCard, IWit
         
     }
 
-    public override void OnRoundEnd(Battle battle)
+    public void OnRoundEnd(Battle battle)
     {
         if (CoolDownCounter.Value > 0)
         {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
@@ -7,7 +8,7 @@ namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 public class BaseHandEvaluateRule
 {
-    public virtual void EvaluateAndRecord(List<BasePokerCard> cards,
+    public virtual void EvaluateAndRecord(List<PokerCard> cards,
         Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHandStrengths, Enums.HandTier? forRank=null)
     {
         forRank ??= Tier;
@@ -17,7 +18,7 @@ public class BaseHandEvaluateRule
         if (calculatedHandStrengths!= null) calculatedHandStrengths[forRank.Value] = res;
     }
     
-    protected virtual List<CompletedHand> Evaluate(List<BasePokerCard> cards, Enums.HandTier? forRank=null)
+    protected virtual List<CompletedHand> Evaluate(List<PokerCard> cards, Enums.HandTier? forRank=null)
     {
         forRank ??= Tier;
         var picks = Pick(cards);
@@ -36,18 +37,18 @@ public class BaseHandEvaluateRule
     
     public virtual Enums.HandTier Tier => Enums.HandTier.HighCard;
     
-    protected virtual List<List<BasePokerCard>> Pick(List<BasePokerCard> cards)
+    protected virtual List<List<PokerCard>> Pick(List<PokerCard> cards)
     {
-        var res = new List<List<BasePokerCard>>();
+        var res = new List<List<PokerCard>>();
         return res;
     }
     
-    protected virtual List<BasePokerCard> GetPrimaryComparerCards(List<BasePokerCard> pick, List<BasePokerCard> cards)
+    protected virtual List<PokerCard> GetPrimaryComparerCards(List<PokerCard> pick, List<PokerCard> cards)
     {
-        return new List<BasePokerCard> { pick.Max() };
+        return new List<PokerCard> { pick.Max() };
     }
     
-    protected virtual List<BasePokerCard> GetKickers(List<BasePokerCard> pick, List<BasePokerCard> cards)
+    protected virtual List<PokerCard> GetKickers(List<PokerCard> pick, List<PokerCard> cards)
     {
         var res = cards.Except(pick).OrderByDescending(c => c).ToList();
         return res;

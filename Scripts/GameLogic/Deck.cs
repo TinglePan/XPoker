@@ -13,7 +13,7 @@ public class Deck
 {
     public ObservableCollection<BaseCard> CardList;
 
-    public Deck(List<BasePokerCard> cards=null)
+    public Deck(List<PokerCard> cards=null)
     {
         CardList = cards == null ? new ObservableCollection<BaseCard>() : new ObservableCollection<BaseCard>(cards);
         // HashSet<Enums.CardRank> excludedRanks = new HashSet<Enums.CardRank>()

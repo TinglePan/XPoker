@@ -7,7 +7,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class BalatrollCard: BaseActivatableAbilityCard
+public class BalatrollCard: BaseActivatableCard
 {
 
     public class BalatrollCardInputHandler : BaseInputHandler
@@ -65,7 +65,7 @@ public class BalatrollCard: BaseActivatableAbilityCard
             {
                 foreach (var selectedCardNode in _selectedCardNodes)
                 {
-                    selectedCardNode.Card.Value.IsSelected.Value = false;
+                    selectedCardNode.IsSelected.Value = false;
                     var newCard = GameMgr.CurrentBattle.DealingDeck.Deal();
                     newCard.Face.Value = Enums.CardFace.Up;
                     selectedCardNode.Card.Value = newCard;
@@ -84,25 +84,30 @@ public class BalatrollCard: BaseActivatableAbilityCard
         {
             if (_selectedCardNodes.Contains(node))
             {
-                node.Card.Value.IsSelected.Value = false;
+                node.IsSelected.Value = false;
                 _selectedCardNodes.Remove(node);
             }
             else
             {
                 _selectedCardNodes.Add(node);
-                node.Card.Value.IsSelected.Value = true;
+                node.IsSelected.Value = true;
             }
         }
     }
     
     public CardContainer PlayerCardContainer; 
     
-    public BalatrollCard(GameMgr gameMgr, Enums.CardFace face, Enums.CardSuit suit, BattleEntity owner,
-        int cost, int coolDown, bool isQuick = false) : base(gameMgr, "Balatroll", 
-        "Troll version of Balatro.", face, suit, "res://Sprites/Cards/balatroll.png", cost, coolDown,
+    public BalatrollCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1, int coolDown = 0,
+        bool isQuick = false, BattleEntity owner = null) : base("Balatroll", 
+        "Troll version of Balatro.", "res://Sprites/Cards/balatroll.png", face, suit, rank, cost, coolDown,
         isQuick, owner)
     {
-        PlayerCardContainer = gameMgr.UiMgr.GetNodeById<CardContainer>("playerHoleCardContainer");
+    }
+
+    public override void Setup(Dictionary<string, object> args)
+    {
+        base.Setup(args);
+        PlayerCardContainer = GameMgr.UiMgr.GetNode<CardContainer>("PlayerCardContainer"); 
     }
     
     public override void Activate()

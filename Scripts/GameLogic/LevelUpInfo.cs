@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Cards.PokerCards;
 
@@ -10,13 +11,15 @@ public class LevelUpInfo
     public int ShowDownHoleCardCountMax;
     public int DealCardCount;
     
-    public List<BaseAbilityCard> AbilityCards;
-    public List<BasePokerCard> PokerCards;
+    public List<BaseCard> AbilityCards;
+    public List<PokerCard> PokerCards;
+    public List<BasePokerCardMarker> PokerCardMarkers;
     
     public LevelUpInfo(int cost, int showDownHoleCardCountMax, int dealCardCount)
     {
-        AbilityCards = new List<BaseAbilityCard>();
-        PokerCards = new List<BasePokerCard>();
+        AbilityCards = new List<BaseCard>();
+        PokerCards = new List<PokerCard>();
+        PokerCardMarkers = new List<BasePokerCardMarker>();
         Cost = cost;
         ShowDownHoleCardCountMax = showDownHoleCardCountMax;
         DealCardCount = dealCardCount;

@@ -12,15 +12,16 @@ public class BaseTemporaryBuff: BaseBuff, ITemporaryBuff
     {
         Duration = duration;
         DurationCounter = new ObservableProperty<int>(nameof(DurationCounter), this, 0);
+        Battle.OnRoundEnd += OnRoundEnd;
     }
     
-    public override void OnRoundEnd(Battle battle)
+    protected virtual void OnRoundEnd(Battle battle)
     {
         DurationCounter.Value++;
         if (DurationCounter.Value >= Duration)
         {
             Entity.Buffs.Remove(this);
-            OnExhausted(battle);
+            OnDisposalFromField(battle);
         }
     }
 

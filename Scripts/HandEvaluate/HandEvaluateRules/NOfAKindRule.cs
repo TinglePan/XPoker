@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using Utils = XCardGame.Scripts.Common.Utils;
@@ -20,13 +21,13 @@ public class NOfAKindRule: BaseHandEvaluateRule
         ValidRanks = validRanks;
     }
 
-    protected override List<List<BasePokerCard>> Pick(List<BasePokerCard> cards)
+    protected override List<List<PokerCard>> Pick(List<PokerCard> cards)
     {
-        var picks = new List<List<BasePokerCard>>();
-        var cardsByRank = new Dictionary<Enums.CardRank, List<BasePokerCard>>();
+        var picks = new List<List<PokerCard>>();
+        var cardsByRank = new Dictionary<Enums.CardRank, List<PokerCard>>();
         foreach (var card in cards)
         {
-            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<BasePokerCard>();
+            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<PokerCard>();
             cardsByRank[card.Rank.Value].Add(card);
         }
         foreach (var rank in ValidRanks)

@@ -17,7 +17,7 @@ public class RankAverageToNeighbourPokerCard: RevealTriggeredPokerCard
         int leftIndex = index - 1, rightIndex = index + 1;
         if (leftIndex >= 0 && leftIndex < Node.Container.Cards.Count && rightIndex >= 0 && rightIndex < Node.Container.Cards.Count)
         {
-            if (Node.Container.Cards[leftIndex] is BasePokerCard leftCard && Node.Container.Cards[rightIndex] is BasePokerCard rightCard)
+            if (Node.Container.Cards[leftIndex] is PokerCard leftCard && Node.Container.Cards[rightIndex] is PokerCard rightCard)
             {
                 Rank.Value = (Enums.CardRank)(((int)leftCard.Rank.Value + (int)rightCard.Rank.Value) / 2);
             }

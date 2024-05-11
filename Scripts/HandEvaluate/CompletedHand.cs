@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
@@ -8,12 +9,12 @@ namespace XCardGame.Scripts.HandEvaluate;
 public class CompletedHand: IComparable<CompletedHand>
 {
     public Enums.HandTier Tier;
-    public List<BasePokerCard> PrimaryCards;
-    public List<BasePokerCard> PrimaryComparerCards;
-    public List<BasePokerCard> Kickers;
+    public List<PokerCard> PrimaryCards;
+    public List<PokerCard> PrimaryComparerCards;
+    public List<PokerCard> Kickers;
     
-    public CompletedHand(Enums.HandTier tier, List<BasePokerCard> primaryCards, List<BasePokerCard> primaryComparerCards,
-        List<BasePokerCard> kickers)
+    public CompletedHand(Enums.HandTier tier, List<PokerCard> primaryCards, List<PokerCard> primaryComparerCards,
+        List<PokerCard> kickers)
     {
         Tier = tier;
         PrimaryCards = primaryCards;

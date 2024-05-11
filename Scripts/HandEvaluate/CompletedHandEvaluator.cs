@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
@@ -24,7 +25,7 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         CalculatedHands = new Dictionary<Enums.HandTier, List<CompletedHand>>();
     }
     
-    public CompletedHand EvaluateBestHand(List<BasePokerCard> communityCards, List<BasePokerCard> holeCards)
+    public CompletedHand EvaluateBestHand(List<PokerCard> communityCards, List<PokerCard> holeCards)
     {
         CalculatedHands.Clear();
         foreach (var cards in Utils.GetCombinationsWithXToYFromA(holeCards, communityCards, 
@@ -57,7 +58,7 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         return null;
     }
     
-    public (CompletedHand, CompletedHand) EvaluateBestHandsWithAndWithoutFaceDownCards(List<BasePokerCard> communityCards, List<BasePokerCard> holeCards)
+    public (CompletedHand, CompletedHand) EvaluateBestHandsWithAndWithoutFaceDownCards(List<PokerCard> communityCards, List<PokerCard> holeCards)
     {
         var bestHandWithFaceDownCard = EvaluateBestHand(communityCards, holeCards);
         CalculatedHands.Clear();

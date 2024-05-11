@@ -3,9 +3,9 @@ using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.PokerCards;
 
-public class BaseEventTriggeredPokerCard: BasePokerCard, IGameEventTriggeredInBattle
+public class EventTriggeredPokerCard: PokerCard, IGameEventTriggeredInBattle
 {
-    public BaseEventTriggeredPokerCard(Enums.CardSuit cardSuit, Enums.CardFace face, Enums.CardRank rank, BattleEntity owner = null, bool suitAsSecondComparer = false) : base(cardSuit, face, rank, owner, suitAsSecondComparer)
+    public EventTriggeredPokerCard(Enums.CardSuit cardSuit, Enums.CardFace face, Enums.CardRank rank, BattleEntity owner = null, bool suitAsSecondComparer = false) : base(cardSuit, face, rank, owner, suitAsSecondComparer)
     {
     }
 
@@ -49,12 +49,12 @@ public class BaseEventTriggeredPokerCard: BasePokerCard, IGameEventTriggeredInBa
         
     }
 
-    public virtual void OnHoleCardChanged(Battle battle, BattleEntity entity, int index, BasePokerCard from, BasePokerCard to)
+    public virtual void OnHoleCardChanged(Battle battle, BattleEntity entity, int index, PokerCard from, PokerCard to)
     {
         
     }
 
-    public virtual void OnCommunityCardChanged(Battle battle, int index, BasePokerCard from, BasePokerCard to)
+    public virtual void OnCommunityCardChanged(Battle battle, int index, PokerCard from, PokerCard to)
     {
         
     }

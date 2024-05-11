@@ -8,26 +8,34 @@ using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class NineOutsCard: BaseSealableAbilityCard
+public class NineOutsCard: BaseSealableCard
 {
-    public NineOutsCard(GameMgr gameMgr, Enums.CardFace face, Enums.CardSuit suit, BattleEntity owner=null) : base(gameMgr, "Nine Outs", 
-        "Each face-down 9 which contributes to a winning hand adds 9 more damage to attack triggered by that hand.", 
-        face, suit, "res://Sprites/Cards/nine_outs.png", 1, 0, true, owner)
-    {
-    }
-
-    public override void BeforeEngage(Battle battle)
+    public NineOutsCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1,
+        int coolDown = 0, bool isQuick = true, BattleEntity owner = null) : base("Nine Outs", 
+        "Each face-down 9 which contributes to a winning hand adds 9 more damage to attack triggered by that hand.",
+        "res://Sprites/Cards/nine_outs.png", face, suit, rank, cost, coolDown, isQuick, owner)
     {
         
     }
+
+    public override void Setup(Dictionary<string, object> args)
+    {
+        base.Setup(args);
+        Battle.BeforeApplyDamage += BeforeApplyDamage;
+    }
     
-    public override void BeforeApplyDamage(Battle battle, AttackObj obj)
+    ~NineOutsCard()
+    {
+        Battle.BeforeApplyDamage -= BeforeApplyDamage;
+    }
+
+    private void BeforeApplyDamage(Battle battle, AttackObj obj)
     {
         if (obj.IsWinByOuts())
         {
             foreach (var card in battle.CommunityCards)
             {
-                if (card is BasePokerCard pokerCard && card.Face.Value == Enums.CardFace.Down &&
+                if (card is PokerCard pokerCard && card.Face.Value == Enums.CardFace.Down &&
                     pokerCard.Rank.Value == Enums.CardRank.Nine)
                 {
                     obj.ExtraDamages.TryAdd(Name, 0);

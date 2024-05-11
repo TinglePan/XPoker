@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
@@ -13,7 +14,7 @@ public class RoyalFlushRule: StraightFlushRule
     {
     }
     
-    public override void EvaluateAndRecord(List<BasePokerCard> cards,
+    public override void EvaluateAndRecord(List<PokerCard> cards,
         Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHandStrengths, Enums.HandTier? forRank=null)
     {
         forRank ??= Tier;

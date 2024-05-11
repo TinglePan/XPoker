@@ -17,14 +17,14 @@ public class ChangeNeighbourSuitPokerCard: RevealTriggeredPokerCard
         int leftIndex = index - 1, rightIndex = index + 1;
         if (leftIndex >= 0 && leftIndex < Node.Container.Cards.Count)
         {
-            if (Node.Container.Cards[leftIndex] is BasePokerCard targetCard)
+            if (Node.Container.Cards[leftIndex] is PokerCard targetCard)
             {
                 targetCard.Suit.Value = Suit.Value;
             }
         }
         if (rightIndex >= 0 && rightIndex < Node.Container.Cards.Count)
         {
-            if (Node.Container.Cards[rightIndex] is BasePokerCard targetCard)
+            if (Node.Container.Cards[rightIndex] is PokerCard targetCard)
             {
                 targetCard.Suit.Value = Suit.Value;
             }

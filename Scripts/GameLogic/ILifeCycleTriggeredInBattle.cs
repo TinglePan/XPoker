@@ -2,6 +2,6 @@
 
 public interface ILifeCycleTriggeredInBattle
 {
-    public void OnSpawn(Battle battle);
-    public void OnExhausted(Battle battle);
+    public void OnAppearInField(Battle battle);
+    public void OnDisposalFromField(Battle battle);
 }

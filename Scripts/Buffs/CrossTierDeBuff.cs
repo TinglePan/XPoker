@@ -15,7 +15,7 @@ public class CrossTierDeBuff: BaseTemporaryBuff
         Strength = strength;
     }
 
-    public override void OnRoundEnd(Battle battle)
+    protected override void OnRoundEnd(Battle battle)
     {
         Entity.Morale.Value = Mathf.Clamp(Entity.Morale.Value - Strength, 0, Entity.MaxMorale.Value);
         base.OnRoundEnd(battle);

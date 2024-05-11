@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Godot;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
@@ -108,8 +109,21 @@ public partial class GameMgr : Node
 			UiMgr.OpenCommunityCardContainer(CurrentBattle.CommunityCards);
 		
 			// Add ability cards after player ui collection is set up to avoid firing init event for observable collection.
-			player.AbilityCards.Add(new D6Card(this, Enums.CardFace.Up, Enums.CardSuit.Diamonds, player));
-			player.AbilityCards.Add(new NetherSwapCard(this, Enums.CardFace.Up, Enums.CardSuit.Spades, player));
+			BaseActivatableCard abilityCard = new D6Card(Enums.CardFace.Up, Enums.CardSuit.Diamonds, Enums.CardRank.Six, owner: player);
+			player.AbilityCards.Add(abilityCard);
+			abilityCard.Setup(new Dictionary<string, object>()
+			{
+				{ "gameMgr", this },
+				{ "node", abilityCard.Node }
+			});
+			
+			abilityCard = new NetherSwapCard(Enums.CardFace.Up, Enums.CardSuit.Hearts, Enums.CardRank.Six, owner: player);
+			player.AbilityCards.Add(abilityCard);
+			abilityCard.Setup(new Dictionary<string, object>()
+			{
+				{ "gameMgr", this },
+				{ "node", abilityCard.Node }
+			});
 
 			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
 		

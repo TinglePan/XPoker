@@ -26,6 +26,9 @@ public partial class CardNode: Control, ISetup
     public ObservableProperty<BaseCard> Card;
     public CardContainer Container;
     public Action<CardNode> OnPressed;
+    
+    public ObservableProperty<bool> IsFocused;
+    public ObservableProperty<bool> IsSelected;
 
     protected GameMgr GameMgr;
     
@@ -39,6 +42,8 @@ public partial class CardNode: Control, ISetup
 	{
 		GameMgr = GetNode<GameMgr>("/root/GameMgr");
 		Card = new ObservableProperty<BaseCard>(nameof(Card), this, null);
+		IsFocused = new ObservableProperty<bool>(nameof(IsFocused), this, false);
+		IsSelected = new ObservableProperty<bool>(nameof(IsSelected), this, false);
 		Card.DetailedValueChanged += OnCardChanged;
 		MouseEntered += OnMouseEntered;
 		MouseExited += OnMouseExited;
@@ -111,7 +116,7 @@ public partial class CardNode: Control, ISetup
 		GD.Print($"On mouse entered {Card.Value}");
 		if (Card is { Value: not null })
 		{
-			Card.Value.IsFocused.Value = true;
+			IsFocused.Value = true;
 		}
 	}
 
@@ -120,7 +125,7 @@ public partial class CardNode: Control, ISetup
 		GD.Print($"On mouse exited {Card.Value}");
 		if (Card is { Value: not null })
 		{
-			Card.Value.IsFocused.Value = false;
+			IsFocused.Value = false;
 		}
 	}
     
@@ -160,16 +165,13 @@ public partial class CardNode: Control, ISetup
 		card.Node = this;
 		card.Face.DetailedValueChanged += OnCardFaceChanged;
 		card.Face.FireValueChangeEventsOnInit();
-		if (card is BasePokerCard pokerCard)
+		card.Rank.DetailedValueChanged += OnCardRankChanged;
+		card.Rank.FireValueChangeEventsOnInit();
+		card.Suit.DetailedValueChanged += OnCardSuitChanged;
+		card.Suit.FireValueChangeEventsOnInit();
+		if (card.TexturePath != null)
 		{
-			pokerCard.Rank.DetailedValueChanged += OnCardRankChanged;
-			pokerCard.Rank.FireValueChangeEventsOnInit();
-			pokerCard.Suit.DetailedValueChanged += OnCardSuitChanged;
-			pokerCard.Suit.FireValueChangeEventsOnInit();
-		}
-		else if (card is BaseAbilityCard abilityCard)
-		{
-			Icon.Texture = GD.Load<Texture2D>(abilityCard.IconPath);
+			Icon.Texture = GD.Load<Texture2D>(card.TexturePath);
 		}
 	}
 
@@ -179,18 +181,8 @@ public partial class CardNode: Control, ISetup
 		if (card != null)
 		{
 			card.Face.DetailedValueChanged -= OnCardFaceChanged;
-			if (card is BasePokerCard pokerCard)
-			{
-				pokerCard.Rank.DetailedValueChanged -= OnCardRankChanged;
-				pokerCard.Suit.DetailedValueChanged -= OnCardSuitChanged;
-			} else if (card is BaseAbilityCard _)
-			{
-				Icon.Texture = null;
-			}
-			if (card.Node == this)
-			{
-				card.Node = null;
-			}
+			card.Rank.DetailedValueChanged -= OnCardRankChanged;
+			card.Suit.DetailedValueChanged -= OnCardSuitChanged;
 		}
 	}
 }

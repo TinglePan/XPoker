@@ -39,7 +39,7 @@ public class MainInputHandler: BaseInputHandler
     protected void ClickCard(CardNode node)
     {
         GD.Print($"ClickCard {node.Card.Value}");
-        if (node.Card.Value is IActivatableCard card && card.CanActivate())
+        if (node.Card.Value is BaseActivatableCard card && card.CanActivate())
         {
             card.Activate();
         }

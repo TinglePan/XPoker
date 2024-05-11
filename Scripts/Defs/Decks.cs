@@ -1,4 +1,5 @@
 ﻿using System;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
@@ -25,7 +26,7 @@ public static class Decks
                 {
                     continue;
                 }
-                BasePokerCard pokerCard = new BasePokerCard((Enums.CardSuit)suit, Enums.CardFace.Down, (Enums.CardRank)rank);
+                PokerCard pokerCard = new PokerCard(null, Enums.CardFace.Down, (Enums.CardSuit)suit, (Enums.CardRank)rank);
                 deck.CardList.Add(pokerCard);
             }
         }

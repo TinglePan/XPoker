@@ -30,7 +30,7 @@ public class SuitEqualsNeighbourPokerCard: RevealTriggeredPokerCard
         }
         if (targetIndex >= 0 && targetIndex < Node.Container.Cards.Count)
         {
-            if (Node.Container.Cards[targetIndex] is BasePokerCard targetCard)
+            if (Node.Container.Cards[targetIndex] is PokerCard targetCard)
             {
                 Suit.Value = targetCard.Suit.Value;
             }

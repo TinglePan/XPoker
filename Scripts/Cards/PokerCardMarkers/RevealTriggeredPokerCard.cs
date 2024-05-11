@@ -4,7 +4,7 @@ using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.PokerCards;
 
-public class RevealTriggeredPokerCard: BaseEventTriggeredPokerCard
+public class RevealTriggeredPokerCard: EventTriggeredPokerCard
 {
     public Battle Battle;
     

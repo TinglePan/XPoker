@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 
@@ -9,22 +10,22 @@ namespace XCardGame.Scripts.GameLogic;
 
 public class DealingDeck
 {
-    public List<BasePokerCard> CardList;
-    public List<BasePokerCard> DealingCards;
-    public List<BasePokerCard> DealtCards;
+    public List<PokerCard> CardList;
+    public List<PokerCard> DealingCards;
+    public List<PokerCard> DealtCards;
     
     public DealingDeck()
     {
-        CardList = new List<BasePokerCard>();
-        DealingCards = new List<BasePokerCard>();
-        DealtCards = new List<BasePokerCard>();
+        CardList = new List<PokerCard>();
+        DealingCards = new List<PokerCard>();
+        DealtCards = new List<PokerCard>();
     }
     
-    public DealingDeck(List<Deck> srcDecks, List<BasePokerCard> excludedCards = null)
+    public DealingDeck(List<Deck> srcDecks, List<PokerCard> excludedCards = null)
     {
-        CardList = new List<BasePokerCard>();
-        DealingCards = new List<BasePokerCard>();
-        DealtCards = new List<BasePokerCard>();
+        CardList = new List<PokerCard>();
+        DealingCards = new List<PokerCard>();
+        DealtCards = new List<PokerCard>();
         foreach (var deck in srcDecks)
         {
             MixIn(deck, excludedCards);
@@ -32,9 +33,9 @@ public class DealingDeck
         Shuffle();
     }
     
-    public void MixIn(Deck deck, List<BasePokerCard> excludedCards = null)
+    public void MixIn(Deck deck, List<PokerCard> excludedCards = null)
     {
-        foreach (var card in deck.CardList.OfType<BasePokerCard>())
+        foreach (var card in deck.CardList.OfType<PokerCard>())
         {
             if (excludedCards != null && excludedCards.Contains(card))
             {
@@ -62,7 +63,7 @@ public class DealingDeck
         }
     }
 
-    public BasePokerCard Deal()
+    public PokerCard Deal()
     {
         if (DealingCards.Count == 0)
         {
@@ -74,7 +75,7 @@ public class DealingDeck
         return card;
     }
     
-    public BasePokerCard Deal(BattleEntity e)
+    public PokerCard Deal(BattleEntity e)
     {
         for (int i = 0; i < DealingCards.Count; i++)
         {

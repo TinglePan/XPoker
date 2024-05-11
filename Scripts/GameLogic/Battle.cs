@@ -13,8 +13,14 @@ namespace XCardGame.Scripts.GameLogic;
 
 public partial class Battle: Node, ISetup
 {
-    public Action OnNewRound;
-    public Action OnBattleFinished;
+    public Action<Battle> AfterDealCards;
+    
+    public Action<Battle> OnRoundStart;
+    public Action<Battle> OnRoundEnd;
+    public Action<Battle> BeforeShowDown;
+    public Action<Battle> BeforeEngage;
+    public Action<Battle, AttackObj> BeforeApplyDamage;
+    public Action<Battle> OnBattleFinished;
     
     public int RoundCount;
     public PlayerBattleEntity Player;
@@ -106,7 +112,7 @@ public partial class Battle: Node, ISetup
             {
                 if (card.Face.Value == Enums.CardFace.Down)
                 {
-                    card.Flip(this, null);
+                    card.Flip();
                 }
             }
         }
@@ -115,8 +121,8 @@ public partial class Battle: Node, ISetup
 
         foreach (var entity in Entities)
         {
-            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.OfType<BasePokerCard>().Where(x => x.Face.Value == Enums.CardFace.Up).ToList(),
-                entity.HoleCards.OfType<BasePokerCard>().ToList());
+            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.OfType<PokerCard>().Where(x => x.Face.Value == Enums.CardFace.Up).ToList(),
+                entity.HoleCards.OfType<PokerCard>().ToList());
             RoundHandStrengthsWithoutFaceDownCards.Add(entity, bestHand);
         }
         
@@ -128,8 +134,8 @@ public partial class Battle: Node, ISetup
         
         foreach (var entity in Entities)
         {
-            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.OfType<BasePokerCard>().ToList(),
-                entity.HoleCards.OfType<BasePokerCard>().ToList());
+            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.OfType<PokerCard>().ToList(),
+                entity.HoleCards.OfType<PokerCard>().ToList());
             RoundHandStrengths.Add(entity, bestHand);
         }
 

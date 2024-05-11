@@ -9,6 +9,9 @@ public static class Enums
         Clubs,
         Hearts,
         Spades,
+        BlackJoker,
+        RedJoker,
+        RainbowJoker,
     }
 
     public enum CardColor
@@ -36,6 +39,7 @@ public static class Enums
         Ace = 14,
         BlackJoker = 15,
         RedJoker = 16,
+        RainbowJoker = 17,
     }
 
     public enum CardFace

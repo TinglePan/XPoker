@@ -1,6 +1,5 @@
 ﻿using System;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 

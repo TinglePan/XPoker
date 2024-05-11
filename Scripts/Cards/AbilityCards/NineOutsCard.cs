@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
-using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.HandEvaluate;

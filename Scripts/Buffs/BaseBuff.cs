@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.HandEvaluate;

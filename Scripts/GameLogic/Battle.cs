@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.HandEvaluate;
 
@@ -62,6 +61,7 @@ public partial class Battle: Node, ISetup
     
     public void NewRound()
     {
+        OnRoundStart?.Invoke(this);
         RoundCount++;
         foreach (var entity in Entities)
         {
@@ -102,10 +102,12 @@ public partial class Battle: Node, ISetup
             card.Face.Value = i < DealCommunityCardCount - FaceDownCommunityCardCount ? Enums.CardFace.Up : Enums.CardFace.Down;
             CommunityCards.Add(card);
         }
+        AfterDealCards?.Invoke(this);
     }
     
     public void ShowDown()
     {
+        BeforeShowDown?.Invoke(this);
         void FlipFaceDownCards(IEnumerable<BaseCard> cards)
         {
             foreach (var card in cards)
@@ -139,6 +141,7 @@ public partial class Battle: Node, ISetup
             RoundHandStrengths.Add(entity, bestHand);
         }
 
+        BeforeEngage?.Invoke(this);
         for (int i = 0; i < Entities.Count; i++)
         {
             var entity = Entities[i];
@@ -160,8 +163,8 @@ public partial class Battle: Node, ISetup
                         handStrengthWithoutFaceDownCard, otherHandStrength,
                         otherHandStrengthWithoutFaceDownCard);
                     //TODO: BeforeApplyDamage here
+                    BeforeApplyDamage?.Invoke(this, attack);
                     attack.Apply();
-                    
                 }
                 if (handStrength.CompareTo(otherHandStrength) <= 0)
                 {
@@ -169,12 +172,7 @@ public partial class Battle: Node, ISetup
                 }
             }
         }
-        
-        foreach (var entity in Entities)
-        {
-            FlipFaceDownCards(entity.HoleCards);
-        }
-        FlipFaceDownCards(CommunityCards);
+        OnRoundEnd?.Invoke(this);
         // var endTime = Time.GetTicksUsec();
         // GD.Print($"Hand evaluation time: {endTime - startTime} us");
         // GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
@@ -184,6 +182,8 @@ public partial class Battle: Node, ISetup
 
     public void OnEntityWin(BattleEntity e)
     {
+        GD.Print($"{e} win");
+        OnBattleFinished?.Invoke(this);
     }
 
     public void OnEntityDefeated(BattleEntity e)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.PokerCards;
+
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.HandEvaluate;
 

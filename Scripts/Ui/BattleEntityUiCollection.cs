@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.PokerCards;
+
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Ui;

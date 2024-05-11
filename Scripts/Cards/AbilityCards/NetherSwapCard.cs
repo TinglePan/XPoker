@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Godot;
-using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;

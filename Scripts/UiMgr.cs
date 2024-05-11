@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
-using XCardGame.Scripts.Cards.PokerCards;
+
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Ui;
 

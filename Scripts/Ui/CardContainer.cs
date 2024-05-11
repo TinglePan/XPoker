@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.PokerCards;
+
 using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Ui;

@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.PokerCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.HandEvaluate;

@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.PokerCards;
+
 using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.GameLogic;

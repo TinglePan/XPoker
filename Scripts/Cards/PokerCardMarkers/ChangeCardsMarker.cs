@@ -141,7 +141,7 @@ public class ChangeCardsMarker: BasePokerCardMarker
         ChangeFunc = changeFunc;
     }
 
-    public override void OnAppearInField(Battle battle)
+    public override void OnAppear(Battle battle)
     {
         var cards = CardSelector(battle, Card).ToList();
         ChangeFunc(cards, Card, Battle);

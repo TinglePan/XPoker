@@ -13,38 +13,42 @@ public class PokerCard: BaseCard, IComparable<PokerCard>
 	}
 	
 	public List<BasePokerCardMarker> Markers;
-	public bool SuitAsSecondComparer;
 	
 	public PokerCard(string texturePath, Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank,
 		List<BasePokerCardMarker> markers = null, BattleEntity owner = null, bool suitAsSecondComparer = false):
 		base(GetCardName(suit, rank), GetCardName(suit, rank), texturePath, face, suit, rank, owner)
 	{
 		Markers = markers;
-		SuitAsSecondComparer = suitAsSecondComparer;
 	}
 
-	public override void OnAppearInField(Battle battle)
+	public override void OnAppear(Battle battle)
 	{
-		base.OnAppearInField(battle);
+		base.OnAppear(battle);
 		foreach (var marker in Markers)
 		{
-			marker.OnAppearInField(battle);
+			marker.OnAppear(battle);
 		}
 	}
 
-	public override void OnDisposalFromField(Battle battle)
+	public override void OnDisappear(Battle battle)
 	{
-		base.OnDisposalFromField(battle);
+		base.OnDisappear(battle);
 		foreach (var marker in Markers)
 		{
-			marker.OnDisposalFromField(battle);
+			marker.OnDisappear(battle);
 		}
 	}
 
 	public int CompareTo(PokerCard other)
 	{
+		return CompareTo(other, false);
+	}
+
+	public int CompareTo(PokerCard other, bool isSuitSecondComparer)
+	{
+		
 		var res = Rank.Value.CompareTo(other.Rank.Value);
-		if (res == 0 && SuitAsSecondComparer)
+		if (res == 0 && isSuitSecondComparer)
 		{
 			res = Suit.Value.CompareTo(other.Suit.Value);
 		}

@@ -7,24 +7,25 @@ using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class NineOutsCard: BaseSealableCard
+public class NineOutsCard: BasePassiveCard
 {
     public NineOutsCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1,
-        int coolDown = 0, bool isQuick = true, BattleEntity owner = null) : base("Nine Outs", 
+        int sealDuration = 0, bool isQuick = true, BattleEntity owner = null) : base("Nine Outs", 
         "Each face-down 9 which contributes to a winning hand adds 9 more damage to attack triggered by that hand.",
-        "res://Sprites/Cards/nine_outs.png", face, suit, rank, cost, coolDown, isQuick, owner)
+        "res://Sprites/Cards/nine_outs.png", face, suit, rank, cost, sealDuration, isQuick, owner)
     {
         
     }
 
-    public override void Setup(Dictionary<string, object> args)
+    public override void OnAppear(Battle battle)
     {
-        base.Setup(args);
+        base.OnAppear(battle);
         Battle.BeforeApplyDamage += BeforeApplyDamage;
     }
-    
-    ~NineOutsCard()
+
+    public override void OnDisappear(Battle battle)
     {
+        base.OnDisappear(battle);
         Battle.BeforeApplyDamage -= BeforeApplyDamage;
     }
 

@@ -22,22 +22,27 @@ public class CompletedHand: IComparable<CompletedHand>
         Kickers = kickers;
     }
 
-
     public int CompareTo(CompletedHand other)
+    {
+        return CompareTo(other, false, false);
+    }
+
+    public int CompareTo(CompletedHand other, bool isCompareTierOnly, bool isSuitSecondComparer)
     {
         if (Tier > other.Tier) return 1;
         if (Tier < other.Tier) return -1;
+        if (isCompareTierOnly) return 0;
         for (var i = 0; i < PrimaryCards.Count; i++)
         {
-            if (PrimaryCards[i].Rank.Value > other.PrimaryCards[i].Rank.Value) return 1;
-            if (PrimaryCards[i].Rank.Value < other.PrimaryCards[i].Rank.Value) return -1;
+            var compareRes = PrimaryCards[i].CompareTo(other.PrimaryCards[i], isSuitSecondComparer);
+            if (compareRes != 0) return compareRes;
         }
         if (Kickers != null)
         {
             for (var i = 0; i < Kickers.Count; i++)
             {
-                if (Kickers[i].Rank.Value > other.Kickers[i].Rank.Value) return 1;
-                if (Kickers[i].Rank.Value < other.Kickers[i].Rank.Value) return -1;
+                var compareRes = Kickers[i].CompareTo(other.Kickers[i], isSuitSecondComparer);
+                if (compareRes != 0) return compareRes;
             }
         }
         return 0;

@@ -21,7 +21,7 @@ public class BaseTemporaryBuff: BaseBuff, ITemporaryBuff
         if (DurationCounter.Value >= Duration)
         {
             Entity.Buffs.Remove(this);
-            OnDisposalFromField(battle);
+            OnDisposal(battle);
         }
     }
 

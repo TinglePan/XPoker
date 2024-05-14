@@ -16,6 +16,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle
     public ObservableProperty<Enums.CardFace> Face;
     public ObservableProperty<Enums.CardSuit> Suit;
     public ObservableProperty<Enums.CardRank> Rank;
+    public ObservableProperty<bool> IsNegated;
     
     public BattleEntity Owner;
 
@@ -41,6 +42,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle
         Face = new ObservableProperty<Enums.CardFace>(nameof(Face), this, face);
         Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, suit);
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);
+        IsNegated = new ObservableProperty<bool>(nameof(IsNegated), this, false);
         Owner = owner;
     }
     
@@ -58,33 +60,41 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle
         Face.FireValueChangeEventsOnInit();
     }
 
-    public void Flip()
+    public virtual void Flip()
     {
         Face.Value = Face.Value == Enums.CardFace.Up ? Enums.CardFace.Down : Enums.CardFace.Up;
     }
     
     public void Disposal()
     {
-        OnDisposalFromField(Battle);
         Node.QueueFree();
         Node = null;
+        OnDisappear(Battle);
     }
-    
-    public virtual void OnAppearInField(Battle battle)
+
+    public virtual void OnAppear(Battle battle)
     {
         
     }
 
-    public virtual void OnDisposalFromField(Battle battle)
+    public virtual void OnDisappear(Battle battle)
     {
         
     }
     
-    protected void OnFaceChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardFace> args)
+    public virtual void OnDisposal(Battle battle)
+    {
+        OnDisappear(battle);
+    }
+    
+    protected virtual void OnFaceChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardFace> args)
     {
         if (args.NewValue == Enums.CardFace.Up)
         {
-            OnAppearInField(Battle);
+            OnAppear(Battle);
+        } else if (args is { NewValue: Enums.CardFace.Down, OldValue: Enums.CardFace.Up })
+        {
+            OnDisappear(Battle);
         }
     }
 }

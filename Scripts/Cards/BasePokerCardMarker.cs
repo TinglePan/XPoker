@@ -20,11 +20,15 @@ public class BasePokerCardMarker: ILifeCycleTriggeredInBattle
         Battle = card.Battle;
     }
 
-    public virtual void OnAppearInField(Battle battle)
+    public virtual void OnAppear(Battle battle)
     {
     }
 
-    public virtual void OnDisposalFromField(Battle battle)
+    public virtual void OnDisappear(Battle battle)
+    {
+    }
+    
+    public virtual void OnDisposal(Battle battle)
     {
     }
 }

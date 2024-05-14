@@ -14,6 +14,8 @@ public class CompletedHandEvaluator: BaseHandEvaluator
 {
     // public Dictionary<string, object> Context;
     public Dictionary<Enums.HandTier, List<CompletedHand>> CalculatedHands;
+    public bool IsCompareHandTierOnly;
+    public bool IsSuitSecondComparer;
 
     public CompletedHandEvaluator(int cardCount,
         int requiredHoleCardCountMin, int requiredHoleCardCountMax, List<BaseHandEvaluateRule> rules = null): base(cardCount, requiredHoleCardCountMin, requiredHoleCardCountMax, rules)
@@ -23,12 +25,15 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         RequiredHoleCardCountMin = requiredHoleCardCountMin;
         RequiredHoleCardCountMax = requiredHoleCardCountMax;
         CalculatedHands = new Dictionary<Enums.HandTier, List<CompletedHand>>();
+        IsCompareHandTierOnly = false;
     }
     
     public CompletedHand EvaluateBestHand(List<PokerCard> communityCards, List<PokerCard> holeCards)
     {
         CalculatedHands.Clear();
-        foreach (var cards in Utils.GetCombinationsWithXToYFromA(holeCards, communityCards, 
+        var validHoleCards = holeCards.Where(x => !x.IsNegated.Value).ToList();
+        var validCommunityCards = communityCards.Where(x => !x.IsNegated.Value).ToList();
+        foreach (var cards in Utils.GetCombinationsWithXToYFromA(validHoleCards, validCommunityCards, 
                      CardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
         {
             Dictionary<Enums.HandTier, List<CompletedHand>> calculatedHandStrengths = new();
@@ -64,5 +69,10 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         CalculatedHands.Clear();
         var bestHandWithoutFaceDownCard = EvaluateBestHand(communityCards.Where(x => x.Face.Value == Enums.CardFace.Up).ToList(), holeCards);
         return (bestHandWithFaceDownCard, bestHandWithoutFaceDownCard);
+    }
+
+    public int Compare(CompletedHand a, CompletedHand b)
+    {
+        return a.CompareTo(b, IsCompareHandTierOnly, IsSuitSecondComparer);
     }
 }

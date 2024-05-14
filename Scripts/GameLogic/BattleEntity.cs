@@ -82,7 +82,7 @@ public partial class BattleEntity: Node, ISetup
     public void InflictBuffOn(BaseBuff buff, BattleEntity target)
     {
         target.Buffs.Add(buff);
-        buff.OnAppearInField(_battle);
+        buff.OnAppear(_battle);
     }
 
     public void TakeDamage(int damage, BattleEntity source)

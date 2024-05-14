@@ -8,7 +8,7 @@ using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class TurnTheTablesCard: BaseSealableCard
+public class TurnTheTablesCard: BasePassiveCard
 {
     public BattleEntity Source;
     public BattleEntity Target;
@@ -25,7 +25,18 @@ public class TurnTheTablesCard: BaseSealableCard
         base.Setup(args);
         Source = args.TryGetValue("source", out var arg) ? (BattleEntity) arg : Battle.Player;
         Target = (BattleEntity)args["target"];
+    }
+
+    public override void OnAppear(Battle battle)
+    {
+        base.OnAppear(battle);
         Battle.BeforeEngage += BeforeEngage;
+    }
+
+    public override void OnDisappear(Battle battle)
+    {
+        base.OnDisappear(battle);
+        Battle.BeforeEngage -= BeforeEngage;
     }
 
     private void BeforeEngage(Battle battle)

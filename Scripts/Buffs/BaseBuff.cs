@@ -28,11 +28,15 @@ public class BaseBuff: ILifeCycleTriggeredInBattle
         Battle = gameMgr.CurrentBattle;
     }
 
-    public virtual void OnAppearInField(Battle battle)
+    public virtual void OnAppear(Battle battle)
     {
     }
 
-    public virtual void OnDisposalFromField(Battle battle)
+    public virtual void OnDisappear(Battle battle)
+    {
+    }
+
+    public void OnDisposal(Battle battle)
     {
     }
 }

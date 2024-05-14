@@ -157,7 +157,7 @@ public partial class Battle: Node, ISetup
                 var otherHandStrength = RoundHandStrengths[otherEntity];
                 var otherHandStrengthWithoutFaceDownCard = RoundHandStrengthsWithoutFaceDownCards[otherEntity];
                 
-                if (handStrength.CompareTo(otherHandStrength) >= 0)
+                if (HandEvaluator.Compare(handStrength, otherHandStrength) >= 0)
                 {
                     AttackObj attack = new AttackObj(_gameMgr, entity, otherEntity, handStrength, 
                         handStrengthWithoutFaceDownCard, otherHandStrength,
@@ -166,9 +166,13 @@ public partial class Battle: Node, ISetup
                     BeforeApplyDamage?.Invoke(this, attack);
                     attack.Apply();
                 }
-                if (handStrength.CompareTo(otherHandStrength) <= 0)
+                if (HandEvaluator.Compare(handStrength, otherHandStrength) <= 0)
                 {
-                    otherEntity.Attack(entity, otherHandStrength, handStrength);
+                    AttackObj attack = new AttackObj(_gameMgr, otherEntity, entity, otherHandStrength,
+                        otherHandStrengthWithoutFaceDownCard, handStrength, 
+                        handStrengthWithoutFaceDownCard);
+                    BeforeApplyDamage?.Invoke(this, attack);
+                    attack.Apply();
                 }
             }
         }

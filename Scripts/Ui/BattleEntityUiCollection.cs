@@ -11,6 +11,7 @@ public partial class BattleEntityUiCollection : Control, ISetup, IManagedUi
 {
 	[Export] public BattleEntityInfoUi BattleEntityInfoUi;
 	[Export] public CardContainer HoleCardContainer;
+	[Export] public BuffContainer BuffContainer;
 	
 	[Export]
 	public string Identifier { get; set; }
@@ -49,6 +50,10 @@ public partial class BattleEntityUiCollection : Control, ISetup, IManagedUi
 				{ "cards", Entity.HoleCards }
 			});
 			BattleEntityInfoUi.Setup(args);
+			BuffContainer.Setup(new Dictionary<string, object>()
+			{
+				{ "buffs", Entity.Buffs },
+			});
 		}
 	}
 }

@@ -11,8 +11,9 @@ public class BaseBuff: ILifeCycleTriggeredInBattle
 {
     public string Name;
     public string Description;
-    public string IconPath;
+    public ObservableProperty<string> IconPath;
 
+    public BuffNode Node;
     public BattleEntity Entity;
     
     protected GameMgr GameMgr;
@@ -22,10 +23,15 @@ public class BaseBuff: ILifeCycleTriggeredInBattle
     {
         Name = name;
         Description = description;
-        IconPath = iconPath;
+        IconPath = new ObservableProperty<string>(nameof(IconPath), this, iconPath);
         Entity = entity;
-        GameMgr = gameMgr;
-        Battle = gameMgr.CurrentBattle;
+    }
+    
+    public virtual void Setup(Dictionary<string, object> args)
+    {
+        GameMgr = (GameMgr)args["gameMgr"];
+        Node = (BuffNode)args["node"];
+        Battle = GameMgr.CurrentBattle;
     }
 
     public virtual void OnAppear(Battle battle)

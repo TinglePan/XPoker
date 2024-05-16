@@ -13,9 +13,10 @@ namespace XCardGame.Scripts.GameLogic;
 public partial class PlayerBattleEntity: BattleEntity
 {
     public ObservableCollection<BaseCard> AbilityCards;
-    public Dictionary<Enums.CardSuit, ObservableProperty<int>> Overload;
     public ObservableProperty<int> Cost;
     public ObservableProperty<int> MaxCost;
+    public ObservableProperty<int> Concentration;
+    public ObservableProperty<int> MaxConcentration;
 
     public Dictionary<int, LevelUpInfo> LevelUpTable;
 
@@ -23,27 +24,20 @@ public partial class PlayerBattleEntity: BattleEntity
     {
         base.Setup(args);
         var maxCost = (int)args["maxCost"];
+        var maxConcentration = (int)args["maxConcentration"];
         MaxCost = new ObservableProperty<int>(nameof(MaxCost), this, maxCost);
         Cost = new ObservableProperty<int>(nameof(Cost), this, maxCost);
+        Concentration = new ObservableProperty<int>(nameof(Concentration), this, maxConcentration);
+        MaxConcentration = new ObservableProperty<int>(nameof(MaxConcentration), this, maxConcentration);
         AbilityCards = args.TryGetValue("abilityCards", out var arg) ? arg as ObservableCollection<BaseCard> : new ObservableCollection<BaseCard>();
-        Overload = new Dictionary<Enums.CardSuit, ObservableProperty<int>>()
-        {
-            { Enums.CardSuit.Clubs, new ObservableProperty<int>("Overload.Clubs", this, 0) },
-            { Enums.CardSuit.Diamonds, new ObservableProperty<int>("Overload.Diamonds", this, 0) },
-            { Enums.CardSuit.Hearts, new ObservableProperty<int>("Overload.Hearts", this, 0) },
-            { Enums.CardSuit.Spades, new ObservableProperty<int>("Overload.Spades", this, 0) }
-        };
         LevelUpTable = args["levelUpTable"] as Dictionary<int, LevelUpInfo>;
         Level.DetailedValueChanged += LevelChanged;
     }
 
     public override void RoundReset()
     {
-        base.Reset();
-        foreach (var suit in Overload.Keys)
-        {
-            Overload[suit].Value = 0;
-        }
+        base.RoundReset();
+        Concentration.Value = MaxConcentration.Value;
         Cost.Value = MaxCost.Value;
     }
 

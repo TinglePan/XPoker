@@ -12,7 +12,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle
 {
     public string Name;
     public string Description;
-    public string TexturePath;
+    public ObservableProperty<string> TexturePath;
     public ObservableProperty<Enums.CardFace> Face;
     public ObservableProperty<Enums.CardSuit> Suit;
     public ObservableProperty<Enums.CardRank> Rank;
@@ -38,7 +38,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle
     {
         Name = name;
         Description = description;
-        TexturePath = texturePath;
+        TexturePath = new ObservableProperty<string>(nameof(TexturePath), this, texturePath);
         Face = new ObservableProperty<Enums.CardFace>(nameof(Face), this, face);
         Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, suit);
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);

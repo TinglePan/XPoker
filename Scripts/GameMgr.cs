@@ -49,17 +49,17 @@ public partial class GameMgr : Node
 		ChangeScene(MainScene);
 		InputMgr ??= GetNode<InputMgr>("/root/InputMgr");
 		UiMgr ??= GetNode<UiMgr>("/root/UiMgr");
-		var setupButton = GetNode<Button>("/root/Main/SetupButton");
+		var setupButton = GetNode<Button>("/root/Main/Field/SetupButton");
 		setupButton.Pressed += SetupBattle;
-		var startButton = GetNode<Button>("/root/Main/StartButton");
+		var startButton = GetNode<Button>("/root/Main/Field/StartButton");
 		startButton.Pressed += () => CurrentBattle.Start();
-		var nextRoundButton = GetNode<Button>("/root/Main/NextRoundButton");
+		var nextRoundButton = GetNode<Button>("/root/Main/Field/NextRoundButton");
 		nextRoundButton.Pressed += () =>
 		{
 			CurrentBattle.NewRound();
 			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
 		};
-		var proceedButton = GetNode<Button>("/root/Main/ProceedButton");
+		var proceedButton = GetNode<Button>("/root/Main/Field/ProceedButton");
 		proceedButton.Pressed += () =>
 		{
 			CurrentBattle.ShowDown();
@@ -79,7 +79,11 @@ public partial class GameMgr : Node
 				{ "battle", CurrentBattle },
 				{ "deck", Decks.PlayerInitialDeck },
 				{ "damageTable", DamageTables.DefaultPlayerDamageTable },
-				{ "maxMorale", 20 }
+				{ "maxMorale", 20 },
+				{ "maxCost", 3 },
+				{ "maxConcentration", 3 },
+				{ "levelUpTable", LevelUpTables.DefaultPlayerLevelUpTable },
+				{ "portraitPath", "res://Sprites/duster_guy.png" }
 			});
 			var enemy = Utils.InstantiatePrefab(OpponentPrefab, CurrentBattle) as BattleEntity;
 			Debug.Assert(enemy != null);
@@ -90,7 +94,8 @@ public partial class GameMgr : Node
 				{ "deck", Decks.OpponentInitialDeck },
 				{ "factionId", Enums.FactionId.Opponent },
 				{ "damageTable", DamageTables.DefaultOpponentDamageTable },
-				{ "maxMorale", 20 }
+				{ "maxMorale", 20 },
+				{ "portraitPath", "res://Sprites/cloak_guy.png" }
 			});
 			CurrentBattle.Setup(new Dictionary<string, object>()
 			{
@@ -106,6 +111,7 @@ public partial class GameMgr : Node
 			UiMgr.OpenBattleEntityUiCollection(player);
 			// GD.Print("open enemy");
 			UiMgr.OpenBattleEntityUiCollection(enemy);
+			UiMgr.OpenFieldUiCollection(player);
 			UiMgr.OpenCommunityCardContainer(CurrentBattle.CommunityCards);
 		
 			// Add ability cards after player ui collection is set up to avoid firing init event for observable collection.

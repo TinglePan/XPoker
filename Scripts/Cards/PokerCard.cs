@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards;
@@ -19,6 +21,7 @@ public class PokerCard: BaseCard, IComparable<PokerCard>
 		base(GetCardName(suit, rank), GetCardName(suit, rank), texturePath, face, suit, rank, owner)
 	{
 		Markers = markers;
+		Suit.DetailedValueChanged += OnSuitChanged;
 	}
 
 	public override void OnAppear(Battle battle)
@@ -58,5 +61,10 @@ public class PokerCard: BaseCard, IComparable<PokerCard>
 	public override string ToString()
 	{
 		return $"{Rank.Value} of {Suit.Value}(faced {Face.Value})";
+	}
+	
+	protected virtual void OnSuitChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardSuit> args)
+	{
+		TexturePath.Value = Utils.GetCardTexturePath(args.NewValue);
 	}
 }

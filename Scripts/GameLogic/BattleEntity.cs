@@ -13,6 +13,7 @@ namespace XCardGame.Scripts.GameLogic;
 public partial class BattleEntity: Node, ISetup
 {
     public string DisplayName;
+    public string PortraitPath;
     public Deck Deck;
     public ObservableCollection<BaseCard> HoleCards;
     public int DealCardCount;
@@ -37,6 +38,7 @@ public partial class BattleEntity: Node, ISetup
     public virtual void Setup(Dictionary<string, object> args)
     {
         DisplayName = (string)args["name"];
+        PortraitPath = (string)args["portraitPath"];
         _battle = (Battle)args["battle"];
         Deck = (Deck)args["deck"];
         foreach (var card in Deck.CardList)

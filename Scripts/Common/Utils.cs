@@ -78,6 +78,28 @@ public static class Utils
         return "";
     }
 
+    public static Texture2D GetCardSuitTexture(Enums.CardSuit suit)
+    {
+        var texturePath = GetCardTexturePath(suit);
+        return texturePath != null ? ResourceCache.Instance.Load<Texture2D>(texturePath) : null;
+    }
+    
+    public static string GetCardTexturePath(Enums.CardSuit suit)
+    {
+        switch (suit)
+        {
+            case Enums.CardSuit.Clubs:
+                return "res://Sprites/Suits/clubs.png";
+            case Enums.CardSuit.Diamonds:
+                return "res://Sprites/Suits/diamonds.png";
+            case Enums.CardSuit.Hearts:
+                return "res://Sprites/Suits/hearts.png";
+            case Enums.CardSuit.Spades:
+                return "res://Sprites/Suits/spades.png";
+        }
+        return null;
+    }
+
     public static string PrettyPrintCardRank(Enums.CardRank rank)
     {
         switch (rank)

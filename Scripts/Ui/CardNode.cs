@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Xsl;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
@@ -19,8 +20,11 @@ public partial class CardNode: Control, ISetup
     
     [Export]
     public TextureRect Icon;
+    [Export]
+    public Label FallbackLabelForIcon;
     
-    [Export] public Label SuitLabel;
+    [Export]
+    public TextureRect SuitIcon;
     [Export] public Label RankLabel;
  
     public ObservableProperty<BaseCard> Card;
@@ -55,6 +59,7 @@ public partial class CardNode: Control, ISetup
 		{
 			if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
 			{
+				GD.Print($"On mouse pressed {Card.Value}");
 				OnPressed?.Invoke(this);
 			}
 		}
@@ -145,12 +150,21 @@ public partial class CardNode: Control, ISetup
     
     protected void OnCardSuitChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardSuit> args)
     {
-	    SuitLabel.Text = Utils.PrettyPrintCardSuit(args.NewValue);
+	    SuitIcon.Texture = Utils.GetCardSuitTexture(args.NewValue);
     }
     
     protected void OnCardRankChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardRank> args)
 	{
 	    RankLabel.Text = Utils.PrettyPrintCardRank(args.NewValue);
+	}
+    
+    protected void OnTexturePathChanged(object sender, ValueChangedEventDetailedArgs<string> args)
+	{
+	    if (args.NewValue != null)
+	    {
+		    Icon.Texture = ResourceCache.Instance.Load<Texture2D>(args.NewValue);
+	    }
+	    FallbackLabelForIcon.Text = Icon.Texture == null ? Card.Name[0].ToString() : "";
 	}
     
 	protected void OnCardChanged(object sender, ValueChangedEventDetailedArgs<BaseCard> args)
@@ -169,20 +183,16 @@ public partial class CardNode: Control, ISetup
 		card.Rank.FireValueChangeEventsOnInit();
 		card.Suit.DetailedValueChanged += OnCardSuitChanged;
 		card.Suit.FireValueChangeEventsOnInit();
-		if (card.TexturePath != null)
-		{
-			Icon.Texture = GD.Load<Texture2D>(card.TexturePath);
-		}
+		card.TexturePath.DetailedValueChanged += OnTexturePathChanged;
+		card.TexturePath.FireValueChangeEventsOnInit();
 	}
 
 	protected void OnCardDetached(BaseCard card)
 	{
 		GD.Print($"On card detached {card}");
-		if (card != null)
-		{
-			card.Face.DetailedValueChanged -= OnCardFaceChanged;
-			card.Rank.DetailedValueChanged -= OnCardRankChanged;
-			card.Suit.DetailedValueChanged -= OnCardSuitChanged;
-		}
+		card.Face.DetailedValueChanged -= OnCardFaceChanged;
+		card.Rank.DetailedValueChanged -= OnCardRankChanged;
+		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
+		card.TexturePath.DetailedValueChanged -= OnTexturePathChanged;
 	}
 }

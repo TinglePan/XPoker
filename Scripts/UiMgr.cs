@@ -66,7 +66,7 @@ public partial class UiMgr: Node
             }
         } else if (!_nodes.TryAdd(node.Identifier, node))
         {
-            GD.PrintErr($"Duplicate node identifier:{node.Identifier} by {node}");
+            GD.PrintErr($"Duplicate node identifier:{node.Identifier} by {node}, existing {_nodes[node.Identifier]}");
         }
     }
 
@@ -86,7 +86,15 @@ public partial class UiMgr: Node
         {
             { "entity", entity },
         });
-        
+    }
+
+    public void OpenFieldUiCollection(PlayerBattleEntity player)
+    {
+        var fieldUiCollection = GetNodeById<FieldUiCollection>("fieldUiCollection");
+        fieldUiCollection.Setup(new Dictionary<string, object>()
+        {
+            { "player", player }
+        });
     }
 
     public void OpenAbilityCardUi(ObservableCollection<BaseCard> abilityCards)

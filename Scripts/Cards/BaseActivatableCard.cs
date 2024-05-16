@@ -1,4 +1,5 @@
-﻿using XCardGame.Scripts.Common.Constants;
+﻿using System.Collections.Generic;
+using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.GameLogic;
 
@@ -11,7 +12,7 @@ public class BaseActivatableCard: BaseCard
     public bool IsQuick;
     public int Cost;
     public int ActualCost =>
-        IsQuick ? Cost : Cost + (Battle.Player.Overload.TryGetValue(Suit.Value, out var overload) ? overload.Value : 0);
+        IsQuick || Battle.Player.Concentration.Value >= 0 ? Cost : Cost - Battle.Player.Concentration.Value;
     
     public BaseActivatableCard(string name, string description, string iconPath, Enums.CardFace face,
         Enums.CardSuit suit, Enums.CardRank rank, int cost, int coolDown, bool isQuick = false, BattleEntity owner = null) : 
@@ -21,12 +22,20 @@ public class BaseActivatableCard: BaseCard
         CoolDown = coolDown;
         CoolDownCounter = new ObservableProperty<int>(nameof(CoolDownCounter), this, 0);
         IsQuick = isQuick;
+    }
+
+    public override void Setup(Dictionary<string, object> args)
+    {
+        base.Setup(args);
         Battle.OnRoundEnd += OnRoundEnd;
     }
-    
+
     ~BaseActivatableCard()
     {
-        Battle.OnRoundEnd -= OnRoundEnd;
+        if (Battle != null)
+        {
+            Battle.OnRoundEnd -= OnRoundEnd;
+        }
     }
 
     public virtual bool CanActivate()

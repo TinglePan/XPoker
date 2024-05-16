@@ -8,20 +8,23 @@ namespace XCardGame.Scripts.GameLogic;
 public class LevelUpInfo
 {
     public int Cost;
+    public int Concentration;
+    public int Morale;
     public int ShowDownHoleCardCountMax;
     public int DealCardCount;
     
     public List<BaseCard> AbilityCards;
     public List<PokerCard> PokerCards;
-    public List<BasePokerCardMarker> PokerCardMarkers;
     
-    public LevelUpInfo(int cost, int showDownHoleCardCountMax, int dealCardCount)
+    public LevelUpInfo(int cost, int concentration, int morale, int showDownHoleCardCountMax, int dealCardCount, List<BaseCard> abilityCards,
+        List<PokerCard> pokerCards)
     {
-        AbilityCards = new List<BaseCard>();
-        PokerCards = new List<PokerCard>();
-        PokerCardMarkers = new List<BasePokerCardMarker>();
         Cost = cost;
+        Concentration = concentration;
+        Morale = morale;
         ShowDownHoleCardCountMax = showDownHoleCardCountMax;
         DealCardCount = dealCardCount;
+        AbilityCards = abilityCards;
+        PokerCards = pokerCards;
     }
 }

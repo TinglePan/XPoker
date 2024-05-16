@@ -1,12 +1,16 @@
-[gd_scene load_steps=8 format=3 uid="uid://nko5a5mn6ufg"]
+[gd_scene load_steps=12 format=3 uid="uid://nko5a5mn6ufg"]
 
 [ext_resource type="PackedScene" uid="uid://cu8cytigbn45" path="res://Scenes/DialogueBoxUi.tscn" id="1_ofsbe"]
+[ext_resource type="Script" path="res://Scripts/Ui/FieldUiCollection.cs" id="2_nytjy"]
+[ext_resource type="FontFile" uid="uid://cy2x5d3tsilqd" path="res://Fonts/ark-pixel-12px-proportional-zh_cn.woff2" id="2_w346v"]
 [ext_resource type="Script" path="res://Scripts/Ui/BattleEntityUiCollection.cs" id="4_545oh"]
 [ext_resource type="Script" path="res://Scripts/Ui/CardContainer.cs" id="4_ddjib"]
 [ext_resource type="Script" path="res://Scripts/Ui/PlayerBattleEntityUiCollection.cs" id="4_kno6j"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="4_y43ou"]
 [ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="5_k1xbh"]
 [ext_resource type="PackedScene" uid="uid://cp0d1hoqmk0ia" path="res://Scenes/InfoUi.tscn" id="6_j08d8"]
+[ext_resource type="PackedScene" uid="uid://blf82px0mx4rp" path="res://Scenes/Deck.tscn" id="8_jfmj2"]
+[ext_resource type="PackedScene" uid="uid://2yj0yi24lkar" path="res://Scenes/BuffTabUi.tscn" id="8_xi4np"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -16,53 +20,250 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SetupButton" type="Button" parent="."]
+[node name="DialogueBoxUi" parent="." instance=ExtResource("1_ofsbe")]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+offset_top = -160.0
+offset_right = -320.0
+grow_vertical = 0
+Identifier = "BattleLogDialogueBox"
+
+[node name="InspectorUi" parent="." instance=ExtResource("1_ofsbe")]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+offset_left = -324.0
+grow_horizontal = 0
+Identifier = "InspectorDialogueBox"
+
+[node name="Field" type="Control" parent="." node_paths=PackedStringArray("AbilityCardContainer", "CurrentCostLabel", "MaxCostLabel", "CurrentConcentrationLabel", "MaxConcentrationLabel")]
+layout_mode = 1
+anchor_right = 0.719
+anchor_bottom = 0.753
+offset_right = -0.288025
+offset_bottom = 0.0559998
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_nytjy")
+AbilityCardContainer = NodePath("AbilityCards")
+CurrentCostLabel = NodePath("Cost/Current")
+MaxCostLabel = NodePath("Cost/Max")
+CurrentConcentrationLabel = NodePath("Concentration/Current")
+MaxConcentrationLabel = NodePath("Concentration/Max")
+Identifier = "fieldUiCollection"
+
+[node name="SetupButton" type="Button" parent="Field"]
 layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
+offset_right = 53.0
+offset_bottom = 31.0
 text = "Setup
 "
 
-[node name="StartButton" type="Button" parent="."]
+[node name="StartButton" type="Button" parent="Field"]
 layout_mode = 0
 offset_left = 55.0
 offset_right = 101.0
 offset_bottom = 31.0
 text = "Start"
 
-[node name="NextRoundButton" type="Button" parent="."]
+[node name="NextRoundButton" type="Button" parent="Field"]
 layout_mode = 0
 offset_left = 103.0
-offset_right = 149.0
+offset_right = 199.0
 offset_bottom = 31.0
 text = "NextRound
 "
 
-[node name="ProceedButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 201.0
-offset_right = 272.0
-offset_bottom = 31.0
-text = "Proceed"
-
-[node name="DialogueBoxUi" parent="." instance=ExtResource("1_ofsbe")]
+[node name="Cost" type="Control" parent="Field"]
 layout_mode = 1
-anchors_preset = 12
+anchors_preset = 3
+anchor_left = 1.0
 anchor_top = 1.0
-offset_top = -160.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -56.0
+offset_right = -102.0
+offset_bottom = -32.0
+grow_horizontal = 0
 grow_vertical = 0
 
-[node name="CommunityCardContainer" type="HBoxContainer" parent="." groups=["cardContainer", "pokerCardContainer"]]
+[node name="Text" type="Label" parent="Field/Cost"]
+texture_filter = 1
 layout_mode = 1
-anchors_preset = -1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = -9.0
+offset_bottom = 9.0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_w346v")
+theme_override_font_sizes/font_size = 12
+text = "Cost:"
+
+[node name="Current" type="Label" parent="Field/Cost"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 6.0
+offset_top = -9.0
+offset_right = 14.0
+offset_bottom = 9.0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_w346v")
+theme_override_font_sizes/font_size = 12
+text = "X"
+
+[node name="Label" type="Label" parent="Field/Cost"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
-anchor_top = 0.395
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 0.395
-offset_left = -64.0
-offset_top = -41.96
-offset_right = 64.0
-offset_bottom = 42.04
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -9.0
+offset_right = 4.0
+offset_bottom = 9.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 10
+theme_override_fonts/font = ExtResource("2_w346v")
+theme_override_font_sizes/font_size = 12
+text = "/"
+
+[node name="Max" type="Label" parent="Field/Cost"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -12.0
+offset_top = -9.0
+offset_right = -4.0
+offset_bottom = 9.0
+grow_horizontal = 0
+grow_vertical = 2
+size_flags_horizontal = 10
+theme_override_fonts/font = ExtResource("2_w346v")
+theme_override_font_sizes/font_size = 12
+text = "Y"
+
+[node name="Concentration" type="Control" parent="Field"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -32.0
+offset_right = -102.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Text" type="Label" parent="Field/Concentration"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -78.0
+offset_top = -9.0
+offset_bottom = 9.0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_w346v")
+theme_override_font_sizes/font_size = 12
+text = "Concentration:"
+
+[node name="Current" type="Label" parent="Field/Concentration"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 6.0
+offset_top = -9.0
+offset_right = 14.0
+offset_bottom = 9.0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_w346v")
+theme_override_font_sizes/font_size = 12
+text = "X"
+
+[node name="Label" type="Label" parent="Field/Concentration"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -9.0
+offset_right = 4.0
+offset_bottom = 9.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 10
+theme_override_fonts/font = ExtResource("2_w346v")
+theme_override_font_sizes/font_size = 12
+text = "/"
+
+[node name="Max" type="Label" parent="Field/Concentration"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -12.0
+offset_top = -9.0
+offset_right = -4.0
+offset_bottom = 9.0
+grow_horizontal = 0
+grow_vertical = 2
+size_flags_horizontal = 10
+theme_override_fonts/font = ExtResource("2_w346v")
+theme_override_font_sizes/font_size = 12
+text = "Y"
+
+[node name="ProceedButton" type="Button" parent="Field"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -86.0
+offset_top = -47.0
+offset_right = -15.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Proceed"
+
+[node name="CommunityCardContainer" type="HBoxContainer" parent="Field" groups=["cardContainer", "pokerCardContainer"]]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -152.0
+offset_top = -34.0
+offset_right = 152.0
+offset_bottom = 34.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 16
@@ -70,110 +271,159 @@ script = ExtResource("4_ddjib")
 Identifier = "communityCardContainer"
 CardPrefab = ExtResource("4_y43ou")
 
-[node name="Card" parent="CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Card" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
 
-[node name="Card2" parent="CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Card2" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
 
-[node name="Card3" parent="CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Card3" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
 
-[node name="Card4" parent="CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Card4" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
 
-[node name="Card5" parent="CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Card5" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
 
-[node name="PlayerUiCollection" type="Control" parent="." node_paths=PackedStringArray("AbilityCardContainer", "BattleEntityInfoUi", "HoleCardContainer")]
+[node name="EnemyUiCollection" type="Control" parent="Field" node_paths=PackedStringArray("BattleEntityInfoUi", "HoleCardContainer", "BuffContainer")]
+custom_minimum_size = Vector2(96, 100)
+layout_direction = 2
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -160.0
-offset_bottom = -160.0
-grow_vertical = 0
-script = ExtResource("4_kno6j")
-AbilityCardContainer = NodePath("AbilityCards")
-BattleEntityInfoUi = NodePath("InfoTab1")
-HoleCardContainer = NodePath("Cards1")
-Identifier = "playerUiCollection"
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -108.0
+offset_top = -82.0
+offset_right = -12.0
+offset_bottom = 70.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("4_545oh")
+BattleEntityInfoUi = NodePath("InfoTab2")
+HoleCardContainer = NodePath("Cards2")
+BuffContainer = NodePath("BuffTab2")
+Identifier = "enemyUiCollection"
 
-[node name="Cards1" parent="PlayerUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
+[node name="Cards2" parent="Field/EnemyUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 175.0
-offset_top = -174.0
-offset_right = 175.0
-offset_bottom = -174.0
-grow_horizontal = 2
-grow_vertical = 0
-Identifier = "playerHoleCardContainer"
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -48.0
+offset_top = -100.0
+offset_right = 0.0
+offset_bottom = -32.0
+grow_horizontal = 0
+alignment = 2
 
-[node name="InfoTab1" parent="PlayerUiCollection" instance=ExtResource("6_j08d8")]
+[node name="InfoTab2" parent="Field/EnemyUiCollection" instance=ExtResource("6_j08d8")]
+layout_mode = 1
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="BuffTab2" parent="Field/EnemyUiCollection" instance=ExtResource("8_xi4np")]
+layout_mode = 0
+anchors_preset = 0
+anchor_top = 0.0
+anchor_bottom = 0.0
+offset_top = 0.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_vertical = 1
+
+[node name="Deck" parent="Field" instance=ExtResource("8_jfmj2")]
 layout_mode = 1
 anchors_preset = 2
 anchor_left = 0.0
 anchor_top = 1.0
 anchor_right = 0.0
 anchor_bottom = 1.0
-offset_left = 0.0
-offset_top = -128.0
-offset_right = 0.0
-offset_bottom = -128.0
+offset_left = 18.0
+offset_top = -78.0
+offset_right = 18.0
+offset_bottom = -78.0
 grow_horizontal = 1
 grow_vertical = 0
 
-[node name="AbilityCards" parent="PlayerUiCollection" instance=ExtResource("5_k1xbh")]
+[node name="PlayerUiCollection" type="Control" parent="Field" node_paths=PackedStringArray("AbilityCardContainer", "BattleEntityInfoUi", "HoleCardContainer", "BuffContainer")]
+custom_minimum_size = Vector2(96, 100)
 layout_mode = 1
-offset_left = 376.0
-offset_top = -106.0
-offset_right = 432.0
-offset_bottom = -22.0
-Identifier = "abilityCardContainer"
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_top = -82.0
+offset_right = 106.0
+offset_bottom = 70.0
+grow_vertical = 2
+script = ExtResource("4_kno6j")
+AbilityCardContainer = NodePath("../AbilityCards")
+BattleEntityInfoUi = NodePath("InfoTab1")
+HoleCardContainer = NodePath("Cards1")
+BuffContainer = NodePath("BuffTab2")
+Identifier = "playerUiCollection"
 
-[node name="EnemyUiCollection" type="Control" parent="." node_paths=PackedStringArray("BattleEntityInfoUi", "HoleCardContainer")]
-layout_direction = 2
+[node name="Cards1" parent="Field/PlayerUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -350.0
-offset_right = -350.0
-grow_horizontal = 0
-script = ExtResource("4_545oh")
-BattleEntityInfoUi = NodePath("InfoTab2")
-HoleCardContainer = NodePath("Cards2")
-Identifier = "enemyUiCollection"
-
-[node name="Cards2" parent="EnemyUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
+anchors_preset = -1
+anchor_left = 0.0
 anchor_top = 0.0
-anchor_right = 0.5
+anchor_right = 0.0
 anchor_bottom = 0.0
-offset_left = 179.0
-offset_top = 177.0
-offset_right = 179.0
-offset_bottom = 177.0
-grow_horizontal = 2
-grow_vertical = 1
+offset_left = 0.0
+offset_top = -100.0
+offset_right = 48.0
+offset_bottom = -32.0
+grow_horizontal = 1
+Identifier = "playerHoleCardContainer"
 
-[node name="InfoTab2" parent="EnemyUiCollection" instance=ExtResource("6_j08d8")]
+[node name="InfoTab1" parent="Field/PlayerUiCollection" instance=ExtResource("6_j08d8")]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
+anchors_preset = 0
+anchor_left = 0.0
 anchor_top = 0.0
-anchor_right = 1.0
+anchor_right = 0.0
 anchor_bottom = 0.0
 offset_left = 0.0
 offset_top = 0.0
 offset_right = 0.0
 offset_bottom = 0.0
-grow_horizontal = 0
+grow_horizontal = 1
 grow_vertical = 1
+
+[node name="BuffTab2" parent="Field/PlayerUiCollection" instance=ExtResource("8_xi4np")]
+layout_mode = 0
+anchors_preset = 0
+anchor_top = 0.0
+anchor_bottom = 0.0
+offset_top = 0.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_vertical = 1
+
+[node name="AbilityCards" parent="Field" instance=ExtResource("5_k1xbh")]
+layout_mode = 1
+anchors_preset = 7
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -24.0
+offset_top = -78.0
+offset_right = 24.0
+offset_bottom = -10.0
+grow_vertical = 0
+mouse_filter = 2
+Identifier = "abilityCardContainer"

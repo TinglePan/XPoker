@@ -1,33 +1,132 @@
-[gd_scene load_steps=5 format=3 uid="uid://87j6cwak3dn2"]
+[gd_scene load_steps=9 format=3 uid="uid://87j6cwak3dn2"]
 
 [ext_resource type="Texture2D" uid="uid://tvral62jfpfe" path="res://Sprites/cardback.png" id="1_fhgce"]
 [ext_resource type="Script" path="res://Scripts/Ui/CardNode.cs" id="1_htcbf"]
 [ext_resource type="FontFile" uid="uid://dgad516eak3ca" path="res://Fonts/ark-pixel-12px-proportional-latin.woff2" id="2_6i3pd"]
-[ext_resource type="Texture2D" uid="uid://dyxrykpq2yl7r" path="res://Sprites/cardBackground.png" id="2_yschw"]
+[ext_resource type="Texture2D" uid="uid://8nooaaepsol3" path="res://Sprites/Suits/clubs.png" id="3_tyh2j"]
+[ext_resource type="FontFile" uid="uid://cy2x5d3tsilqd" path="res://Fonts/ark-pixel-12px-proportional-zh_cn.woff2" id="4_3uljb"]
+[ext_resource type="Texture2D" uid="uid://8bwa8txo6frd" path="res://Sprites/baetyl.png" id="6_i8vr7"]
 
-[node name="Card" type="MarginContainer" node_paths=PackedStringArray("Front", "Back", "Icon", "SuitLabel", "RankLabel")]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0nb4u"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yrhwe"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+anti_aliasing = false
+
+[node name="Card" type="PanelContainer" node_paths=PackedStringArray("Front", "Back", "Icon", "FallbackLabelForIcon", "SuitIcon", "RankLabel")]
+clip_contents = true
+custom_minimum_size = Vector2(48, 68)
+offset_right = 48.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_0nb4u")
 script = ExtResource("1_htcbf")
 Front = NodePath("Front")
 Back = NodePath("Back")
-Icon = NodePath("Front/CardBackGround/TextureRect")
-SuitLabel = NodePath("Front/CardBackGround/SuitBig")
-RankLabel = NodePath("Front/CardBackGround/Rank")
+Icon = NodePath("Front/Icon")
+FallbackLabelForIcon = NodePath("Front/FallbackLabel")
+SuitIcon = NodePath("Front/Suit")
+RankLabel = NodePath("Front/Rank")
 
-[node name="Front" type="MarginContainer" parent="."]
+[node name="Front" type="Control" parent="."]
+visible = false
 layout_mode = 2
+mouse_filter = 2
 
-[node name="CardBackGround" type="NinePatchRect" parent="Front"]
+[node name="Rank" type="Label" parent="Front"]
 texture_filter = 1
-custom_minimum_size = Vector2(56, 84)
+layout_mode = 1
+offset_left = 4.0
+offset_top = -1.0
+offset_right = 10.0
+offset_bottom = 17.0
+theme_override_fonts/font = ExtResource("2_6i3pd")
+theme_override_font_sizes/font_size = 12
+text = "7"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Suit" type="TextureRect" parent="Front"]
+texture_filter = 1
+layout_mode = 1
+offset_left = 1.0
+offset_top = 13.0
+offset_right = 13.0
+offset_bottom = 29.0
+texture = ExtResource("3_tyh2j")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FallbackLabel" type="Label" parent="Front"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -39.0
+offset_top = -53.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("4_3uljb")
+theme_override_font_sizes/font_size = 24
+text = "A"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Front"]
+texture_filter = 3
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -39.0
+offset_top = -53.0
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource("3_tyh2j")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Back" type="Control" parent="."]
 layout_mode = 2
-texture = ExtResource("2_yschw")
+mouse_filter = 2
+
+[node name="Panel" type="Panel" parent="Back"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 3.0
+offset_top = 2.0
+offset_right = 43.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_yrhwe")
+
+[node name="Pattern" type="NinePatchRect" parent="Back"]
+texture_filter = 1
+layout_mode = 2
+offset_left = 6.0
+offset_top = 5.0
+offset_right = 40.0
+offset_bottom = 61.0
+texture = ExtResource("1_fhgce")
 region_rect = Rect2(0, 0, 32, 32)
 patch_margin_left = 2
 patch_margin_top = 2
@@ -36,62 +135,11 @@ patch_margin_bottom = 2
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Rank" type="Label" parent="Front/CardBackGround"]
+[node name="TextureRect" type="TextureRect" parent="Back"]
 texture_filter = 1
-layout_mode = 1
-offset_left = 5.0
-offset_top = -6.0
-offset_right = 17.0
-offset_bottom = 30.0
-theme_override_fonts/font = ExtResource("2_6i3pd")
-theme_override_font_sizes/font_size = 24
-
-[node name="SuitBig" type="Label" parent="Front/CardBackGround"]
-texture_filter = 1
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -22.0
-offset_top = -26.0
-offset_right = 26.0
-offset_bottom = 46.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("2_6i3pd")
-theme_override_font_sizes/font_size = 48
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="Front/CardBackGround"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Back" type="MarginContainer" parent="."]
-visible = false
-layout_mode = 2
-
-[node name="CardBackGround2" type="NinePatchRect" parent="Back"]
-texture_filter = 1
-custom_minimum_size = Vector2(56, 84)
-layout_mode = 2
-texture = ExtResource("1_fhgce")
-region_rect = Rect2(0, 0, 32, 32)
-patch_margin_left = 5
-patch_margin_top = 5
-patch_margin_right = 5
-patch_margin_bottom = 5
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
+layout_mode = 0
+offset_left = 12.0
+offset_top = 16.0
+offset_right = 36.0
+offset_bottom = 48.0
+texture = ExtResource("6_i8vr7")

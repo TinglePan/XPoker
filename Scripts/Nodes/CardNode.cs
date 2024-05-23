@@ -10,9 +10,8 @@ namespace XCardGame.Scripts.Nodes;
 
 public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 {
-	
-	[Export] public Control Front;
-    [Export] public Control Back;
+	[Export] public Node3D Front;
+    [Export] public Node3D Back;
 
     [Export] public IconWithTextFallback MainIcon;
     
@@ -48,7 +47,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		Content.Value = null;
 	}
 
-	public override void _GuiInput(InputEvent @event)
+	public override void _Input(InputEvent @event)
 	{
 		if (@event is InputEventMouseButton mouseButton)
 		{

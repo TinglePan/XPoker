@@ -5,7 +5,7 @@ using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Nodes;
 
-public class IconWithTextFallback: Control, ISetup
+public class IconWithTextFallback: Sprite3D, ISetup
 {
     [Export] public TextureRect Icon;
     [Export] public Label FallbackLabel;

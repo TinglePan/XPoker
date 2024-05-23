@@ -4,10 +4,12 @@ using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Nodes;
 
-public abstract partial class BaseContentNode<TNode, TContent> : Control, ISetup
+public abstract partial class BaseContentNode<TNode, TContent> : Node3D, ISetup
     where TNode: BaseContentNode<TNode, TContent>
     where TContent: IContent<TNode, TContent>
 {
+    [Export] public Area3D Area;
+    
     public BaseContentContainer<TNode, TContent> Container;
     public bool HasSetup { get; set; }
 
@@ -20,8 +22,8 @@ public abstract partial class BaseContentNode<TNode, TContent> : Control, ISetup
         IsFocused = new ObservableProperty<bool>(nameof(IsFocused), this, false);
         Content = new ObservableProperty<TContent>(nameof(Content), this, default);
         Content.DetailedValueChanged += OnContentChanged;
-        MouseEntered += OnMouseEnter;
-        MouseExited += OnMouseExit;
+        Area.MouseEntered += OnMouseEnter;
+        Area.MouseExited += OnMouseExit;
     }
 
     public virtual void Setup(Dictionary<string, object> args)

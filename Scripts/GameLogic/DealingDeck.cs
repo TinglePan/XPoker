@@ -10,7 +10,7 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public class DealingDeck: Control, ISetup
+public class DealingDeck: Node, ISetup
 {
     [Export]
     public CardNode TopCardNode;

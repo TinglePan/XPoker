@@ -55,10 +55,11 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Node
     {
         EnsureSetup();
         var index = startingIndex;
-        List<Control> removedNodes = new List<Control>();
-        foreach (var content in contents)
+        List<TContentNode> removedNodes = new List<TContentNode>();
+        foreach (var _ in contents)
         {
-            removedNodes.Add(GetChild<Control>(index));
+            removedNodes.Add(ContentNodes[index]);
+            ContentNodes.RemoveAt(index);
             index++;
         }
         foreach (var removedNode in removedNodes)
@@ -74,7 +75,7 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Node
         {
             if (oldContents[i] is TContent oldContent && newContents[i] is TContent newContent)
             {
-                var oldContentNode = GetChild<Control>(oldContentsStartingIndex + i).GetChild<TContentNode>(0);
+                var oldContentNode = ContentNodes[oldContentsStartingIndex + i];
                 oldContentNode.Content.Value = newContent;
             }
         }
@@ -114,7 +115,7 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Node
         EnsureSetup();
         if (ContentNodes[index] != node)
         {
-            node.CustomMinimumSize = ContentMinimumSize;
+            // node.CustomMinimumSize = ContentMinimumSize;
             if (tweenTime != 0)
             {
                 var position = CalculateContentNodePosition(index);

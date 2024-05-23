@@ -14,7 +14,7 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public class Battle: Control, ISetup, IManagedUi
+public class Battle: Node, ISetup, IManagedUi
 {
     [Export] public DealingDeck DealingDeck;
     [Export] public CardContainer CommunityCardContainer;

@@ -2,9 +2,9 @@
 
 public interface ILifeCycleTriggeredInBattle
 {
-    public void OnAppear(Battle battle);
+    public void OnStart(Battle battle);
     
-    public void OnDisappear(Battle battle);
+    public void OnStop(Battle battle);
     
     public void OnDisposal(Battle battle);
 }

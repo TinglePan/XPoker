@@ -4,25 +4,26 @@ using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Nodes;
+using CardNode = XCardGame.Scripts.Nodes.CardNode;
 
 namespace XCardGame.Scripts.Cards;
 
-public class BaseCard: ISetup, ILifeCycleTriggeredInBattle
+public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<CardNode, BaseCard>, IComparable<BaseCard>
 {
-    public string Name;
-    public string Description;
-    public ObservableProperty<string> TexturePath;
-    public ObservableProperty<Enums.CardFace> Face;
-    public ObservableProperty<Enums.CardSuit> Suit;
-    public ObservableProperty<Enums.CardRank> Rank;
-    public ObservableProperty<bool> IsNegated;
-    
-    public BattleEntity Owner;
-
-    public CardNode Node;
+    public CardNode Node { get; set; }
     public GameMgr GameMgr;
     public Battle Battle;
+    public BattleEntity Owner;
+    public bool HasSetup { get; set; }
+    
+    public string Name;
+    public string Description;
+    public ObservableProperty<string> IconPath;
+    public Enums.CardSuit OriginalSuit;
+    public ObservableProperty<Enums.CardSuit> Suit;
+    public Enums.CardRank OriginalRank;
+    public ObservableProperty<Enums.CardRank> Rank;
     
     public Enums.CardColor CardColor => Suit.Value switch
     {
@@ -33,68 +34,66 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle
         _ => Enums.CardColor.None
     };
     
-    public BaseCard(string name, string description, string texturePath, Enums.CardFace face,
-        Enums.CardSuit suit = Enums.CardSuit.None, Enums.CardRank rank = Enums.CardRank.None, BattleEntity owner=null)
+    public BaseCard(string name, string description, string iconPath, Enums.CardSuit suit = Enums.CardSuit.None,
+        Enums.CardRank rank = Enums.CardRank.None)
     {
         Name = name;
         Description = description;
-        TexturePath = new ObservableProperty<string>(nameof(TexturePath), this, texturePath);
-        Face = new ObservableProperty<Enums.CardFace>(nameof(Face), this, face);
+        IconPath = new ObservableProperty<string>(nameof(IconPath), this, iconPath);
+        OriginalSuit = suit;
         Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, suit);
+        OriginalRank = rank;
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);
-        IsNegated = new ObservableProperty<bool>(nameof(IsNegated), this, false);
-        Owner = owner;
     }
     
     public override string ToString()
     {
-        return $"{Description}({Face.Value})";
+        return $"{Name}({Description})";
     }
 
     public virtual void Setup(Dictionary<string, object> args)
     {
         GameMgr = (GameMgr)args["gameMgr"];
         Node = (CardNode)args["node"];
-        Battle = GameMgr.CurrentBattle;
-        Face.DetailedValueChanged += OnFaceChanged;
-        Face.FireValueChangeEventsOnInit();
+        Battle = (Battle)args["battle"];
+        Owner = (BattleEntity)args["owner"];
     }
 
-    public virtual void Flip()
+    public void EnsureSetup()
     {
-        Face.Value = Face.Value == Enums.CardFace.Up ? Enums.CardFace.Down : Enums.CardFace.Up;
-    }
-    
-    public void Disposal()
-    {
-        Node.QueueFree();
-        Node = null;
-        OnDisappear(Battle);
+        if (!HasSetup)
+        {
+            GD.PrintErr($"{this} not setup yet");
+        }
     }
 
-    public virtual void OnAppear(Battle battle)
+    public virtual void OnStart(Battle battle)
     {
         
     }
 
-    public virtual void OnDisappear(Battle battle)
+    public virtual void OnStop(Battle battle)
     {
         
     }
     
     public virtual void OnDisposal(Battle battle)
     {
-        OnDisappear(battle);
+        OnStop(battle);
     }
     
-    protected virtual void OnFaceChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardFace> args)
+    public int CompareTo(BaseCard other)
     {
-        if (args.NewValue == Enums.CardFace.Up)
+        return CompareTo(other, false);
+    }
+
+    public int CompareTo(BaseCard other, bool isSuitSecondComparer)
+    {
+        var res = Rank.Value.CompareTo(other.Rank.Value);
+        if (res == 0 && isSuitSecondComparer)
         {
-            OnAppear(Battle);
-        } else if (args is { NewValue: Enums.CardFace.Down, OldValue: Enums.CardFace.Up })
-        {
-            OnDisappear(Battle);
+            res = Suit.Value.CompareTo(other.Suit.Value);
         }
+        return res;
     }
 }

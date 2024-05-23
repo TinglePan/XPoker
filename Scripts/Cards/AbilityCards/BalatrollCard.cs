@@ -1,119 +1,67 @@
 ﻿using System.Collections.Generic;
 using Godot;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class BalatrollCard: BaseActivatableCard
+public class BalatrollCard: BaseUseCard
 {
-
-    public class BalatrollCardInputHandler : BaseInputHandler
+    public class BalatrollCardInputHandler : BaseInteractCardInputHandler<BalatrollCard>
     {
-
-        private BalatrollCard _card;
-        
-        private List<CardNode> _selectedCardNodes;
-        
-        public BalatrollCardInputHandler(GameMgr gameMgr, BalatrollCard card) : base(gameMgr)
+        public BalatrollCardInputHandler(BalatrollCard card) : base(card)
         {
-            _card = card;
-            _selectedCardNodes = new List<CardNode>();
-        }
-        
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            foreach (var card in _card.PlayerCardContainer.Cards)
-            {
-                card.Node.OnPressed += ClickCard;
-            }
-            _card.Node.OnPressed += ClickSelf;
-            // GD.Print("Enter BalatrollCardInputHandler");
         }
 
-        public override void OnExit()
+        protected override IEnumerable<CardNode> GetValidSelectTargets()
         {
-            base.OnExit();
-            foreach (var card in _card.PlayerCardContainer.Cards)
+            foreach (var node in Card.PlayerCardContainer.ContentNodes)
             {
-                card.Node.OnPressed -= ClickCard;
+                yield return node;
             }
-            _card.Node.OnPressed -= ClickSelf;
         }
-        
-        protected override void OnRightMouseButtonPressed(Vector2 position)
+
+        protected override void Confirm()
         {
-            _card.AfterCanceled();
-            GameMgr.InputMgr.QuitCurrentInputHandler();
-        }
-        
-        protected override void OnActionPressed(InputEventAction action)
-        {
-            if (action.Action == "ui_escape")
+            if (SelectedCardNodes.Count != 0)
             {
-                _card.AfterCanceled();
+                foreach (var selectedCardNode in SelectedCardNodes)
+                {
+                    selectedCardNode.IsSelected = false;
+                    Card.Battle.DealingDeck.DealCardReplace(selectedCardNode);
+                }
+                SelectedCardNodes.Clear();
+                Card.Use();
                 GameMgr.InputMgr.QuitCurrentInputHandler();
             }
-        }
-        
-        protected void ClickSelf(CardNode node)
-        {
-            if (_selectedCardNodes.Count != 0)
-            {
-                foreach (var selectedCardNode in _selectedCardNodes)
-                {
-                    selectedCardNode.IsSelected.Value = false;
-                    var newCard = GameMgr.CurrentBattle.DealingDeck.Deal();
-                    newCard.Face.Value = Enums.CardFace.Up;
-                    selectedCardNode.Card.Value = newCard;
-                }
-                _selectedCardNodes.Clear();
-                _card.AfterEffect();
-            }
             else
             {
-                _card.AfterCanceled();
-            }
-            GameMgr.InputMgr.QuitCurrentInputHandler();
-        }
-        
-        protected void ClickCard(CardNode node)
-        {
-            if (_selectedCardNodes.Contains(node))
-            {
-                node.IsSelected.Value = false;
-                _selectedCardNodes.Remove(node);
-            }
-            else
-            {
-                _selectedCardNodes.Add(node);
-                node.IsSelected.Value = true;
+                // TODO: Hint on invalid confirm
             }
         }
     }
     
     public CardContainer PlayerCardContainer; 
     
-    public BalatrollCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1, int coolDown = 0,
-        bool isQuick = false, BattleEntity owner = null) : base("Balatroll", 
-        "Troll version of Balatro.", "res://Sprites/Cards/balatroll.png", face, suit, rank, cost, coolDown,
-        isQuick, owner)
+    public BalatrollCard(Enums.CardSuit suit, Enums.CardRank rank) : base("Balatroll", 
+        "Discard your hole cards at will, like in Balatro.", "res://Sprites/Cards/balatroll.png", 
+        suit, rank, 1)
     {
     }
 
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        PlayerCardContainer = GameMgr.UiMgr.GetNode<CardContainer>("PlayerCardContainer"); 
+        PlayerCardContainer = GameMgr.UiMgr.GetNode<CardContainer>("playerCardContainer"); 
     }
-    
-    public override void Activate()
+
+    public override void ChooseTargets()
     {
         var inputHandler =
-            new BalatrollCardInputHandler(GameMgr, this);
+            new BalatrollCardInputHandler(this);
         GameMgr.InputMgr.SwitchToInputHandler(inputHandler);
     }
 }

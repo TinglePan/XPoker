@@ -1,51 +1,75 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class NineOutsCard: BasePassiveCard
+public class NineOutsCard: BaseTapCard
 {
-    public NineOutsCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1,
-        int sealDuration = 0, bool isQuick = true, BattleEntity owner = null) : base("Nine Outs", 
-        "Each face-down 9 which contributes to a winning hand adds 9 more damage to attack triggered by that hand.",
-        "res://Sprites/Cards/nine_outs.png", face, suit, rank, cost, sealDuration, isQuick, owner)
-    {
-        
-    }
 
-    public override void OnAppear(Battle battle)
+    class NineOutsEffect: BaseSingleTurnEffect
     {
-        base.OnAppear(battle);
-        Battle.BeforeApplyDamage += BeforeApplyDamage;
-    }
-
-    public override void OnDisappear(Battle battle)
-    {
-        base.OnDisappear(battle);
-        Battle.BeforeApplyDamage -= BeforeApplyDamage;
-    }
-
-    private void BeforeApplyDamage(Battle battle, AttackObj obj)
-    {
-        if (obj.IsWinByOuts())
+        public NineOutsEffect(string name, string description, string iconPath, BaseCard createdByCard) : base(name, description, iconPath, createdByCard)
         {
-            foreach (var card in battle.CommunityCards)
+        }
+
+        public override void OnStart(Battle battle)
+        {
+            base.OnStart(battle);
+            battle.BeforeApplyDamage += BeforeApplyDamage;
+        }
+        
+        public override void OnStop(Battle battle)
+        {
+            base.OnStop(battle);
+            battle.BeforeApplyDamage -= BeforeApplyDamage;
+        }
+
+        protected void BeforeApplyDamage(Battle battle, Attack attack)
+        {
+            if (attack.IsWinByOuts())
             {
-                if (card is PokerCard pokerCard && card.Face.Value == Enums.CardFace.Down &&
-                    pokerCard.Rank.Value == Enums.CardRank.Nine)
+                int counter = 0;
+                foreach (var card in battle.CommunityCardContainer.Contents)
                 {
-                    obj.ExtraDamages.TryAdd(Name, 0);
-                    obj.ExtraDamages[Name] += 9;
+                    if (card is MarkerCard pokerCard && card.Node.FaceDirection == Enums.CardFace.Down &&
+                        pokerCard.Rank.Value == Enums.CardRank.Nine)
+                    {
+                        counter++;
+                        switch (counter)
+                        {
+                            case 1:
+                                attack.ExtraDamages.TryAdd($"{Name} 1", 9);
+                                break;
+                            case 2:
+                                attack.ExtraMultipliers.TryAdd("{Name} 2", 9);
+                                break;
+                            case 3:
+                                attack.ExtraDamages.TryAdd("{Name} 3", 999);
+                                break;
+                        }
+                    }
                 }
-            }
-            if (obj.ExtraDamages.ContainsKey(Name))
-            {
-                AfterEffect();
             }
         }
     }
+    
+    public NineOutsCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) : base("Nine Outs", 
+        "Outs are face-down cards that contributes to a winning hand. The first out of 9 adds 9 more damage to resulting attack. The second out of 9 times the raw damage of resulting attack by 9. The third out of 9 is an instant death.",
+        "res://Sprites/Cards/nine_outs.png", suit, rank, tapCost, unTapCost)
+    {
+        
+    }
+    
+    public override void Setup(Dictionary<string, object> args)
+    {
+        base.Setup(args);
+        Effect = new NineOutsEffect(Name, Description, IconPath.Value, this);
+    }
+
 }

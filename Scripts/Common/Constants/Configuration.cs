@@ -13,8 +13,12 @@ public static class Configuration
     public static readonly int DefaultMorale = 20;
     public static readonly int CompletedHandCardCount = 5;
     public static readonly int DefaultCrossTierThreshold = 2;
-    public static readonly float RevealFadeInDuration = 1f;
-    public static readonly float RevealFadeOutDuration = 0.5f;
-    public static readonly float RevealDelayPerCard = 0.2f;
+    public static readonly float RevealTweenTime = 1f;
     public static readonly float RevealDuration = 2f;
+    public static readonly float FlipTweenTime = 0.5f;
+    public static readonly float DealCardTweenTime = 0.5f;
+    public static readonly float TapTweenTime = 0.5f;
+    public static readonly float NegateTweenTime = 0.5f;
+    public static readonly float SwapCardTweenTime = 0.5f;
+    public static readonly float InvalidConfirmTweenTime = 0.5f;
 }

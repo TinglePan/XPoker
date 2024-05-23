@@ -40,14 +40,14 @@ public class StraightRule: BaseHandEvaluateRule
         AllowAceLowStraight = canWrap || allowAceLowStraight;
     }
     
-    protected override List<List<PokerCard>> Pick(List<PokerCard> cards)
+    protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
-        List<List<PokerCard>> picks = new List<List<PokerCard>>();
-        List<PokerCard> currPick = new List<PokerCard>();
-        var cardsByRank = new Dictionary<Enums.CardRank, List<PokerCard>>();
+        List<List<BaseCard>> picks = new List<List<BaseCard>>();
+        List<BaseCard> currPick = new List<BaseCard>();
+        var cardsByRank = new Dictionary<Enums.CardRank, List<BaseCard>>();
         foreach (var card in cards)
         {
-            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<PokerCard>();
+            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<BaseCard>();
             cardsByRank[card.Rank.Value].Add(card);
         }
         
@@ -55,7 +55,7 @@ public class StraightRule: BaseHandEvaluateRule
         {
             if (currPick.Count == CardCount)
             {
-                picks.Add(new List<PokerCard>(currPick));
+                picks.Add(new List<BaseCard>(currPick));
                 return;
             }
             var currRank = Range[currentRankIndexInRange];
@@ -95,11 +95,11 @@ public class StraightRule: BaseHandEvaluateRule
         return picks;
     }
 
-    protected override List<PokerCard> GetPrimaryComparerCards(List<PokerCard> pick, List<PokerCard> cards)
+    protected override List<BaseCard> GetPrimaryComparerCards(List<BaseCard> pick, List<BaseCard> cards)
     {
         if (!AllowAceLowStraight && !CanWrap) return base.GetPrimaryComparerCards(pick, cards);
         var pickCardByRank = pick.ToDictionary(card => card.Rank.Value);
-        PokerCard endAtPokerCard = null;
+        BaseCard endAtBaseCard = null;
         for (int i = 0; i < Range.Count; i++)
         {
             bool found = true;
@@ -114,9 +114,9 @@ public class StraightRule: BaseHandEvaluateRule
             }
             if (found)
             {
-                endAtPokerCard = pickCardByRank[Range[(i + CardCount - 1) % Range.Count]];
+                endAtBaseCard = pickCardByRank[Range[(i + CardCount - 1) % Range.Count]];
             } 
         }
-        return new List<PokerCard>() { endAtPokerCard };
+        return new List<BaseCard>() { endAtBaseCard };
     }
 }

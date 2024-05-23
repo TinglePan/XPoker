@@ -9,11 +9,11 @@ using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts;
 
-public partial class GameMgr : Node
+public partial class GameMgr : Node, ISetup
 {
 	[Export] public PackedScene MainScene;
 	[Export] public PackedScene PlayerPrefab;
@@ -71,7 +71,7 @@ public partial class GameMgr : Node
 	{
 		void MockSetup()
 		{
-			var player = Utils.InstantiatePrefab(PlayerPrefab, CurrentBattle) as PlayerBattleEntity;
+			var player = Utils.InstantiatePrefab(PlayerPrefab, CurrentBattle) as BattleEntity;
 			Debug.Assert(player != null);
 			player.Setup(new Dictionary<string, object>()
 			{
@@ -81,7 +81,6 @@ public partial class GameMgr : Node
 				{ "damageTable", DamageTables.DefaultPlayerDamageTable },
 				{ "maxMorale", 20 },
 				{ "maxCost", 3 },
-				{ "maxConcentration", 3 },
 				{ "levelUpTable", LevelUpTables.DefaultPlayerLevelUpTable },
 				{ "portraitPath", "res://Sprites/duster_guy.png" }
 			});
@@ -111,28 +110,28 @@ public partial class GameMgr : Node
 			UiMgr.OpenBattleEntityUiCollection(player);
 			// GD.Print("open enemy");
 			UiMgr.OpenBattleEntityUiCollection(enemy);
-			UiMgr.OpenFieldUiCollection(player);
-			UiMgr.OpenCommunityCardContainer(CurrentBattle.CommunityCards);
+			UiMgr.OpenBattleUiCollection((PlayerBattleEntity)player);
 		
 			// Add ability cards after player ui collection is set up to avoid firing init event for observable collection.
-			BaseActivatableCard abilityCard = new D6Card(Enums.CardFace.Up, Enums.CardSuit.Diamonds, Enums.CardRank.Six, owner: player);
-			player.AbilityCards.Add(abilityCard);
+			BaseInteractCard abilityCard = new D6Card(Enums.CardSuit.Diamonds, Enums.CardRank.Six);
+			player.AbilityCardContainer.Contents.Add(abilityCard);
 			abilityCard.Setup(new Dictionary<string, object>()
 			{
 				{ "gameMgr", this },
-				{ "node", abilityCard.Node }
+				{ "node", abilityCard.Node },
+				{ "owner", player }
 			});
 			
-			abilityCard = new NetherSwapCard(Enums.CardFace.Up, Enums.CardSuit.Hearts, Enums.CardRank.Six, owner: player);
-			player.AbilityCards.Add(abilityCard);
+			abilityCard = new NetherSwapCard(Enums.CardSuit.Hearts, Enums.CardRank.Six);
+			player.AbilityCardContainer.Contents.Add(abilityCard);
 			abilityCard.Setup(new Dictionary<string, object>()
 			{
 				{ "gameMgr", this },
-				{ "node", abilityCard.Node }
+				{ "node", abilityCard.Node },
+				{ "owner", player }
 			});
 
 			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
-		
 		}
 		
 		if (CurrentBattle == null)
@@ -157,5 +156,16 @@ public partial class GameMgr : Node
 			CurrentScene.QueueFree();
 		}
 		CurrentScene = node;
+	}
+
+	public bool HasSetup { get; set; }
+	public void Setup(Dictionary<string, object> args)
+	{
+		throw new NotImplementedException();
+	}
+
+	public void EnsureSetup()
+	{
+		throw new NotImplementedException();
 	}
 }

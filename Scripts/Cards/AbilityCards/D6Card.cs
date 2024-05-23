@@ -1,42 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using Godot;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Nodes;
+using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class D6Card: BaseActivatableCard
+public class D6Card: BaseUseCard
 {
-    private List<CardContainer> _cardContainers;
-    public D6Card(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1, int coolDown = 0,
-        bool isQuick = false, BattleEntity owner = null) : 
-        base("Dice 6", "Reroll your destiny", "res://Sprites/Cards/d6.png", face, suit, rank, 
-            cost, coolDown, isQuick, owner)
+    public List<CardContainer> CardContainers;
+    public D6Card(Enums.CardSuit suit, Enums.CardRank rank) : 
+        base("Dice 6", "Reroll your destiny", "res://Sprites/Cards/d6.png", suit, rank, 1)
     {
     }
 
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        _cardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
+        CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }
 
-    public override void Activate()
+    public override void Use()
     {
-        foreach (var cardContainer in _cardContainers)
+        base.Use();
+        foreach (var cardContainer in CardContainers)
         {
-            for (var i = 0; i < cardContainer.Cards.Count; i++)
+            foreach (var card in cardContainer.Contents)
             {
-                var card = cardContainer.Cards[i];
-                if (card.Face.Value != Enums.CardFace.Up) continue;
-                var newCard = GameMgr.CurrentBattle.DealingDeck.Deal();
-                newCard.Face.Value = Enums.CardFace.Up;
-                cardContainer.Cards[i] = newCard;
+                if (card.Node.FaceDirection != Enums.CardFace.Up) continue;
+                Battle.DealingDeck.DealCardReplace(card.Node);
             }
         }
-        AfterEffect();
     }
 }

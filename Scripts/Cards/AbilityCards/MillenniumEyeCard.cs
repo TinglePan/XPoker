@@ -1,40 +1,77 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Nodes;
+using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class MillenniumEyeCard: BaseActivatableCard
+public class MillenniumEyeCard: BaseUseCard
 {
-    private List<CardContainer> _cardContainers;
+    class MillenniumEyeEffect : BaseSingleTurnEffect
+    {
+        public List<BaseCard> RevealedCards;
+        public MillenniumEyeEffect(string name, string description, string iconPath, BaseCard createdByCard) : base(name, description, iconPath, createdByCard)
+        {
+            RevealedCards = new List<BaseCard>();
+        }
+
+        public override void OnStart(Battle battle)
+        {
+            base.OnStart(battle);
+            
+            if (CreatedByCard is MillenniumEyeCard millenniumEyeCard)
+            {
+                foreach (var container in millenniumEyeCard.CardContainers)
+                {
+                    foreach (var card in container.Contents)
+                    {
+                        if (card.Node.FaceDirection == Enums.CardFace.Down && !card.Node.IsRevealed)
+                        {
+                            card.Node.TweenReveal(true, Configuration.RevealTweenTime);
+                            RevealedCards.Add(card);
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void OnStop(Battle battle)
+        {
+            base.OnStop(battle);
+            foreach (var card in RevealedCards)
+            {
+                card.Node.TweenReveal(false, Configuration.RevealTweenTime);
+            }
+        }
+    }
     
-    public MillenniumEyeCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1,
-        int coolDown = 2, bool isQuick = false, BattleEntity owner = null) : 
-        base("Millennium Eye", "I can see forever.", "res://Sprites/Cards/millennium_eye.png", 
-            face, suit, rank, cost, coolDown, isQuick, owner)
+    public List<CardContainer> CardContainers;
+    
+    public MillenniumEyeCard(Enums.CardSuit suit, Enums.CardRank rank) : 
+        base("Millennium Eye", "All knowing at the cost of all power.", "res://Sprites/Cards/millennium_eye.png", 
+            suit, rank, 0, 0)
     {
     }
     
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        _cardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
+        CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
     }
-    
-    
-    public override void Activate()
+
+    public override void Use()
     {
-        float delay = 0f;
-        foreach (var cardContainer in _cardContainers)
-        {
-            foreach (var card in cardContainer.Cards)
-            {
-                if (card.Face.Value == Enums.CardFace.Up) continue;
-                delay += Configuration.RevealDelayPerCard;
-                card.Node.Reveal(Configuration.RevealDuration, delay);
-            }
-        }
-        AfterEffect();
+        var effect = new MillenniumEyeEffect(Name, Description, IconPath.Value, this);
+        Battle.StartEffect(effect);
+        Battle.Player.Energy.Value -= ActualCost();
+        StartRecharge();
+    }
+
+    public override int ActualCost()
+    {
+        return Battle.Player.Energy.Value;
     }
 }

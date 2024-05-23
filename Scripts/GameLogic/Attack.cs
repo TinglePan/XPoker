@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public class AttackObj
+public class Attack
 {
     public BattleEntity Source;
     public BattleEntity Target;
@@ -15,12 +16,13 @@ public class AttackObj
     public CompletedHand TargetHandWithoutFaceDownCards;
     public int BaseDamage;
     public Dictionary<string, int> ExtraDamages;
+    public Dictionary<string, float> ExtraMultipliers;
 
     public int Damage => BaseDamage + ExtraDamages.Values.Sum();
     
     protected GameMgr GameMgr;
     
-    public AttackObj(GameMgr gameMgr, BattleEntity source, BattleEntity target, CompletedHand sourceHand,
+    public Attack(GameMgr gameMgr, BattleEntity source, BattleEntity target, CompletedHand sourceHand,
         CompletedHand sourceHandWithoutFaceDownCards, CompletedHand targetHand, CompletedHand targetHandWithoutFaceDownCards)
     {
         GameMgr = gameMgr;
@@ -30,8 +32,9 @@ public class AttackObj
         SourceHandWithoutFaceDownCards = sourceHandWithoutFaceDownCards;
         TargetHand = targetHand;
         TargetHandWithoutFaceDownCards = targetHandWithoutFaceDownCards;
-        BaseDamage = Source.DamageTable[SourceHand.Tier];
+        BaseDamage = Source.HandPowers[SourceHand.Tier];
         ExtraDamages = new Dictionary<string, int>();
+        ExtraMultipliers = new Dictionary<string, float>();
     }
 
     public bool IsWinByOuts()
@@ -41,10 +44,6 @@ public class AttackObj
     
     public void Apply()
     {
-        Target.TakeDamage(Damage, Source);
-        if (SourceHand.Tier - TargetHand.Tier >= Target.CrossTierThreshold)
-        {
-            Source.InflictBuffOn(new CrossTierDeBuff(GameMgr, Target, SourceHand.Tier - TargetHand.Tier, 1), Target);
-        }
+        Target.HitPoint.Value = Mathf.Clamp(Target.HitPoint.Value - Damage, 0, Target.MaxHitPoint.Value);
     }
 }

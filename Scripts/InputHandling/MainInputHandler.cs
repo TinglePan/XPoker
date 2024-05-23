@@ -2,7 +2,9 @@
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Nodes;
+using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
+using CardNode = XCardGame.Scripts.Nodes.CardNode;
 
 namespace XCardGame.Scripts.InputHandling;
 
@@ -19,8 +21,8 @@ public class MainInputHandler: BaseInputHandler
     public override void OnEnter()
     {
         base.OnEnter();
-        _abilityCardContainer.Cards.CollectionChanged += OnAbilityCardCollectionChanged;
-        foreach (var card in _abilityCardContainer.Cards)
+        _abilityCardContainer.Contents.CollectionChanged += OnAbilityCardCollectionChanged;
+        foreach (var card in _abilityCardContainer.Contents)
         {
             card.Node.OnPressed += ClickCard;
         }
@@ -29,8 +31,8 @@ public class MainInputHandler: BaseInputHandler
     public override void OnExit()
     {
         base.OnExit();
-        _abilityCardContainer.Cards.CollectionChanged -= OnAbilityCardCollectionChanged;
-        foreach (var card in _abilityCardContainer.Cards)
+        _abilityCardContainer.Contents.CollectionChanged -= OnAbilityCardCollectionChanged;
+        foreach (var card in _abilityCardContainer.Contents)
         {
             card.Node.OnPressed -= ClickCard;
         }
@@ -38,10 +40,10 @@ public class MainInputHandler: BaseInputHandler
     
     protected void ClickCard(CardNode node)
     {
-        GD.Print($"ClickCard {node.Card.Value}");
-        if (node.Card.Value is BaseActivatableCard card && card.CanActivate())
+        GD.Print($"ClickCard {node.Content.Value}");
+        if (node.Content.Value is BaseInteractCard card && card.CanInteract())
         {
-            card.Activate();
+            card.Interact();
         }
     }
     
@@ -58,7 +60,6 @@ public class MainInputHandler: BaseInputHandler
                             card.Node.OnPressed += ClickCard;
                         }
                     }
-
                 break;
             case NotifyCollectionChangedAction.Remove:
                 if (args.OldItems != null)
@@ -70,13 +71,6 @@ public class MainInputHandler: BaseInputHandler
                         }
                     }
                 break;
-            case NotifyCollectionChangedAction.Replace:
-                if (args.OldItems != null && args.OldItems[0] is BaseCard replacedCard && args.NewItems != null)
-                {
-                    var replacedCardNode = _abilityCardContainer.GetChild<CardNode>(args.OldStartingIndex);
-                    replacedCardNode.Card.Value = args.NewItems[0] as BaseCard;
-                }
-                break;
             case NotifyCollectionChangedAction.Reset:
                 foreach (var node in _abilityCardContainer.GetChildren())
                 {
@@ -85,7 +79,6 @@ public class MainInputHandler: BaseInputHandler
                         card.OnPressed -= ClickCard;
                     }
                 }
-                _abilityCardContainer.ClearChildren();
                 break;
         }
     }

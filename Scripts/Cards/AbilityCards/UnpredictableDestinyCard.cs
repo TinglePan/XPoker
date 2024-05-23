@@ -1,29 +1,26 @@
-﻿using XCardGame.Scripts.Common.Constants;
+﻿using XCardGame.Scripts.Common;
+using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class UnpredictableDestinyCard: BaseSealableCard
+public class UnpredictableDestinyCard: BaseTapCard
 {
-    public int Count;
-    
-    public UnpredictableDestinyCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1,
-        int sealDuration = 1, bool isQuick = true, BattleEntity owner = null) :
+    public UnpredictableDestinyCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) :
         base("Unpredictable destiny", "Add more face-down community cards", 
-            "res://Sprites/Cards/unpredictable_destiny.png", face, suit, rank, cost, sealDuration, isQuick, owner)
+            "res://Sprites/Cards/unpredictable_destiny.png", suit, rank, tapCost, unTapCost)
     {
     }
     
-    
-    public override void OnAppear(Battle battle)
+    public override void OnStart(Battle battle)
     {
-        base.OnAppear(battle);
-        battle.FaceDownCommunityCardCount += Count;
+        base.OnStart(battle);
+        battle.FaceDownCommunityCardCount += Utils.GetCardRankValue(Rank.Value);
     }
     
-    public override void OnDisappear(Battle battle)
+    public override void OnStop(Battle battle)
     {
-        base.OnDisappear(battle);
-        battle.FaceDownCommunityCardCount -= Count;
+        base.OnStop(battle);
+        battle.FaceDownCommunityCardCount -= Utils.GetCardRankValue(Rank.Value);
     }
 }

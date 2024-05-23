@@ -28,11 +28,11 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         IsCompareHandTierOnly = false;
     }
     
-    public CompletedHand EvaluateBestHand(List<PokerCard> communityCards, List<PokerCard> holeCards)
+    public CompletedHand EvaluateBestHand(List<BaseCard> communityCards, List<BaseCard> holeCards)
     {
         CalculatedHands.Clear();
-        var validHoleCards = holeCards.Where(x => !x.IsNegated.Value).ToList();
-        var validCommunityCards = communityCards.Where(x => !x.IsNegated.Value).ToList();
+        var validHoleCards = holeCards.Where(x => !x.Node.IsTapped).ToList();
+        var validCommunityCards = communityCards.Where(x => !x.Node.IsTapped).ToList();
         foreach (var cards in Utils.GetCombinationsWithXToYFromA(validHoleCards, validCommunityCards, 
                      CardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
         {
@@ -63,11 +63,12 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         return null;
     }
     
-    public (CompletedHand, CompletedHand) EvaluateBestHandsWithAndWithoutFaceDownCards(List<PokerCard> communityCards, List<PokerCard> holeCards)
+    public (CompletedHand, CompletedHand) EvaluateBestHandsWithAndWithoutFaceDownCards(List<BaseCard> communityCards, List<BaseCard> holeCards)
     {
         var bestHandWithFaceDownCard = EvaluateBestHand(communityCards, holeCards);
         CalculatedHands.Clear();
-        var bestHandWithoutFaceDownCard = EvaluateBestHand(communityCards.Where(x => x.Face.Value == Enums.CardFace.Up).ToList(), holeCards);
+        var bestHandWithoutFaceDownCard = EvaluateBestHand(
+            communityCards.Where(x => x.Node.FaceDirection == Enums.CardFace.Up).ToList(), holeCards);
         return (bestHandWithFaceDownCard, bestHandWithoutFaceDownCard);
     }
 

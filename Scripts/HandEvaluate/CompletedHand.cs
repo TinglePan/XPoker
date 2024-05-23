@@ -9,12 +9,12 @@ namespace XCardGame.Scripts.HandEvaluate;
 public class CompletedHand: IComparable<CompletedHand>
 {
     public Enums.HandTier Tier;
-    public List<PokerCard> PrimaryCards;
-    public List<PokerCard> PrimaryComparerCards;
-    public List<PokerCard> Kickers;
+    public List<BaseCard> PrimaryCards;
+    public List<BaseCard> PrimaryComparerCards;
+    public List<BaseCard> Kickers;
     
-    public CompletedHand(Enums.HandTier tier, List<PokerCard> primaryCards, List<PokerCard> primaryComparerCards,
-        List<PokerCard> kickers)
+    public CompletedHand(Enums.HandTier tier, List<BaseCard> primaryCards, List<BaseCard> primaryComparerCards,
+        List<BaseCard> kickers)
     {
         Tier = tier;
         PrimaryCards = primaryCards;

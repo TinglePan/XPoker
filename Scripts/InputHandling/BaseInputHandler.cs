@@ -6,11 +6,11 @@ namespace XCardGame.Scripts.InputHandling;
 
 public class BaseInputHandler: IHandleInput
 {
+    protected GameMgr GameMgr;
+    
     public Action<InputEventAction> OnInputAction;
     public Action<Vector2> OnLMouseButtonPressed;
     public Action<Vector2> OnRMouseButtonPressed;
-    
-    protected GameMgr GameMgr;
     
     public BaseInputHandler(GameMgr gameMgr)
     {

@@ -19,13 +19,13 @@ public class FlushRule: BaseHandEvaluateRule
         ValidSuits = validSuits;
     }
     
-    protected override List<List<PokerCard>> Pick(List<PokerCard> cards)
+    protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
-        List<List<PokerCard>> picks = new List<List<PokerCard>>();
-        var cardsBySuit = new Dictionary<Enums.CardSuit, List<PokerCard>>();
+        List<List<BaseCard>> picks = new List<List<BaseCard>>();
+        var cardsBySuit = new Dictionary<Enums.CardSuit, List<BaseCard>>();
         foreach (var card in cards)
         {
-            if (!cardsBySuit.ContainsKey(card.Suit.Value)) cardsBySuit[card.Suit.Value] = new List<PokerCard>();
+            if (!cardsBySuit.ContainsKey(card.Suit.Value)) cardsBySuit[card.Suit.Value] = new List<BaseCard>();
             cardsBySuit[card.Suit.Value].Add(card);
         }
         foreach (var suit in ValidSuits)

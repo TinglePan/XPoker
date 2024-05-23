@@ -1,4 +1,5 @@
 ﻿using Godot;
+using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.GameLogic;
 
@@ -6,18 +7,18 @@ namespace XCardGame.Scripts.Buffs;
 
 public class CrossTierDeBuff: BaseTemporaryBuff
 {
-    public int Strength;
+    public int Power;
     
-    public CrossTierDeBuff(GameMgr gameMgr, BattleEntity entity, int strength, int duration) : base(
+    public CrossTierDeBuff(int power, int duration, BattleEntity inflictedBy, BaseCard inflictedByCard) : base(
         "Cross tier", "Subjected to a powerful hand. Too powerful that it takes away determination.",
-        "res://Sprites/Icons/cross_tier.png", gameMgr, entity, duration)
+        "res://Sprites/Icons/cross_tier.png", duration, inflictedBy, inflictedByCard)
     {
-        Strength = strength;
+        Power = power;
     }
 
     protected override void OnRoundEnd(Battle battle)
     {
-        Entity.Morale.Value = Mathf.Clamp(Entity.Morale.Value - Strength, 0, Entity.MaxMorale.Value);
+        Entity.HitPoint.Value = Mathf.Clamp(Entity.HitPoint.Value - Power, 0, Entity.MaxHitPoint.Value);
         base.OnRoundEnd(battle);
     }
 

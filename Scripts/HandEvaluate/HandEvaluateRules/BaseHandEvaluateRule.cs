@@ -8,7 +8,7 @@ namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 public class BaseHandEvaluateRule
 {
-    public virtual void EvaluateAndRecord(List<PokerCard> cards,
+    public virtual void EvaluateAndRecord(List<BaseCard> cards,
         Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHandStrengths, Enums.HandTier? forRank=null)
     {
         forRank ??= Tier;
@@ -18,7 +18,7 @@ public class BaseHandEvaluateRule
         if (calculatedHandStrengths!= null) calculatedHandStrengths[forRank.Value] = res;
     }
     
-    protected virtual List<CompletedHand> Evaluate(List<PokerCard> cards, Enums.HandTier? forRank=null)
+    protected virtual List<CompletedHand> Evaluate(List<BaseCard> cards, Enums.HandTier? forRank=null)
     {
         forRank ??= Tier;
         var picks = Pick(cards);
@@ -37,18 +37,18 @@ public class BaseHandEvaluateRule
     
     public virtual Enums.HandTier Tier => Enums.HandTier.HighCard;
     
-    protected virtual List<List<PokerCard>> Pick(List<PokerCard> cards)
+    protected virtual List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
-        var res = new List<List<PokerCard>>();
+        var res = new List<List<BaseCard>>();
         return res;
     }
     
-    protected virtual List<PokerCard> GetPrimaryComparerCards(List<PokerCard> pick, List<PokerCard> cards)
+    protected virtual List<BaseCard> GetPrimaryComparerCards(List<BaseCard> pick, List<BaseCard> cards)
     {
-        return new List<PokerCard> { pick.Max() };
+        return new List<BaseCard> { pick.Max() };
     }
     
-    protected virtual List<PokerCard> GetKickers(List<PokerCard> pick, List<PokerCard> cards)
+    protected virtual List<BaseCard> GetKickers(List<BaseCard> pick, List<BaseCard> cards)
     {
         var res = cards.Except(pick).OrderByDescending(c => c).ToList();
         return res;

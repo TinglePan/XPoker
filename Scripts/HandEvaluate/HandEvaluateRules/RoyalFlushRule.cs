@@ -14,7 +14,7 @@ public class RoyalFlushRule: StraightFlushRule
     {
     }
     
-    public override void EvaluateAndRecord(List<PokerCard> cards,
+    public override void EvaluateAndRecord(List<BaseCard> cards,
         Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHandStrengths, Enums.HandTier? forRank=null)
     {
         forRank ??= Tier;

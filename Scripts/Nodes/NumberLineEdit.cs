@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Godot;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Scripts.Nodes;
 
 public partial class NumberLineEdit: LineEdit, ISetup
 {
+    public bool HasSetup { get; set; }
+    
+    public Action<int, int> ValueChanged;
+    
     private Regex _regex;
     private string _oldText;
     private int _oldValue;
     private int _min;
     private int _max;
-
-    public Action<int, int> ValueChanged;
     
     public int Value
     {
@@ -40,12 +42,20 @@ public partial class NumberLineEdit: LineEdit, ISetup
         TextSubmitted += OnTextSubmitted;
     }
 
-    public void Setup(Dictionary<string, object> args)
+    void ISetup.Setup(Dictionary<string, object> args)
     {
         _min = (int)args["min"];
         _max = (int)args["max"];
     }
-    
+
+    public void EnsureSetup()
+    {
+        if (!HasSetup)
+        {
+            GD.PrintErr($"{this} not setup yet");
+        }
+    }
+
     private void OnTextChanged(string newText)
     {
         if (_regex.IsMatch(newText))

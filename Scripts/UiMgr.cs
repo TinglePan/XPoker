@@ -5,7 +5,9 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
 
 using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Nodes;
+using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 
 namespace XCardGame.Scripts;
 
@@ -81,17 +83,17 @@ public partial class UiMgr: Node
 
     public void OpenBattleEntityUiCollection(BattleEntity entity)
     {
-        var uiCollection = entity == _gameMgr.CurrentBattle.Player ? GetNodeById<PlayerBattleEntityUiCollection>("playerUiCollection") : GetNodeById<BattleEntityUiCollection>("enemyUiCollection");
+        var uiCollection = entity == _gameMgr.CurrentBattle.Player ? GetNodeById<PlayerBattleEntity>("playerUiCollection") : GetNodeById<BattleEntity>("enemyUiCollection");
         uiCollection.Setup(new Dictionary<string, object>()
         {
             { "entity", entity },
         });
     }
 
-    public void OpenFieldUiCollection(PlayerBattleEntity player)
+    public void OpenBattleUiCollection(PlayerBattleEntity player)
     {
-        var fieldUiCollection = GetNodeById<FieldUiCollection>("fieldUiCollection");
-        fieldUiCollection.Setup(new Dictionary<string, object>()
+        var battleUiCollection = GetNodeById<Battle>("battleUiCollection");
+        battleUiCollection.Setup(new Dictionary<string, object>()
         {
             { "player", player }
         });

@@ -21,13 +21,13 @@ public class NOfAKindRule: BaseHandEvaluateRule
         ValidRanks = validRanks;
     }
 
-    protected override List<List<PokerCard>> Pick(List<PokerCard> cards)
+    protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
-        var picks = new List<List<PokerCard>>();
-        var cardsByRank = new Dictionary<Enums.CardRank, List<PokerCard>>();
+        var picks = new List<List<BaseCard>>();
+        var cardsByRank = new Dictionary<Enums.CardRank, List<BaseCard>>();
         foreach (var card in cards)
         {
-            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<PokerCard>();
+            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<BaseCard>();
             cardsByRank[card.Rank.Value].Add(card);
         }
         foreach (var rank in ValidRanks)

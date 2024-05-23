@@ -1,4 +1,4 @@
-﻿namespace XCardGame.Scripts.Ui;
+﻿namespace XCardGame.Scripts.Nodes;
 
 public interface IManagedUi
 {

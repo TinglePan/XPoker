@@ -37,7 +37,7 @@ offset_left = -324.0
 grow_horizontal = 0
 Identifier = "InspectorDialogueBox"
 
-[node name="Field" type="Control" parent="." node_paths=PackedStringArray("AbilityCardContainer", "CurrentCostLabel", "MaxCostLabel", "CurrentConcentrationLabel", "MaxConcentrationLabel")]
+[node name="Battle" type="Control" parent="." node_paths=PackedStringArray("AbilityCardContainer", "CurrentCostLabel", "MaxCostLabel", "CurrentConcentrationLabel", "MaxConcentrationLabel")]
 layout_mode = 1
 anchor_right = 0.719
 anchor_bottom = 0.753
@@ -52,23 +52,23 @@ CurrentCostLabel = NodePath("Cost/Current")
 MaxCostLabel = NodePath("Cost/Max")
 CurrentConcentrationLabel = NodePath("Concentration/Current")
 MaxConcentrationLabel = NodePath("Concentration/Max")
-Identifier = "fieldUiCollection"
+Identifier = "battleUiCollection"
 
-[node name="SetupButton" type="Button" parent="Field"]
+[node name="SetupButton" type="Button" parent="Battle"]
 layout_mode = 0
 offset_right = 53.0
 offset_bottom = 31.0
 text = "Setup
 "
 
-[node name="StartButton" type="Button" parent="Field"]
+[node name="StartButton" type="Button" parent="Battle"]
 layout_mode = 0
 offset_left = 55.0
 offset_right = 101.0
 offset_bottom = 31.0
 text = "Start"
 
-[node name="NextRoundButton" type="Button" parent="Field"]
+[node name="NextRoundButton" type="Button" parent="Battle"]
 layout_mode = 0
 offset_left = 103.0
 offset_right = 199.0
@@ -76,7 +76,7 @@ offset_bottom = 31.0
 text = "NextRound
 "
 
-[node name="Cost" type="Control" parent="Field"]
+[node name="Cost" type="Control" parent="Battle"]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -90,7 +90,7 @@ offset_bottom = -32.0
 grow_horizontal = 0
 grow_vertical = 0
 
-[node name="Text" type="Label" parent="Field/Cost"]
+[node name="Text" type="Label" parent="Battle/Cost"]
 texture_filter = 1
 layout_mode = 1
 anchors_preset = 4
@@ -104,7 +104,7 @@ theme_override_fonts/font = ExtResource("2_w346v")
 theme_override_font_sizes/font_size = 12
 text = "Cost:"
 
-[node name="Current" type="Label" parent="Field/Cost"]
+[node name="Current" type="Label" parent="Battle/Cost"]
 texture_filter = 1
 layout_mode = 1
 anchors_preset = 4
@@ -119,7 +119,7 @@ theme_override_fonts/font = ExtResource("2_w346v")
 theme_override_font_sizes/font_size = 12
 text = "X"
 
-[node name="Label" type="Label" parent="Field/Cost"]
+[node name="Label" type="Label" parent="Battle/Cost"]
 texture_filter = 1
 layout_mode = 1
 anchors_preset = 8
@@ -138,7 +138,7 @@ theme_override_fonts/font = ExtResource("2_w346v")
 theme_override_font_sizes/font_size = 12
 text = "/"
 
-[node name="Max" type="Label" parent="Field/Cost"]
+[node name="Max" type="Label" parent="Battle/Cost"]
 texture_filter = 1
 layout_mode = 1
 anchors_preset = 6
@@ -157,7 +157,7 @@ theme_override_fonts/font = ExtResource("2_w346v")
 theme_override_font_sizes/font_size = 12
 text = "Y"
 
-[node name="Concentration" type="Control" parent="Field"]
+[node name="Concentration" type="Control" parent="Battle"]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -171,7 +171,7 @@ offset_bottom = -8.0
 grow_horizontal = 0
 grow_vertical = 0
 
-[node name="Text" type="Label" parent="Field/Concentration"]
+[node name="Text" type="Label" parent="Battle/Concentration"]
 texture_filter = 1
 layout_mode = 1
 anchors_preset = 4
@@ -185,7 +185,7 @@ theme_override_fonts/font = ExtResource("2_w346v")
 theme_override_font_sizes/font_size = 12
 text = "Concentration:"
 
-[node name="Current" type="Label" parent="Field/Concentration"]
+[node name="Current" type="Label" parent="Battle/Concentration"]
 texture_filter = 1
 layout_mode = 1
 anchors_preset = 4
@@ -200,7 +200,7 @@ theme_override_fonts/font = ExtResource("2_w346v")
 theme_override_font_sizes/font_size = 12
 text = "X"
 
-[node name="Label" type="Label" parent="Field/Concentration"]
+[node name="Label" type="Label" parent="Battle/Concentration"]
 texture_filter = 1
 layout_mode = 1
 anchors_preset = 8
@@ -219,7 +219,7 @@ theme_override_fonts/font = ExtResource("2_w346v")
 theme_override_font_sizes/font_size = 12
 text = "/"
 
-[node name="Max" type="Label" parent="Field/Concentration"]
+[node name="Max" type="Label" parent="Battle/Concentration"]
 texture_filter = 1
 layout_mode = 1
 anchors_preset = 6
@@ -238,7 +238,7 @@ theme_override_fonts/font = ExtResource("2_w346v")
 theme_override_font_sizes/font_size = 12
 text = "Y"
 
-[node name="ProceedButton" type="Button" parent="Field"]
+[node name="ProceedButton" type="Button" parent="Battle"]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -253,7 +253,7 @@ grow_horizontal = 0
 grow_vertical = 0
 text = "Proceed"
 
-[node name="CommunityCardContainer" type="HBoxContainer" parent="Field" groups=["cardContainer", "pokerCardContainer"]]
+[node name="CommunityCardContainer" type="HBoxContainer" parent="Battle" groups=["cardContainer", "pokerCardContainer"]]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -271,22 +271,39 @@ script = ExtResource("4_ddjib")
 Identifier = "communityCardContainer"
 CardPrefab = ExtResource("4_y43ou")
 
-[node name="Card" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Control" type="Control" parent="Battle/CommunityCardContainer"]
+custom_minimum_size = Vector2(48, 68)
 layout_mode = 2
 
-[node name="Card2" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Card" parent="Battle/CommunityCardContainer/Control" instance=ExtResource("4_y43ou")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -34.0
+offset_right = 24.0
+offset_bottom = 34.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -6.28319
+pivot_offset = Vector2(24, 34)
+
+[node name="Card2" parent="Battle/CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
 
-[node name="Card3" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Card3" parent="Battle/CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
 
-[node name="Card4" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Card4" parent="Battle/CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
 
-[node name="Card5" parent="Field/CommunityCardContainer" instance=ExtResource("4_y43ou")]
+[node name="Card5" parent="Battle/CommunityCardContainer" instance=ExtResource("4_y43ou")]
 layout_mode = 2
 
-[node name="EnemyUiCollection" type="Control" parent="Field" node_paths=PackedStringArray("BattleEntityInfoUi", "HoleCardContainer", "BuffContainer")]
+[node name="EnemyUiCollection" type="Control" parent="Battle" node_paths=PackedStringArray("BattleEntityInfoUi", "HoleCardContainer", "BuffContainer")]
 custom_minimum_size = Vector2(96, 100)
 layout_direction = 2
 layout_mode = 1
@@ -307,7 +324,7 @@ HoleCardContainer = NodePath("Cards2")
 BuffContainer = NodePath("BuffTab2")
 Identifier = "enemyUiCollection"
 
-[node name="Cards2" parent="Field/EnemyUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
+[node name="Cards2" parent="Battle/EnemyUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 1.0
@@ -321,7 +338,7 @@ offset_bottom = -32.0
 grow_horizontal = 0
 alignment = 2
 
-[node name="InfoTab2" parent="Field/EnemyUiCollection" instance=ExtResource("6_j08d8")]
+[node name="InfoTab2" parent="Battle/EnemyUiCollection" instance=ExtResource("6_j08d8")]
 layout_mode = 1
 anchors_preset = 0
 anchor_left = 0.0
@@ -335,7 +352,7 @@ offset_bottom = 0.0
 grow_horizontal = 1
 grow_vertical = 1
 
-[node name="BuffTab2" parent="Field/EnemyUiCollection" instance=ExtResource("8_xi4np")]
+[node name="BuffTab2" parent="Battle/EnemyUiCollection" instance=ExtResource("8_xi4np")]
 layout_mode = 0
 anchors_preset = 0
 anchor_top = 0.0
@@ -345,7 +362,7 @@ offset_right = 16.0
 offset_bottom = 16.0
 grow_vertical = 1
 
-[node name="Deck" parent="Field" instance=ExtResource("8_jfmj2")]
+[node name="Deck" parent="Battle" instance=ExtResource("8_jfmj2")]
 layout_mode = 1
 anchors_preset = 2
 anchor_left = 0.0
@@ -359,7 +376,7 @@ offset_bottom = -78.0
 grow_horizontal = 1
 grow_vertical = 0
 
-[node name="PlayerUiCollection" type="Control" parent="Field" node_paths=PackedStringArray("AbilityCardContainer", "BattleEntityInfoUi", "HoleCardContainer", "BuffContainer")]
+[node name="PlayerUiCollection" type="Control" parent="Battle" node_paths=PackedStringArray("AbilityCardContainer", "BattleEntityInfoUi", "HoleCardContainer", "BuffContainer")]
 custom_minimum_size = Vector2(96, 100)
 layout_mode = 1
 anchors_preset = 4
@@ -377,7 +394,7 @@ HoleCardContainer = NodePath("Cards1")
 BuffContainer = NodePath("BuffTab2")
 Identifier = "playerUiCollection"
 
-[node name="Cards1" parent="Field/PlayerUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
+[node name="Cards1" parent="Battle/PlayerUiCollection" groups=["pokerCardContainer"] instance=ExtResource("5_k1xbh")]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.0
@@ -391,7 +408,7 @@ offset_bottom = -32.0
 grow_horizontal = 1
 Identifier = "playerHoleCardContainer"
 
-[node name="InfoTab1" parent="Field/PlayerUiCollection" instance=ExtResource("6_j08d8")]
+[node name="InfoTab1" parent="Battle/PlayerUiCollection" instance=ExtResource("6_j08d8")]
 layout_mode = 1
 anchors_preset = 0
 anchor_left = 0.0
@@ -405,7 +422,7 @@ offset_bottom = 0.0
 grow_horizontal = 1
 grow_vertical = 1
 
-[node name="BuffTab2" parent="Field/PlayerUiCollection" instance=ExtResource("8_xi4np")]
+[node name="BuffTab2" parent="Battle/PlayerUiCollection" instance=ExtResource("8_xi4np")]
 layout_mode = 0
 anchors_preset = 0
 anchor_top = 0.0
@@ -415,7 +432,7 @@ offset_right = 16.0
 offset_bottom = 16.0
 grow_vertical = 1
 
-[node name="AbilityCards" parent="Field" instance=ExtResource("5_k1xbh")]
+[node name="AbilityCards" parent="Battle" instance=ExtResource("5_k1xbh")]
 layout_mode = 1
 anchors_preset = 7
 anchor_top = 1.0

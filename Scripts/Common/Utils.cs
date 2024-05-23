@@ -78,6 +78,63 @@ public static class Utils
         return "";
     }
 
+    public static int GetCardRankValue(Enums.CardRank rank)
+    {
+        switch (rank)
+        {
+            case Enums.CardRank.Ace:
+                return 1;
+            case Enums.CardRank.Two:
+            case Enums.CardRank.Three:
+            case Enums.CardRank.Four:
+            case Enums.CardRank.Five:
+            case Enums.CardRank.Six:
+            case Enums.CardRank.Seven:
+            case Enums.CardRank.Eight:
+            case Enums.CardRank.Nine:
+            case Enums.CardRank.Ten:
+            case Enums.CardRank.Jack:
+            case Enums.CardRank.Queen:
+            case Enums.CardRank.King:
+                return (int)rank;
+        }
+        return 0;
+    }
+    
+    public static Enums.CardRank GetCardRank(int value)
+    {
+        switch (value)
+        {
+            case 1:
+                return Enums.CardRank.Ace;
+            case 2:
+                return Enums.CardRank.Two;
+            case 3:
+                return Enums.CardRank.Three;
+            case 4:
+                return Enums.CardRank.Four;
+            case 5:
+                return Enums.CardRank.Five;
+            case 6:
+                return Enums.CardRank.Six;
+            case 7:
+                return Enums.CardRank.Seven;
+            case 8:
+                return Enums.CardRank.Eight;
+            case 9:
+                return Enums.CardRank.Nine;
+            case 10:
+                return Enums.CardRank.Ten;
+            case 11:
+                return Enums.CardRank.Jack;
+            case 12:
+                return Enums.CardRank.Queen;
+            case 13:
+                return Enums.CardRank.King;
+        }
+        return Enums.CardRank.None;
+    }
+
     public static Texture2D GetCardSuitTexture(Enums.CardSuit suit)
     {
         var texturePath = GetCardTexturePath(suit);

@@ -3,24 +3,23 @@ using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class TheTieBreakerCard: BaseSealableCard
+public class TheTieBreakerCard: BaseTapCard
 {
-    public TheTieBreakerCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1,
-        int sealDuration = 1, bool isQuick = true, BattleEntity owner = null) : 
+    public TheTieBreakerCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) : 
         base("The Tie Breaker", "Card suit is used to break a tie, suit order from high to low: Spades, Hearts, Clubs, Diamonds",
-            "res://Sprites/Cards/the_tie_breaker.png", face, suit, rank, cost, sealDuration, isQuick, owner)
+            "res://Sprites/Cards/the_tie_breaker.png", suit, rank, tapCost, unTapCost)
     {
     }
     
-    public override void OnAppear(Battle battle)
+    public override void OnStart(Battle battle)
     {
-        base.OnAppear(battle);
+        base.OnStart(battle);
         battle.HandEvaluator.IsSuitSecondComparer = true;
     }
-    
-    public override void OnDisappear(Battle battle)
+
+    public override void OnStop(Battle battle)
     {
-        base.OnDisappear(battle);
+        base.OnStop(battle);
         battle.HandEvaluator.IsSuitSecondComparer = false;
     }
 }

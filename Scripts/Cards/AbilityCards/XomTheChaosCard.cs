@@ -3,12 +3,11 @@ using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class XomTheChaosCard: BaseSealableCard
+public class XomTheChaosCard: BaseTapCard
 {
-    public XomTheChaosCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1,
-        int sealDuration = 1, bool isQuick = true, BattleEntity owner = null) : 
+    public XomTheChaosCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) : 
         base("Xom the Chaos", "Random effects that change every turn.", 
-            "res://Sprites/Cards/xom_the_chaos.png", face, suit, rank, cost, sealDuration, isQuick, owner)
+            "res://Sprites/Cards/xom_the_chaos.png", suit, rank, tapCost, unTapCost)
     {
     }
     

@@ -15,14 +15,14 @@ public class NPlusMRule: NOfAKindRule
         M = m;
     }
 
-    protected override List<List<PokerCard>> Pick(List<PokerCard> cards)
+    protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
-        var res = new List<List<PokerCard>>();
+        var res = new List<List<BaseCard>>();
         var nPicks = base.Pick(cards);
-        var cardsByRank = new Dictionary<Enums.CardRank, List<PokerCard>>();
+        var cardsByRank = new Dictionary<Enums.CardRank, List<BaseCard>>();
         foreach (var card in cards)
         {
-            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<PokerCard>();
+            if (!cardsByRank.ContainsKey(card.Rank.Value)) cardsByRank[card.Rank.Value] = new List<BaseCard>();
             cardsByRank[card.Rank.Value].Add(card);
         }
         foreach (var nPick in nPicks)
@@ -40,7 +40,7 @@ public class NPlusMRule: NOfAKindRule
         return res;
     }
 
-    protected override List<PokerCard> GetPrimaryComparerCards(List<PokerCard> pick, List<PokerCard> cards)
+    protected override List<BaseCard> GetPrimaryComparerCards(List<BaseCard> pick, List<BaseCard> cards)
     {
         return pick.GroupBy(card => card.Rank, (rank, groupCards) => new
             {

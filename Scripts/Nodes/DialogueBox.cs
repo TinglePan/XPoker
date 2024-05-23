@@ -1,15 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using Godot;
+﻿using Godot;
 using XCardGame.Scripts.Common.DataBinding;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Scripts.Nodes;
 
 public partial class DialogueBox: Container, IManagedUi
 {
     [Export] public string Identifier { get; set; }
     [Export] public Label TextWidget;
-    public GameMgr GameMgr { get; set; }
-    public UiMgr UiMgr { get; set; }
+    public GameMgr GameMgr { get; private set; }
+    public UiMgr UiMgr { get; private set; }
 
     public ObservableProperty<string> Content;
     
@@ -33,6 +32,7 @@ public partial class DialogueBox: Container, IManagedUi
     
     protected void OnContentChanged(object sender, ValueChangedEventDetailedArgs<string> args)
     {
+        // TODO: play text change animation
         TextWidget.Text = args.NewValue;
     }
 }

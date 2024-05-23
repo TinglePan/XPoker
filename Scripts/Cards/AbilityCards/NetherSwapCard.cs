@@ -4,132 +4,73 @@ using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Nodes;
+using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
+using CardNode = XCardGame.Scripts.Nodes.CardNode;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class NetherSwapCard: BaseActivatableCard
+public class NetherSwapCard: BaseUseCard
 {
-    public class NetherSwapCardInputHandler : BaseInputHandler
+    public class NetherSwapCardInputHandler : BaseInteractCardInputHandler<NetherSwapCard>
     {
-
-        private NetherSwapCard _card;
-        
-        private List<CardNode> _selectedCardNodes;
-        
-        public NetherSwapCardInputHandler(GameMgr gameMgr, NetherSwapCard card) : base(gameMgr)
+        public NetherSwapCardInputHandler(NetherSwapCard card) : base(card)
         {
-            _card = card;
-            _selectedCardNodes = new List<CardNode>();
-        }
-        
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            foreach (var cardContainer in _card.CardContainers)
-            {
-                foreach (var card in cardContainer.Cards)
-                {
-                    card.Node.OnPressed += ClickCard;
-                }
-            }
-            _card.Node.OnPressed += ClickSelf;
-            // GD.Print("Enter NetherSwapCardInputHandler");
         }
 
-        public override void OnExit()
+        protected override IEnumerable<CardNode> GetValidSelectTargets()
         {
-            base.OnExit();
-            foreach (var cardContainer in _card.CardContainers)
+            foreach (var cardContainer in Card.CardContainers)
             {
-                foreach (var card in cardContainer.Cards)
+                foreach (var node in cardContainer.ContentNodes)
                 {
-                    card.Node.OnPressed -= ClickCard;
+                    yield return node;
                 }
             }
-            _card.Node.OnPressed -= ClickSelf;
         }
-        
-        protected override void OnRightMouseButtonPressed(Vector2 position)
+
+        protected override async void Confirm()
         {
-            _card.AfterCanceled();
-            GameMgr.InputMgr.QuitCurrentInputHandler();
-        }
-        
-        protected override void OnActionPressed(InputEventAction action)
-        {
-            if (action.Action == "ui_escape")
+            if (SelectedCardNodes.Count == 2)
             {
-                _card.AfterCanceled();
-                GameMgr.InputMgr.QuitCurrentInputHandler();
-            }
-        }
-        
-        protected void ClickSelf(CardNode node)
-        {
-            if (_selectedCardNodes.Count == 2)
-            {
-                var fromNode = _selectedCardNodes[0];
-                var toNode = _selectedCardNodes[1];
-                var fromCard = fromNode.Card.Value;
-                var toCard = toNode.Card.Value;
+                var fromNode = SelectedCardNodes[0];
+                var toNode = SelectedCardNodes[1];
                 var fromContainer = fromNode.Container;
                 var toContainer = toNode.Container;
-                var fromIndex = fromContainer.Cards.IndexOf(fromCard);
-                var toIndex = toContainer.Cards.IndexOf(toCard);
-                toContainer.Cards[toIndex] = fromCard;
-                fromCard.Node.IsSelected.Value = false;
-                fromContainer.Cards[fromIndex] = toCard;
-                toCard.Node.IsSelected.Value = false;
-                // keep face value in sync with their target container
-                if (fromCard.Face.Value != toCard.Face.Value)
-                {
-                    (fromCard.Face.Value, toCard.Face.Value) = (toCard.Face.Value, fromCard.Face.Value);
-                }
-                _selectedCardNodes.Clear();
-                _card.AfterEffect();
+                var fromIndex = fromContainer.ContentNodes.IndexOf(fromNode);
+                var toIndex = toContainer.ContentNodes.IndexOf(toNode);
+                await toContainer.ReplaceContentNode(toIndex, fromNode, Configuration.SwapCardTweenTime);
+                await fromContainer.ReplaceContentNode(fromIndex, toNode, Configuration.SwapCardTweenTime);
+                fromNode.IsSelected = false;
+                toNode.IsSelected = false;
+                SelectedCardNodes.Clear();
+                Card.Use();
+                GameMgr.InputMgr.QuitCurrentInputHandler();
             }
             else
             {
-                _card.AfterCanceled();
-            }
-            GameMgr.InputMgr.QuitCurrentInputHandler();
-        }
-        
-        protected void ClickCard(CardNode node)
-        {
-            if (_selectedCardNodes.Contains(node))
-            {
-                node.IsSelected.Value = false;
-                _selectedCardNodes.Remove(node);
-            }
-            else
-            {
-                _selectedCardNodes.Add(node);
-                node.IsSelected.Value = true;
+                // TODO: Hint on invalid confirm
             }
         }
     }
     
     public List<CardContainer> CardContainers;
     
-    public NetherSwapCard(Enums.CardFace face, Enums.CardSuit suit, Enums.CardRank rank, int cost = 1,
-        int coolDown = 2, bool isQuick = false, BattleEntity owner = null) : base("Nether swap",
-        "Swap any two cards you can see.", "res://Sprites/Cards/nether_swap.png", face, suit, rank,
-        cost, coolDown, isQuick, owner)
+    public NetherSwapCard(Enums.CardSuit suit, Enums.CardRank rank) : base("Nether swap",
+        "Swap any two cards you can see.", "res://Sprites/Cards/nether_swap.png", suit, rank, 1)
     {
     }
 
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
+        CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("cardContainer");
     }
 
-    public override void Activate()
+    public override void ChooseTargets()
     {
         var inputHandler =
-            new NetherSwapCardInputHandler(GameMgr, this);
+            new NetherSwapCardInputHandler(this);
         GameMgr.InputMgr.SwitchToInputHandler(inputHandler);
     }
 }

@@ -83,4 +83,18 @@ public static class Enums
         Player,
         Opponent
     }
+
+    public enum CardInteractions
+    {
+        None,
+        Use,
+        Activate,
+        Seal
+    }
+
+    public enum TapDirection
+    {
+        Tapped,
+        UnTapped
+    }
 }

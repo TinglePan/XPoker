@@ -7,21 +7,19 @@ namespace XCardGame.Scripts.GameLogic;
 
 public class LevelUpInfo
 {
-    public int Cost;
-    public int Concentration;
-    public int Morale;
+    public int Energy;
+    public int HitPoint;
     public int ShowDownHoleCardCountMax;
     public int DealCardCount;
     
     public List<BaseCard> AbilityCards;
-    public List<PokerCard> PokerCards;
+    public List<MarkerCard> PokerCards;
     
-    public LevelUpInfo(int cost, int concentration, int morale, int showDownHoleCardCountMax, int dealCardCount, List<BaseCard> abilityCards,
-        List<PokerCard> pokerCards)
+    public LevelUpInfo(int energy, int hitPoint, int showDownHoleCardCountMax, int dealCardCount, List<BaseCard> abilityCards,
+        List<MarkerCard> pokerCards)
     {
-        Cost = cost;
-        Concentration = concentration;
-        Morale = morale;
+        Energy = energy;
+        HitPoint = hitPoint;
         ShowDownHoleCardCountMax = showDownHoleCardCountMax;
         DealCardCount = dealCardCount;
         AbilityCards = abilityCards;

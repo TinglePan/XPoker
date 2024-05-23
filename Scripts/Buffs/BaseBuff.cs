@@ -1,48 +1,67 @@
 ﻿using System.Collections.Generic;
+using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.HandEvaluate;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Nodes;
+using BuffNode = XCardGame.Scripts.Nodes.BuffNode;
 
 namespace XCardGame.Scripts.Buffs;
 
-public class BaseBuff: ILifeCycleTriggeredInBattle
+public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BuffNode, BaseBuff>
 {
+    public BuffNode Node { get; set; }
+    public GameMgr GameMgr;
+    public Battle Battle;
+    public BattleEntity Entity;
+
+    public BattleEntity InflictedBy;
+    public BaseCard InflictedByCard;
+    
+    public bool HasSetup { get; set; }
+    
     public string Name;
     public string Description;
-    public ObservableProperty<string> IconPath;
-
-    public BuffNode Node;
-    public BattleEntity Entity;
+    public string IconPath;
     
-    protected GameMgr GameMgr;
-    protected Battle Battle;
-    
-    public BaseBuff(string name, string description, string iconPath, GameMgr gameMgr, BattleEntity entity)
+    public BaseBuff(string name, string description, string iconPath, BattleEntity inflictedBy, BaseCard inflictedByCard)
     {
+        HasSetup = false;
         Name = name;
         Description = description;
-        IconPath = new ObservableProperty<string>(nameof(IconPath), this, iconPath);
-        Entity = entity;
+        IconPath = iconPath;
+        InflictedBy = inflictedBy;
+        InflictedByCard = inflictedByCard;
     }
-    
-    public virtual void Setup(Dictionary<string, object> args)
+
+    public void Setup(Dictionary<string, object> args)
     {
-        GameMgr = (GameMgr)args["gameMgr"];
         Node = (BuffNode)args["node"];
-        Battle = GameMgr.CurrentBattle;
+        GameMgr = (GameMgr)args["gameMgr"];
+        Battle = (Battle)args["battle"];
+        Entity = (BattleEntity)args["entity"];
+        HasSetup = true;
     }
 
-    public virtual void OnAppear(Battle battle)
+    public void EnsureSetup()
+    {
+        if (!HasSetup)
+        {
+            GD.PrintErr($"{this} not setup yet");
+        }
+    }
+
+    public virtual void OnStart(Battle battle)
     {
     }
 
-    public virtual void OnDisappear(Battle battle)
+    public virtual void OnStop(Battle battle)
     {
     }
 
     public void OnDisposal(Battle battle)
     {
+        OnStop(battle);
     }
 }

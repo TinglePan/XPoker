@@ -2,6 +2,8 @@
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Buffs;
+using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.SkillCards;
 using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.GameLogic;
@@ -15,6 +17,7 @@ public class Attack
     public CompletedHand TargetHand;
     public CompletedHand TargetHandWithoutFaceDownCards;
     public int BaseDamage;
+    public List<BaseSkillCard> SkillCards;
     public Dictionary<string, int> ExtraDamages;
     public Dictionary<string, float> ExtraMultipliers;
 

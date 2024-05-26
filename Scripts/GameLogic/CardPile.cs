@@ -10,7 +10,7 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public class DealingDeck: Node, ISetup
+public partial class CardPile: Node2D, ISetup
 {
     [Export]
     public CardNode TopCardNode;
@@ -25,7 +25,7 @@ public class DealingDeck: Node, ISetup
     public List<MarkerCard> DealingCards;
     public List<MarkerCard> DealtCards;
     
-    public DealingDeck()
+    public CardPile()
     {
         HasSetup = false;
         SourceDecks = new List<Deck>();
@@ -34,7 +34,7 @@ public class DealingDeck: Node, ISetup
         DealtCards = new List<MarkerCard>();
     }
     
-    public DealingDeck(List<Deck> srcDecks, List<MarkerCard> excludedCards = null)
+    public CardPile(List<Deck> srcDecks, List<MarkerCard> excludedCards = null)
     {
         HasSetup = false;
         SourceDecks = srcDecks;
@@ -146,7 +146,7 @@ public class DealingDeck: Node, ISetup
     {
         if (index >= CardList.Count)
         {
-            GD.PrintErr($"DealingDeck.Deal: index {index} >= CardList.Count {CardList.Count}");
+            GD.PrintErr($"CardPile.Deal: index {index} >= CardList.Count {CardList.Count}");
             return null;
         }
         if (index >= DealingCards.Count)

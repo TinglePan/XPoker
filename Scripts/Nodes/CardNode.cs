@@ -10,16 +10,17 @@ namespace XCardGame.Scripts.Nodes;
 
 public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 {
-	[Export] public Node3D Front;
-    [Export] public Node3D Back;
+	[Export] public Node2D Front;
+    [Export] public Node2D Back;
 
     [Export] public IconWithTextFallback MainIcon;
     
     [Export]
-    public TextureRect SuitIcon;
+    public Sprite2D SuitIcon;
     [Export] public Label RankLabel;
-    [Export] public TextureRect JokerMark;
+    [Export] public Sprite2D JokerMark;
     [Export] public Label CostLabel;
+    [Export] public AnimationPlayer AnimationPlayer;
     
     public Action<CardNode> OnPressed;
 
@@ -33,6 +34,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	public override void _Ready()
 	{
 		base._Ready();
+		Content = new ObservableProperty<BaseCard>(nameof(Content), this, default);
 		FaceDirection = Enums.CardFace.Down;
 		IsTapped = false;
 		IsNegated = false;
@@ -80,7 +82,8 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		if (useTween)
 		{
 			TweenReveal(false, Configuration.RevealTweenTime);
-			TweenFlip(OriginalFaceDirection, Configuration.FlipTweenTime);
+			// TweenFlip(OriginalFaceDirection, Configuration.FlipTweenTime);
+			AnimateFlip(OriginalFaceDirection);
 			TweenTap(false, Configuration.TapTweenTime);
 			TweenNegate(false, Configuration.NegateTweenTime);
 		}
@@ -102,12 +105,28 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		IsRevealed = toState;
 	}
 
-	public async void TweenFlip(Enums.CardFace toFaceDir, float tweenTime)
+	// public async void TweenFlip(Enums.CardFace toFaceDir, float tweenTime)
+	// {
+	// 	if (FaceDirection == toFaceDir) return;
+	// 	var tween = GetTree().CreateTween();
+	// 	tween.TweenProperty(this, "rotation:y", toFaceDir == Enums.CardFace.Down ? 180f : 0f, tweenTime);
+	// 	await ToSignal(tween, Tween.SignalName.Finished);
+	// 	FaceDirection = toFaceDir;
+	// 	if (FaceDirection == Enums.CardFace.Down)
+	// 	{
+	// 		Content.Value.OnStop(Content.Value.Battle);
+	// 	}
+	// 	else
+	// 	{
+	// 		Content.Value.OnStart(Content.Value.Battle);
+	// 	}
+	// }
+
+	public async void AnimateFlip(Enums.CardFace toFaceDir)
 	{
 		if (FaceDirection == toFaceDir) return;
-		var tween = GetTree().CreateTween();
-		tween.TweenProperty(this, "rotation:y", toFaceDir == Enums.CardFace.Down ? 180f : 0f, tweenTime);
-		await ToSignal(tween, Tween.SignalName.Finished);
+		AnimationPlayer.Play("flip");
+		await ToSignal(AnimationPlayer, "animation_finished");
 		FaceDirection = toFaceDir;
 		if (FaceDirection == Enums.CardFace.Down)
 		{
@@ -116,6 +135,23 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		else
 		{
 			Content.Value.OnStart(Content.Value.Battle);
+		}
+		GD.Print($"Flip animation finished {FaceDirection}");
+	}
+
+	public void OnFlipAnimationToggleCardFace()
+	{
+		if (FaceDirection == Enums.CardFace.Down)
+		{
+			FaceDirection = Enums.CardFace.Up;
+			Back.Hide();
+			Front.Show();
+		}
+		else
+		{
+			FaceDirection = Enums.CardFace.Down;
+			Front.Hide();
+			Back.Show();
 		}
 	}
 

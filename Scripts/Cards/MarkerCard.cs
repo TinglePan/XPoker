@@ -28,18 +28,24 @@ public class MarkerCard: BaseCard
 	public override void OnStart(Battle battle)
 	{
 		base.OnStart(battle);
-		foreach (var marker in Markers)
+		if (Markers != null)
 		{
-			marker.OnStart(battle);
+			foreach (var marker in Markers)
+			{
+				marker.OnStart(battle);
+			}
 		}
 	}
 
 	public override void OnStop(Battle battle)
 	{
 		base.OnStop(battle);
-		foreach (var marker in Markers)
+		if (Markers != null)
 		{
-			marker.OnStop(battle);
+			foreach (var marker in Markers)
+			{
+				marker.OnStop(battle);
+			}
 		}
 	}
 

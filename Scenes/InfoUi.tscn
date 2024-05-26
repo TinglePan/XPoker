@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cp0d1hoqmk0ia"]
 
-[ext_resource type="Script" path="res://Scripts/Ui/BattleEntityInfoUi.cs" id="1_6j7ah"]
+[ext_resource type="Script" path="res://Scripts/GameLogic/BattleEntity.cs" id="1_6j7ah"]
 [ext_resource type="Texture2D" uid="uid://oldgvrsgrmpi" path="res://Sprites/GodotHead.svg" id="2_d743s"]
 [ext_resource type="FontFile" uid="uid://cy2x5d3tsilqd" path="res://Fonts/ark-pixel-12px-proportional-zh_cn.woff2" id="3_1koy6"]
 
@@ -16,23 +16,10 @@ corner_radius_top_right = 1
 corner_radius_bottom_right = 1
 corner_radius_bottom_left = 1
 
-[node name="InfoTab" type="Control" groups=["infoUi"]]
-layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -576.0
-offset_top = -324.0
-offset_right = -576.0
-offset_bottom = -324.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="InfoTab" type="Node2D" groups=["infoUi"]]
 script = ExtResource("1_6j7ah")
 
 [node name="Panel" type="Panel" parent="."]
-layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

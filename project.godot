@@ -11,15 +11,9 @@ config_version=5
 [application]
 
 config/name="XCardGame"
-run/main_scene="res://Scenes/Intro.tscn"
+run/main_scene="res://Scenes/Testbed/TestFlipCard.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
-
-[autoload]
-
-GameMgr="*res://Scenes/GameMgr.tscn"
-InputMgr="*res://Scripts/InputMgr.cs"
-UiMgr="*res://Scripts/UiMgr.cs"
 
 [dotnet]
 

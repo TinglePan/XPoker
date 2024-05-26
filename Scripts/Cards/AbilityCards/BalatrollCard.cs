@@ -31,7 +31,7 @@ public class BalatrollCard: BaseUseCard
                 foreach (var selectedCardNode in SelectedCardNodes)
                 {
                     selectedCardNode.IsSelected = false;
-                    Card.Battle.DealingDeck.DealCardReplace(selectedCardNode);
+                    Card.Battle.CardPile.DealCardReplace(selectedCardNode);
                 }
                 SelectedCardNodes.Clear();
                 Card.Use();

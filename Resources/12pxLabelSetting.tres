@@ -1,0 +1,8 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://dnk1tgnksbjj0"]
+
+[ext_resource type="FontFile" uid="uid://cy2x5d3tsilqd" path="res://Fonts/ark-pixel-12px-proportional-zh_cn.woff2" id="1_vburp"]
+
+[resource]
+line_spacing = 0.0
+font = ExtResource("1_vburp")
+font_size = 12

@@ -13,17 +13,19 @@ public class PublicInfrastructureCard: BaseTapCard
         base("Public Infrastructure", "Add community cards dealt each round", "res://Sprites/Cards/public_infrastructure.png",
         suit, rank, tapCost, unTapCost)
     {
+        Count = 0;
     }
 
     public override void OnStart(Battle battle)
     {
         base.OnStart(battle);
-        battle.DealCommunityCardCount += Utils.GetCardRankValue(Rank.Value);
+        Count = Utils.GetCardRankValue(Rank.Value);
+        battle.DealCommunityCardCount += Count;
     }
 
     public override void OnStop(Battle battle)
     {
         base.OnStop(battle);
-        battle.DealCommunityCardCount -= Utils.GetCardRankValue(Rank.Value);
+        battle.DealCommunityCardCount -= Count;
     }
 }

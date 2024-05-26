@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using Godot;
+using Godot.Collections;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
@@ -14,13 +14,13 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public class Battle: Node, ISetup, IManagedUi
+public partial class Battle: Node, ISetup, IManagedUi
 {
-    [Export] public DealingDeck DealingDeck;
+    [Export] public CardPile CardPile;
     [Export] public CardContainer CommunityCardContainer;
     [Export] public CardContainer FieldCardContainer;
     [Export] public PlayerBattleEntity Player;
-    [Export] public List<BattleEntity> Entities;
+    [Export] public Array<BattleEntity> Entities;
     [Export] public Label CurrentEnergyLabel;
     [Export] public Label MaxEnergyLabel;
     [Export] public BaseButton ProceedButton;
@@ -46,16 +46,16 @@ public class Battle: Node, ISetup, IManagedUi
     public int FaceDownCommunityCardCount;
     
     public int RoundCount;
-    public Dictionary<BattleEntity, CompletedHand> RoundHandStrengths;
-    public Dictionary<BattleEntity, CompletedHand> RoundHandStrengthsWithoutFaceDownCards;
+    public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHandStrengths;
+    public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHandStrengthsWithoutFaceDownCards;
     
     public List<BaseEffect> Effects;
     
     public override void _Ready()
     {
         HasSetup = false;
-        RoundHandStrengths = new Dictionary<BattleEntity, CompletedHand>();
-        RoundHandStrengthsWithoutFaceDownCards = new Dictionary<BattleEntity, CompletedHand>();
+        RoundHandStrengths = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
+        RoundHandStrengthsWithoutFaceDownCards = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, Configuration.DefaultRequiredHoleCardCountMin, Configuration.DefaultRequiredHoleCardCountMax);
     }
     
@@ -69,25 +69,25 @@ public class Battle: Node, ISetup, IManagedUi
         }
     }
 
-    public virtual void Setup(Dictionary<string, object> args)
+    public virtual void Setup(System.Collections.Generic.Dictionary<string, object> args)
     {
         GameMgr = (GameMgr)args["gameMgr"];
         DealCommunityCardCount = (int)args["dealCommunityCardCount"];
         FaceDownCommunityCardCount = (int)args["faceDownCommunityCardCount"];
         
-        DealingDeck.Setup(new Dictionary<string, object>()
+        CardPile.Setup(new System.Collections.Generic.Dictionary<string, object>()
         {
             { "sourceDecks" , Entities.Select(e => e.Deck).ToList() },
             { "excludedCards" , null }
         });
         
-        CommunityCardContainer.Setup(new Dictionary<string, object>()
+        CommunityCardContainer.Setup(new System.Collections.Generic.Dictionary<string, object>()
         {
             { "cards", new ObservableCollection<BaseCard>() },
             { "getCardFaceDirectionFunc", (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc }
         });
         
-        FieldCardContainer.Setup(new Dictionary<string, object>()
+        FieldCardContainer.Setup(new System.Collections.Generic.Dictionary<string, object>()
         {
             { "cards", new ObservableCollection<BaseCard>() }
         });
@@ -124,7 +124,7 @@ public class Battle: Node, ISetup, IManagedUi
     public void Start()
     {
         Reset();
-        DealingDeck.Shuffle();
+        CardPile.Shuffle();
         NewRound();
     }
     
@@ -151,7 +151,7 @@ public class Battle: Node, ISetup, IManagedUi
         }
         CommunityCardContainer.ClearContents();
         FieldCardContainer.ClearContents();
-        DealingDeck.Reset();
+        CardPile.Reset();
     }
 
     public void DealCards()
@@ -160,12 +160,12 @@ public class Battle: Node, ISetup, IManagedUi
         {
             for (int i = 0; i < entity.DealCardCount; i++)
             {
-                DealingDeck.DealCardAppend(entity.HoleCardContainer);
+                CardPile.DealCardAppend(entity.HoleCardContainer);
             }
         }
         for (int i = 0; i < DealCommunityCardCount; i++)
         {
-            DealingDeck.DealCardAppend(CommunityCardContainer);
+            CardPile.DealCardAppend(CommunityCardContainer);
         }
         AfterDealCards?.Invoke(this);
     }
@@ -189,12 +189,14 @@ public class Battle: Node, ISetup, IManagedUi
         {
             foreach (var card in entity.HoleCardContainer.Contents)
             {
-                card.Node.TweenFlip(Enums.CardFace.Up, Configuration.FlipTweenTime);
+                // card.Node.TweenFlip(Enums.CardFace.Up, Configuration.FlipTweenTime);
+                card.Node.AnimateFlip(Enums.CardFace.Up);
             }
         }
         foreach (var card in CommunityCardContainer.Contents)
         {
-            card.Node.TweenFlip(Enums.CardFace.Up, Configuration.FlipTweenTime);
+            // card.Node.TweenFlip(Enums.CardFace.Up, Configuration.FlipTweenTime);
+            card.Node.AnimateFlip(Enums.CardFace.Up);
         }
 
         BeforeEngage?.Invoke(this);

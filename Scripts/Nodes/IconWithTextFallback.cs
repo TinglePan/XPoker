@@ -5,9 +5,9 @@ using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Nodes;
 
-public class IconWithTextFallback: Sprite3D, ISetup
+public partial class IconWithTextFallback: Node2D, ISetup
 {
-    [Export] public TextureRect Icon;
+    [Export] public Sprite2D Icon;
     [Export] public Label FallbackLabel;
     
     public bool HasSetup { get; set; }
@@ -19,6 +19,7 @@ public class IconWithTextFallback: Sprite3D, ISetup
     {
         base._Ready();
         HasSetup = false;
+        FallbackLabel.Hide();
     }
     
     public override void _ExitTree()

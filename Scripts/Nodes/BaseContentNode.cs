@@ -4,11 +4,11 @@ using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Nodes;
 
-public abstract partial class BaseContentNode<TNode, TContent> : Node3D, ISetup
+public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
     where TNode: BaseContentNode<TNode, TContent>
     where TContent: IContent<TNode, TContent>
 {
-    [Export] public Area3D Area;
+    [Export] public Area2D Area;
     
     public BaseContentContainer<TNode, TContent> Container;
     public bool HasSetup { get; set; }

@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://cekueu3b37vxa"]
+
+[ext_resource type="Script" path="res://Scripts/Tests/TestFlipCard.cs" id="1_bubdw"]
+[ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="2_dkdcq"]
+
+[node name="TestFlipCard" type="Node2D" node_paths=PackedStringArray("CardNode")]
+script = ExtResource("1_bubdw")
+CardNode = NodePath("Card")
+
+[node name="Card" parent="." instance=ExtResource("2_dkdcq")]

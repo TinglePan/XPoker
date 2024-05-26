@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cu8cytigbn45"]
 
-[ext_resource type="Script" path="res://Scripts/Ui/DialogueBox.cs" id="1_x2gea"]
+[ext_resource type="Script" path="res://Scripts/Nodes/DialogueBox.cs" id="1_x2gea"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xr7yc"]
 bg_color = Color(0, 0, 0, 1)
@@ -25,6 +25,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_xr7yc")
 script = ExtResource("1_x2gea")
+Identifier = null
 TextWidget = NodePath("MarginContainer/ScrollContainer/LineEdit")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]

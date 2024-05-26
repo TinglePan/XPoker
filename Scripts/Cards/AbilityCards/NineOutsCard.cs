@@ -72,4 +72,9 @@ public class NineOutsCard: BaseTapCard
         Effect = new NineOutsEffect(Name, Description, IconPath.Value, this);
     }
 
+    public override void OnStop(Battle battle)
+    {
+        base.OnStop(battle);
+        battle.StopEffect(Effect);
+    }
 }

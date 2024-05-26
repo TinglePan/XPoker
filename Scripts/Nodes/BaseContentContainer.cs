@@ -7,7 +7,7 @@ using Godot;
 
 namespace XCardGame.Scripts.Nodes;
 
-public abstract partial class BaseContentContainer<TContentNode, TContent>: Node3D, ISetup, IManagedUi 
+public abstract partial class BaseContentContainer<TContentNode, TContent>: Node2D, ISetup, IManagedUi 
     where TContentNode: BaseContentNode<TContentNode, TContent>
     where TContent: IContent<TContentNode, TContent>
 {
@@ -100,9 +100,9 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Node
         Contents.Clear();
     }
     
-    public virtual Vector3 CalculateContentNodePosition(int index)
+    public virtual Vector2 CalculateContentNodePosition(int index)
     {
-        return Transform.Origin;
+        return Position;
     }
     
     public virtual float CalculateContentNodeRotationZ(int index)

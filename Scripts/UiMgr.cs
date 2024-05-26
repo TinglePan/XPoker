@@ -2,12 +2,9 @@
 using System.Collections.ObjectModel;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.AbilityCards;
 
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
-using XCardGame.Scripts.Nodes;
-using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 
 namespace XCardGame.Scripts;
 

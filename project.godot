@@ -11,13 +11,20 @@ config_version=5
 [application]
 
 config/name="XCardGame"
-run/main_scene="res://Scenes/Testbed/TestFlipCard.tscn"
+run/main_scene="res://Scenes/Testbed/TestContainerPositioning.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 Panku="*res://addons/panku_console/console.tscn"
+GameMgr="*res://Scenes/GameMgr.tscn"
+UiMgr="*res://Scripts/UiMgr.cs"
+
+[display]
+
+window/size/viewport_width=960
+window/size/viewport_height=540
 
 [dotnet]
 

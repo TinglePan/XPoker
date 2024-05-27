@@ -28,7 +28,7 @@ public class MillenniumEyeCard: BaseUseCard
                 {
                     foreach (var card in container.Contents)
                     {
-                        if (card.Node.FaceDirection == Enums.CardFace.Down && !card.Node.IsRevealed)
+                        if (card.Node.FaceDirection.Value == Enums.CardFace.Down && !card.Node.IsRevealed)
                         {
                             card.Node.TweenReveal(true, Configuration.RevealTweenTime);
                             RevealedCards.Add(card);

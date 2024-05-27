@@ -68,7 +68,7 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         var bestHandWithFaceDownCard = EvaluateBestHand(communityCards, holeCards);
         CalculatedHands.Clear();
         var bestHandWithoutFaceDownCard = EvaluateBestHand(
-            communityCards.Where(x => x.Node.FaceDirection == Enums.CardFace.Up).ToList(), holeCards);
+            communityCards.Where(x => x.Node.FaceDirection.Value == Enums.CardFace.Up).ToList(), holeCards);
         return (bestHandWithFaceDownCard, bestHandWithoutFaceDownCard);
     }
 

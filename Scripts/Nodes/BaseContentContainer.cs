@@ -21,7 +21,8 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Node
     public ObservableCollection<TContent> Contents;
     public List<TContentNode> ContentNodes;
     
-    public Vector2 ContentMinimumSize;
+    public Vector2 ContentNodeSize;
+    public int Separation;
     
     public override void _Ready()
     {
@@ -38,7 +39,8 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Node
     public virtual void Setup(Dictionary<string, object> args)
     {
         HasSetup = true;
-        ContentMinimumSize = args.TryGetValue("contentMinimumSize", out var value) ? (Vector2)value : Vector2.Zero;
+        ContentNodeSize = (Vector2)args["contentNodeSize"];
+        Separation = (int)args["separation"];
     }
     
     public void EnsureSetup()
@@ -100,46 +102,52 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Node
         Contents.Clear();
     }
     
-    public virtual Vector2 CalculateContentNodePosition(int index)
+    public virtual Vector2 CalculateContentNodePosition(int index, int n)
     {
-        return Position;
+        return Position + CalculateContentNodeOffset(index, n);
+    }
+
+    public virtual Vector2 CalculateContentNodeOffset(int index, int n)
+    {
+        var size = n * ContentNodeSize.X + (n - 1) * Separation;
+        var offsetInContainer = (ContentNodeSize.X + Separation) * index + ContentNodeSize.X / 2;
+        var offset = offsetInContainer - size / 2;
+        return new Vector2(offset, 0);
     }
     
-    public virtual float CalculateContentNodeRotationZ(int index)
+    public virtual float CalculateContentNodeRotation(int index, int n)
     {
         return 0f;
     }
     
-    public async Task AddContentNode(int index, TContentNode node, float tweenTime = 0f)
+    public void AddContentNode(int index, TContentNode node, float tweenTime = 0f)
     {
         EnsureSetup();
-        if (ContentNodes[index] != node)
+        if (index < ContentNodes.Count && ContentNodes[index] == node) return;
+        ContentNodes.Insert(index, node);
+        node.Reparent(this);
+        MoveChild(node, index);
+        node.Container = this;
+        for (int i = 0; i < ContentNodes.Count; i++)
         {
-            // node.CustomMinimumSize = ContentMinimumSize;
-            if (tweenTime != 0)
-            {
-                var position = CalculateContentNodePosition(index);
-                var rotationZ = CalculateContentNodeRotationZ(index);
-                var tween = node.GetTree().CreateTween();
-                tween.TweenProperty(node, "position", position, tweenTime);
-                tween.Parallel().TweenProperty(node, "rotation:z", rotationZ, tweenTime);
-                await ToSignal(tween, Tween.SignalName.Finished);
-            }
-            ContentNodes.Insert(index, node);
-            AddChild(node);
-            MoveChild(node, index);
-            node.Container = this;
-            OnV2MAddNode(index, node);
+            AdjustContentNode(i, tweenTime);
         }
+        OnV2MAddNode(index, node);
+    }
+    
+    public void AppendContentNode(TContentNode node, float tweenTime = 0f)
+    {
+        EnsureSetup();
+        AddContentNode(ContentNodes.Count, node, tweenTime);
     }
 
-    public async Task<TContentNode> ReplaceContentNode(int index, TContentNode node, float tweenTime = 0f)
+    public TContentNode ReplaceContentNode(int index, TContentNode node, float tweenTime = 0f)
     {
         EnsureSetup();
         if (ContentNodes[index] != node)
         {
             var replacedNode = RemoveContentNode(index);
-            await AddContentNode(index, node, tweenTime);
+            AddContentNode(index, node, tweenTime);
             return replacedNode;
         }
         return null;
@@ -196,6 +204,24 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Node
             case NotifyCollectionChangedAction.Reset:
                 ClearChildren();
                 break;
+        }
+    }
+
+    protected void AdjustContentNode(int index, float tweenTime = 0f)
+    {
+        var node = ContentNodes[index];
+        var position = CalculateContentNodePosition(index, ContentNodes.Count);
+        var rotation = CalculateContentNodeRotation(index, ContentNodes.Count);
+        if (tweenTime != 0)
+        {
+            var tween = node.GetTree().CreateTween();
+            tween.TweenProperty(node, "position", position, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+            tween.Parallel().TweenProperty(node, "rotation", rotation, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+        }
+        else
+        {
+            node.Position = position;
+            node.Rotation = rotation;
         }
     }
 }

@@ -37,7 +37,7 @@ public class NineOutsCard: BaseTapCard
                 int counter = 0;
                 foreach (var card in battle.CommunityCardContainer.Contents)
                 {
-                    if (card is MarkerCard pokerCard && card.Node.FaceDirection == Enums.CardFace.Down &&
+                    if (card is MarkerCard pokerCard && card.Node.FaceDirection.Value == Enums.CardFace.Down &&
                         pokerCard.Rank.Value == Enums.CardRank.Nine)
                     {
                         counter++;

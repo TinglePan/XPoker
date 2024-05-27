@@ -19,4 +19,13 @@ patch_margin_bottom = 1
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Card" parent="." instance=ExtResource("2_u3vkn")]
+[node name="Card" parent="." node_paths=PackedStringArray("Front", "Back", "MainIcon", "SuitIcon", "RankLabel", "JokerMark", "CostLabel", "AnimationPlayer", "Area") instance=ExtResource("2_u3vkn")]
+Front = NodePath("")
+Back = NodePath("")
+MainIcon = NodePath("")
+SuitIcon = NodePath("")
+RankLabel = NodePath("")
+JokerMark = NodePath("")
+CostLabel = NodePath("")
+AnimationPlayer = NodePath("")
+Area = NodePath("")

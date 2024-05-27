@@ -33,7 +33,6 @@ public partial class CardContainer: BaseContentContainer<CardNode, BaseCard>
 			Contents = cards;
 			Contents.CollectionChanged += OnContentsChanged;
 		}
-
 		Debug.Assert(args.ContainsKey("defaultDealtCardFaceDirection") || args.ContainsKey("getCardFaceDirectionFunc"));
 		if (args.TryGetValue("defaultDealtCardFaceDirection", out var arg))
 		{
@@ -54,7 +53,7 @@ public partial class CardContainer: BaseContentContainer<CardNode, BaseCard>
 			if (content is BaseCard card)
 			{
 				var cardNode = CardPrefab.Instantiate<CardNode>();
-				await AddContentNode(index, cardNode);
+				AddContentNode(index, cardNode);
 				var faceDirection = GetCardFaceDirectionFunc?.Invoke(index) ?? DefaultDealtCardFaceDirection;
 				cardNode.Setup(new Dictionary<string, object>()
 				{

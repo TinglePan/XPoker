@@ -121,8 +121,7 @@ public partial class CardPile: Node2D, ISetup
             { "faceDirection", Enums.CardFace.Down }
         });
         cardNode.Position = TopCardNode.Position;
-        await targetContainer.AddContentNode(targetContainer.Contents.Count, cardNode, Configuration.DealCardTweenTime);
-        cardNode.Container = targetContainer;
+        targetContainer.AddContentNode(targetContainer.Contents.Count, cardNode, Configuration.DealCardTweenTime);
         ResetTopCard();
     }
 
@@ -136,7 +135,7 @@ public partial class CardPile: Node2D, ISetup
             { "faceDirection", node.FaceDirection }
         });
         cardNode.Position = TopCardNode.Position;
-        var replacedContentNode = await node.Container.ReplaceContentNode(node.Container.ContentNodes.IndexOf(node),
+        var replacedContentNode = node.Container.ReplaceContentNode(node.Container.ContentNodes.IndexOf(node),
             cardNode, Configuration.DealCardTweenTime);
         replacedContentNode.QueueFree();
         ResetTopCard();

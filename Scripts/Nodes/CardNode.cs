@@ -25,7 +25,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
     public Action<CardNode> OnPressed;
 
     public Enums.CardFace OriginalFaceDirection;
-    public Enums.CardFace FaceDirection;
+    public ObservableProperty<Enums.CardFace> FaceDirection;
     public bool IsTapped;
     public bool IsNegated;
     public bool IsRevealed;
@@ -35,7 +35,8 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	{
 		base._Ready();
 		Area.InputEvent += InputEventHandler;
-		FaceDirection = Enums.CardFace.Down;
+		FaceDirection = new ObservableProperty<Enums.CardFace>(nameof(FaceDirection), this, Enums.CardFace.Down);
+		FaceDirection.DetailedValueChanged += OnCardFaceChanged;
 		IsTapped = false;
 		IsNegated = false;
 		IsRevealed = false;
@@ -45,8 +46,11 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	public override void _ExitTree()
 	{
 		base._ExitTree();
-		Content.Value.OnDisposal(Content.Value.Battle);
-		Content.Value = null;
+		if (Content.Value != null)
+		{
+			Content.Value.OnDisposal(Content.Value.Battle);
+			Content.Value = null;
+		}
 	}
 
 	public override void Setup(Dictionary<string, object> args)
@@ -59,7 +63,8 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		    { "displayName", Content.Value.Name }
 	    });
 	    OriginalFaceDirection = (Enums.CardFace)args["faceDirection"];
-	    FaceDirection = OriginalFaceDirection;
+	    FaceDirection.Value = OriginalFaceDirection;
+	    FaceDirection.FireValueChangeEventsOnInit();
     }
 
 	public void Reset(bool useTween = true)
@@ -78,7 +83,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		else
 		{
 			IsRevealed = false;
-			FaceDirection = OriginalFaceDirection;
+			FaceDirection.Value = OriginalFaceDirection;
 			IsTapped = false;
 			IsNegated = false;
 		}
@@ -112,11 +117,10 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 
 	public async void AnimateFlip(Enums.CardFace toFaceDir)
 	{
-		if (FaceDirection == toFaceDir) return;
+		if (FaceDirection.Value == toFaceDir) return;
 		AnimationPlayer.Play("flip");
 		await ToSignal(AnimationPlayer, "animation_finished");
-		FaceDirection = toFaceDir;
-		if (FaceDirection == Enums.CardFace.Down)
+		if (FaceDirection.Value == Enums.CardFace.Down)
 		{
 			Content.Value.OnStop(Content.Value.Battle);
 		}
@@ -129,15 +133,15 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 
 	public void OnFlipAnimationToggleCardFace()
 	{
-		if (FaceDirection == Enums.CardFace.Down)
+		if (FaceDirection.Value == Enums.CardFace.Down)
 		{
-			FaceDirection = Enums.CardFace.Up;
+			FaceDirection.Value = Enums.CardFace.Up;
 			Back.Hide();
 			Front.Show();
 		}
 		else
 		{
-			FaceDirection = Enums.CardFace.Down;
+			FaceDirection.Value = Enums.CardFace.Down;
 			Front.Hide();
 			Back.Show();
 		}
@@ -170,6 +174,21 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 				GD.Print($"On mouse pressed {Content.Value}");
 				OnPressed?.Invoke(this);
 			}
+		}
+	}
+
+	protected void OnCardFaceChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardFace> args)
+	{
+		if (args.NewValue == Enums.CardFace.Down)
+		{
+			Back.Show();
+			Front.Hide();
+		}
+		else
+		{
+			
+			Back.Hide();
+			Front.Show();
 		}
 	}
     

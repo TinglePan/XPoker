@@ -64,13 +64,11 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 
     protected virtual void OnContentAttached(TContent content)
     {
-        // Implement attaching buff to the node
         content.Node = (TNode)this;
     }
 
     protected virtual void OnContentDetached(TContent content)
     {
         content.Node = null;
-        // Implement detaching buff from the node
     }
 }

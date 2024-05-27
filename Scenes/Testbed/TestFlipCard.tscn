@@ -8,3 +8,4 @@ script = ExtResource("1_bubdw")
 CardNode = NodePath("Card")
 
 [node name="Card" parent="." instance=ExtResource("2_dkdcq")]
+position = Vector2(519, 328)

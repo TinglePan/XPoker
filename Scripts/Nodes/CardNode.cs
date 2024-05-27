@@ -34,7 +34,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	public override void _Ready()
 	{
 		base._Ready();
-		Content = new ObservableProperty<BaseCard>(nameof(Content), this, default);
+		Area.InputEvent += InputEventHandler;
 		FaceDirection = Enums.CardFace.Down;
 		IsTapped = false;
 		IsNegated = false;
@@ -47,18 +47,6 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		base._ExitTree();
 		Content.Value.OnDisposal(Content.Value.Battle);
 		Content.Value = null;
-	}
-
-	public override void _Input(InputEvent @event)
-	{
-		if (@event is InputEventMouseButton mouseButton)
-		{
-			if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
-			{
-				GD.Print($"On mouse pressed {Content.Value}");
-				OnPressed?.Invoke(this);
-			}
-		}
 	}
 
 	public override void Setup(Dictionary<string, object> args)
@@ -171,6 +159,18 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		tween.TweenProperty(this, "modulate", toState ? Colors.DimGray : Colors.White, tweenTime);
 		await ToSignal(tween, Tween.SignalName.Finished);
 		IsNegated = toState;
+	}
+
+	protected void InputEventHandler(Node viewport, InputEvent @event, long shapeIdx)
+	{
+		if (@event is InputEventMouseButton mouseButton)
+		{
+			if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
+			{
+				GD.Print($"On mouse pressed {Content.Value}");
+				OnPressed?.Invoke(this);
+			}
+		}
 	}
     
     protected void OnCardRankChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardRank> args)

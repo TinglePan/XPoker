@@ -40,6 +40,7 @@ public partial class BattleEntity: Node, ISetup
     public int ShowDownHoleCardCountMax;
     public int FactionId;
     public Dictionary<Enums.HandTier, int> HandPowers;
+    public int BaseHandPower;
     public ObservableProperty<int> HitPoint;
     public ObservableProperty<int> MaxHitPoint;
     public ObservableProperty<int> Level;
@@ -70,6 +71,7 @@ public partial class BattleEntity: Node, ISetup
         ShowDownHoleCardCountMax = (int)args["showDownHoleCardCountMax"];
         FactionId = (int)args["factionId"];
         HandPowers = (Dictionary<Enums.HandTier, int>)args["handPowers"];
+        BaseHandPower = (int)args["baseHandPower"];
         var maxHitPoint = (int)args["maxHitPoint"];
         HitPoint = new ObservableProperty<int>(nameof(HitPoint), this, maxHitPoint);
         MaxHitPoint = new ObservableProperty<int>(nameof(MaxHitPoint), this, maxHitPoint);

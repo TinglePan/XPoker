@@ -48,7 +48,6 @@ public partial class Battle: BaseManagedNode2D, ISetup
     
     public int RoundCount;
     public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHandStrengths;
-    public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHandStrengthsWithoutFaceDownCards;
     
     public List<BaseEffect> Effects;
     public State CurrentState;
@@ -59,7 +58,6 @@ public partial class Battle: BaseManagedNode2D, ISetup
         base._Ready();
         HasSetup = false;
         RoundHandStrengths = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
-        RoundHandStrengthsWithoutFaceDownCards = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount,
             Configuration.DefaultRequiredHoleCardCountMin, Configuration.DefaultRequiredHoleCardCountMax);
     }
@@ -144,7 +142,6 @@ public partial class Battle: BaseManagedNode2D, ISetup
         }
         CommunityCardContainer.ClearContents();
         RoundHandStrengths.Clear();
-        RoundHandStrengthsWithoutFaceDownCards.Clear();
         CurrentState = State.BeforeDealCards;
     }
     
@@ -186,10 +183,9 @@ public partial class Battle: BaseManagedNode2D, ISetup
 
         foreach (var entity in Entities)
         {
-            var (bestHand, bestHandWithoutFaceDownCards) = 
-                HandEvaluator.EvaluateBestHandsWithAndWithoutFaceDownCards(CommunityCardContainer.Contents.ToList(),
+            var bestHand = 
+                HandEvaluator.EvaluateBestHand(CommunityCardContainer.Contents.ToList(),
                     entity.HoleCardContainer.Contents.ToList());
-            RoundHandStrengthsWithoutFaceDownCards.Add(entity, bestHandWithoutFaceDownCards);
             RoundHandStrengths.Add(entity, bestHand);
         }
 
@@ -221,23 +217,19 @@ public partial class Battle: BaseManagedNode2D, ISetup
                     continue;
                 }
                 var handStrength = RoundHandStrengths[entity];
-                var handStrengthWithoutFaceDownCard = RoundHandStrengthsWithoutFaceDownCards[entity];
                 var otherHandStrength = RoundHandStrengths[otherEntity];
-                var otherHandStrengthWithoutFaceDownCard = RoundHandStrengthsWithoutFaceDownCards[otherEntity];
                 
                 if (HandEvaluator.Compare(handStrength, otherHandStrength) >= 0)
                 {
-                    Attack attack = new Attack(GameMgr, entity, otherEntity, handStrength, 
-                        handStrengthWithoutFaceDownCard, otherHandStrength,
-                        otherHandStrengthWithoutFaceDownCard);
+                    Attack attack = new Attack(GameMgr, entity, otherEntity, handStrength,
+                        otherHandStrength);
                     BeforeApplyDamage?.Invoke(this, attack);
                     attack.Apply();
                 }
                 if (HandEvaluator.Compare(handStrength, otherHandStrength) <= 0)
                 {
-                    Attack attack = new Attack(GameMgr, otherEntity, entity, otherHandStrength,
-                        otherHandStrengthWithoutFaceDownCard, handStrength, 
-                        handStrengthWithoutFaceDownCard);
+                    Attack attack = new Attack(GameMgr, otherEntity, entity, otherHandStrength, 
+                        handStrength);
                     BeforeApplyDamage?.Invoke(this, attack);
                     attack.Apply();
                 }

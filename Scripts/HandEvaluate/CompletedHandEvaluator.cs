@@ -63,14 +63,14 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         return null;
     }
     
-    public (CompletedHand, CompletedHand) EvaluateBestHandsWithAndWithoutFaceDownCards(List<BaseCard> communityCards, List<BaseCard> holeCards)
-    {
-        var bestHandWithFaceDownCard = EvaluateBestHand(communityCards, holeCards);
-        CalculatedHands.Clear();
-        var bestHandWithoutFaceDownCard = EvaluateBestHand(
-            communityCards.Where(x => x.Node.FaceDirection.Value == Enums.CardFace.Up).ToList(), holeCards);
-        return (bestHandWithFaceDownCard, bestHandWithoutFaceDownCard);
-    }
+    // public (CompletedHand, CompletedHand) EvaluateBestHandsWithAndWithoutFaceDownCards(List<BaseCard> communityCards, List<BaseCard> holeCards)
+    // {
+    //     var bestHandWithFaceDownCard = EvaluateBestHand(communityCards, holeCards);
+    //     CalculatedHands.Clear();
+    //     var bestHandWithoutFaceDownCard = EvaluateBestHand(
+    //         communityCards.Where(x => x.Node.FaceDirection.Value == Enums.CardFace.Up).ToList(), holeCards);
+    //     return (bestHandWithFaceDownCard, bestHandWithoutFaceDownCard);
+    // }
 
     public int Compare(CompletedHand a, CompletedHand b)
     {

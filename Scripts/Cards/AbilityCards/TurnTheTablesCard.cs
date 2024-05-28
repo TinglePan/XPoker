@@ -35,14 +35,6 @@ public class TurnTheTablesCard: BaseTapCard
                 (battle.RoundHandStrengths[card.Source], battle.RoundHandStrengths[card.Target]) = 
                     (battle.RoundHandStrengths[card.Target], battle.RoundHandStrengths[card.Source]);
             }
-            if (battle.RoundHandStrengthsWithoutFaceDownCards.ContainsKey(card.Source) && 
-                battle.RoundHandStrengthsWithoutFaceDownCards.ContainsKey(card.Target))
-            {
-                (battle.RoundHandStrengthsWithoutFaceDownCards[card.Source], 
-                        battle.RoundHandStrengthsWithoutFaceDownCards[card.Target]) = 
-                    (battle.RoundHandStrengthsWithoutFaceDownCards[card.Target], 
-                        battle.RoundHandStrengthsWithoutFaceDownCards[card.Source]);
-            }
         }
     }
     

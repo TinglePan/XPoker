@@ -4,3 +4,4 @@
 
 [node name="BuffTab2" type="Node2D" groups=["buffContainer"]]
 script = ExtResource("1_1n1y4")
+Identifier = null

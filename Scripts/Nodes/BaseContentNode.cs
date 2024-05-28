@@ -42,6 +42,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 
     protected void OnMouseEnter()
     {
+        GD.Print($"{this} OnMouseEnter");
         if (HasSetup)
         {
             IsFocused.Value = true;
@@ -50,6 +51,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 
     protected void OnMouseExit()
     {
+        GD.Print($"{this} OnMouseExit");
         if (HasSetup)
         {
             IsFocused.Value = false;

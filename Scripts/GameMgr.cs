@@ -37,11 +37,11 @@ public partial class GameMgr : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (!IsGameStarted)
-		{
-			StartGame();
-			IsGameStarted = true;
-		}
+		// if (!IsGameStarted)
+		// {
+		// 	StartGame();
+		// 	IsGameStarted = true;
+		// }
 	}
 
 	public void StartGame()

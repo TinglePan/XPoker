@@ -11,3 +11,4 @@ CardContainer = NodePath("Cards")
 
 [node name="Cards" parent="." instance=ExtResource("3_oju3t")]
 position = Vector2(480, 270)
+Identifier = null

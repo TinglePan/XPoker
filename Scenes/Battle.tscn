@@ -11,6 +11,7 @@
 [node name="Battle" type="Node2D" node_paths=PackedStringArray("Entities")]
 script = ExtResource("1_xec1t")
 Entities = []
+Identifier = null
 
 [node name="CommunityCardContainer" type="Node2D" parent="." groups=["cardContainer", "markerCardContainer"]]
 position = Vector2(0, 68)

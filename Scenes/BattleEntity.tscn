@@ -32,11 +32,13 @@ MaxHitPointLabel = NodePath("CharacterCard/Panel/MaxHp")
 
 [node name="HoleCards" parent="." groups=["markerCardContainer"] instance=ExtResource("2_5h213")]
 position = Vector2(48, -48)
+Identifier = null
 
 [node name="Card" parent="HoleCards" instance=ExtResource("3_k1fdh")]
 
 [node name="SkillCards" parent="." groups=["skillCardContainer"] instance=ExtResource("2_5h213")]
 position = Vector2(48, 210)
+Identifier = null
 
 [node name="Card" parent="SkillCards" instance=ExtResource("3_k1fdh")]
 

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="XCardGame"
-run/main_scene="res://Scenes/Testbed/TestContainerPositioning.tscn"
+run/main_scene="res://Scenes/Intro.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -19,12 +19,14 @@ config/icon="res://icon.svg"
 
 Panku="*res://addons/panku_console/console.tscn"
 GameMgr="*res://Scenes/GameMgr.tscn"
-UiMgr="*res://Scripts/UiMgr.cs"
+InputMgr="*res://Scripts/InputMgr.cs"
+SceneMgr="*res://Scripts/SceneMgr.cs"
 
 [display]
 
-window/size/viewport_width=960
-window/size/viewport_height=540
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/stretch/mode="viewport"
 
 [dotnet]
 

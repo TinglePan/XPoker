@@ -8,15 +8,15 @@ namespace XCardGame.Scripts.Cards.AbilityCards;
 
 public class BaseTapCard: BaseInteractCard, ITapCard
 {
-    public int TapCost { get; private set; }
-    public int UnTapCost { get; private set; }
+    public int TappedCost { get; private set; }
+    public int UnTappedCost { get; private set; }
     
     public BaseEffect Effect { get; protected set; }
     
     public BaseTapCard(string name, string description, string iconPath, Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) : base(name, description, iconPath, suit, rank)
     {
-        TapCost = tapCost;
-        UnTapCost = unTapCost;
+        TappedCost = tapCost;
+        UnTappedCost = unTapCost;
     }
     
     public override void Setup(Dictionary<string, object> args)
@@ -27,7 +27,7 @@ public class BaseTapCard: BaseInteractCard, ITapCard
     
     public override bool CanInteract()
     {
-        return ((CardContainer)Node.Container).AllowEffect && Node.IsTapped && Battle.Player.Energy.Value >= TapCost || !Node.IsTapped && Battle.Player.Energy.Value >= UnTapCost;
+        return ((CardContainer)Node.Container).AllowEffect && Node.IsTapped && Battle.Player.Cost.Value >= TappedCost || !Node.IsTapped && Battle.Player.Cost.Value >= UnTappedCost;
     }
 
     public void StartEffect()
@@ -41,7 +41,7 @@ public class BaseTapCard: BaseInteractCard, ITapCard
     public void ToggleTap()
     {
         Node.TweenTap(!Node.IsTapped, Configuration.TapTweenTime);
-        Battle.Player.Energy.Value -= Node.IsTapped ? UnTapCost : TapCost;
+        Battle.Player.Cost.Value -= Node.IsTapped ? UnTappedCost : TappedCost;
     }
 
     // NOTE: Effect manages its stop on its own. And check if its source card in in position to decide whether its effect is skipped.

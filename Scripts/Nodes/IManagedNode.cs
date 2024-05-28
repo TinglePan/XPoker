@@ -1,9 +1,9 @@
 ﻿namespace XCardGame.Scripts.Nodes;
 
-public interface IManagedUi
+public interface IManagedNode
 {
     public string Identifier { get; }
     public GameMgr GameMgr { get; }
-    public UiMgr UiMgr { get; }
+    public SceneMgr SceneMgr { get; }
     
 }

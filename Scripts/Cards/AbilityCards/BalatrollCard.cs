@@ -55,7 +55,7 @@ public class BalatrollCard: BaseUseCard
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        PlayerCardContainer = GameMgr.UiMgr.GetNode<CardContainer>("playerCardContainer"); 
+        PlayerCardContainer = GameMgr.SceneMgr.GetNode<CardContainer>("playerHoleCardContainer"); 
     }
 
     public override void ChooseTargets()

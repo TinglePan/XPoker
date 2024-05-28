@@ -44,7 +44,7 @@ public partial class CardContainer: BaseContentContainer<CardNode, BaseCard>
 		}
 	}
 
-	public override async void OnM2VAddContents(int startingIndex, IList contents)
+	public override void OnM2VAddContents(int startingIndex, IList contents)
 	{
 		EnsureSetup();
 		var index = startingIndex;

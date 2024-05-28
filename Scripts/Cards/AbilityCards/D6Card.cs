@@ -21,7 +21,7 @@ public class D6Card: BaseUseCard
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
+        CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer");
     }
 
     public override void Use()

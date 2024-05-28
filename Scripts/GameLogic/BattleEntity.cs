@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.AbilityCards;
+using XCardGame.Scripts.Cards.SkillCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
@@ -14,12 +16,10 @@ namespace XCardGame.Scripts.GameLogic;
 
 public partial class BattleEntity: Node, ISetup
 {
-    [Export]
-    public CardContainer HoleCardContainer;
-    [Export]
-    public CardContainer AbilityCardContainer;
-    [Export]
-    public BuffContainer BuffContainer;
+    [Export] public CardContainer HoleCardContainer;
+    [Export] public CardContainer SkillCardContainer;
+    [Export] public BuffContainer BuffContainer;
+    
     [Export] public Label NameLabel;
     [Export] public TextureRect Portrait;
     [Export] public Label HitPointLabel;
@@ -44,6 +44,7 @@ public partial class BattleEntity: Node, ISetup
     public ObservableProperty<int> MaxHitPoint;
     public ObservableProperty<int> Level;
     public bool IsHoleCardDealtVisible;
+    public ObservableCollection<BaseAbilityCard> AbilityCards;
 
     public override void _Ready()
     {
@@ -74,15 +75,16 @@ public partial class BattleEntity: Node, ISetup
         MaxHitPoint = new ObservableProperty<int>(nameof(MaxHitPoint), this, maxHitPoint);
         Level = new ObservableProperty<int>(nameof(Level), this, (int)args["level"]);
         IsHoleCardDealtVisible = (bool)args["isHoleCardDealtVisible"];
+        AbilityCards = (ObservableCollection<BaseAbilityCard>)args["abilityCards"];
         
         HoleCardContainer.Setup(new Dictionary<string, object>()
         {
             { "cards", new ObservableCollection<BaseCard>() },
             { "defaultCardFaceDirection", IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down } 
         });
-        AbilityCardContainer.Setup(new Dictionary<string, object>()
+        SkillCardContainer.Setup(new Dictionary<string, object>()
         {
-            { "cards", new ObservableCollection<BaseCard>() }
+            { "cards", (ObservableCollection<BaseSkillCard>)args["skillCards"] }
         });
         BuffContainer.Setup(new Dictionary<string, object>()
         {

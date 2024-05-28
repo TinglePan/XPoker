@@ -1,6 +1,139 @@
-[gd_scene load_steps=2 format=3 uid="uid://qybvcg5uhnvi"]
+[gd_scene load_steps=9 format=3 uid="uid://blyra6wixgoc7"]
 
 [ext_resource type="Script" path="res://Scripts/GameLogic/BattleEntity.cs" id="1_2py8r"]
+[ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="2_5h213"]
+[ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="3_k1fdh"]
+[ext_resource type="Texture2D" uid="uid://oldgvrsgrmpi" path="res://Sprites/GodotHead.svg" id="4_1ofts"]
+[ext_resource type="PackedScene" uid="uid://2yj0yi24lkar" path="res://Scenes/BuffTabUi.tscn" id="4_jb6u6"]
+[ext_resource type="FontFile" uid="uid://cy2x5d3tsilqd" path="res://Fonts/ark-pixel-12px-proportional-zh_cn.woff2" id="5_7ckbk"]
+[ext_resource type="PackedScene" uid="uid://cfh3qchowgcu0" path="res://Scenes/Buff.tscn" id="5_oeiac"]
 
-[node name="Entity" type="Node"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8fxvn"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[node name="BattleEntity" type="Node2D" node_paths=PackedStringArray("HoleCardContainer", "SkillCardContainer", "BuffContainer", "NameLabel", "Portrait", "HitPointLabel", "MaxHitPointLabel")]
 script = ExtResource("1_2py8r")
+HoleCardContainer = NodePath("HoleCards")
+SkillCardContainer = NodePath("SkillCards")
+BuffContainer = NodePath("Buffs")
+NameLabel = NodePath("CharacterCard/Panel/Name")
+Portrait = NodePath("CharacterCard/Panel/Portrait")
+HitPointLabel = NodePath("CharacterCard/Panel/Hp")
+MaxHitPointLabel = NodePath("CharacterCard/Panel/MaxHp")
+
+[node name="HoleCards" parent="." groups=["markerCardContainer"] instance=ExtResource("2_5h213")]
+position = Vector2(48, -48)
+
+[node name="Card" parent="HoleCards" instance=ExtResource("3_k1fdh")]
+
+[node name="SkillCards" parent="." groups=["skillCardContainer"] instance=ExtResource("2_5h213")]
+position = Vector2(48, 210)
+
+[node name="Card" parent="SkillCards" instance=ExtResource("3_k1fdh")]
+
+[node name="Buffs" parent="." instance=ExtResource("4_jb6u6")]
+position = Vector2(48, 156)
+
+[node name="Buff" parent="Buffs" instance=ExtResource("5_oeiac")]
+
+[node name="CharacterCard" type="Node2D" parent="."]
+
+[node name="Panel" type="Panel" parent="CharacterCard"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_right = 96.0
+offset_bottom = 136.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_8fxvn")
+
+[node name="Portrait" type="TextureRect" parent="CharacterCard/Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_top = 16.0
+offset_right = 32.0
+offset_bottom = 80.0
+grow_horizontal = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 10.0
+texture = ExtResource("4_1ofts")
+expand_mode = 1
+
+[node name="Hp" type="Label" parent="CharacterCard/Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -16.0
+offset_top = 106.0
+offset_right = -8.0
+offset_bottom = 124.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("5_7ckbk")
+theme_override_font_sizes/font_size = 12
+text = "X"
+
+[node name="Label" type="Label" parent="CharacterCard/Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -3.0
+offset_top = 106.0
+offset_right = 3.0
+offset_bottom = 124.0
+grow_horizontal = 2
+size_flags_horizontal = 10
+theme_override_fonts/font = ExtResource("5_7ckbk")
+theme_override_font_sizes/font_size = 12
+text = "/"
+
+[node name="MaxHp" type="Label" parent="CharacterCard/Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 10.0
+offset_top = 106.0
+offset_right = 18.0
+offset_bottom = 124.0
+grow_horizontal = 2
+size_flags_horizontal = 10
+theme_override_fonts/font = ExtResource("5_7ckbk")
+theme_override_font_sizes/font_size = 12
+text = "Y"
+
+[node name="Name" type="Label" parent="CharacterCard/Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -18.0
+offset_top = 83.0
+offset_right = 22.0
+offset_bottom = 107.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("5_7ckbk")
+theme_override_font_sizes/font_size = 12
+text = "Test"
+horizontal_alignment = 1

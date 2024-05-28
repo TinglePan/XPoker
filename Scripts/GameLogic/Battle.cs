@@ -14,24 +14,25 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public partial class Battle: Node, ISetup, IManagedUi
+public partial class Battle: BaseManagedNode2D, ISetup
 {
+
+    public enum State
+    {
+        Finished,
+        BeforeDealCards,
+        BeforeShowDown,
+    }
+    
     [Export] public CardPile CardPile;
     [Export] public CardContainer CommunityCardContainer;
     [Export] public CardContainer FieldCardContainer;
     [Export] public PlayerBattleEntity Player;
     [Export] public Array<BattleEntity> Entities;
-    [Export] public Label CurrentEnergyLabel;
-    [Export] public Label MaxEnergyLabel;
-    [Export] public BaseButton ProceedButton;
-    
-    [Export]
-    public string Identifier { get; set; }
-    public GameMgr GameMgr { get; private set; }
-    public UiMgr UiMgr { get; private set; }
     
     public bool HasSetup { get; set; }
     
+    public Action<Battle> OnBattleProceed;
     public Action<Battle> AfterDealCards;
     public Action<Battle> OnRoundStart;
     public Action<Battle> OnRoundEnd;
@@ -50,28 +51,21 @@ public partial class Battle: Node, ISetup, IManagedUi
     public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHandStrengthsWithoutFaceDownCards;
     
     public List<BaseEffect> Effects;
+    public State CurrentState;
+    
     
     public override void _Ready()
     {
+        base._Ready();
         HasSetup = false;
         RoundHandStrengths = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
         RoundHandStrengthsWithoutFaceDownCards = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
-        HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, Configuration.DefaultRequiredHoleCardCountMin, Configuration.DefaultRequiredHoleCardCountMax);
-    }
-    
-    public override void _ExitTree()
-    {
-        base._ExitTree();
-        if (HasSetup && Player != null)
-        {
-            Player.Energy.DetailedValueChanged -= OnPlayerEnergyChanged;
-            Player.MaxEnergy.DetailedValueChanged -= OnPlayerMaxEnergyChanged;
-        }
+        HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount,
+            Configuration.DefaultRequiredHoleCardCountMin, Configuration.DefaultRequiredHoleCardCountMax);
     }
 
     public virtual void Setup(System.Collections.Generic.Dictionary<string, object> args)
     {
-        GameMgr = (GameMgr)args["gameMgr"];
         DealCommunityCardCount = (int)args["dealCommunityCardCount"];
         FaceDownCommunityCardCount = (int)args["faceDownCommunityCardCount"];
         
@@ -105,11 +99,6 @@ public partial class Battle: Node, ISetup, IManagedUi
         {
             entity.OnDefeated += OnEntityDefeated;
         }
-        
-        Player.Energy.DetailedValueChanged += OnPlayerEnergyChanged;
-        Player.Energy.FireValueChangeEventsOnInit();
-        Player.MaxEnergy.DetailedValueChanged += OnPlayerMaxEnergyChanged;
-        Player.MaxEnergy.FireValueChangeEventsOnInit();
         HasSetup = true;
     }
 
@@ -127,6 +116,23 @@ public partial class Battle: Node, ISetup, IManagedUi
         CardPile.Shuffle();
         NewRound();
     }
+
+    public void Proceed()
+    {
+        switch (CurrentState)
+        {
+            case State.Finished:
+                Start();
+                break;
+            case State.BeforeDealCards:
+                DealCards();
+                break;
+            case State.BeforeShowDown:
+                ShowDown();
+                break;
+        }
+        OnBattleProceed?.Invoke(this);
+    }
     
     public void NewRound()
     {
@@ -139,12 +145,13 @@ public partial class Battle: Node, ISetup, IManagedUi
         CommunityCardContainer.ClearContents();
         RoundHandStrengths.Clear();
         RoundHandStrengthsWithoutFaceDownCards.Clear();
-        DealCards();
+        CurrentState = State.BeforeDealCards;
     }
     
     public void Reset()
     {
         RoundCount = 0;
+        CurrentState = State.Finished;
         foreach (var entity in Entities)
         {
             entity.Reset();
@@ -168,6 +175,7 @@ public partial class Battle: Node, ISetup, IManagedUi
             CardPile.DealCardAppend(CommunityCardContainer);
         }
         AfterDealCards?.Invoke(this);
+        CurrentState = State.BeforeShowDown;
     }
     
     public void ShowDown()
@@ -236,6 +244,7 @@ public partial class Battle: Node, ISetup, IManagedUi
             }
         }
         OnRoundEnd?.Invoke(this);
+        CurrentState = State.BeforeDealCards;
         // var endTime = Time.GetTicksUsec();
         // GD.Print($"Hand evaluation time: {endTime - startTime} us");
         // GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
@@ -282,16 +291,6 @@ public partial class Battle: Node, ISetup, IManagedUi
             effect.OnStop(this);
             Effects.Remove(effect);
         }
-    }
-    
-    protected void OnPlayerEnergyChanged(object sender, ValueChangedEventDetailedArgs<int> args)
-    {
-        CurrentEnergyLabel.Text = args.NewValue.ToString();
-    }
-	
-    protected void OnPlayerMaxEnergyChanged(object sender, ValueChangedEventDetailedArgs<int> args)
-    {
-        MaxEnergyLabel.Text = args.NewValue.ToString();
     }
 
     protected Enums.CardFace GetCommunityCardFaceDirectionFunc(int i)

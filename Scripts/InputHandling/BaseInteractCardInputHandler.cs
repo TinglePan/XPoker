@@ -9,17 +9,19 @@ public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler wher
 {
     public TCard Card;
     public List<CardNode> SelectedCardNodes;
+    public BaseButton ProceedButton;
     
     public BaseInteractCardInputHandler(TCard card) : base(card.GameMgr)
     {
         Card = card;
         SelectedCardNodes = new List<CardNode>();
+        ProceedButton = SceneMgr.GetNode<BaseButton>("proceedButton");
     }
     
     public override void OnEnter()
     {
         base.OnEnter();
-        Card.Battle.ProceedButton.Pressed += Confirm;
+        ProceedButton.Pressed += Confirm;
         foreach (var selectTarget in GetValidSelectTargets())
         {
             selectTarget.OnPressed += ClickCard;
@@ -32,7 +34,7 @@ public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler wher
     public override void OnExit()
     {
         base.OnExit();
-        Card.Battle.ProceedButton.Pressed -= Confirm;
+        ProceedButton.Pressed -= Confirm;
         foreach (var selectTarget in GetValidSelectTargets())
         {
             selectTarget.OnPressed -= ClickCard;

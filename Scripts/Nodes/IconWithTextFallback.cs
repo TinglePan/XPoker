@@ -25,7 +25,10 @@ public partial class IconWithTextFallback: Node2D, ISetup
     public override void _ExitTree()
     {
         base._ExitTree();
-        IconPath.DetailedValueChanged -= OnIconPathChanged;
+        if (IconPath != null)
+        {
+            IconPath.DetailedValueChanged -= OnIconPathChanged;
+        }
     }
 
     public void Setup(Dictionary<string, object> args)

@@ -111,7 +111,7 @@ public partial class CardPile: Node2D, ISetup
         }
     }
     
-    public async void DealCardAppend(CardContainer targetContainer)
+    public void DealCardAppend(CardContainer targetContainer)
     {
         var cardNode = CardPrefab.Instantiate<CardNode>();
         cardNode.Setup(new Dictionary<string, object>()
@@ -125,7 +125,7 @@ public partial class CardPile: Node2D, ISetup
         ResetTopCard();
     }
 
-    public async void DealCardReplace(CardNode node)
+    public void DealCardReplace(CardNode node)
     {
         var cardNode = CardPrefab.Instantiate<CardNode>();
         cardNode.Setup(new Dictionary<string, object>()

@@ -10,19 +10,22 @@ namespace XCardGame.Scripts.InputHandling;
 
 public class MainInputHandler: BaseInputHandler
 {
-    
-    private CardContainer _abilityCardContainer;
+    public BaseButton ProceedButton;
+    public CardContainer PlayerAbilityCardContainer;
+    public CardContainer FieldCardContainer;
     
     public MainInputHandler(GameMgr gameMgr) : base(gameMgr)
     {
-        _abilityCardContainer = GameMgr.UiMgr.GetNodeById<CardContainer>("abilityCardContainer");
+        PlayerAbilityCardContainer = GameMgr.SceneMgr.GetNodeById<CardContainer>("playerAbilityCardContainer");
+        ProceedButton = SceneMgr.GetNode<BaseButton>("proceedButton");
     }
     
     public override void OnEnter()
     {
         base.OnEnter();
-        _abilityCardContainer.Contents.CollectionChanged += OnAbilityCardCollectionChanged;
-        foreach (var card in _abilityCardContainer.Contents)
+        ProceedButton.Pressed += GameMgr.CurrentBattle.Proceed;
+        PlayerAbilityCardContainer.Contents.CollectionChanged += OnAbilityCardCollectionChanged;
+        foreach (var card in PlayerAbilityCardContainer.Contents)
         {
             card.Node.OnPressed += ClickCard;
         }
@@ -31,8 +34,9 @@ public class MainInputHandler: BaseInputHandler
     public override void OnExit()
     {
         base.OnExit();
-        _abilityCardContainer.Contents.CollectionChanged -= OnAbilityCardCollectionChanged;
-        foreach (var card in _abilityCardContainer.Contents)
+        ProceedButton.Pressed -= GameMgr.CurrentBattle.Proceed;
+        PlayerAbilityCardContainer.Contents.CollectionChanged -= OnAbilityCardCollectionChanged;
+        foreach (var card in PlayerAbilityCardContainer.Contents)
         {
             card.Node.OnPressed -= ClickCard;
         }
@@ -72,7 +76,7 @@ public class MainInputHandler: BaseInputHandler
                     }
                 break;
             case NotifyCollectionChangedAction.Reset:
-                foreach (var node in _abilityCardContainer.GetChildren())
+                foreach (var node in PlayerAbilityCardContainer.GetChildren())
                 {
                     if (node is CardNode card)
                     {

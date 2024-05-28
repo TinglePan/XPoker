@@ -59,19 +59,19 @@ public class MillenniumEyeCard: BaseUseCard
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("pokerCardContainer");
+        CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer");
     }
 
     public override void Use()
     {
         var effect = new MillenniumEyeEffect(Name, Description, IconPath.Value, this);
         Battle.StartEffect(effect);
-        Battle.Player.Energy.Value -= ActualCost();
+        Battle.Player.Cost.Value -= ActualCost();
         StartRecharge();
     }
 
     public override int ActualCost()
     {
-        return Battle.Player.Energy.Value;
+        return Battle.Player.Cost.Value;
     }
 }

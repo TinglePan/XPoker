@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://Scripts/GameMgr.cs" id="1_55qvx"]
 [ext_resource type="PackedScene" uid="uid://nko5a5mn6ufg" path="res://Scenes/Main.tscn" id="2_xqibx"]
-[ext_resource type="PackedScene" uid="uid://bv3mbrqn86bsb" path="res://Scenes/PlayerBattleEntity.tscn" id="3_0wqxj"]
-[ext_resource type="PackedScene" uid="uid://qybvcg5uhnvi" path="res://Scenes/BattleEntity.tscn" id="3_l0xdt"]
+[ext_resource type="PackedScene" uid="uid://q1m4avgc5ecx" path="res://Scenes/PlayerBattleEntity.tscn" id="3_0wqxj"]
+[ext_resource type="PackedScene" uid="uid://blyra6wixgoc7" path="res://Scenes/BattleEntity.tscn" id="3_l0xdt"]
 
 [node name="GameMgr" type="Node"]
 script = ExtResource("1_55qvx")

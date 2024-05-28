@@ -29,7 +29,7 @@ public class NetherSwapCard: BaseUseCard
             }
         }
 
-        protected override async void Confirm()
+        protected override void Confirm()
         {
             if (SelectedCardNodes.Count == 2)
             {
@@ -64,7 +64,7 @@ public class NetherSwapCard: BaseUseCard
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        CardContainers = GameMgr.UiMgr.GetNodes<CardContainer>("cardContainer");
+        CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer");
     }
 
     public override void ChooseTargets()

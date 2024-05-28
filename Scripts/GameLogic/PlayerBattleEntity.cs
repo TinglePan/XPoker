@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
-
+using XCardGame.Scripts.Cards.SkillCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 
@@ -12,16 +13,16 @@ namespace XCardGame.Scripts.GameLogic;
 
 public partial class PlayerBattleEntity: BattleEntity
 {
-    public ObservableProperty<int> Energy;
-    public ObservableProperty<int> MaxEnergy;
+    public ObservableProperty<int> Cost;
+    public ObservableProperty<int> MaxCost;
     public Dictionary<int, LevelUpInfo> LevelUpTable;
     
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        var maxEnergy = (int)args["maxEnergy"];
-        MaxEnergy = new ObservableProperty<int>(nameof(MaxEnergy), this, maxEnergy);
-        Energy = new ObservableProperty<int>(nameof(Energy), this, maxEnergy);
+        var maxCost = (int)args["maxCost"];
+        MaxCost = new ObservableProperty<int>(nameof(MaxCost), this, maxCost);
+        Cost = new ObservableProperty<int>(nameof(Cost), this, maxCost);
         LevelUpTable = (Dictionary<int, LevelUpInfo>)args["levelUpTable"];
         Level.DetailedValueChanged += LevelChanged;
     }
@@ -29,7 +30,7 @@ public partial class PlayerBattleEntity: BattleEntity
     public override void RoundReset()
     {
         base.RoundReset();
-        Energy.Value = MaxEnergy.Value;
+        Cost.Value = MaxCost.Value;
     }
 
     protected void LevelChanged(object obj, ValueChangedEventDetailedArgs<int> args)
@@ -39,24 +40,29 @@ public partial class PlayerBattleEntity: BattleEntity
         {
             if (LevelUpTable.TryGetValue(i, out var levelUpInfo))
             {
-                // TODO: Choose one from cards in list
-                if (levelUpInfo.AbilityCards is { Count: > 0 })
+                // TODO: Choose one from cards in list?
+                if (levelUpInfo.GrantCards is { Count: > 0 })
                 {
-                    foreach (var abilityCard in levelUpInfo.AbilityCards)
+                    foreach (var card in levelUpInfo.GrantCards)
                     {
-                        AbilityCardContainer.Contents.Add(abilityCard);
+                        if (card is MarkerCard markerCard)
+                        {
+                            Deck.CardList.Add(markerCard);
+                        } else if (card is BaseSkillCard skillCard)
+                        {
+                            SkillCardContainer.Contents.Add(skillCard);
+                        }
+                        else if (card is BaseAbilityCard abilityCard)
+                        {
+                            AbilityCards.Add(abilityCard);
+                        }
+                        else
+                        {
+                            GD.PrintErr($"Invalid card type {card} in level up table");
+                        }
                     }
                 }
-                if (levelUpInfo.PokerCards is { Count: > 0 })
-                {
-                    foreach (var pokerCard in levelUpInfo.PokerCards)
-                    {
-                        Deck.CardList.Add(pokerCard);
-                    }
-                }
-                MaxEnergy.Value += levelUpInfo.Energy;
-                DealCardCount += levelUpInfo.DealCardCount;
-                ShowDownHoleCardCountMax += levelUpInfo.ShowDownHoleCardCountMax;
+                MaxCost.Value += levelUpInfo.Cost;
             }
         } 
     }

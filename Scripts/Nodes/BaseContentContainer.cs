@@ -7,15 +7,10 @@ using Godot;
 
 namespace XCardGame.Scripts.Nodes;
 
-public abstract partial class BaseContentContainer<TContentNode, TContent>: Node2D, ISetup, IManagedUi 
+public abstract partial class BaseContentContainer<TContentNode, TContent>: BaseManagedNode2D, ISetup 
     where TContentNode: BaseContentNode<TContentNode, TContent>
     where TContent: IContent<TContentNode, TContent>
 {
-    [Export]
-    public string Identifier { get; set; }
-    public GameMgr GameMgr { get; private set; }
-    public UiMgr UiMgr { get; private set;  }
-    
     public bool HasSetup { get; set; }
 
     public ObservableCollection<TContent> Contents;
@@ -26,10 +21,8 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Node
     
     public override void _Ready()
     {
+        base._Ready();
         ClearChildren();
-        GameMgr = GetNode<GameMgr>("/root/GameMgr");
-        UiMgr = GetNode<UiMgr>("/root/UiMgr");
-        UiMgr.Register(this);
         Contents = new ObservableCollection<TContent>();
         Contents.CollectionChanged += OnContentsChanged;
         ContentNodes = new List<TContentNode>();

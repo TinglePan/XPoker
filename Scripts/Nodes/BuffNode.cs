@@ -9,7 +9,7 @@ namespace XCardGame.Scripts.Nodes;
 public partial class BuffNode: BaseContentNode<BuffNode, BaseBuff>
 {
     [Export]
-    public TextureRect Icon;
+    public Sprite2D Icon;
     
     public override void _ExitTree()
     {

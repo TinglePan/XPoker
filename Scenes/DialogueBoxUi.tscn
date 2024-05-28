@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://cu8cytigbn45"]
+[gd_scene load_steps=14 format=3 uid="uid://cu8cytigbn45"]
 
 [ext_resource type="Script" path="res://Scripts/Nodes/DialogueBox.cs" id="1_x2gea"]
 
@@ -10,12 +10,37 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(1, 1, 1, 1)
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rpjht"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_laygk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_k1gcg"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_iawns"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xtm3n"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e6e16"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gpmn6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ijt8y"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mchix"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wmjwq"]
+
 [sub_resource type="Theme" id="Theme_8sflm"]
-HScrollBar/styles/grabber = null
-HScrollBar/styles/grabber_highlight = null
-HScrollBar/styles/grabber_pressed = null
-HScrollBar/styles/scroll = null
-HScrollBar/styles/scroll_focus = null
+HScrollBar/styles/grabber = SubResource("StyleBoxEmpty_rpjht")
+HScrollBar/styles/grabber_highlight = SubResource("StyleBoxEmpty_laygk")
+HScrollBar/styles/grabber_pressed = SubResource("StyleBoxEmpty_k1gcg")
+HScrollBar/styles/scroll = SubResource("StyleBoxEmpty_iawns")
+HScrollBar/styles/scroll_focus = SubResource("StyleBoxEmpty_xtm3n")
+VScrollBar/styles/grabber = SubResource("StyleBoxEmpty_e6e16")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxEmpty_gpmn6")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxEmpty_ijt8y")
+VScrollBar/styles/scroll = SubResource("StyleBoxEmpty_mchix")
+VScrollBar/styles/scroll_focus = SubResource("StyleBoxEmpty_wmjwq")
 
 [node name="DialogueBoxUi" type="PanelContainer" node_paths=PackedStringArray("TextWidget") groups=["dialogueBox"]]
 anchors_preset = 15
@@ -25,7 +50,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_xr7yc")
 script = ExtResource("1_x2gea")
-Identifier = null
 TextWidget = NodePath("MarginContainer/ScrollContainer/LineEdit")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -39,6 +63,7 @@ theme_override_constants/margin_bottom = 32
 layout_mode = 2
 theme = SubResource("Theme_8sflm")
 follow_focus = true
+vertical_scroll_mode = 2
 
 [node name="LineEdit" type="Label" parent="MarginContainer/ScrollContainer"]
 layout_mode = 2

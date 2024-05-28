@@ -13,14 +13,14 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts;
 
-public partial class GameMgr : Node, ISetup
+public partial class GameMgr : Node
 {
 	[Export] public PackedScene MainScene;
 	[Export] public PackedScene PlayerPrefab;
 	[Export] public PackedScene OpponentPrefab;
 	
 	public InputMgr InputMgr;
-	public UiMgr UiMgr;
+	public SceneMgr SceneMgr;
 	public Node CurrentScene;
 	public Battle CurrentBattle;
 
@@ -37,34 +37,20 @@ public partial class GameMgr : Node, ISetup
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		// if (!IsGameStarted)
-		// {
-		// 	StartGame();
-		// 	IsGameStarted = true;
-		// }
+		if (!IsGameStarted)
+		{
+			StartGame();
+			IsGameStarted = true;
+		}
 	}
 
 	public void StartGame()
 	{
 		ChangeScene(MainScene);
 		InputMgr ??= GetNode<InputMgr>("/root/InputMgr");
-		UiMgr ??= GetNode<UiMgr>("/root/UiMgr");
-		var setupButton = GetNode<Button>("/root/Main/Field/SetupButton");
+		SceneMgr ??= GetNode<SceneMgr>("/root/SceneMgr");
+		var setupButton = GetNode<Button>("/root/Main/SetupButton");
 		setupButton.Pressed += SetupBattle;
-		var startButton = GetNode<Button>("/root/Main/Field/StartButton");
-		startButton.Pressed += () => CurrentBattle.Start();
-		var nextRoundButton = GetNode<Button>("/root/Main/Field/NextRoundButton");
-		nextRoundButton.Pressed += () =>
-		{
-			CurrentBattle.NewRound();
-			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
-		};
-		var proceedButton = GetNode<Button>("/root/Main/Field/ProceedButton");
-		proceedButton.Pressed += () =>
-		{
-			CurrentBattle.ShowDown();
-			InputMgr.SwitchToInputHandler(new MainInputHandler(this));
-		};
 	}
 
 	public void SetupBattle()
@@ -106,15 +92,10 @@ public partial class GameMgr : Node, ISetup
 				},
 				{ "player", player }
 			});
-			// GD.Print("open player");
-			UiMgr.OpenBattleEntityUiCollection(player);
-			// GD.Print("open enemy");
-			UiMgr.OpenBattleEntityUiCollection(enemy);
-			UiMgr.OpenBattleUiCollection((PlayerBattleEntity)player);
 		
 			// Add ability cards after player ui collection is set up to avoid firing init event for observable collection.
 			BaseInteractCard abilityCard = new D6Card(Enums.CardSuit.Diamonds, Enums.CardRank.Six);
-			player.AbilityCardContainer.Contents.Add(abilityCard);
+			player.SkillCardContainer.Contents.Add(abilityCard);
 			abilityCard.Setup(new Dictionary<string, object>()
 			{
 				{ "gameMgr", this },
@@ -123,7 +104,7 @@ public partial class GameMgr : Node, ISetup
 			});
 			
 			abilityCard = new NetherSwapCard(Enums.CardSuit.Hearts, Enums.CardRank.Six);
-			player.AbilityCardContainer.Contents.Add(abilityCard);
+			player.SkillCardContainer.Contents.Add(abilityCard);
 			abilityCard.Setup(new Dictionary<string, object>()
 			{
 				{ "gameMgr", this },
@@ -156,16 +137,5 @@ public partial class GameMgr : Node, ISetup
 			CurrentScene.QueueFree();
 		}
 		CurrentScene = node;
-	}
-
-	public bool HasSetup { get; set; }
-	public void Setup(Dictionary<string, object> args)
-	{
-		throw new NotImplementedException();
-	}
-
-	public void EnsureSetup()
-	{
-		throw new NotImplementedException();
 	}
 }

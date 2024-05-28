@@ -1,15 +1,27 @@
-[gd_scene load_steps=3 format=3 uid="uid://blf82px0mx4rp"]
+[gd_scene load_steps=4 format=3 uid="uid://blf82px0mx4rp"]
 
+[ext_resource type="Script" path="res://Scripts/GameLogic/CardPile.cs" id="1_kikce"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="2_u3vkn"]
 [ext_resource type="Texture2D" uid="uid://1k8i88v2afkx" path="res://Sprites/deck_shade.png" id="3_kxpvv"]
 
-[node name="CardPile" type="Node2D"]
+[node name="CardPile" type="Node2D" node_paths=PackedStringArray("TopCardNode")]
+script = ExtResource("1_kikce")
+TopCardNode = NodePath("Card")
+CardPrefab = ExtResource("2_u3vkn")
 
 [node name="TextureRect" type="NinePatchRect" parent="."]
 texture_filter = 1
-offset_left = -8.0
-offset_right = 2.0
-offset_bottom = 68.0
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -32.0
+offset_top = -34.0
+offset_right = -22.0
+offset_bottom = 34.0
+grow_horizontal = 0
+grow_vertical = 2
 texture = ExtResource("3_kxpvv")
 region_rect = Rect2(0, 0, 32, 32)
 patch_margin_left = 1
@@ -19,13 +31,4 @@ patch_margin_bottom = 1
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Card" parent="." node_paths=PackedStringArray("Front", "Back", "MainIcon", "SuitIcon", "RankLabel", "JokerMark", "CostLabel", "AnimationPlayer", "Area") instance=ExtResource("2_u3vkn")]
-Front = NodePath("")
-Back = NodePath("")
-MainIcon = NodePath("")
-SuitIcon = NodePath("")
-RankLabel = NodePath("")
-JokerMark = NodePath("")
-CostLabel = NodePath("")
-AnimationPlayer = NodePath("")
-Area = NodePath("")
+[node name="Card" parent="." instance=ExtResource("2_u3vkn")]

@@ -9,9 +9,9 @@ public class UnpredictableDestinyCard: BaseTapCard
 
     public int Count;
     
-    public UnpredictableDestinyCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) :
+    public UnpredictableDestinyCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost) :
         base("Unpredictable destiny", "Add more face-down community cards", 
-            "res://Sprites/Cards/unpredictable_destiny.png", suit, rank, tapCost, unTapCost)
+            "res://Sprites/Cards/unpredictable_destiny.png", suit, rank, tappedCost, unTappedCost)
     {
         Count = 0;
     }

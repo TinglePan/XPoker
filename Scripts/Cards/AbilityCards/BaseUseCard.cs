@@ -29,18 +29,13 @@ public class BaseUseCard: BaseInteractCard, IUseCard
 
     public override bool CanInteract()
     {
-        return ((CardContainer)Node.Container).AllowEffect && !IsRecharging && Battle.Player.Cost.Value >= ActualCost();
+        return ((CardContainer)Node.Container).AllowEffect && !IsRecharging;
     }
     
     public override void Interact()
     {
         base.Interact();
         ChooseTargets();
-    }
-
-    public virtual int ActualCost()
-    {
-        return Cost;
     }
 
     public virtual void ChooseTargets()
@@ -50,7 +45,6 @@ public class BaseUseCard: BaseInteractCard, IUseCard
 
     public virtual void Use()
     {
-        Battle.Player.Cost.Value -= ActualCost();
         var newRank = Utils.GetCardRank(Utils.GetCardRankValue(Rank.Value) + RankChangePerUse);
         if (newRank == Enums.CardRank.None)
         {

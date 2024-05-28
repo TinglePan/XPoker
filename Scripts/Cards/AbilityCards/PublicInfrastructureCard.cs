@@ -9,9 +9,9 @@ public class PublicInfrastructureCard: BaseTapCard
 {
     public int Count;
     
-    public PublicInfrastructureCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) : 
+    public PublicInfrastructureCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost) : 
         base("Public Infrastructure", "Add community cards dealt each round", "res://Sprites/Cards/public_infrastructure.png",
-        suit, rank, tapCost, unTapCost)
+        suit, rank, tappedCost, unTappedCost)
     {
         Count = 0;
     }

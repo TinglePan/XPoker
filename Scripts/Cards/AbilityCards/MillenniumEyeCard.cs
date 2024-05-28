@@ -52,7 +52,7 @@ public class MillenniumEyeCard: BaseUseCard
     
     public MillenniumEyeCard(Enums.CardSuit suit, Enums.CardRank rank) : 
         base("Millennium Eye", "All knowing at the cost of all power.", "res://Sprites/Cards/millennium_eye.png", 
-            suit, rank, 0, 0)
+            suit, rank, 3, -99)
     {
     }
     
@@ -66,12 +66,6 @@ public class MillenniumEyeCard: BaseUseCard
     {
         var effect = new MillenniumEyeEffect(Name, Description, IconPath.Value, this);
         Battle.StartEffect(effect);
-        Battle.Player.Cost.Value -= ActualCost();
         StartRecharge();
-    }
-
-    public override int ActualCost()
-    {
-        return Battle.Player.Cost.Value;
     }
 }

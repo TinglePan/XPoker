@@ -5,9 +5,9 @@ namespace XCardGame.Scripts.Cards.AbilityCards;
 
 public class XomTheChaosCard: BaseTapCard
 {
-    public XomTheChaosCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) : 
+    public XomTheChaosCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost) : 
         base("Xom the Chaos", "Random effects that change every turn.", 
-            "res://Sprites/Cards/xom_the_chaos.png", suit, rank, tapCost, unTapCost)
+            "res://Sprites/Cards/xom_the_chaos.png", suit, rank, tappedCost, unTappedCost)
     {
     }
     

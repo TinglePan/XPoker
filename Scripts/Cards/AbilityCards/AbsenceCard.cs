@@ -93,8 +93,8 @@ public class AbsenceCard: BaseTapCard
     public BaseAbsenceCardRule Rule;
     public List<CardContainer> CardContainers;
     
-    public AbsenceCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost, BaseAbsenceCardRule rule): 
-        base("Absence", "Certain cards do not count, the rule alters each round.", "res://Sprites/Cards/absence.png", suit, rank, tapCost, unTapCost)
+    public AbsenceCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost, BaseAbsenceCardRule rule): 
+        base("Absence", "Certain cards do not count, the rule alters each round.", "res://Sprites/Cards/absence.png", suit, rank, tappedCost, unTappedCost)
     {
         Rule = rule;
     }

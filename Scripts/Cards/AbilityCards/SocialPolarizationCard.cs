@@ -6,9 +6,9 @@ namespace XCardGame.Scripts.Cards.AbilityCards;
 
 public class SocialPolarizationCard: BaseTapCard
 {
-    public SocialPolarizationCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) : 
+    public SocialPolarizationCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost) : 
         base("Social polarization", "Add community cards dealt each round",
-        "res://Sprites/Cards/public_infrastructure.png", suit, rank, tapCost, unTapCost)
+        "res://Sprites/Cards/public_infrastructure.png", suit, rank, tappedCost, unTappedCost)
     {
     }
 

@@ -49,9 +49,9 @@ public class TurnTheTablesCard: BaseTapCard
     public BattleEntity Source;
     public BattleEntity Target;
     
-    public TurnTheTablesCard(Enums.CardSuit suit, Enums.CardRank rank, int tapCost, int unTapCost) : base("Turn The Tables", 
+    public TurnTheTablesCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost) : base("Turn The Tables", 
         "When you proceed a round with this card faced up, you showdown with your opponent's hole cards, and vice versa.", 
-        "res://Sprites/Cards/turn_the_tables.png", suit, rank, tapCost, unTapCost)
+        "res://Sprites/Cards/turn_the_tables.png", suit, rank, tappedCost, unTappedCost)
     {
     }
 

@@ -47,7 +47,7 @@ public partial class Battle: BaseManagedNode2D, ISetup
     public int FaceDownCommunityCardCount;
     
     public int RoundCount;
-    public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHandStrengths;
+    public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHands;
     
     public List<BaseEffect> Effects;
     public State CurrentState;
@@ -57,7 +57,7 @@ public partial class Battle: BaseManagedNode2D, ISetup
     {
         base._Ready();
         HasSetup = false;
-        RoundHandStrengths = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
+        RoundHands = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount,
             Configuration.DefaultRequiredHoleCardCountMin, Configuration.DefaultRequiredHoleCardCountMax);
     }
@@ -141,7 +141,7 @@ public partial class Battle: BaseManagedNode2D, ISetup
             entity.RoundReset();
         }
         CommunityCardContainer.ClearContents();
-        RoundHandStrengths.Clear();
+        RoundHands.Clear();
         CurrentState = State.BeforeDealCards;
     }
     
@@ -186,7 +186,7 @@ public partial class Battle: BaseManagedNode2D, ISetup
             var bestHand = 
                 HandEvaluator.EvaluateBestHand(CommunityCardContainer.Contents.ToList(),
                     entity.HoleCardContainer.Contents.ToList());
-            RoundHandStrengths.Add(entity, bestHand);
+            RoundHands.Add(entity, bestHand);
         }
 
         foreach (var entity in Entities)
@@ -216,20 +216,20 @@ public partial class Battle: BaseManagedNode2D, ISetup
                 {
                     continue;
                 }
-                var handStrength = RoundHandStrengths[entity];
-                var otherHandStrength = RoundHandStrengths[otherEntity];
+                var hand = RoundHands[entity];
+                var otherHand = RoundHands[otherEntity];
                 
-                if (HandEvaluator.Compare(handStrength, otherHandStrength) >= 0)
+                if (HandEvaluator.Compare(hand, otherHand) >= 0)
                 {
-                    Attack attack = new Attack(GameMgr, entity, otherEntity, handStrength,
-                        otherHandStrength);
+                    Attack attack = new Attack(GameMgr, this, entity, otherEntity, hand,
+                        otherHand);
                     BeforeApplyDamage?.Invoke(this, attack);
                     attack.Apply();
                 }
-                if (HandEvaluator.Compare(handStrength, otherHandStrength) <= 0)
+                if (HandEvaluator.Compare(hand, otherHand) <= 0)
                 {
-                    Attack attack = new Attack(GameMgr, otherEntity, entity, otherHandStrength, 
-                        handStrength);
+                    Attack attack = new Attack(GameMgr, this, otherEntity, entity, otherHand, 
+                        hand);
                     BeforeApplyDamage?.Invoke(this, attack);
                     attack.Apply();
                 }

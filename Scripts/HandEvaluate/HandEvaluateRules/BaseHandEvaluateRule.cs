@@ -9,13 +9,13 @@ namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 public class BaseHandEvaluateRule
 {
     public virtual void EvaluateAndRecord(List<BaseCard> cards,
-        Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHandStrengths, Enums.HandTier? forRank=null)
+        Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHands, Enums.HandTier? forRank=null)
     {
         forRank ??= Tier;
-        if (calculatedHandStrengths != null &&
-            calculatedHandStrengths.TryGetValue(forRank.Value, out var calculatedRes) && calculatedRes.Count > 0) return;
+        if (calculatedHands != null &&
+            calculatedHands.TryGetValue(forRank.Value, out var calculatedRes) && calculatedRes.Count > 0) return;
         var res = Evaluate(cards, forRank);
-        if (calculatedHandStrengths!= null) calculatedHandStrengths[forRank.Value] = res;
+        if (calculatedHands!= null) calculatedHands[forRank.Value] = res;
     }
     
     protected virtual List<CompletedHand> Evaluate(List<BaseCard> cards, Enums.HandTier? forRank=null)
@@ -54,16 +54,16 @@ public class BaseHandEvaluateRule
         return res;
     }
 
-    protected virtual void UpgradeHandRank(CompletedHand target, Enums.HandTier toTier,
-        Dictionary<Enums.HandTier, List<CompletedHand>> calculatedHandStrengths)
+    protected virtual void UpgradeHandTier(CompletedHand target, Enums.HandTier toTier,
+        Dictionary<Enums.HandTier, List<CompletedHand>> calculatedHands)
     {
         if (target.Tier != Tier) return;
-        calculatedHandStrengths[target.Tier].Remove(target);
+        calculatedHands[target.Tier].Remove(target);
         target.Tier = toTier;
-        if (!calculatedHandStrengths.ContainsKey(toTier))
+        if (!calculatedHands.ContainsKey(toTier))
         {
-            calculatedHandStrengths[toTier] = new List<CompletedHand>();
+            calculatedHands[toTier] = new List<CompletedHand>();
         }
-        calculatedHandStrengths[toTier].Add(target);
+        calculatedHands[toTier].Add(target);
     }
 }

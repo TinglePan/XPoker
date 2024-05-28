@@ -30,10 +30,10 @@ public class TurnTheTablesCard: BaseTapCard
         protected void BeforeEngage(Battle battle)
         {
             var card = (TurnTheTablesCard)CreatedByCard;
-            if (battle.RoundHandStrengths.ContainsKey(card.Source) && battle.RoundHandStrengths.ContainsKey(card.Target))
+            if (battle.RoundHands.ContainsKey(card.Source) && battle.RoundHands.ContainsKey(card.Target))
             {
-                (battle.RoundHandStrengths[card.Source], battle.RoundHandStrengths[card.Target]) = 
-                    (battle.RoundHandStrengths[card.Target], battle.RoundHandStrengths[card.Source]);
+                (battle.RoundHands[card.Source], battle.RoundHands[card.Target]) = 
+                    (battle.RoundHands[card.Target], battle.RoundHands[card.Source]);
             }
         }
     }

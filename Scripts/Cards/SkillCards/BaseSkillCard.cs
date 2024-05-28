@@ -6,7 +6,6 @@ namespace XCardGame.Scripts.Cards.SkillCards;
 
 public class BaseSkillCard: BaseCard
 {
-
     public Dictionary<Enums.HandTier, BaseEffect> Effects;
     
     public BaseSkillCard(string name, string description, string iconPath, Enums.CardSuit suit, Enums.CardRank rank,

@@ -36,17 +36,17 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         foreach (var cards in Utils.GetCombinationsWithXToYFromA(validHoleCards, validCommunityCards, 
                      CardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
         {
-            Dictionary<Enums.HandTier, List<CompletedHand>> calculatedHandStrengths = new();
+            Dictionary<Enums.HandTier, List<CompletedHand>> calculatedHands = new();
             foreach (var rule in Rules)
             {
-                if (calculatedHandStrengths.TryGetValue(rule.Tier, out var handStrengths) && handStrengths.Count > 0) continue;
-                rule.EvaluateAndRecord(cards, calculatedHandStrengths);
+                if (calculatedHands.TryGetValue(rule.Tier, out var hands) && hands.Count > 0) continue;
+                rule.EvaluateAndRecord(cards, calculatedHands);
             }
 
-            foreach (var (handRank, handStrengths) in calculatedHandStrengths)
+            foreach (var (handRank, hands) in calculatedHands)
             {
                 if (!CalculatedHands.ContainsKey(handRank)) CalculatedHands[handRank] = new List<CompletedHand>();
-                CalculatedHands[handRank].AddRange(handStrengths);
+                CalculatedHands[handRank].AddRange(hands);
             }
         }
 
@@ -54,9 +54,9 @@ public class CompletedHandEvaluator: BaseHandEvaluator
             OrderByDescending(x => x);
         foreach (var handRank in handRanksInDescendingOrder)
         {
-            if (CalculatedHands.TryGetValue(handRank, out var handStrengths) && handStrengths.Count > 0)
+            if (CalculatedHands.TryGetValue(handRank, out var hands) && hands.Count > 0)
             {
-                return handStrengths.OrderByDescending(x => x).First();
+                return hands.OrderByDescending(x => x).First();
             }
         }
         GD.PrintErr("No hand rank rule matched. Not supposed to happen.");

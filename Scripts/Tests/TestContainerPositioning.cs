@@ -23,7 +23,7 @@ public partial class TestContainerPositioning: Node
             { "cards", new ObservableCollection<CardNode>() },
             { "contentNodeSize", new Vector2(48, 68) },
             { "separation", 12 },
-            { "defaultDealtCardFaceDirection", Enums.CardFace.Up }
+            { "defaultCardFaceDirection", Enums.CardFace.Up }
         });
         SpawnCardNodeAndAppend();
         GD.Print("task start");

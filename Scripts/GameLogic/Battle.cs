@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.HandEvaluate;
 using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public partial class Battle: BaseManagedNode2D, ISetup
+public partial class Battle: ManagedNode2D, ISetup
 {
 
     public enum State
@@ -21,6 +21,7 @@ public partial class Battle: BaseManagedNode2D, ISetup
         Finished,
         BeforeDealCards,
         BeforeShowDown,
+        AfterShowDown
     }
     
     [Export] public CardPile CardPile;
@@ -28,6 +29,8 @@ public partial class Battle: BaseManagedNode2D, ISetup
     [Export] public CardContainer FieldCardContainer;
     [Export] public Godot.Collections.Array<BattleEntity> Entities;
 
+    public BaseButton ProceedButton;
+    
     public PlayerBattleEntity Player => Entities[0] as PlayerBattleEntity;
     
     public bool HasSetup { get; set; }
@@ -63,8 +66,6 @@ public partial class Battle: BaseManagedNode2D, ISetup
         base._Ready();
         HasSetup = false;
         RoundHands = new Dictionary<BattleEntity, CompletedHand>();
-        HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, 
-            RequiredHoleCardCountMin, RequiredHoleCardCountMax);
         CommunityCards = new ObservableCollection<BaseCard>();
         FieldCards = new ObservableCollection<BaseCard>();
     }
@@ -75,22 +76,45 @@ public partial class Battle: BaseManagedNode2D, ISetup
         FaceDownCommunityCardCount = (int)args["faceDownCommunityCardCount"];
         RequiredHoleCardCountMin = (int)args["requiredHoleCardCountMin"];
         RequiredHoleCardCountMax = (int)args["requiredHoleCardCountMax"];
+        HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, 
+            RequiredHoleCardCountMin, RequiredHoleCardCountMax);
         
-        CardPile.Setup(new Dictionary<string, object>()
-        {
-            { "sourceDecks" , Entities.Select(e => e.Deck).ToList() },
-            { "excludedCards" , null }
-        });
         
         CommunityCardContainer.Setup(new Dictionary<string, object>()
         {
+            { "allowInteract", false },
             { "cards", CommunityCards },
+            { "contentNodeSize", Configuration.CardSize },
+            { "separation", Configuration.CardContainerSeparation },
             { "getCardFaceDirectionFunc", (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc }
         });
         
         FieldCardContainer.Setup(new Dictionary<string, object>()
         {
-            { "cards", FieldCards }
+            { "allowInteract", true },
+            { "cards", FieldCards },
+            { "contentNodeSize", Configuration.CardSize },
+            { "separation", Configuration.CardContainerSeparation },
+            { "defaultCardFaceDirection", Enums.CardFace.Up } 
+        });
+        
+        var entitiesSetupArgs = (List<Dictionary<string, object>>)args["entities"];
+        for (int i = 0; i < Entities.Count; i++)
+        {
+            var entity = Entities[i];
+            entity.Setup(entitiesSetupArgs[i]);
+            entity.OnDefeated += OnEntityDefeated;
+            entity.AbilityCards.CollectionChanged += OnEntityAbilityCardsChanged;
+            foreach (var abilityCard in entity.AbilityCards)
+            {
+                FieldCards.Add(abilityCard);
+            }
+        }
+        
+        CardPile.Setup(new Dictionary<string, object>()
+        {
+            { "sourceDecks" , Entities.Select(e => e.Deck).ToList() },
+            { "excludedCards" , null }
         });
         
         // Player.Setup((Dictionary<string, object>)args["playerSetupArgs"]);
@@ -101,14 +125,9 @@ public partial class Battle: BaseManagedNode2D, ISetup
         //     entity.Setup(((List<Dictionary<string, object>>)args["enemySetupArgs"])[iEnemy]);
         //     iEnemy++;
         // }
+        
+        Reset();
 
-        var entitiesSetupArgs = (List<Dictionary<string, object>>)args["entities"];
-        for (int i = 0; i < Entities.Count; i++)
-        {
-            var entity = Entities[i];
-            entity.Setup(entitiesSetupArgs[i]);
-            entity.OnDefeated += OnEntityDefeated;
-        }
         HasSetup = true;
     }
 
@@ -133,12 +152,17 @@ public partial class Battle: BaseManagedNode2D, ISetup
         {
             case State.Finished:
                 Start();
+                DealCards();
                 break;
             case State.BeforeDealCards:
                 DealCards();
                 break;
             case State.BeforeShowDown:
                 ShowDown();
+                break;
+            case State.AfterShowDown:
+                NewRound();
+                DealCards();
                 break;
         }
         OnBattleProceed?.Invoke(this);
@@ -154,7 +178,6 @@ public partial class Battle: BaseManagedNode2D, ISetup
         }
         CommunityCardContainer.ClearContents();
         RoundHands.Clear();
-        CurrentState = State.BeforeDealCards;
     }
     
     public void Reset()
@@ -166,7 +189,7 @@ public partial class Battle: BaseManagedNode2D, ISetup
             entity.Reset();
         }
         CommunityCardContainer.ClearContents();
-        FieldCardContainer.ClearContents();
+        // FieldCardContainer.ClearContents();
         CardPile.Reset();
     }
 
@@ -248,7 +271,7 @@ public partial class Battle: BaseManagedNode2D, ISetup
             }
         }
         OnRoundEnd?.Invoke(this);
-        CurrentState = State.BeforeDealCards;
+        CurrentState = State.AfterShowDown;
         // var endTime = Time.GetTicksUsec();
         // GD.Print($"Hand evaluation time: {endTime - startTime} us");
         // GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
@@ -300,6 +323,56 @@ public partial class Battle: BaseManagedNode2D, ISetup
     protected Enums.CardFace GetCommunityCardFaceDirectionFunc(int i)
     {
         return i < DealCommunityCardCount - FaceDownCommunityCardCount ? Enums.CardFace.Up : Enums.CardFace.Down;
+    }
+
+    protected void OnEntityAbilityCardsChanged(object sender, NotifyCollectionChangedEventArgs args)
+    {
+        switch (args.Action)
+        {
+            
+            case NotifyCollectionChangedAction.Add:
+                if (args.NewItems != null)
+                    foreach (var t in args.NewItems)
+                    {
+                        if (t is BaseCard card)
+                        {
+                            FieldCards.Add(card);
+                        }
+                    }
+                break;
+            case NotifyCollectionChangedAction.Remove:
+                if (args.OldItems != null)
+                    foreach (var t in args.OldItems)
+                    {
+                        if (t is BaseCard card)
+                        {
+                            FieldCards.Remove(card);
+                        }
+                    }
+                break;
+            case NotifyCollectionChangedAction.Reset:
+                var removedCards = new List<BaseCard>();
+                foreach (var fieldCard in FieldCards)
+                {
+                    var found = false;
+                    foreach (var entity in Entities)
+                    {
+                        if (entity.AbilityCards.Contains(fieldCard))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) removedCards.Add(fieldCard);
+                }
+
+                foreach (var removedCard in removedCards)
+                {
+                    FieldCards.Remove(removedCard);
+                }
+
+                break;
+        }
     }
 
 }

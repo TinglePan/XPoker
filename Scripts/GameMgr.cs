@@ -9,6 +9,7 @@ using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
+using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts;
 
@@ -38,14 +39,16 @@ public partial class GameMgr : Node
 	{
 	}
 
-	public void SetupBattle()
+	public void StartBattle()
 	{
-
-		CurrentBattle ??= ChangeScene(BattleScene) as Battle;
-		CurrentBattle?.Setup(new Dictionary<string, object>
+		ChangeScene(BattleScene);
+		CurrentBattle = ((BattleScene)CurrentScene).Battle;
+		CurrentBattle.Setup(new Dictionary<string, object>
 		{
 			{ "dealCommunityCardCount", 5 },
 			{ "faceDownCommunityCardCount", 1 },
+			{ "requiredHoleCardCountMin", 0 },
+			{ "requiredHoleCardCountMax", 2 },
 			{
 				"entities", new List<Dictionary<string, object>>
 				{
@@ -102,10 +105,7 @@ public partial class GameMgr : Node
 				}
 			}
 		});
-	}
-
-	public void StartBattle()
-	{
+		
 		InputMgr.SwitchToInputHandler(new MainInputHandler(this));
 		CurrentBattle.Start();
 	}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
@@ -24,12 +25,17 @@ public class D6Card: BaseUseCard
         CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer");
     }
 
+    public override bool CanInteract()
+    {
+        return base.CanInteract() && Battle.CurrentState == Battle.State.BeforeShowDown;
+    }
+
     public override void Use()
     {
         base.Use();
         foreach (var cardContainer in CardContainers)
         {
-            foreach (var card in cardContainer.Contents)
+            foreach (var card in cardContainer.Contents.ToList())
             {
                 if (card.Node.FaceDirection.Value != Enums.CardFace.Up) continue;
                 Battle.CardPile.DealCardReplace(card.Node);

@@ -67,6 +67,11 @@ public class NetherSwapCard: BaseUseCard
         CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer");
     }
 
+    public override bool CanInteract()
+    {
+        return base.CanInteract() && Battle.CurrentState == Battle.State.BeforeShowDown;
+    }
+    
     public override void ChooseTargets()
     {
         var inputHandler =

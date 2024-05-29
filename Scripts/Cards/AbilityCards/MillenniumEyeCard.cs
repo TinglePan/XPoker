@@ -62,6 +62,11 @@ public class MillenniumEyeCard: BaseUseCard
         CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer");
     }
 
+    public override bool CanInteract()
+    {
+        return base.CanInteract() && Battle.CurrentState == Battle.State.BeforeShowDown;
+    }
+
     public override void Use()
     {
         var effect = new MillenniumEyeEffect(Name, Description, IconPath.Value, this);

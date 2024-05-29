@@ -1,12 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://cxhp6l2mgripf"]
+[gd_scene load_steps=4 format=3 uid="uid://cxhp6l2mgripf"]
 
 [ext_resource type="Script" path="res://Scripts/GameMgr.cs" id="1_55qvx"]
-[ext_resource type="PackedScene" uid="uid://nko5a5mn6ufg" path="res://Scenes/Main.tscn" id="2_xqibx"]
-[ext_resource type="PackedScene" uid="uid://q1m4avgc5ecx" path="res://Scenes/PlayerBattleEntity.tscn" id="3_0wqxj"]
-[ext_resource type="PackedScene" uid="uid://blyra6wixgoc7" path="res://Scenes/BattleEntity.tscn" id="3_l0xdt"]
+[ext_resource type="PackedScene" uid="uid://77vdut83237t" path="res://Scenes/Intro.tscn" id="2_uh305"]
+[ext_resource type="PackedScene" uid="uid://nko5a5mn6ufg" path="res://Scenes/BattleScene.tscn" id="3_f164q"]
 
 [node name="GameMgr" type="Node"]
 script = ExtResource("1_55qvx")
-MainScene = ExtResource("2_xqibx")
-PlayerPrefab = ExtResource("3_0wqxj")
-OpponentPrefab = ExtResource("3_l0xdt")
+IntroScene = ExtResource("2_uh305")
+BattleScene = ExtResource("3_f164q")

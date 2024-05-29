@@ -15,7 +15,7 @@ public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler wher
     {
         Card = card;
         SelectedCardNodes = new List<CardNode>();
-        ProceedButton = SceneMgr.GetNode<BaseButton>("proceedButton");
+        ProceedButton = GameMgr.CurrentBattle.ProceedButton;
     }
     
     public override void OnEnter()

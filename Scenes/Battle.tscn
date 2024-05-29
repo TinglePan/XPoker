@@ -8,9 +8,12 @@
 [ext_resource type="PackedScene" uid="uid://q1m4avgc5ecx" path="res://Scenes/PlayerBattleEntity.tscn" id="6_65vqs"]
 [ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="7_xlxsy"]
 
-[node name="Battle" type="Node2D" node_paths=PackedStringArray("Entities")]
+[node name="Battle" type="Node2D" node_paths=PackedStringArray("CardPile", "CommunityCardContainer", "FieldCardContainer", "Entities")]
 script = ExtResource("1_xec1t")
-Entities = []
+CardPile = NodePath("CardPile")
+CommunityCardContainer = NodePath("CommunityCardContainer")
+FieldCardContainer = NodePath("FieldCards")
+Entities = [NodePath("Player"), NodePath("Enemy")]
 Identifier = null
 
 [node name="CommunityCardContainer" type="Node2D" parent="." groups=["cardContainer", "markerCardContainer"]]

@@ -25,12 +25,13 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BuffNode, Ba
     public string Description;
     public string IconPath;
     
-    public BaseBuff(string name, string description, string iconPath, BattleEntity inflictedBy, BaseCard inflictedByCard)
+    public BaseBuff(string name, string description, string iconPath, BattleEntity entity, BattleEntity inflictedBy, BaseCard inflictedByCard)
     {
         HasSetup = false;
         Name = name;
         Description = description;
         IconPath = iconPath;
+        Entity = entity;
         InflictedBy = inflictedBy;
         InflictedByCard = inflictedByCard;
     }
@@ -40,7 +41,6 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BuffNode, Ba
         Node = (BuffNode)args["node"];
         GameMgr = (GameMgr)args["gameMgr"];
         Battle = (Battle)args["battle"];
-        Entity = (BattleEntity)args["entity"];
         HasSetup = true;
     }
 

@@ -20,23 +20,25 @@ corner_radius_top_right = 1
 corner_radius_bottom_right = 1
 corner_radius_bottom_left = 1
 
-[node name="BattleEntity" type="Node2D" node_paths=PackedStringArray("HoleCardContainer", "SkillCardContainer", "BuffContainer", "NameLabel", "Portrait", "HitPointLabel", "MaxHitPointLabel")]
+[node name="BattleEntity" type="Node2D" node_paths=PackedStringArray("HoleCardContainer", "SkillCardContainer", "BuffContainer", "NameLabel", "Portrait", "HpLabel", "MaxHpLabel")]
 script = ExtResource("1_ks5tt")
 HoleCardContainer = NodePath("HoleCards")
 SkillCardContainer = NodePath("SkillCards")
 BuffContainer = NodePath("Buffs")
 NameLabel = NodePath("CharacterCard/Panel/Name")
 Portrait = NodePath("CharacterCard/Panel/Portrait")
-HitPointLabel = NodePath("CharacterCard/Panel/Hp")
-MaxHitPointLabel = NodePath("CharacterCard/Panel/MaxHp")
+HpLabel = NodePath("CharacterCard/Panel/Hp")
+MaxHpLabel = NodePath("CharacterCard/Panel/MaxHp")
 
 [node name="HoleCards" parent="." groups=["markerCardContainer"] instance=ExtResource("2_i2lmi")]
 position = Vector2(48, -48)
+Identifier = null
 
 [node name="Card" parent="HoleCards" instance=ExtResource("3_m84t7")]
 
 [node name="SkillCards" parent="." groups=["skillCardContainer"] instance=ExtResource("2_i2lmi")]
 position = Vector2(48, 210)
+Identifier = null
 
 [node name="Card" parent="SkillCards" instance=ExtResource("3_m84t7")]
 

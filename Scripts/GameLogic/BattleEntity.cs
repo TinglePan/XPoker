@@ -43,7 +43,7 @@ public partial class BattleEntity: Node, ISetup
     public ObservableProperty<int> MaxHp;
     public ObservableProperty<int> Level;
     public bool IsHoleCardDealtVisible;
-    public ObservableCollection<BaseAbilityCard> AbilityCards;
+    public ObservableCollection<BaseCard> AbilityCards;
 
     public override void _Ready()
     {
@@ -71,20 +71,31 @@ public partial class BattleEntity: Node, ISetup
         Hp = new ObservableProperty<int>(nameof(Hp), this, MaxHp.Value);
         Level = new ObservableProperty<int>(nameof(Level), this, (int)args["level"]);
         IsHoleCardDealtVisible = (bool)args["isHoleCardDealtVisible"];
-        AbilityCards = (ObservableCollection<BaseAbilityCard>)args["abilityCards"];
+        AbilityCards = (ObservableCollection<BaseCard>)args["abilityCards"];
         
         HoleCardContainer.Setup(new Dictionary<string, object>()
         {
+            { "allowInteract", false },
             { "cards", new ObservableCollection<BaseCard>() },
+            { "contentNodeSize", Configuration.CardSize },
+            { "separation", Configuration.CardContainerSeparation },
             { "defaultCardFaceDirection", IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down } 
         });
         SkillCardContainer.Setup(new Dictionary<string, object>()
         {
-            { "cards", (ObservableCollection<BaseCard>)args["skillCards"] }
+            { "allowInteract", false },
+            { "cards", (ObservableCollection<BaseCard>)args["skillCards"] },
+            { "contentNodeSize", Configuration.CardSize },
+            { "separation", Configuration.CardContainerSeparation },
+            { "defaultCardFaceDirection", Enums.CardFace.Up } 
         });
         BuffContainer.Setup(new Dictionary<string, object>()
         {
+            { "allowInteract", false },
             { "buffs", new ObservableCollection<BaseBuff>() },
+            { "contentNodeSize", Configuration.CardSize },
+            { "separation", Configuration.CardContainerSeparation },
+            { "defaultCardFaceDirection", Enums.CardFace.Up } 
         });
         NameLabel.Text = DisplayName;
         Portrait.Texture = ResourceCache.Instance.Load<Texture2D>(PortraitPath);

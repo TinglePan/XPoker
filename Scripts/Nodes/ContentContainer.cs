@@ -4,10 +4,11 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Godot;
+using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.Nodes;
 
-public abstract partial class BaseContentContainer<TContentNode, TContent>: BaseManagedNode2D, ISetup 
+public abstract partial class ContentContainer<TContentNode, TContent>: ManagedNode2D, ISetup 
     where TContentNode: BaseContentNode<TContentNode, TContent>
     where TContent: IContent<TContentNode, TContent>
 {
@@ -50,12 +51,16 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Base
     {
         EnsureSetup();
         var index = startingIndex;
+        if (index >= ContentNodes.Count) return;
         List<TContentNode> removedNodes = new List<TContentNode>();
-        foreach (var _ in contents)
+        foreach (var content in contents)
         {
-            removedNodes.Add(ContentNodes[index]);
-            ContentNodes.RemoveAt(index);
-            index++;
+            if (content is TContent typedContent && ContentNodes[index].Content.Value.Equals(typedContent))
+            {
+                removedNodes.Add(ContentNodes[index]);
+                ContentNodes.RemoveAt(index);
+                index++;
+            }
         }
         foreach (var removedNode in removedNodes)
         {
@@ -79,25 +84,28 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Base
     public void OnV2MAddNode(int index, TContentNode node)
     {
         EnsureSetup();
+        if (index < Contents.Count && Contents[index].Equals(node.Content.Value)) return;
         Contents.Insert(index, node.Content.Value);
     }
 
-    public void OnV2MRemoveNode(int index)
+    public void OnV2MRemoveNode(int index, TContentNode node)
     {
         EnsureSetup();
+        if (index >= Contents.Count || !Contents[index].Equals(node.Content.Value)) return;
         Contents.RemoveAt(index);
     }
 
     public void OnV2MClearNodes()
     {
         EnsureSetup();
-        ContentNodes.Clear();
+        if (Contents.Count == 0) return;
         Contents.Clear();
     }
-    
-    public virtual Vector2 CalculateContentNodePosition(int index, int n)
+
+    public virtual Vector2 CalculateContentNodePosition(int index, int n, bool isInsideContainer = false)
     {
-        return Position + CalculateContentNodeOffset(index, n);
+        var offset = CalculateContentNodeOffset(index, n);
+        return isInsideContainer ? offset : Position + offset;
     }
 
     public virtual Vector2 CalculateContentNodeOffset(int index, int n)
@@ -113,7 +121,7 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Base
         return 0f;
     }
     
-    public void AddContentNode(int index, TContentNode node, float tweenTime = 0f)
+    public virtual void AddContentNode(int index, TContentNode node, float tweenTime = 0f)
     {
         EnsureSetup();
         if (index < ContentNodes.Count && ContentNodes[index] == node) return;
@@ -121,6 +129,7 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Base
         node.Reparent(this);
         MoveChild(node, index);
         node.Container = this;
+        GD.Print($"{node.Content.Value}({node}) container added {this}");
         for (int i = 0; i < ContentNodes.Count; i++)
         {
             AdjustContentNode(i, tweenTime);
@@ -150,8 +159,10 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Base
     {
         EnsureSetup();
         var node = ContentNodes[index];
-        OnV2MRemoveNode(index);
+        ContentNodes.RemoveAt(index);
+        OnV2MRemoveNode(index, node);
         node.Container = null;
+        GD.Print($"{node.Content.Value}({node}) container removed");
         if (free)
         {
             node.QueueFree();
@@ -162,6 +173,7 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Base
     public void ClearContents()
     {
         EnsureSetup();
+        ContentNodes.Clear();
         OnV2MClearNodes();
         // ClearChildren();
     }
@@ -203,7 +215,7 @@ public abstract partial class BaseContentContainer<TContentNode, TContent>: Base
     protected void AdjustContentNode(int index, float tweenTime = 0f)
     {
         var node = ContentNodes[index];
-        var position = CalculateContentNodePosition(index, ContentNodes.Count);
+        var position = CalculateContentNodePosition(index, ContentNodes.Count, true);
         var rotation = CalculateContentNodeRotation(index, ContentNodes.Count);
         if (tweenTime != 0)
         {

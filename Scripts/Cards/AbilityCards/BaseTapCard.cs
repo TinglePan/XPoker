@@ -31,14 +31,14 @@ public class BaseTapCard: BaseInteractCard, ITapCard
     
     public override bool CanInteract()
     {
-        return ((CardContainer)Node.Container).AllowEffect && 
+        return ((CardContainer)Node.Container).AllowInteract && 
                (!Node.IsTapped && Battle.Player.Cost.Value + TapCostChange <= Battle.Player.MaxCost.Value ||
                 Node.IsTapped && Battle.Player.Cost.Value + UnTapCostChange <= Battle.Player.MaxCost.Value);
     }
 
     public void StartEffect()
     {
-        if (((CardContainer)Node.Container).AllowEffect)
+        if (((CardContainer)Node.Container).AllowInteract)
         {
             Battle.StartEffect(Effect);
         }

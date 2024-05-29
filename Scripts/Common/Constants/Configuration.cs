@@ -14,4 +14,6 @@ public static class Configuration
     public static readonly float NegateTweenTime = 0.5f;
     public static readonly float SwapCardTweenTime = 0.5f;
     public static readonly float InvalidConfirmTweenTime = 0.5f;
+    public static readonly Vector2 CardSize = new Vector2(48, 68);
+    public static readonly int CardContainerSeparation = 12;
 }

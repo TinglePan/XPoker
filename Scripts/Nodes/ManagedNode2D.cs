@@ -2,7 +2,7 @@ using Godot;
 
 namespace XCardGame.Scripts.Nodes;
 
-public partial class BaseManagedNode2D: Node2D, IManagedNode
+public partial class ManagedNode2D: Node2D, IManagedNode
 {
 	[Export]
 	public string Identifier { get; set; }

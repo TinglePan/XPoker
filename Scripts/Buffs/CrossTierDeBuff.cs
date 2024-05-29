@@ -9,9 +9,9 @@ public class CrossTierDeBuff: BaseTemporaryBuff
 {
     public int Power;
     
-    public CrossTierDeBuff(int power, int duration, BattleEntity inflictedBy, BaseCard inflictedByCard) : base(
-        "Cross tier", "Subjected to a powerful hand. Too powerful that it takes away determination.",
-        "res://Sprites/Icons/cross_tier.png", duration, inflictedBy, inflictedByCard)
+    public CrossTierDeBuff(int power, int duration, BattleEntity entity, BattleEntity inflictedBy, BaseCard inflictedByCard) : 
+        base("Cross tier", "Subjected to a powerful hand. Too powerful that it takes away determination.",
+        "res://Sprites/Icons/cross_tier.png", duration, entity, inflictedBy, inflictedByCard)
     {
         Power = power;
     }

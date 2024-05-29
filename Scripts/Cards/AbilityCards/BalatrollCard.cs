@@ -57,6 +57,11 @@ public class BalatrollCard: BaseUseCard
         base.Setup(args);
         PlayerCardContainer = GameMgr.SceneMgr.GetNode<CardContainer>("playerHoleCardContainer"); 
     }
+    
+    public override bool CanInteract()
+    {
+        return base.CanInteract() && Battle.CurrentState == Battle.State.BeforeShowDown;
+    }
 
     public override void ChooseTargets()
     {

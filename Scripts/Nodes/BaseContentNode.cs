@@ -10,7 +10,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 {
     [Export] public Area2D Area;
     
-    public BaseContentContainer<TNode, TContent> Container;
+    public ContentContainer<TNode, TContent> Container;
     public bool HasSetup { get; set; }
 
     public ObservableProperty<TContent> Content;
@@ -28,7 +28,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 
     public virtual void Setup(Dictionary<string, object> args)
     {
-        Container = (BaseContentContainer<TNode, TContent>)args["container"];
+        Container = (ContentContainer<TNode, TContent>)args["container"];
         HasSetup = true;
     }
 

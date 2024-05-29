@@ -11,21 +11,20 @@ namespace XCardGame.Scripts.InputHandling;
 public class MainInputHandler: BaseInputHandler
 {
     public BaseButton ProceedButton;
-    public CardContainer PlayerAbilityCardContainer;
     public CardContainer FieldCardContainer;
     
     public MainInputHandler(GameMgr gameMgr) : base(gameMgr)
     {
-        PlayerAbilityCardContainer = GameMgr.SceneMgr.GetNodeById<CardContainer>("playerAbilityCardContainer");
-        ProceedButton = SceneMgr.GetNode<BaseButton>("proceedButton");
+        FieldCardContainer = GameMgr.SceneMgr.GetNodeById<CardContainer>("fieldCardContainer");
+        ProceedButton = GameMgr.CurrentBattle.ProceedButton;
     }
     
     public override void OnEnter()
     {
         base.OnEnter();
         ProceedButton.Pressed += GameMgr.CurrentBattle.Proceed;
-        PlayerAbilityCardContainer.Contents.CollectionChanged += OnAbilityCardCollectionChanged;
-        foreach (var card in PlayerAbilityCardContainer.Contents)
+        FieldCardContainer.Contents.CollectionChanged += OnFieldCardCollectionChanged;
+        foreach (var card in FieldCardContainer.Contents)
         {
             card.Node.OnPressed += ClickCard;
         }
@@ -35,8 +34,8 @@ public class MainInputHandler: BaseInputHandler
     {
         base.OnExit();
         ProceedButton.Pressed -= GameMgr.CurrentBattle.Proceed;
-        PlayerAbilityCardContainer.Contents.CollectionChanged -= OnAbilityCardCollectionChanged;
-        foreach (var card in PlayerAbilityCardContainer.Contents)
+        FieldCardContainer.Contents.CollectionChanged -= OnFieldCardCollectionChanged;
+        foreach (var card in FieldCardContainer.Contents)
         {
             card.Node.OnPressed -= ClickCard;
         }
@@ -51,7 +50,7 @@ public class MainInputHandler: BaseInputHandler
         }
     }
     
-    protected void OnAbilityCardCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+    protected void OnFieldCardCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
     {
         switch (args.Action)
         {
@@ -76,7 +75,7 @@ public class MainInputHandler: BaseInputHandler
                     }
                 break;
             case NotifyCollectionChangedAction.Reset:
-                foreach (var node in PlayerAbilityCardContainer.GetChildren())
+                foreach (var node in FieldCardContainer.GetChildren())
                 {
                     if (node is CardNode card)
                     {

@@ -5,6 +5,7 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Nodes;
 
@@ -31,9 +32,15 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
     public bool IsRevealed;
     public bool IsSelected;
 
+    protected GameMgr GameMgr;
+    protected Battle Battle;
+
 	public override void _Ready()
 	{
 		base._Ready();
+
+		GameMgr = GetNode<GameMgr>("/root/GameMgr");
+		Battle = GameMgr.CurrentBattle;
 		Area.InputEvent += InputEventHandler;
 		FaceDirection = new ObservableProperty<Enums.CardFace>(nameof(FaceDirection), this, Enums.CardFace.Down);
 		FaceDirection.DetailedValueChanged += OnCardFaceChanged;
@@ -43,13 +50,13 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		IsSelected = false;
 	}
 	
-	public override void _ExitTree()
+	public override void _Notification(int what)
 	{
-		base._ExitTree();
-		if (Content.Value != null)
+		if (what == NotificationPredelete && Content.Value != null)
 		{
-			Content.Value.OnDisposal(Content.Value.Battle);
+			var card = Content.Value;
 			Content.Value = null;
+			card.OnDisposal(card.Battle);
 		}
 	}
 
@@ -151,7 +158,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	{
 		if (IsTapped == toState) return;
 		var tween = GetTree().CreateTween();
-		tween.TweenProperty(this, "rotation:z", toState ? -90f : 0, tweenTime);
+		tween.TweenProperty(this, "rotation_degrees", toState ? 90f : 0, tweenTime);
 		await ToSignal(tween, Tween.SignalName.Finished);
 		IsTapped = toState;
 	}
@@ -229,7 +236,13 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	protected override void OnContentAttached(BaseCard card)
 	{
 		base.OnContentAttached(card);
-		GD.Print($"On card attached {card}");
+		// GD.Print($"On card attached {card}");
+		card.Setup(new Dictionary<string, object>()
+		{
+			{ "gameMgr", GameMgr },
+			{ "battle", Battle },
+			{ "node", this }
+		});
 		card.Node = this;
 		card.Rank.DetailedValueChanged += OnCardRankChanged;
 		card.Rank.FireValueChangeEventsOnInit();
@@ -241,7 +254,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 
 	protected override void OnContentDetached(BaseCard card)
 	{
-		GD.Print($"On card detached {card}");
+		// GD.Print($"On card detached {card}");
 		card.Rank.DetailedValueChanged -= OnCardRankChanged;
 		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
 		MainIcon.ResetIconPath(null);

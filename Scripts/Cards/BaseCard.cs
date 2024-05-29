@@ -35,7 +35,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<CardNode, B
     };
     
     public BaseCard(string name, string description, string iconPath, Enums.CardSuit suit = Enums.CardSuit.None,
-        Enums.CardRank rank = Enums.CardRank.None)
+        Enums.CardRank rank = Enums.CardRank.None, BattleEntity owner = null)
     {
         Name = name;
         Description = description;
@@ -44,8 +44,9 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<CardNode, B
         Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, suit);
         OriginalRank = rank;
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);
+        Owner = owner;
     }
-    
+
     public override string ToString()
     {
         return $"{Name}({Description})";
@@ -54,9 +55,8 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<CardNode, B
     public virtual void Setup(Dictionary<string, object> args)
     {
         GameMgr = (GameMgr)args["gameMgr"];
-        Node = (CardNode)args["node"];
         Battle = (Battle)args["battle"];
-        Owner = (BattleEntity)args["owner"];
+        Node = (CardNode)args["node"];
     }
 
     public void EnsureSetup()

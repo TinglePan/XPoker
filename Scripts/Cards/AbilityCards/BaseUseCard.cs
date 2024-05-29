@@ -29,7 +29,7 @@ public class BaseUseCard: BaseInteractCard, IUseCard
 
     public override bool CanInteract()
     {
-        return ((CardContainer)Node.Container).AllowEffect && !IsRecharging;
+        return ((CardContainer)Node.Container).AllowInteract && !IsRecharging;
     }
     
     public override void Interact()

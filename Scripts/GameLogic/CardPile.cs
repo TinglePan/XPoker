@@ -72,6 +72,7 @@ public partial class CardPile: Node2D, ISetup
 
     public void Reset()
     {
+        CardList.Clear();
         foreach (var deck in SourceDecks)
         {
             MixIn(deck, ExcludedCards);
@@ -114,6 +115,7 @@ public partial class CardPile: Node2D, ISetup
     public void DealCardAppend(CardContainer targetContainer)
     {
         var cardNode = CardPrefab.Instantiate<CardNode>();
+        AddChild(cardNode);
         cardNode.Setup(new Dictionary<string, object>()
         {
             { "card", TopCardNode.Content.Value },
@@ -128,11 +130,12 @@ public partial class CardPile: Node2D, ISetup
     public void DealCardReplace(CardNode node)
     {
         var cardNode = CardPrefab.Instantiate<CardNode>();
+        AddChild(cardNode);
         cardNode.Setup(new Dictionary<string, object>()
         {
             { "card", TopCardNode.Content.Value },
             { "container", null },
-            { "faceDirection", node.FaceDirection }
+            { "faceDirection", node.FaceDirection.Value }
         });
         cardNode.Position = TopCardNode.Position;
         var replacedContentNode = node.Container.ReplaceContentNode(node.Container.ContentNodes.IndexOf(node),
@@ -182,7 +185,7 @@ public partial class CardPile: Node2D, ISetup
         TopCardNode.Setup(new Dictionary<string, object>()
         {
             { "card", topCard },
-            { "Container", null },
+            { "container", null },
             { "faceDirection", Enums.CardFace.Down }
         });
     }

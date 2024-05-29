@@ -22,8 +22,8 @@ public partial class BattleEntity: Node, ISetup
     
     [Export] public Label NameLabel;
     [Export] public TextureRect Portrait;
-    [Export] public Label HitPointLabel;
-    [Export] public Label MaxHitPointLabel;
+    [Export] public Label HpLabel;
+    [Export] public Label MaxHpLabel;
     
     public GameMgr GameMgr;
     public Battle Battle;
@@ -36,13 +36,11 @@ public partial class BattleEntity: Node, ISetup
     public string PortraitPath;
     public Deck Deck;
     public int DealCardCount;
-    public int ShowDownHoleCardCountMin;
-    public int ShowDownHoleCardCountMax;
     public int FactionId;
     public Dictionary<Enums.HandTier, int> HandPowers;
     public int BaseHandPower;
-    public ObservableProperty<int> HitPoint;
-    public ObservableProperty<int> MaxHitPoint;
+    public ObservableProperty<int> Hp;
+    public ObservableProperty<int> MaxHp;
     public ObservableProperty<int> Level;
     public bool IsHoleCardDealtVisible;
     public ObservableCollection<BaseAbilityCard> AbilityCards;
@@ -50,14 +48,13 @@ public partial class BattleEntity: Node, ISetup
     public override void _Ready()
     {
         base._Ready();
+        GameMgr = GetNode<GameMgr>("/root/GameMgr");
+        Battle = GameMgr.CurrentBattle;
         HasSetup = false;
     }
 
     public virtual void Setup(Dictionary<string, object> args)
     {
-        GameMgr = (GameMgr)args["gameMgr"];
-        Battle = (Battle)args["battle"];
-        
         DisplayName = (string)args["name"];
         PortraitPath = (string)args["portraitPath"];
         Deck = (Deck)args["deck"];
@@ -67,14 +64,11 @@ public partial class BattleEntity: Node, ISetup
         }
 
         DealCardCount = (int)args["dealCardCount"];
-        ShowDownHoleCardCountMin = (int)args["showDownHoleCardCountMin"];
-        ShowDownHoleCardCountMax = (int)args["showDownHoleCardCountMax"];
         FactionId = (int)args["factionId"];
         HandPowers = (Dictionary<Enums.HandTier, int>)args["handPowers"];
         BaseHandPower = (int)args["baseHandPower"];
-        var maxHitPoint = (int)args["maxHitPoint"];
-        HitPoint = new ObservableProperty<int>(nameof(HitPoint), this, maxHitPoint);
-        MaxHitPoint = new ObservableProperty<int>(nameof(MaxHitPoint), this, maxHitPoint);
+        MaxHp = new ObservableProperty<int>(nameof(MaxHp), this, (int)args["maxHp"]);
+        Hp = new ObservableProperty<int>(nameof(Hp), this, MaxHp.Value);
         Level = new ObservableProperty<int>(nameof(Level), this, (int)args["level"]);
         IsHoleCardDealtVisible = (bool)args["isHoleCardDealtVisible"];
         AbilityCards = (ObservableCollection<BaseAbilityCard>)args["abilityCards"];
@@ -86,7 +80,7 @@ public partial class BattleEntity: Node, ISetup
         });
         SkillCardContainer.Setup(new Dictionary<string, object>()
         {
-            { "cards", (ObservableCollection<BaseSkillCard>)args["skillCards"] }
+            { "cards", (ObservableCollection<BaseCard>)args["skillCards"] }
         });
         BuffContainer.Setup(new Dictionary<string, object>()
         {
@@ -94,10 +88,10 @@ public partial class BattleEntity: Node, ISetup
         });
         NameLabel.Text = DisplayName;
         Portrait.Texture = ResourceCache.Instance.Load<Texture2D>(PortraitPath);
-        HitPoint.DetailedValueChanged += OnHitPointChanged;
-        HitPoint.FireValueChangeEventsOnInit();
-        MaxHitPoint.DetailedValueChanged += OnMaxHitPointChanged;
-        MaxHitPoint.FireValueChangeEventsOnInit();
+        Hp.DetailedValueChanged += OnHpChanged;
+        Hp.FireValueChangeEventsOnInit();
+        MaxHp.DetailedValueChanged += OnMaxHpChanged;
+        MaxHp.FireValueChangeEventsOnInit();
         
         HasSetup = true;
     }
@@ -112,7 +106,7 @@ public partial class BattleEntity: Node, ISetup
 
     public virtual void Reset()
     {
-        HitPoint.Value = MaxHitPoint.Value;
+        Hp.Value = MaxHp.Value;
         HoleCardContainer.ClearContents();
         BuffContainer.ClearContents();
     }
@@ -127,22 +121,22 @@ public partial class BattleEntity: Node, ISetup
         return DisplayName;
     }
     
-    protected void OnHitPointChanged(object sender, ValueChangedEventDetailedArgs<int> args)
+    protected void OnHpChanged(object sender, ValueChangedEventDetailedArgs<int> args)
     {
         // TODO: Animate number change here 
-        HitPointLabel.Text = args.NewValue.ToString();
+        HpLabel.Text = args.NewValue.ToString();
         if (args.NewValue <= 0)
         {
             OnDefeated?.Invoke(this);
         }
     }
 	
-    protected void OnMaxHitPointChanged(object sender, ValueChangedEventDetailedArgs<int> args)
+    protected void OnMaxHpChanged(object sender, ValueChangedEventDetailedArgs<int> args)
     {
-        MaxHitPointLabel.Text = args.NewValue.ToString();
-        if (HitPoint.Value > args.NewValue)
+        MaxHpLabel.Text = args.NewValue.ToString();
+        if (Hp.Value > args.NewValue)
         {
-            HitPoint.Value = args.NewValue;
+            Hp.Value = args.NewValue;
         }
     }
 }

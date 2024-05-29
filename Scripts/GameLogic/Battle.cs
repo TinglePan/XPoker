@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Godot;
-using Godot.Collections;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
@@ -27,8 +26,9 @@ public partial class Battle: BaseManagedNode2D, ISetup
     [Export] public CardPile CardPile;
     [Export] public CardContainer CommunityCardContainer;
     [Export] public CardContainer FieldCardContainer;
-    [Export] public PlayerBattleEntity Player;
-    [Export] public Array<BattleEntity> Entities;
+    [Export] public Godot.Collections.Array<BattleEntity> Entities;
+
+    public PlayerBattleEntity Player => Entities[0] as PlayerBattleEntity;
     
     public bool HasSetup { get; set; }
     
@@ -40,14 +40,19 @@ public partial class Battle: BaseManagedNode2D, ISetup
     public Action<Battle> BeforeEngage;
     public Action<Battle, Attack> BeforeApplyDamage;
     public Action<Battle> OnBattleFinished;
+
+    public ObservableCollection<BaseCard> CommunityCards;
+    public ObservableCollection<BaseCard> FieldCards;
     
     public CompletedHandEvaluator HandEvaluator;
     
     public int DealCommunityCardCount;
     public int FaceDownCommunityCardCount;
+    public int RequiredHoleCardCountMin;
+    public int RequiredHoleCardCountMax;
     
     public int RoundCount;
-    public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHands;
+    public Dictionary<BattleEntity, CompletedHand> RoundHands;
     
     public List<BaseEffect> Effects;
     public State CurrentState;
@@ -57,31 +62,35 @@ public partial class Battle: BaseManagedNode2D, ISetup
     {
         base._Ready();
         HasSetup = false;
-        RoundHands = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
-        HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount,
-            Configuration.DefaultRequiredHoleCardCountMin, Configuration.DefaultRequiredHoleCardCountMax);
+        RoundHands = new Dictionary<BattleEntity, CompletedHand>();
+        HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, 
+            RequiredHoleCardCountMin, RequiredHoleCardCountMax);
+        CommunityCards = new ObservableCollection<BaseCard>();
+        FieldCards = new ObservableCollection<BaseCard>();
     }
 
-    public virtual void Setup(System.Collections.Generic.Dictionary<string, object> args)
+    public virtual void Setup(Dictionary<string, object> args)
     {
         DealCommunityCardCount = (int)args["dealCommunityCardCount"];
         FaceDownCommunityCardCount = (int)args["faceDownCommunityCardCount"];
+        RequiredHoleCardCountMin = (int)args["requiredHoleCardCountMin"];
+        RequiredHoleCardCountMax = (int)args["requiredHoleCardCountMax"];
         
-        CardPile.Setup(new System.Collections.Generic.Dictionary<string, object>()
+        CardPile.Setup(new Dictionary<string, object>()
         {
             { "sourceDecks" , Entities.Select(e => e.Deck).ToList() },
             { "excludedCards" , null }
         });
         
-        CommunityCardContainer.Setup(new System.Collections.Generic.Dictionary<string, object>()
+        CommunityCardContainer.Setup(new Dictionary<string, object>()
         {
-            { "cards", new ObservableCollection<BaseCard>() },
+            { "cards", CommunityCards },
             { "getCardFaceDirectionFunc", (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc }
         });
         
-        FieldCardContainer.Setup(new System.Collections.Generic.Dictionary<string, object>()
+        FieldCardContainer.Setup(new Dictionary<string, object>()
         {
-            { "cards", new ObservableCollection<BaseCard>() }
+            { "cards", FieldCards }
         });
         
         // Player.Setup((Dictionary<string, object>)args["playerSetupArgs"]);
@@ -92,9 +101,12 @@ public partial class Battle: BaseManagedNode2D, ISetup
         //     entity.Setup(((List<Dictionary<string, object>>)args["enemySetupArgs"])[iEnemy]);
         //     iEnemy++;
         // }
-        
-        foreach (var entity in Entities)
+
+        var entitiesSetupArgs = (List<Dictionary<string, object>>)args["entities"];
+        for (int i = 0; i < Entities.Count; i++)
         {
+            var entity = Entities[i];
+            entity.Setup(entitiesSetupArgs[i]);
             entity.OnDefeated += OnEntityDefeated;
         }
         HasSetup = true;

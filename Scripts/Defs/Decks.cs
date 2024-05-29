@@ -8,7 +8,7 @@ namespace XCardGame.Scripts.Defs;
 public static class Decks
 {
     public static Deck PlayerInitialDeck = LoadStandard52Deck();
-    public static Deck OpponentInitialDeck = LoadStandard52Deck();
+    public static Deck EnemyInitialDeck = LoadStandard52Deck();
 
     private static Deck LoadStandard52Deck()
     {

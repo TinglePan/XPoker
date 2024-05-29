@@ -81,7 +81,7 @@ public static class Enums
     public enum FactionId
     {
         Player,
-        Opponent
+        Enemy
     }
 
     public enum CardInteractions

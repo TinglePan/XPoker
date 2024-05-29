@@ -9,14 +9,14 @@ namespace XCardGame.Scripts.GameLogic;
 public class LevelUpInfo
 {
     public int Cost;
-    public int HitPoint;
+    public int Hp;
 
     public List<BaseCard> GrantCards;
     
-    public LevelUpInfo(int cost, int hitPoint, List<BaseCard> grantCards)
+    public LevelUpInfo(int cost, int Hp, List<BaseCard> grantCards)
     {
         Cost = cost;
-        HitPoint = hitPoint;
+        Hp = Hp;
         GrantCards = grantCards;
     }
 }

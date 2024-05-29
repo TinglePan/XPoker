@@ -1,6 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://77vdut83237t"]
-
-[ext_resource type="Script" path="res://Scripts/Tests/Test.cs" id="1_4wov1"]
+[gd_scene format=3 uid="uid://77vdut83237t"]
 
 [node name="Control" type="Node"]
-script = ExtResource("1_4wov1")
+
+[node name="SetupButton" type="Button" parent="."]
+offset_right = 53.0
+offset_bottom = 31.0
+text = "Setup
+"
+
+[node name="StartButton" type="Button" parent="."]
+offset_left = 55.0
+offset_right = 101.0
+offset_bottom = 31.0
+text = "Start"

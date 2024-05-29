@@ -4,10 +4,10 @@ using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.Defs;
 
-public static class DamageTables
+public static class HandPowerTables
 {
     
-    private static Dictionary<Enums.HandTier, int> _defaultDamageTable = new()
+    private static Dictionary<Enums.HandTier, int> _defaultHandPowerTable = new()
     {
         { Enums.HandTier.HighCard, 1 },
 
@@ -30,7 +30,7 @@ public static class DamageTables
         { Enums.HandTier.RoyalFlush, 999 }
     };
     
-    public static Dictionary<Enums.HandTier, int> HighCardPairStrengthenedDamageTable = new()
+    public static Dictionary<Enums.HandTier, int> HighCardPairStrengthenedHandPowerTable = new()
     {
         { Enums.HandTier.HighCard, 2 },
 
@@ -53,7 +53,7 @@ public static class DamageTables
         { Enums.HandTier.RoyalFlush, 999 }
     };
     
-    public static Dictionary<Enums.HandTier, int> HighCardHybridDamageTable = new()
+    public static Dictionary<Enums.HandTier, int> HighCardHybridHandPowerTable = new()
     {
         { Enums.HandTier.HighCard, 6 },
 
@@ -76,7 +76,7 @@ public static class DamageTables
         { Enums.HandTier.RoyalFlush, 999 }
     };
     
-    public static Dictionary<Enums.HandTier, int> NoaKEnhancedDamageTable = new()
+    public static Dictionary<Enums.HandTier, int> NoaKEnhancedHandPowerTable = new()
     {
         { Enums.HandTier.HighCard, 1 },
 
@@ -99,7 +99,7 @@ public static class DamageTables
         { Enums.HandTier.RoyalFlush, 999 }
     };
     
-    public static Dictionary<Enums.HandTier, int> StraightEnhancedDamageTable = new()
+    public static Dictionary<Enums.HandTier, int> StraightEnhancedHandPowerTable = new()
     {
         { Enums.HandTier.HighCard, 1 },
 
@@ -123,7 +123,7 @@ public static class DamageTables
     };
     
     
-    public static Dictionary<Enums.HandTier, int> FlushEnhancedDamageTable = new()
+    public static Dictionary<Enums.HandTier, int> FlushEnhancedHandPowerTable = new()
     {
         { Enums.HandTier.HighCard, 1 },
 
@@ -146,8 +146,8 @@ public static class DamageTables
         { Enums.HandTier.RoyalFlush, 999 }
     };
     
-    public static Dictionary<Enums.HandTier, int> DefaultPlayerDamageTable = _defaultDamageTable;
+    public static Dictionary<Enums.HandTier, int> DefaultPlayerHandPowerTable = _defaultHandPowerTable;
 
-    public static Dictionary<Enums.HandTier, int> DefaultOpponentDamageTable = _defaultDamageTable;
+    public static Dictionary<Enums.HandTier, int> DefaultEnemyHandPowerTable = _defaultHandPowerTable;
 
 }

@@ -20,9 +20,8 @@ public partial class PlayerBattleEntity: BattleEntity
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        var maxCost = (int)args["maxCost"];
-        MaxCost = new ObservableProperty<int>(nameof(MaxCost), this, maxCost);
-        Cost = new ObservableProperty<int>(nameof(Cost), this, maxCost);
+        Cost = new ObservableProperty<int>(nameof(Cost), this, 0);
+        MaxCost = new ObservableProperty<int>(nameof(MaxCost), this, (int)args["maxCost"]);
         LevelUpTable = (Dictionary<int, LevelUpInfo>)args["levelUpTable"];
         Level.DetailedValueChanged += LevelChanged;
     }

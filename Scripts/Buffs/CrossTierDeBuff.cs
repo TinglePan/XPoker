@@ -18,7 +18,7 @@ public class CrossTierDeBuff: BaseTemporaryBuff
 
     protected override void OnRoundEnd(Battle battle)
     {
-        Entity.HitPoint.Value = Mathf.Clamp(Entity.HitPoint.Value - Power, 0, Entity.MaxHitPoint.Value);
+        Entity.Hp.Value = Mathf.Clamp(Entity.Hp.Value - Power, 0, Entity.MaxHp.Value);
         base.OnRoundEnd(battle);
     }
 

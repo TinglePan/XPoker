@@ -8,12 +8,11 @@
 [ext_resource type="PackedScene" uid="uid://4gturyb6lq6" path="res://Scenes/Dealer.tscn" id="7_ppf5v"]
 [ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="7_xlxsy"]
 
-[node name="Battle" type="Node2D" node_paths=PackedStringArray("Dealer", "CommunityCardContainer", "FieldCardContainer", "Entities")]
+[node name="Battle" type="Node2D" node_paths=PackedStringArray("Dealer", "CommunityCardContainer", "FieldCardContainer")]
 script = ExtResource("1_xec1t")
 Dealer = NodePath("Dealer")
 CommunityCardContainer = NodePath("CommunityCardContainer")
 FieldCardContainer = NodePath("FieldCards")
-Entities = [NodePath("Player"), NodePath("Enemy")]
 Identifier = null
 
 [node name="CommunityCardContainer" type="Node2D" parent="." groups=["cardContainer", "markerCardContainer"]]
@@ -33,7 +32,6 @@ position = Vector2(-352, 0)
 
 [node name="FieldCards" parent="." instance=ExtResource("7_xlxsy")]
 position = Vector2(0, 256)
-ContentNodeTransformTweenTime = null
 Identifier = "fieldCardContainer"
 
 [node name="Card" parent="FieldCards" instance=ExtResource("3_0wwqy")]

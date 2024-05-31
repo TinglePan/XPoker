@@ -32,18 +32,18 @@ MaxHpLabel = NodePath("CharacterCard/Panel/MaxHp")
 
 [node name="HoleCards" parent="." groups=["markerCardContainer"] instance=ExtResource("2_i2lmi")]
 position = Vector2(48, -48)
-Identifier = null
 
 [node name="Card" parent="HoleCards" instance=ExtResource("3_m84t7")]
 
 [node name="SkillCards" parent="." groups=["skillCardContainer"] instance=ExtResource("2_i2lmi")]
 position = Vector2(48, 210)
-Identifier = null
 
 [node name="Card" parent="SkillCards" instance=ExtResource("3_m84t7")]
 
 [node name="Buffs" parent="." instance=ExtResource("4_b2voi")]
 position = Vector2(48, 156)
+ContentNodeTransformTweenTime = null
+Identifier = null
 
 [node name="Buff" parent="Buffs" instance=ExtResource("5_qmsu8")]
 

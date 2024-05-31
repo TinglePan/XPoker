@@ -66,7 +66,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
         if (TransformTweenControl.IsRunning())
         {
             GD.Print("stop tween before starting new one");
-            TransformTweenControl.InterruptAsStop();
+            TransformTweenControl.Interrupt();
         }
         TransformTweenControl.Tween.Value = CreateTween().SetParallel();
         TransformTweenControl.Time = tweenTime;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
@@ -124,7 +125,7 @@ public partial class BattleEntity: Node, ISetup
     
     public virtual void RoundReset()
     {
-        foreach (var contentNode in HoleCardContainer.ContentNodes)
+        foreach (var contentNode in HoleCardContainer.ContentNodes.ToList())
         {
             Battle.Dealer.AnimateDiscard(contentNode);
         }

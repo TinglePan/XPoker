@@ -111,11 +111,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: ManagedN
             if (node is TContentNode contentNode)
             {
                 Contents.RemoveAt(index);
-                // NOTE: ContentNode may not be a child of container at this point. This is intended for easy contentNode repositioning
-                if (contentNode.GetParent() == this)
-                {
-                    RemoveChild(contentNode);
-                }
+                RemoveChild(contentNode);
                 contentNode.Container = null;
                 GD.Print($"{contentNode.Content.Value}({contentNode}) container removed {this}");
             }
@@ -137,10 +133,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: ManagedN
             if (oldNodes[i] is TContentNode oldNode && newNodes[i] is TContentNode newNode)
             {
                 Contents[oldNodesStartingIndex + i] = newNode.Content.Value;
-                if (oldNode.GetParent() == this)
-                {
-                    RemoveChild(oldNode);
-                }
+                RemoveChild(oldNode);
                 oldNode.Container = null;
                 newNode.Reparent(newNode);
                 MoveChild(newNode, oldNodesStartingIndex + i);

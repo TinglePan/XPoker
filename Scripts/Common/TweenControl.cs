@@ -36,12 +36,20 @@ public class TweenControl
         }
     }
 
-    public void InterruptAsStop()
+    public void InterruptAndStop()
     {
         if (Tween.Value != null)
         {
             Tween.Value.Stop();
             Callback.Value?.Invoke();
+        }
+    }
+
+    public void Interrupt()
+    {
+        if (Tween.Value != null)
+        {
+            Tween.Value.Stop();
         }
     }
 
@@ -51,6 +59,7 @@ public class TweenControl
         {
             if (valueChangedEventDetailedArgs.OldValue != null)
             {
+                valueChangedEventDetailedArgs.OldValue.Stop();
                 valueChangedEventDetailedArgs.OldValue.Finished -= Callback.Value;
             }
             if (valueChangedEventDetailedArgs.NewValue != null)

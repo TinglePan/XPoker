@@ -1,7 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://2yj0yi24lkar"]
+[gd_scene load_steps=3 format=3 uid="uid://2yj0yi24lkar"]
 
 [ext_resource type="Script" path="res://Scripts/Nodes/BuffContainer.cs" id="1_1n1y4"]
+[ext_resource type="PackedScene" uid="uid://cfh3qchowgcu0" path="res://Scenes/Buff.tscn" id="2_tcdb3"]
 
 [node name="BuffTab2" type="Node2D" groups=["buffContainer"]]
 script = ExtResource("1_1n1y4")
+BuffPrefab = ExtResource("2_tcdb3")
+ContentNodeTransformTweenTime = null
 Identifier = null

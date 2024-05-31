@@ -88,11 +88,12 @@ public partial class Dealer: Node2D, ISetup
             int k = GameMgr.Rand.Next(n + 1);
             (cards[k], cards[n]) = (cards[n], cards[k]);
         }
-        foreach (var card in DiscardCardPile.Cards)
+        DiscardCardPile.Cards.Clear();
+        DealCardPile.Cards.Clear();
+        foreach (var card in cards)
         {
             DealCardPile.Cards.Add(card);
         }
-        DiscardCardPile.Cards.Clear();
     }
     
     public CardNode DealCardIntoContainer(CardContainer targetContainer, Action callback)
@@ -166,6 +167,7 @@ public partial class Dealer: Node2D, ISetup
     public void AnimateDiscard(CardNode node)
     {
         GD.Print($"animate discard {node}");
+        node.Container.Contents.Remove(node.Content.Value);
         node.Reparent(DiscardCardPile);
         node.TweenTransform(DiscardCardPile.TopCard.Position, DiscardCardPile.TopCard.RotationDegrees,
             Configuration.DealCardTweenTime, () => Discard(node));
@@ -190,10 +192,6 @@ public partial class Dealer: Node2D, ISetup
     {
         GD.Print($"discard {cardNode}");
         DiscardCardPile.Cards.Insert(0, cardNode.Content.Value);
-        if (cardNode.Container != null)
-        {
-            cardNode.Container.ContentNodes.Remove(cardNode);
-        }
         cardNode.QueueFree();
     }
 }

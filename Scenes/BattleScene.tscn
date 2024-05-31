@@ -64,6 +64,7 @@ render_target_update_mode = 4
 texture_filter = 1
 
 [node name="Battle" parent="BattleUi/SubViewportContainer/SubViewport" instance=ExtResource("2_b2wp5")]
+Identifier = null
 
 [node name="ProceedButton" type="Button" parent="BattleUi"]
 texture_filter = 1

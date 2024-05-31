@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using Godot;
+using Godot.Collections;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
@@ -27,7 +28,8 @@ public partial class Battle: ManagedNode2D, ISetup
     [Export] public Dealer Dealer;
     [Export] public CardContainer CommunityCardContainer;
     [Export] public CardContainer FieldCardContainer;
-    [Export] public Godot.Collections.Array<BattleEntity> Entities;
+    // [Export] public Godot.Collections.Array<BattleEntity> Entities;
+    public Godot.Collections.Array<BattleEntity> Entities;
 
     public BaseButton ProceedButton;
     
@@ -55,7 +57,7 @@ public partial class Battle: ManagedNode2D, ISetup
     public int RequiredHoleCardCountMax;
     
     public int RoundCount;
-    public Dictionary<BattleEntity, CompletedHand> RoundHands;
+    public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHands;
     
     public List<BaseEffect> Effects;
     public State CurrentState;
@@ -65,12 +67,12 @@ public partial class Battle: ManagedNode2D, ISetup
     {
         base._Ready();
         HasSetup = false;
-        RoundHands = new Dictionary<BattleEntity, CompletedHand>();
+        RoundHands = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
         CommunityCards = new ObservableCollection<BaseCard>();
         FieldCards = new ObservableCollection<BaseCard>();
     }
 
-    public virtual void Setup(Dictionary<string, object> args)
+    public virtual void Setup(System.Collections.Generic.Dictionary<string, object> args)
     {
         DealCommunityCardCount = (int)args["dealCommunityCardCount"];
         FaceDownCommunityCardCount = (int)args["faceDownCommunityCardCount"];
@@ -78,9 +80,15 @@ public partial class Battle: ManagedNode2D, ISetup
         RequiredHoleCardCountMax = (int)args["requiredHoleCardCountMax"];
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, 
             RequiredHoleCardCountMin, RequiredHoleCardCountMax);
-        
-        
-        CommunityCardContainer.Setup(new Dictionary<string, object>()
+
+        // FIXME: Weird. The exported array suddenly does not work any more. The nodes dropped in editor Array do not exist here. So I have to manually add them.
+        Entities = new Array<BattleEntity>
+        {
+            FindChild("Player") as PlayerBattleEntity,
+            FindChild("Enemy") as BattleEntity
+        };
+
+        CommunityCardContainer.Setup(new System.Collections.Generic.Dictionary<string, object>()
         {
             { "allowInteract", false },
             { "cards", CommunityCards },
@@ -89,7 +97,7 @@ public partial class Battle: ManagedNode2D, ISetup
             { "getCardFaceDirectionFunc", (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc }
         });
         
-        FieldCardContainer.Setup(new Dictionary<string, object>()
+        FieldCardContainer.Setup(new System.Collections.Generic.Dictionary<string, object>()
         {
             { "allowInteract", true },
             { "cards", FieldCards },
@@ -98,7 +106,7 @@ public partial class Battle: ManagedNode2D, ISetup
             { "defaultCardFaceDirection", Enums.CardFace.Up } 
         });
         
-        var entitiesSetupArgs = (List<Dictionary<string, object>>)args["entities"];
+        var entitiesSetupArgs = (List<System.Collections.Generic.Dictionary<string, object>>)args["entities"];
         for (int i = 0; i < Entities.Count; i++)
         {
             var entity = Entities[i];
@@ -111,7 +119,7 @@ public partial class Battle: ManagedNode2D, ISetup
             }
         }
         
-        Dealer.Setup(new Dictionary<string, object>()
+        Dealer.Setup(new System.Collections.Generic.Dictionary<string, object>()
         {
             { "sourceDecks" , Entities.Select(e => e.Deck).ToList() },
             { "excludedCards" , null }
@@ -175,7 +183,7 @@ public partial class Battle: ManagedNode2D, ISetup
         {
             entity.RoundReset();
         }
-        foreach (var cardNode in CommunityCardContainer.ContentNodes)
+        foreach (var cardNode in CommunityCardContainer.ContentNodes.ToList())
         {
             Dealer.AnimateDiscard(cardNode);
         }

@@ -53,6 +53,6 @@ public class Attack
     
     public void Apply()
     {
-        Target.Hp.Value = Mathf.Clamp(Target.Hp.Value - Damage(), 0, Target.MaxHp.Value);
+        // Target.Hp.Value = Mathf.Clamp(Target.Hp.Value - Damage(), 0, Target.MaxHp.Value);
     }
 }

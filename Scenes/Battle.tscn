@@ -4,13 +4,13 @@
 [ext_resource type="Script" path="res://Scripts/Nodes/CardContainer.cs" id="2_lbdrp"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="3_0wwqy"]
 [ext_resource type="PackedScene" uid="uid://blyra6wixgoc7" path="res://Scenes/BattleEntity.tscn" id="4_pgdh2"]
-[ext_resource type="PackedScene" uid="uid://blf82px0mx4rp" path="res://Scenes/CardPile.tscn" id="5_03ttu"]
 [ext_resource type="PackedScene" uid="uid://q1m4avgc5ecx" path="res://Scenes/PlayerBattleEntity.tscn" id="6_65vqs"]
+[ext_resource type="PackedScene" uid="uid://4gturyb6lq6" path="res://Scenes/Dealer.tscn" id="7_ppf5v"]
 [ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="7_xlxsy"]
 
-[node name="Battle" type="Node2D" node_paths=PackedStringArray("CardPile", "CommunityCardContainer", "FieldCardContainer", "Entities")]
+[node name="Battle" type="Node2D" node_paths=PackedStringArray("Dealer", "CommunityCardContainer", "FieldCardContainer", "Entities")]
 script = ExtResource("1_xec1t")
-CardPile = NodePath("CardPile")
+Dealer = NodePath("Dealer")
 CommunityCardContainer = NodePath("CommunityCardContainer")
 FieldCardContainer = NodePath("FieldCards")
 Entities = [NodePath("Player"), NodePath("Enemy")]
@@ -20,6 +20,7 @@ Identifier = null
 position = Vector2(0, 68)
 script = ExtResource("2_lbdrp")
 CardPrefab = ExtResource("3_0wwqy")
+ContentNodeTransformTweenTime = null
 Identifier = "communityCardContainer"
 
 [node name="Card" parent="CommunityCardContainer" instance=ExtResource("3_0wwqy")]
@@ -27,14 +28,15 @@ Identifier = "communityCardContainer"
 [node name="Enemy" parent="." instance=ExtResource("4_pgdh2")]
 position = Vector2(256, 0)
 
-[node name="CardPile" parent="." instance=ExtResource("5_03ttu")]
-position = Vector2(-300, -192)
-
 [node name="Player" parent="." instance=ExtResource("6_65vqs")]
 position = Vector2(-352, 0)
 
 [node name="FieldCards" parent="." instance=ExtResource("7_xlxsy")]
 position = Vector2(0, 256)
+ContentNodeTransformTweenTime = null
 Identifier = "fieldCardContainer"
 
 [node name="Card" parent="FieldCards" instance=ExtResource("3_0wwqy")]
+
+[node name="Dealer" parent="." instance=ExtResource("7_ppf5v")]
+position = Vector2(0, -156)

@@ -21,12 +21,6 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 	public bool AllowInteract;
 	
 	protected Battle Battle;
-	
-	public override void _Ready()
-	{
-		base._Ready();
-		ClearChildren();
-	}
 
 	public override void Setup(Dictionary<string, object> args)
 	{
@@ -49,20 +43,29 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		}
 	}
 
-	public override void AddContentNode(int index, CardNode node, float tweenTime = 0f)
+	protected override void OnV2MAddNodes(int startingIndex, IList nodes)
 	{
-		base.AddContentNode(index, node, tweenTime);
-		node.OriginalFaceDirection = GetCardFaceDirection(index);
-		node.FaceDirection.Value = node.OriginalFaceDirection;
+		base.OnV2MAddNodes(startingIndex, nodes);
+		var index = startingIndex;
+		foreach (var node in nodes)
+		{
+			if (node is CardNode cardNode)
+			{
+				cardNode.OriginalFaceDirection = GetCardFaceDirection(index);
+				cardNode.FaceDirection.Value = cardNode.OriginalFaceDirection;
+			}
+			index++;
+		}
 	}
 
-	public override void OnM2VAddContents(int startingIndex, IList contents)
+	protected override void OnM2VAddContents(int startingIndex, IList contents)
 	{
 		EnsureSetup();
+		SuppressNotifications = true;
 		var index = startingIndex;
 		foreach (var content in contents)
 		{
-			if (content is BaseCard card && (index >= ContentNodes.Count || ContentNodes[index].Content.Value != content))
+			if (content is BaseCard card)
 			{
 				var cardNode = CardPrefab.Instantiate<CardNode>();
 				AddChild(cardNode);
@@ -79,10 +82,17 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 					{ "battle", Battle },
 					{ "node", cardNode }
 				});
-				AddContentNode(index, cardNode);
-				index++;
+				ContentNodes.Insert(index, cardNode);
 			}
+			index++;
 		}
+		
+		for (int i = 0; i < ContentNodes.Count; i++)
+		{
+			AdjustContentNode(i, true);
+		}
+
+		SuppressNotifications = false;
 	}
 
 	protected Enums.CardFace GetCardFaceDirection(int index)

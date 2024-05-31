@@ -24,7 +24,7 @@ public partial class Battle: ManagedNode2D, ISetup
         AfterShowDown
     }
     
-    [Export] public CardPile CardPile;
+    [Export] public Dealer Dealer;
     [Export] public CardContainer CommunityCardContainer;
     [Export] public CardContainer FieldCardContainer;
     [Export] public Godot.Collections.Array<BattleEntity> Entities;
@@ -111,7 +111,7 @@ public partial class Battle: ManagedNode2D, ISetup
             }
         }
         
-        CardPile.Setup(new Dictionary<string, object>()
+        Dealer.Setup(new Dictionary<string, object>()
         {
             { "sourceDecks" , Entities.Select(e => e.Deck).ToList() },
             { "excludedCards" , null }
@@ -142,7 +142,7 @@ public partial class Battle: ManagedNode2D, ISetup
     public void Start()
     {
         Reset();
-        CardPile.Shuffle();
+        Dealer.Shuffle();
         NewRound();
     }
 
@@ -162,7 +162,6 @@ public partial class Battle: ManagedNode2D, ISetup
                 break;
             case State.AfterShowDown:
                 NewRound();
-                DealCards();
                 break;
         }
         OnBattleProceed?.Invoke(this);
@@ -176,8 +175,13 @@ public partial class Battle: ManagedNode2D, ISetup
         {
             entity.RoundReset();
         }
-        CommunityCardContainer.ClearContents();
+        foreach (var cardNode in CommunityCardContainer.ContentNodes)
+        {
+            Dealer.AnimateDiscard(cardNode);
+        }
+        // CommunityCardContainer.ContentNodes.Clear();
         RoundHands.Clear();
+        CurrentState = State.BeforeDealCards;
     }
     
     public void Reset()
@@ -188,9 +192,8 @@ public partial class Battle: ManagedNode2D, ISetup
         {
             entity.Reset();
         }
-        CommunityCardContainer.ClearContents();
-        // FieldCardContainer.ClearContents();
-        CardPile.Reset();
+        CommunityCardContainer.ContentNodes.Clear();
+        Dealer.Reset();
     }
 
     public void DealCards()
@@ -199,12 +202,12 @@ public partial class Battle: ManagedNode2D, ISetup
         {
             for (int i = 0; i < entity.DealCardCount; i++)
             {
-                CardPile.DealCardAppend(entity.HoleCardContainer);
+                Dealer.DealCardIntoContainer(entity.HoleCardContainer);
             }
         }
         for (int i = 0; i < DealCommunityCardCount; i++)
         {
-            CardPile.DealCardAppend(CommunityCardContainer);
+            Dealer.DealCardIntoContainer(CommunityCardContainer);
         }
         AfterDealCards?.Invoke(this);
         CurrentState = State.BeforeShowDown;

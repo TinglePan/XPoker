@@ -38,7 +38,7 @@ public class D6Card: BaseUseCard
             foreach (var card in cardContainer.Contents.ToList())
             {
                 if (card.Node.FaceDirection.Value != Enums.CardFace.Up) continue;
-                Battle.CardPile.DealCardReplace(card.Node);
+                Battle.Dealer.DealCardAndReplace(card.Node);
             }
         }
     }

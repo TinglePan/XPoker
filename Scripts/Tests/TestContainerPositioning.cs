@@ -33,7 +33,6 @@ public partial class TestContainerPositioning: Node
 
     public void SpawnCardNodeAndAppend()
     {
-        
         var card = new MarkerCard(Utils.GetCardTexturePath(Enums.CardSuit.Clubs), Enums.CardSuit.Clubs, Enums.CardRank.Ace);
         var cardNode = CardPrefab.Instantiate<CardNode>();
         AddChild(cardNode);
@@ -43,7 +42,7 @@ public partial class TestContainerPositioning: Node
             { "faceDirection", Enums.CardFace.Up },
             { "container", null }
         }); 
-        CardContainer.AppendContentNode(cardNode, .3f);
+        CardContainer.ContentNodes.Add(cardNode);
         GD.Print("done");
     }
 }

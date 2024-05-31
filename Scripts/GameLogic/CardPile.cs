@@ -1,67 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Cards;
-
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public partial class CardPile: Node2D, ISetup
+public partial class CardPile: ManagedNode2D, ISetup
 {
-    [Export]
-    public CardNode TopCardNode;
-    [Export]
-    public PackedScene CardPrefab;
-    
+    [Export] public CardNode TopCard;
+    [Export] public NinePatchRect PileImage;
+    public ObservableCollection<BaseCard> Cards;
+    public Enums.CardFace TopCardFaceDirection;
+
     public bool HasSetup { get; set; }
-
-    public List<Deck> SourceDecks;
-    public List<MarkerCard> ExcludedCards;
-    public List<MarkerCard> CardList;
-    public List<MarkerCard> DealingCards;
-    public List<MarkerCard> DealtCards;
-    
-    public CardPile()
-    {
-        HasSetup = false;
-        SourceDecks = new List<Deck>();
-        CardList = new List<MarkerCard>();
-        DealingCards = new List<MarkerCard>();
-        DealtCards = new List<MarkerCard>();
-    }
-    
-    public CardPile(List<Deck> srcDecks, List<MarkerCard> excludedCards = null)
-    {
-        HasSetup = false;
-        SourceDecks = srcDecks;
-        ExcludedCards = excludedCards;
-        CardList = new List<MarkerCard>();
-        DealingCards = new List<MarkerCard>();
-        DealtCards = new List<MarkerCard>();
-        Reset();
-    }
-
-    public override void _Ready()
-    {
-        base._Ready();
-        HasSetup = false;
-        CardList = new List<MarkerCard>();
-        DealingCards = new List<MarkerCard>();
-        DealtCards = new List<MarkerCard>();
-    }
 
     public void Setup(Dictionary<string, object> args)
     {
-        SourceDecks = (List<Deck>)args["sourceDecks"];
-        ExcludedCards = (List<MarkerCard>)args["excludedCards"];
-        Reset();
-        HasSetup = true;
+        Cards = (ObservableCollection<BaseCard>)args["cards"];
+        Cards.CollectionChanged += OnCardsChanged;
+        TopCardFaceDirection = (Enums.CardFace)args["topCardFaceDirection"];
     }
-    
+
     public void EnsureSetup()
     {
         if (!HasSetup)
@@ -69,124 +33,97 @@ public partial class CardPile: Node2D, ISetup
             GD.PrintErr($"{this} not setup yet");
         }
     }
-
-    public void Reset()
-    {
-        CardList.Clear();
-        foreach (var deck in SourceDecks)
-        {
-            MixIn(deck, ExcludedCards);
-        }
-        Shuffle();
-        ResetTopCard();
-    }
     
-    public void MixIn(Deck deck, List<MarkerCard> excludedCards = null)
+    public BaseCard Take(int index = 0)
     {
-        foreach (var card in deck.CardList.OfType<MarkerCard>())
+        var card = Peek(index);
+        if (card != null)
         {
-            if (excludedCards != null && excludedCards.Contains(card))
-            {
-                continue;
-            }
-            CardList.Add(card);
+            Cards.RemoveAt(index);
         }
-    }
 
-    public void Shuffle()
-    {
-        // TODO: Play shuffle animation
-        DealingCards.Clear();
-        DealtCards.Clear();
-        foreach (var card in CardList)
-        {
-            DealingCards.Add(card);
-        }
-        Random rng = new Random();
-        int n = DealingCards.Count;
-        while (n > 1)
-        {
-            n--;
-            int k = rng.Next(n + 1);
-            (DealingCards[k], DealingCards[n]) = (DealingCards[n], DealingCards[k]);
-        }
-    }
-    
-    public void DealCardAppend(CardContainer targetContainer)
-    {
-        var cardNode = CardPrefab.Instantiate<CardNode>();
-        AddChild(cardNode);
-        cardNode.Setup(new Dictionary<string, object>()
-        {
-            { "card", TopCardNode.Content.Value },
-            { "container", null },
-            { "faceDirection", Enums.CardFace.Down }
-        });
-        cardNode.Position = TopCardNode.Position;
-        targetContainer.AddContentNode(targetContainer.Contents.Count, cardNode, Configuration.DealCardTweenTime);
-        ResetTopCard();
-    }
-
-    public void DealCardReplace(CardNode node)
-    {
-        var cardNode = CardPrefab.Instantiate<CardNode>();
-        AddChild(cardNode);
-        cardNode.Setup(new Dictionary<string, object>()
-        {
-            { "card", TopCardNode.Content.Value },
-            { "container", null },
-            { "faceDirection", node.FaceDirection.Value }
-        });
-        cardNode.Position = TopCardNode.Position;
-        var replacedContentNode = node.Container.ReplaceContentNode(node.Container.ContentNodes.IndexOf(node),
-            cardNode, Configuration.DealCardTweenTime);
-        replacedContentNode.QueueFree();
-        ResetTopCard();
-    }
-    
-    public MarkerCard Take(int index = 0)
-    {
-        if (index >= CardList.Count)
-        {
-            GD.PrintErr($"CardPile.Deal: index {index} >= CardList.Count {CardList.Count}");
-            return null;
-        }
-        if (index >= DealingCards.Count)
-        {
-            Shuffle();
-        }
-        var card = DealingCards[index];
-        DealingCards.RemoveAt(index);
-        DealtCards.Add(card);
         return card;
     }
 
-    public MarkerCard SearchFirst(Func<MarkerCard, bool> filter)
+    public BaseCard Take(Func<BaseCard, bool> filter)
     {
-        for (int i = 0; i < DealingCards.Count; i++)
+        var card = Cards.FirstOrDefault(filter);
+        if (card != null)
         {
-            var card = DealingCards[i];
-            if (filter(card))
-            {
-                return Take(i);
-            }
+            Cards.Remove(card);
         }
-
-        return null;
+        return card;
     }
     
-    protected void ResetTopCard()
+
+    public BaseCard Peek(int index = 0)
     {
-        if (DealingCards.Count == 0)
+        if (index >= Cards.Count)
         {
-            Shuffle();
+            return null;
         }
-        var topCard = Take();
-        TopCardNode.Setup(new Dictionary<string, object>()
+        return Cards[index];
+    }
+    
+    public BaseCard Peek(Func<BaseCard, bool> filter)
+    {
+        return Cards.FirstOrDefault(filter);
+    }
+
+    protected void OnCardsChanged(object sender, NotifyCollectionChangedEventArgs args)
+    {
+        switch (args.Action)
         {
-            { "card", topCard },
-            { "container", null },
-            { "faceDirection", Enums.CardFace.Down }
-        });
+            case NotifyCollectionChangedAction.Add:
+            case NotifyCollectionChangedAction.Remove:
+            case NotifyCollectionChangedAction.Reset:
+                CheckTopCard();
+                CheckPile();
+                break;
+            case NotifyCollectionChangedAction.Replace:
+                CheckTopCard();
+                break;
+        }
+        
+        
+    }
+
+    protected void CheckTopCard()
+    {
+        if (Cards.Count > 0)
+        {
+            TopCard.Show();
+            if (TopCard.HasSetup)
+            {
+                TopCard.Content.Value = Cards[0];
+            }
+            else
+            {
+                TopCard.Setup(new Dictionary<string, object>()
+                {
+                    { "card", Cards[0] },
+                    { "container", null },
+                    { "faceDirection", TopCardFaceDirection }
+                });
+            }
+        }
+        else
+        {
+            TopCard.Hide();
+        }
+    }
+
+    protected void CheckPile()
+    {
+        switch (Cards.Count)
+        {
+            // NYI: update pile sprite according to left card count
+            case 0:
+                PileImage.Hide();
+                break;
+            default:
+                PileImage.Show();
+                break;
+        }
     }
 }

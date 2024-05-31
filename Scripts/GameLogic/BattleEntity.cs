@@ -49,12 +49,12 @@ public partial class BattleEntity: Node, ISetup
     {
         base._Ready();
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
-        Battle = GameMgr.CurrentBattle;
         HasSetup = false;
     }
 
     public virtual void Setup(Dictionary<string, object> args)
     {
+        Battle = GameMgr.CurrentBattle;
         DisplayName = (string)args["name"];
         PortraitPath = (string)args["portraitPath"];
         Deck = (Deck)args["deck"];
@@ -118,13 +118,17 @@ public partial class BattleEntity: Node, ISetup
     public virtual void Reset()
     {
         Hp.Value = MaxHp.Value;
-        HoleCardContainer.ClearContents();
-        BuffContainer.ClearContents();
+        HoleCardContainer.ContentNodes.Clear();
+        BuffContainer.ContentNodes.Clear();
     }
     
     public virtual void RoundReset()
     {
-        HoleCardContainer.ClearContents();
+        foreach (var contentNode in HoleCardContainer.ContentNodes)
+        {
+            Battle.Dealer.AnimateDiscard(contentNode);
+        }
+        // HoleCardContainer.ContentNodes.Clear();
     }
 
     public override string ToString()

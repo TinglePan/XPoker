@@ -39,8 +39,7 @@ public class NetherSwapCard: BaseUseCard
                 var toContainer = toNode.Container;
                 var fromIndex = fromContainer.ContentNodes.IndexOf(fromNode);
                 var toIndex = toContainer.ContentNodes.IndexOf(toNode);
-                toContainer.ReplaceContentNode(toIndex, fromNode, Configuration.SwapCardTweenTime);
-                fromContainer.ReplaceContentNode(fromIndex, toNode, Configuration.SwapCardTweenTime);
+                (toContainer.ContentNodes[toIndex], fromContainer.ContentNodes[fromIndex]) = (fromContainer.ContentNodes[fromIndex], toContainer.ContentNodes[toIndex]);
                 fromNode.IsSelected = false;
                 toNode.IsSelected = false;
                 SelectedCardNodes.Clear();

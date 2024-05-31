@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Cards;
@@ -33,9 +34,12 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         CalculatedHands.Clear();
         var validHoleCards = holeCards.Where(x => !x.Node.IsTapped).ToList();
         var validCommunityCards = communityCards.Where(x => !x.Node.IsTapped).ToList();
+        GD.Print($"valid Community cards: {validCommunityCards.Count}");
+        Profile.StartWatch("evaluate best hand 1");
         foreach (var cards in Utils.GetCombinationsWithXToYFromA(validHoleCards, validCommunityCards, 
                      CardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
         {
+            Profile.StartWatch("evaluate best hand 2");
             Dictionary<Enums.HandTier, List<CompletedHand>> calculatedHands = new();
             foreach (var rule in Rules)
             {
@@ -43,12 +47,14 @@ public class CompletedHandEvaluator: BaseHandEvaluator
                 rule.EvaluateAndRecord(cards, calculatedHands);
             }
 
+            Profile.EndWatch("evaluate best hand 2", true, 1000);
             foreach (var (handRank, hands) in calculatedHands)
             {
                 if (!CalculatedHands.ContainsKey(handRank)) CalculatedHands[handRank] = new List<CompletedHand>();
                 CalculatedHands[handRank].AddRange(hands);
             }
         }
+        Profile.EndWatch("evaluate best hand 1", true, 1);
 
         var handRanksInDescendingOrder = ((Enums.HandTier[])Enum.GetValues(typeof(Enums.HandTier))).
             OrderByDescending(x => x);

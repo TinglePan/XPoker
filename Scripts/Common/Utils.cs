@@ -39,8 +39,8 @@ public static class Utils
 
     public static List<List<T>> GetCombinationsWithXFromA<T>(List<T> a, List<T> b, int m, int x)
     {
-        var picksFromA = Utils.GetCombinations(a, x);
-        var picksFromB = Utils.GetCombinations(b, m - x);
+        var picksFromA = GetCombinations(a, x);
+        var picksFromB = GetCombinations(b, m - x);
         var res = new List<List<T>>();
         foreach (var aPicks in picksFromA)
         {
@@ -49,16 +49,21 @@ public static class Utils
                 res.Add(aPicks.Concat(bPicks).ToList());
             }
         }
+        GD.Print($"GetCombinationsWithXFromA: {a.Count}/{b.Count}{m}/{x} -> {res.Count}");
         return res;
     }
     
-    public static List<List<T>> GetCombinationsWithXToYFromA<T>(List<T> a, List<T> b, int m, int x, int y)
+    public static List<List<T>> 
+        GetCombinationsWithXToYFromA<T>(List<T> a, List<T> b, int m, int x, int y)
     {
+        Profile.StartWatch("get comb");
         var res = new List<List<T>>();
         for (int i = x; i <= y; i++)
         {
             res.AddRange(GetCombinationsWithXFromA(a, b, m, i));
         }
+        Profile.EndWatch("get comb", true, 0);
+        GD.Print($"combination count: {res.Count}");
         return res;
     }
 

@@ -26,9 +26,10 @@ public partial class BuffContainer: ContentContainer<BuffNode, BaseBuff>
         }
     }
 
-    public override void OnM2VAddContents(int startingIndex, IList contents)
+    protected override void OnM2VAddContents(int startingIndex, IList contents)
     {
         EnsureSetup();
+        SuppressNotifications = true;
         var index = startingIndex;
         foreach (var content in contents)
         {
@@ -36,8 +37,6 @@ public partial class BuffContainer: ContentContainer<BuffNode, BaseBuff>
             {
                 var buffNode = BuffPrefab.Instantiate<BuffNode>();
                 AddChild(buffNode);
-                MoveChild(buffNode, index);
-                index++;
                 buffNode.Setup(new Dictionary<string, object>()
                 {
                     { "buff", buff },
@@ -49,7 +48,10 @@ public partial class BuffContainer: ContentContainer<BuffNode, BaseBuff>
                     { "battle", Battle },
                     { "node", buffNode }
                 });
+                ContentNodes.Insert(index, buffNode);
             }
+            index++;
         }
+        SuppressNotifications = false;
     }
 }

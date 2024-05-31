@@ -6,3 +6,5 @@
 [node name="Cards" type="Node2D" groups=["cardContainer"]]
 script = ExtResource("1_7d008")
 CardPrefab = ExtResource("2_8ajwj")
+ContentNodeTransformTweenTime = 0.3
+Identifier = null

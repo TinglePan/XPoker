@@ -10,12 +10,6 @@ public partial class BuffNode: BaseContentNode<BuffNode, BaseBuff>
 {
     [Export]
     public Sprite2D Icon;
-    
-    public override void _ExitTree()
-    {
-        base._ExitTree();
-        Content.Value = null;
-    }
 
     public override void Setup(Dictionary<string, object> args)
     {

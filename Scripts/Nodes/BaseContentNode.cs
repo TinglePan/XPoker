@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Godot;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Nodes;
@@ -15,6 +18,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 
     public ObservableProperty<TContent> Content;
     public ObservableProperty<bool> IsFocused;
+    public TweenControl TransformTweenControl;
 
     public override void _Ready()
     {
@@ -24,6 +28,16 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
         Content.DetailedValueChanged += OnContentChanged;
         Area.MouseEntered += OnMouseEnter;
         Area.MouseExited += OnMouseExit;
+        TransformTweenControl = new TweenControl();
+    }
+    
+    public override void _Notification(int what)
+    {
+        if (what == NotificationPredelete && Content.Value != null)
+        {
+            var card = Content.Value;
+            Content.Value = default;
+        }
     }
 
     public virtual void Setup(Dictionary<string, object> args)
@@ -38,6 +52,26 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
         {
             GD.PrintErr($"{this} not setup yet");
         }
+    }
+
+    public void TweenTransform(Vector2 position, float rotationDegrees, float tweenTime, Action callback)
+    {
+        TransformTweenControl.Callback.Value = callback;
+        TweenTransform(position, rotationDegrees, tweenTime);
+    }
+
+    public void TweenTransform(Vector2 position, float rotationDegrees, float tweenTime)
+    {
+        GD.Print($"tween transform {this}");
+        if (TransformTweenControl.IsRunning())
+        {
+            GD.Print("stop tween before starting new one");
+            TransformTweenControl.InterruptAsStop();
+        }
+        TransformTweenControl.Tween.Value = CreateTween().SetParallel();
+        TransformTweenControl.Time = tweenTime;
+        TransformTweenControl.Tween.Value.TweenProperty(this, "position", position, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+        TransformTweenControl.Tween.Value.TweenProperty(this, "rotation_degrees", rotationDegrees, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
     }
 
     protected void OnMouseEnter()
@@ -73,4 +107,5 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
     {
         content.Node = null;
     }
+
 }

@@ -29,7 +29,7 @@ public partial class Battle: ManagedNode2D, ISetup
     [Export] public CardContainer CommunityCardContainer;
     [Export] public CardContainer FieldCardContainer;
     // [Export] public Godot.Collections.Array<BattleEntity> Entities;
-    public Godot.Collections.Array<BattleEntity> Entities;
+    public Array<BattleEntity> Entities;
 
     public BaseButton ProceedButton;
     
@@ -43,7 +43,7 @@ public partial class Battle: ManagedNode2D, ISetup
     public Action<Battle> OnRoundEnd;
     public Action<Battle> BeforeShowDown;
     public Action<Battle> BeforeEngage;
-    public Action<Battle, Attack> BeforeApplyDamage;
+    public Action<Battle, Attack> BeforeApplyAttack;
     public Action<Battle> OnBattleFinished;
 
     public ObservableCollection<BaseCard> CommunityCards;
@@ -269,14 +269,14 @@ public partial class Battle: ManagedNode2D, ISetup
                 {
                     Attack attack = new Attack(GameMgr, this, entity, otherEntity, hand,
                         otherHand);
-                    BeforeApplyDamage?.Invoke(this, attack);
+                    BeforeApplyAttack?.Invoke(this, attack);
                     attack.Apply();
                 }
                 if (HandEvaluator.Compare(hand, otherHand) <= 0)
                 {
                     Attack attack = new Attack(GameMgr, this, otherEntity, entity, otherHand, 
                         hand);
-                    BeforeApplyDamage?.Invoke(this, attack);
+                    BeforeApplyAttack?.Invoke(this, attack);
                     attack.Apply();
                 }
             }
@@ -289,9 +289,16 @@ public partial class Battle: ManagedNode2D, ISetup
         // GD.Print($"{Players[1]} Best Hand: {opponentBestHand.Rank}, {string.Join(",", opponentBestHand.PrimaryCards)}, Kickers: {string.Join(",", opponentBestHand.Kickers)}");
     }
 
-    public void InflictBuffOn(BaseBuff buff, BattleEntity target)
+    public BattleEntity GetOpponentOf(BattleEntity entity)
     {
-        target.BuffContainer.Contents.Add(buff);
+        foreach (var maybeOpponent in Entities)
+        {
+            if (maybeOpponent != entity)
+            {
+                return maybeOpponent;
+            }
+        }
+        return null;
     }
 
     public void OnEntityDefeated(BattleEntity e)
@@ -328,6 +335,18 @@ public partial class Battle: ManagedNode2D, ISetup
         {
             effect.OnStop(this);
             Effects.Remove(effect);
+        }
+    }
+
+    public void InflictBuffOn(BaseBuff buff, BattleEntity target)
+    {
+        if (target.Buffs.Contains(buff))
+        {
+            buff.Repeat(this, target);
+        }
+        else
+        {
+            target.Buffs.Add(buff);
         }
     }
 

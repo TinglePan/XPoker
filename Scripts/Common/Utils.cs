@@ -83,6 +83,11 @@ public static class Utils
         return "";
     }
 
+    public static string GetPercentageString(float value)
+    {
+        return $"{Mathf.RoundToInt(value * 100)}%";
+    }
+
     public static int GetCardRankValue(Enums.CardRank rank)
     {
         switch (rank)

@@ -9,7 +9,7 @@ using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
 
-public class AbsenceCard: BaseTapCard
+public class BlockOutCard: BaseTapCard
 {
     
     public abstract class BaseAbsenceCardRule
@@ -64,7 +64,7 @@ public class AbsenceCard: BaseTapCard
         public override void OnStart(Battle battle)
         {
             base.OnStart(battle);
-            if (CreatedByCard is AbsenceCard absenceCard)
+            if (CreatedByCard is BlockOutCard absenceCard)
             {
                 foreach (var container in absenceCard.CardContainers)
                 {
@@ -93,7 +93,7 @@ public class AbsenceCard: BaseTapCard
     public BaseAbsenceCardRule Rule;
     public List<CardContainer> CardContainers;
     
-    public AbsenceCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost, BaseAbsenceCardRule rule): 
+    public BlockOutCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost, BaseAbsenceCardRule rule): 
         base("Absence", "Certain cards do not count, the rule alters each round.", "res://Sprites/Cards/absence.png", suit, rank, tappedCost, unTappedCost)
     {
         Rule = rule;

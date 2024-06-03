@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.DataBinding;
@@ -9,7 +10,7 @@ using BuffNode = XCardGame.Scripts.Nodes.BuffNode;
 
 namespace XCardGame.Scripts.Effects;
 
-public class BaseEffect: ILifeCycleTriggeredInBattle
+public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
 {
     public BaseCard CreatedByCard;
     
@@ -18,7 +19,7 @@ public class BaseEffect: ILifeCycleTriggeredInBattle
     public string Name;
     public string Description;
     public string IconPath;
-    
+
     public BaseEffect(string name, string description, string iconPath, BaseCard createdByCard)
     {
         HasSetup = false;
@@ -27,7 +28,12 @@ public class BaseEffect: ILifeCycleTriggeredInBattle
         IconPath = iconPath;
         CreatedByCard = createdByCard;
     }
-    
+
+    public bool Equals(BaseEffect other)
+    {
+        return GetType() == other?.GetType();
+    }
+
     ~BaseEffect()
     {
         OnDisposal(CreatedByCard.Battle);

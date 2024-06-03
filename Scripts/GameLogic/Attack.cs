@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.SkillCards;
+using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.GameLogic;
@@ -15,9 +17,10 @@ public class Attack
     public CompletedHand SourceHand;
     public CompletedHand TargetHand;
     public int Power;
-    public List<BaseSkillCard> SkillCards;
+    public List<BaseSkillCard> RelevantSkillCards;
     public List<(int, string)> ExtraDamages;
     public List<(float, string)> ExtraMultipliers;
+    public bool IsNegated;
     
     protected GameMgr GameMgr;
     protected Battle Battle;
@@ -33,6 +36,8 @@ public class Attack
         Power = Source.HandPowers[SourceHand.Tier] + source.BaseHandPower;
         ExtraDamages = new List<(int, string)>();
         ExtraMultipliers = new List<(float, string)>();
+        RelevantSkillCards = new List<BaseSkillCard>();
+        IsNegated = false;
     }
 
     public int Damage()
@@ -53,6 +58,14 @@ public class Attack
     
     public void Apply()
     {
-        // Target.Hp.Value = Mathf.Clamp(Target.Hp.Value - Damage(), 0, Target.MaxHp.Value);
+        if (!IsNegated)
+        {
+            var actualDamage = Mathf.Clamp(Damage(), 0, Target.Hp.Value);
+            Target.Hp.Value -= actualDamage;
+            foreach (var skillCard in RelevantSkillCards)
+            {
+                skillCard.AfterDamageDealt(this, actualDamage);
+            }
+        }
     }
 }

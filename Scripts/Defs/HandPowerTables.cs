@@ -13,19 +13,19 @@ public static class HandPowerTables
 
         { Enums.HandTier.Pair, 1 },
 
-        { Enums.HandTier.TwoPair, 3 },
+        { Enums.HandTier.TwoPair, 2 },
 
-        { Enums.HandTier.ThreeOfAKind, 4 },
+        { Enums.HandTier.ThreeOfAKind, 3 },
 
-        { Enums.HandTier.Straight, 6 },
+        { Enums.HandTier.Straight, 4 },
 
-        { Enums.HandTier.Flush, 7 },
+        { Enums.HandTier.Flush, 5 },
 
-        { Enums.HandTier.FullHouse, 7 },
+        { Enums.HandTier.FullHouse, 6 },
 
-        { Enums.HandTier.FourOfAKind, 9 },
+        { Enums.HandTier.FourOfAKind, 7 },
 
-        { Enums.HandTier.StraightFlush, 12 },
+        { Enums.HandTier.StraightFlush, 8 },
 
         { Enums.HandTier.RoyalFlush, 999 }
     };
@@ -84,7 +84,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.TwoPair, 0 },
 
-        { Enums.HandTier.ThreeOfAKind, 6 },
+        { Enums.HandTier.ThreeOfAKind, 4 },
 
         { Enums.HandTier.Straight, 0 },
 
@@ -92,7 +92,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.FullHouse, 0 },
 
-        { Enums.HandTier.FourOfAKind, 12 },
+        { Enums.HandTier.FourOfAKind, 8 },
 
         { Enums.HandTier.StraightFlush, 0 },
 
@@ -109,7 +109,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.ThreeOfAKind, 0 },
 
-        { Enums.HandTier.Straight, 13 },
+        { Enums.HandTier.Straight, 6 },
 
         { Enums.HandTier.Flush, 0 },
 
@@ -117,7 +117,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.FourOfAKind, 0 },
 
-        { Enums.HandTier.StraightFlush, 20 },
+        { Enums.HandTier.StraightFlush, 12 },
 
         { Enums.HandTier.RoyalFlush, 999 }
     };
@@ -135,13 +135,13 @@ public static class HandPowerTables
 
         { Enums.HandTier.Straight, 0 },
 
-        { Enums.HandTier.Flush, 12 },
+        { Enums.HandTier.Flush, 6 },
 
         { Enums.HandTier.FullHouse, 0 },
 
         { Enums.HandTier.FourOfAKind, 0 },
 
-        { Enums.HandTier.StraightFlush, 20 },
+        { Enums.HandTier.StraightFlush, 12 },
 
         { Enums.HandTier.RoyalFlush, 999 }
     };

@@ -11,6 +11,16 @@ public partial class BuffNode: BaseContentNode<BuffNode, BaseBuff>
     [Export]
     public Sprite2D Icon;
 
+    public override void _Notification(int what)
+    {
+        if (what == NotificationPredelete && Content.Value != null)
+        {
+            var buff = Content.Value;
+            Content.Value = null;
+            buff.OnDisposal(buff.Battle);
+        }
+    }
+    
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);

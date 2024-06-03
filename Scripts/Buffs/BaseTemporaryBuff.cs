@@ -13,16 +13,30 @@ public class BaseTemporaryBuff: BaseBuff, ITemporaryBuff
     {
         Duration = duration;
         DurationCounter = new ObservableProperty<int>(nameof(DurationCounter), this, 0);
+    }
+
+    public override void Repeat(Battle battle, BattleEntity entity)
+    {
+        OnStart(battle);
+    }
+
+    public override void OnStart(Battle battle)
+    {
+        DurationCounter.Value = Duration;
         Battle.OnRoundEnd += OnRoundEnd;
     }
-    
+
+    public override void OnStop(Battle battle)
+    {
+        Battle.OnRoundEnd -= OnRoundEnd;
+    }
+
     protected virtual void OnRoundEnd(Battle battle)
     {
-        DurationCounter.Value++;
-        if (DurationCounter.Value >= Duration)
+        DurationCounter.Value--;
+        if (DurationCounter.Value <= Duration)
         {
             Entity.BuffContainer.Contents.Remove(this);
-            OnDisposal(battle);
         }
     }
 

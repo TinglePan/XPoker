@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.DataBinding;
@@ -9,7 +10,7 @@ using BuffNode = XCardGame.Scripts.Nodes.BuffNode;
 
 namespace XCardGame.Scripts.Buffs;
 
-public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BuffNode, BaseBuff>
+public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BuffNode, BaseBuff>, IEquatable<BaseBuff>
 {
     public BuffNode Node { get; set; }
     public GameMgr GameMgr;
@@ -24,7 +25,7 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BuffNode, Ba
     public string Name;
     public string Description;
     public string IconPath;
-    
+
     public BaseBuff(string name, string description, string iconPath, BattleEntity entity, BattleEntity inflictedBy, BaseCard inflictedByCard)
     {
         HasSetup = false;
@@ -60,8 +61,17 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BuffNode, Ba
     {
     }
 
+    public virtual void Repeat(Battle battle, BattleEntity entity)
+    {
+    }
+
     public void OnDisposal(Battle battle)
     {
         OnStop(battle);
+    }
+
+    public bool Equals(BaseBuff other)
+    {
+        return GetType() == other?.GetType();
     }
 }

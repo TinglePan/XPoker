@@ -42,7 +42,7 @@ public class NPlusMRule: NOfAKindRule
 
     protected override List<BaseCard> GetPrimaryComparerCards(List<BaseCard> pick, List<BaseCard> cards)
     {
-        return pick.GroupBy(card => card.Rank, (rank, groupCards) => new
+        return pick.GroupBy(card => card.Rank.Value, (rank, groupCards) => new
             {
                 Rank = rank,
                 Cards = groupCards.OrderByDescending(c => c)

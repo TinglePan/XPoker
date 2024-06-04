@@ -125,20 +125,45 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	// 	}
 	// }
 
-	public void AnimateFlip(Enums.CardFace toFaceDir)
+	public void AnimateFlip(Enums.CardFace toFaceDir, float delay = 0f)
 	{
-		if (FaceDirection.Value == toFaceDir) return;
-		AnimationPlayer.Play("flip");
-		// await ToSignal(AnimationPlayer, "animation_finished");
-		if (FaceDirection.Value == Enums.CardFace.Down)
+		void PlayAnimation()
 		{
-			Content.Value.OnStop(Content.Value.Battle);
+			AnimationPlayer.Play("flip");
+		}
+
+		void AnimationFinished(StringName clipName)
+		{
+			if (clipName == "flip")
+			{
+				UpdateFaceDirection();
+			}
+		}
+
+		void UpdateFaceDirection()
+		{
+			if (FaceDirection.Value == Enums.CardFace.Down)
+			{
+				Content.Value.OnStop(Content.Value.Battle);
+			}
+			else
+			{
+				Content.Value.OnStart(Content.Value.Battle);
+			}
+		}
+		
+		if (FaceDirection.Value == toFaceDir) return;
+		if (delay > 0f)
+		{
+			var timer = GetTree().CreateTimer(delay);
+			timer.Timeout += PlayAnimation;
+			AnimationPlayer.AnimationFinished += AnimationFinished;
 		}
 		else
 		{
-			Content.Value.OnStart(Content.Value.Battle);
+			PlayAnimation();
+			AnimationPlayer.AnimationFinished += AnimationFinished;
 		}
-		GD.Print($"Flip animation finished {FaceDirection.Value}");
 	}
 
 	public void OnFlipAnimationToggleCardFace()

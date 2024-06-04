@@ -131,11 +131,13 @@ public partial class BattleEntity: Node, ISetup
         BuffContainer.ContentNodes.Clear();
     }
     
-    public virtual void RoundReset()
+    public virtual void RoundReset(float animateCardDelay = 0f)
     {
+        var index = 0;
         foreach (var contentNode in HoleCardContainer.ContentNodes.ToList())
         {
-            Battle.Dealer.AnimateDiscard(contentNode);
+            Battle.Dealer.AnimateDiscard(contentNode, Configuration.AnimateCardTransformInterval * index + animateCardDelay);
+            index++;
         }
         // HoleCardContainer.ContentNodes.Clear();
     }

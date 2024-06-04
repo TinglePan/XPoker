@@ -56,14 +56,14 @@ public static class Utils
     public static List<List<T>> 
         GetCombinationsWithXToYFromA<T>(List<T> a, List<T> b, int m, int x, int y)
     {
-        Profile.StartWatch("get comb");
+        // Profile.StartWatch("get comb");
         var res = new List<List<T>>();
         for (int i = x; i <= y; i++)
         {
             res.AddRange(GetCombinationsWithXFromA(a, b, m, i));
         }
-        Profile.EndWatch("get comb", true, 0);
-        GD.Print($"combination count: {res.Count}");
+        // Profile.EndWatch("get comb", true, 0);
+        // GD.Print($"combination count: {res.Count}");
         return res;
     }
 

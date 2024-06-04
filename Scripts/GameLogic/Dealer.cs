@@ -96,9 +96,9 @@ public partial class Dealer: Node2D, ISetup
         }
     }
     
-    public CardNode DealCardIntoContainer(CardContainer targetContainer, Action callback)
+    public CardNode DealCardIntoContainer(CardContainer targetContainer, Action callback, float delay = 0f)
     {
-        var cardNode = DealCardIntoContainer(targetContainer);
+        var cardNode = DealCardIntoContainer(targetContainer, delay);
         if (cardNode != null)
         {
             cardNode.TransformTweenControl.Callback.Value = callback;
@@ -106,12 +106,12 @@ public partial class Dealer: Node2D, ISetup
         return cardNode;
     }
     
-    public CardNode DealCardIntoContainer(CardContainer targetContainer)
+    public CardNode DealCardIntoContainer(CardContainer targetContainer, float delay = 0f)
     {
         var card = DrawCard();
         if (card == null) return null;
         var cardNode = CardPrefab.Instantiate<CardNode>();
-        AddChild(cardNode);
+        DealCardPile.AddChild(cardNode);
         cardNode.Setup(new Dictionary<string, object>()
         {
             { "card", card },
@@ -119,13 +119,24 @@ public partial class Dealer: Node2D, ISetup
             { "faceDirection", Enums.CardFace.Down }
         });
         cardNode.Position = DealCardPile.TopCard.Position;
-        targetContainer.ContentNodes.Insert(targetContainer.ContentNodes.Count, cardNode);
+        if (delay > 0)
+        {
+            var timer = GetTree().CreateTimer(delay);
+            timer.Timeout += () =>
+            {
+                targetContainer.ContentNodes.Insert(targetContainer.ContentNodes.Count, cardNode);
+            };
+        }
+        else
+        {
+            targetContainer.ContentNodes.Insert(targetContainer.ContentNodes.Count, cardNode);
+        }
         return cardNode;
     }
 
-    public CardNode DealCardAndReplace(CardNode node, Action callback)
+    public CardNode DealCardAndReplace(CardNode node, Action callback, float delay = 0f)
     {
-        var cardNode = DealCardAndReplace(node);
+        var cardNode = DealCardAndReplace(node, delay);
         if (cardNode != null)
         {
             cardNode.TransformTweenControl.Callback.Value = callback;
@@ -133,12 +144,23 @@ public partial class Dealer: Node2D, ISetup
         return cardNode;
     }
     
-    public CardNode DealCardAndReplace(CardNode node)
+    public CardNode DealCardAndReplace(CardNode node, float delay = 0f)
     {
+        void ReplaceWithCardNode(CardNode cardNode)
+        {
+            cardNode.TweenTransform(node.Position, node.RotationDegrees, Configuration.AnimateCardTransformInterval);
+            cardNode.TransformTweenControl.Callback.Value = () =>
+            {
+                node.Content.Value = cardNode.Content.Value;
+                cardNode.QueueFree();
+            };
+        }
+        
         var card = DrawCard();
         if (card == null) return null;
         var cardNode = CardPrefab.Instantiate<CardNode>();
-        node.GetParent().AddChild(cardNode);
+        DealCardPile.AddChild(cardNode);
+        
         cardNode.Setup(new Dictionary<string, object>()
         {
             { "card", DealCardPile.Take() },
@@ -148,29 +170,45 @@ public partial class Dealer: Node2D, ISetup
         cardNode.Position = DealCardPile.TopCard.Position;
         if (node.Container != null)
         {
-            AnimateDiscard(node);
-            node.Container.ContentNodes[node.Container.ContentNodes.IndexOf(node)] = cardNode;
+            var index = node.Container.ContentNodes.IndexOf(node);
+            AnimateDiscard(node, delay);
+            node.Container.ContentNodes.Insert(index, cardNode);
             return cardNode;
         }
         else
         {
-            cardNode.TweenTransform(node.Position, node.RotationDegrees, Configuration.DealCardTweenTime);
-            cardNode.TransformTweenControl.Callback.Value = () =>
+            if (delay > 0)
             {
-                node.Content.Value = cardNode.Content.Value;
-                cardNode.QueueFree();
-            };
+                var timer = GetTree().CreateTimer(delay);
+                timer.Timeout += () => ReplaceWithCardNode(cardNode);
+            }
+            else
+            {
+                ReplaceWithCardNode(cardNode);
+            }
             return node;
         }
     }
 
-    public void AnimateDiscard(CardNode node)
+    public void AnimateDiscard(CardNode node, float delay = 0f)
     {
+        void Run()
+        {
+            node.Container.Contents.Remove(node.Content.Value);
+            node.Reparent(DiscardCardPile);
+            node.TweenTransform(DiscardCardPile.TopCard.Position, DiscardCardPile.TopCard.RotationDegrees,
+                Configuration.AnimateCardTransformInterval, () => Discard(node));
+        }
         GD.Print($"animate discard {node}");
-        node.Container.Contents.Remove(node.Content.Value);
-        node.Reparent(DiscardCardPile);
-        node.TweenTransform(DiscardCardPile.TopCard.Position, DiscardCardPile.TopCard.RotationDegrees,
-            Configuration.DealCardTweenTime, () => Discard(node));
+        if (delay > 0)
+        {
+            var timer = GetTree().CreateTimer(delay);
+            timer.Timeout += Run;
+        }
+        else
+        {
+            Run();
+        }
     }
 
     protected BaseCard DrawCard()

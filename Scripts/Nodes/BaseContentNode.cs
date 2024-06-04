@@ -62,10 +62,10 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 
     public void TweenTransform(Vector2 position, float rotationDegrees, float tweenTime)
     {
-        GD.Print($"tween transform {this}");
+        // GD.Print($"tween transform {this}");
         if (TransformTweenControl.IsRunning())
         {
-            GD.Print("stop tween before starting new one");
+            // GD.Print("stop tween before starting new one");
             TransformTweenControl.Interrupt();
         }
         TransformTweenControl.Tween.Value = CreateTween().SetParallel();

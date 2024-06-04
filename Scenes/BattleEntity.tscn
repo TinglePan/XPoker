@@ -42,8 +42,6 @@ position = Vector2(48, 210)
 
 [node name="Buffs" parent="." instance=ExtResource("4_jb6u6")]
 position = Vector2(48, 156)
-ContentNodeTransformTweenTime = null
-Identifier = null
 
 [node name="Buff" parent="Buffs" instance=ExtResource("5_oeiac")]
 

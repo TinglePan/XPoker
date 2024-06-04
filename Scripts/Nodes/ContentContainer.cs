@@ -12,8 +12,6 @@ public abstract partial class ContentContainer<TContentNode, TContent>: ManagedN
     where TContentNode: BaseContentNode<TContentNode, TContent>
     where TContent: IContent<TContentNode, TContent>
 {
-    [Export] public float ContentNodeTransformTweenTime;
-    
     public bool HasSetup { get; set; }
 
     public ObservableCollection<TContent> Contents;
@@ -90,7 +88,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: ManagedN
                 contentNode.Reparent(this);
                 MoveChild(contentNode, index);
                 contentNode.Container = this;
-                GD.Print($"{contentNode.Content.Value}({contentNode}) container added {this}");
+                // GD.Print($"{contentNode.Content.Value}({contentNode}) container added {this}");
             }
             index++;
         }
@@ -113,7 +111,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: ManagedN
                 Contents.RemoveAt(index);
                 RemoveChild(contentNode);
                 contentNode.Container = null;
-                GD.Print($"{contentNode.Content.Value}({contentNode}) container removed {this}");
+                // GD.Print($"{contentNode.Content.Value}({contentNode}) container removed {this}");
             }
             index++;
         }
@@ -301,7 +299,16 @@ public abstract partial class ContentContainer<TContentNode, TContent>: ManagedN
         var rotation = CalculateContentNodeRotation(index, ContentNodes.Count);
         if (useTween)
         {
-            node.TweenTransform(position, rotation, ContentNodeTransformTweenTime);
+            float tweenTime;
+            if (node.TransformTweenControl.Tween.Value != null && node.TransformTweenControl.Tween.Value.IsRunning() && node.TransformTweenControl.Time != 0)
+            {
+                tweenTime = node.TransformTweenControl.Time - (float)node.TransformTweenControl.Tween.Value.GetTotalElapsedTime();
+            }
+            else
+            {
+                tweenTime = Configuration.ContentContainerAdjustTweenTime;
+            }
+            node.TweenTransform(position, rotation, tweenTime);
         }
         else
         {

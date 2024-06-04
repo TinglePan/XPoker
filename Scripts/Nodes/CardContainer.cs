@@ -91,7 +91,6 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		{
 			AdjustContentNode(i, true);
 		}
-
 		SuppressNotifications = false;
 	}
 

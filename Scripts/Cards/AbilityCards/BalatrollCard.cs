@@ -28,10 +28,12 @@ public class BalatrollCard: BaseUseCard
         {
             if (SelectedCardNodes.Count != 0)
             {
+                var index = 0;
                 foreach (var selectedCardNode in SelectedCardNodes)
                 {
                     selectedCardNode.IsSelected = false;
-                    Card.Battle.Dealer.DealCardAndReplace(selectedCardNode);
+                    Card.Battle.Dealer.DealCardAndReplace(selectedCardNode, Configuration.AnimateCardTransformInterval * index);
+                    index++;
                 }
                 SelectedCardNodes.Clear();
                 Card.Use();

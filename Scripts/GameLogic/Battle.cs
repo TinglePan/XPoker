@@ -179,13 +179,17 @@ public partial class Battle: ManagedNode2D, ISetup
     {
         RoundCount++;
         OnRoundStart?.Invoke(this);
+        var index = 0;
         foreach (var entity in Entities)
         {
-            entity.RoundReset();
+            var delay = Configuration.AnimateCardTransformInterval * index;
+            index += entity.HoleCards.Count;
+            entity.RoundReset(delay);
         }
         foreach (var cardNode in CommunityCardContainer.ContentNodes.ToList())
         {
-            Dealer.AnimateDiscard(cardNode);
+            Dealer.AnimateDiscard(cardNode, Configuration.AnimateCardTransformInterval * index);
+            index++;
         }
         // CommunityCardContainer.ContentNodes.Clear();
         RoundHands.Clear();
@@ -206,16 +210,19 @@ public partial class Battle: ManagedNode2D, ISetup
 
     public void DealCards()
     {
+        var cardDealt = 0;
         foreach (var entity in Entities)
         {
             for (int i = 0; i < entity.DealCardCount; i++)
             {
-                Dealer.DealCardIntoContainer(entity.HoleCardContainer);
+                Dealer.DealCardIntoContainer(entity.HoleCardContainer, delay: cardDealt * Configuration.AnimateCardTransformInterval);
+                cardDealt++;
             }
         }
         for (int i = 0; i < DealCommunityCardCount; i++)
         {
-            Dealer.DealCardIntoContainer(CommunityCardContainer);
+            Dealer.DealCardIntoContainer(CommunityCardContainer, delay: cardDealt * Configuration.AnimateCardTransformInterval);
+            cardDealt++;
         }
         AfterDealCards?.Invoke(this);
         CurrentState = State.BeforeShowDown;
@@ -250,8 +257,6 @@ public partial class Battle: ManagedNode2D, ISetup
         }
 
         BeforeEngage?.Invoke(this);
-        
-        // TODO: Engage needs rework
         for (int i = 0; i < Entities.Count; i++)
         {
             var entity = Entities[i];

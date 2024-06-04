@@ -26,9 +26,9 @@ public partial class PlayerBattleEntity: BattleEntity
         Level.DetailedValueChanged += LevelChanged;
     }
 
-    public override void RoundReset()
+    public override void RoundReset(float delay = 0f)
     {
-        base.RoundReset();
+        base.RoundReset(delay);
         Cost.Value = MaxCost.Value;
     }
 

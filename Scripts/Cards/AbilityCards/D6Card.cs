@@ -33,12 +33,14 @@ public class D6Card: BaseUseCard
     public override void Use()
     {
         base.Use();
+        var index = 0;
         foreach (var cardContainer in CardContainers)
         {
             foreach (var card in cardContainer.Contents.ToList())
             {
                 if (card.Node.FaceDirection.Value != Enums.CardFace.Up) continue;
-                Battle.Dealer.DealCardAndReplace(card.Node);
+                Battle.Dealer.DealCardAndReplace(card.Node, Configuration.AnimateCardTransformInterval * index);
+                index++;
             }
         }
     }

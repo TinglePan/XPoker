@@ -55,14 +55,17 @@ public class TweenControl
 
     protected void TweenChanged(object sender, ValueChangedEventDetailedArgs<Tween> valueChangedEventDetailedArgs)
     {
-        if (Callback.Value != null)
+        if (valueChangedEventDetailedArgs.OldValue != null)
         {
-            if (valueChangedEventDetailedArgs.OldValue != null)
+            valueChangedEventDetailedArgs.OldValue.Stop();
+            if (Callback.Value != null)
             {
-                valueChangedEventDetailedArgs.OldValue.Stop();
                 valueChangedEventDetailedArgs.OldValue.Finished -= Callback.Value;
             }
-            if (valueChangedEventDetailedArgs.NewValue != null)
+        }
+        if (valueChangedEventDetailedArgs.NewValue != null)
+        {
+            if (Callback.Value != null)
             {
                 valueChangedEventDetailedArgs.NewValue.Finished += Callback.Value;
             }

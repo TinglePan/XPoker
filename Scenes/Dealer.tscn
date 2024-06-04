@@ -12,8 +12,6 @@ CardPrefab = ExtResource("2_ruq67")
 
 [node name="DealPile" parent="." instance=ExtResource("2_02rlv")]
 position = Vector2(-128, 0)
-Identifier = null
 
 [node name="DiscardPile" parent="." instance=ExtResource("2_02rlv")]
 position = Vector2(128, 0)
-Identifier = null

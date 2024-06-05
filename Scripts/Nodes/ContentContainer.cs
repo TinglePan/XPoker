@@ -300,9 +300,10 @@ public abstract partial class ContentContainer<TContentNode, TContent>: ManagedN
         if (useTween)
         {
             float tweenTime;
-            if (node.TransformTweenControl.Tween.Value != null && node.TransformTweenControl.Tween.Value.IsRunning() && node.TransformTweenControl.Time != 0)
+            if (node.TweenControl.IsRunning("transform"))
             {
-                tweenTime = node.TransformTweenControl.Time - (float)node.TransformTweenControl.Tween.Value.GetTotalElapsedTime();
+                var controlledTween = node.TweenControl.GetControlledTween("transform");
+                tweenTime = controlledTween.Time - (float)controlledTween.Tween.Value.GetTotalElapsedTime();
             }
             else
             {

@@ -49,7 +49,7 @@ public static class Utils
                 res.Add(aPicks.Concat(bPicks).ToList());
             }
         }
-        GD.Print($"GetCombinationsWithXFromA: {a.Count}/{b.Count}{m}/{x} -> {res.Count}");
+        // GD.Print($"GetCombinationsWithXFromA: {a.Count}/{b.Count}{m}/{x} -> {res.Count}");
         return res;
     }
     

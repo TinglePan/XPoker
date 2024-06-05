@@ -18,7 +18,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 
     public ObservableProperty<TContent> Content;
     public ObservableProperty<bool> IsFocused;
-    public TweenControl TransformTweenControl;
+    public TweenControl TweenControl;
 
     public override void _Ready()
     {
@@ -28,7 +28,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
         Content.DetailedValueChanged += OnContentChanged;
         Area.MouseEntered += OnMouseEnter;
         Area.MouseExited += OnMouseExit;
-        TransformTweenControl = new TweenControl();
+        TweenControl = new TweenControl();
     }
     
     public override void _Notification(int what)
@@ -54,24 +54,12 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
         }
     }
 
-    public void TweenTransform(Vector2 position, float rotationDegrees, float tweenTime, Action callback)
+    public void TweenTransform(Vector2 position, float rotationDegrees, float tweenTime, Action callback = null)
     {
-        TransformTweenControl.Callback.Value = callback;
-        TweenTransform(position, rotationDegrees, tweenTime);
-    }
-
-    public void TweenTransform(Vector2 position, float rotationDegrees, float tweenTime)
-    {
-        // GD.Print($"tween transform {this}");
-        if (TransformTweenControl.IsRunning())
-        {
-            // GD.Print("stop tween before starting new one");
-            TransformTweenControl.Interrupt();
-        }
-        TransformTweenControl.Tween.Value = CreateTween().SetParallel();
-        TransformTweenControl.Time = tweenTime;
-        TransformTweenControl.Tween.Value.TweenProperty(this, "position", position, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
-        TransformTweenControl.Tween.Value.TweenProperty(this, "rotation_degrees", rotationDegrees, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+        var newTween = CreateTween().SetParallel();
+        newTween.TweenProperty(this, "position", position, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+        newTween.TweenProperty(this, "rotation_degrees", rotationDegrees, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+        TweenControl.AddTween("transform", newTween, tweenTime, callback);
     }
 
     protected void OnMouseEnter()

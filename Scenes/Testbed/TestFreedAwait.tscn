@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://df7mnybintw6u"]
+
+[ext_resource type="Texture2D" uid="uid://oldgvrsgrmpi" path="res://Sprites/GodotHead.svg" id="1_24o4p"]
+[ext_resource type="Script" path="res://Scripts/Tests/TestFreedAwait.cs" id="2_liviw"]
+
+[node name="TestFreedAwait" type="Sprite2D"]
+position = Vector2(372, 304)
+texture = ExtResource("1_24o4p")
+script = ExtResource("2_liviw")

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
 
@@ -75,20 +76,53 @@ public partial class Dealer: Node2D, ISetup
             DealCardPile.Cards.Add(card);
         }
     }
+    
 
+    public async Task AnimateShuffle()
+    {
+        // GD.Print("animate shuffle");
+        var shuffleAnimateCardCount = Mathf.Min(DiscardCardPile.Cards.Count, Configuration.ShuffleAnimateCards);
+        var takeCountForEachAnimatedShuffleCard = DiscardCardPile.Cards.Count / shuffleAnimateCardCount;
+        for (int i = 0; i < shuffleAnimateCardCount; i++)
+        {
+            var delay = Configuration.AnimateCardTransformInterval * i;
+            var timer = GetTree().CreateTimer(delay);
+            await ToSignal(timer, Timer.SignalName.Timeout);
+            var card = await DrawCardFromPile(DiscardCardPile);
+            if (card == null) return;
+            var cardNode = CreateCardNodeOnPile(card, DiscardCardPile);
+            cardNode.Reparent(DealCardPile);
+            cardNode.TweenTransform(DealCardPile.TopCard.Position, DealCardPile.TopCard.RotationDegrees, Configuration.AnimateCardTransformInterval);
+            await ToSignal(cardNode.TweenControl.GetTween("transform"), Tween.SignalName.Finished);
+            DealCardPile.Cards.Add(card);
+            var cards = DiscardCardPile.TakeN(takeCountForEachAnimatedShuffleCard);
+            foreach (var takenCard in cards)
+            {
+                DealCardPile.Cards.Add(takenCard);
+            }
+            if (DiscardCardPile.Cards.Count == 0)
+            {
+                Shuffle();
+            }
+            cardNode.QueueFree();
+        }
+    }
+    
     public void Shuffle()
     {
-        // TODO: Play shuffle animation
         var cards = DealCardPile.Cards.ToList();
-        cards.AddRange(DiscardCardPile.Cards);
-        int n = DealCardPile.Cards.Count;
+        foreach (var card in DiscardCardPile.Cards)
+        {
+            cards.Add(card);
+        }
+        DiscardCardPile.Cards.Clear();
+        int n = cards.Count;
         while (n > 1)
         {
             n--;
             int k = GameMgr.Rand.Next(n + 1);
             (cards[k], cards[n]) = (cards[n], cards[k]);
         }
-        DiscardCardPile.Cards.Clear();
         DealCardPile.Cards.Clear();
         foreach (var card in cards)
         {
@@ -96,128 +130,70 @@ public partial class Dealer: Node2D, ISetup
         }
     }
     
-    public CardNode DealCardIntoContainer(CardContainer targetContainer, Action callback, float delay = 0f)
+    public async void DealCardIntoContainer(CardContainer targetContainer, float delay = 0f)
     {
-        var cardNode = DealCardIntoContainer(targetContainer, delay);
-        if (cardNode != null)
-        {
-            cardNode.TransformTweenControl.Callback.Value = callback;
-        }
-        return cardNode;
-    }
-    
-    public CardNode DealCardIntoContainer(CardContainer targetContainer, float delay = 0f)
-    {
-        var card = DrawCard();
-        if (card == null) return null;
-        var cardNode = CardPrefab.Instantiate<CardNode>();
-        DealCardPile.AddChild(cardNode);
-        cardNode.Setup(new Dictionary<string, object>()
-        {
-            { "card", card },
-            { "container", null },
-            { "faceDirection", Enums.CardFace.Down }
-        });
-        cardNode.Position = DealCardPile.TopCard.Position;
         if (delay > 0)
         {
             var timer = GetTree().CreateTimer(delay);
-            timer.Timeout += () =>
-            {
-                targetContainer.ContentNodes.Insert(targetContainer.ContentNodes.Count, cardNode);
-            };
+            await ToSignal(timer, Timer.SignalName.Timeout);
         }
-        else
-        {
-            targetContainer.ContentNodes.Insert(targetContainer.ContentNodes.Count, cardNode);
-        }
-        return cardNode;
+        var card = await DrawCardFromPile(DealCardPile);
+        if (card == null) return;
+        var cardNode = CreateCardNodeOnPile(card, DealCardPile);
+        targetContainer.ContentNodes.Insert(targetContainer.ContentNodes.Count, cardNode);
     }
 
-    public CardNode DealCardAndReplace(CardNode node, Action callback, float delay = 0f)
+    public async void DealCardAndReplace(CardNode node, float delay = 0f)
     {
-        var cardNode = DealCardAndReplace(node, delay);
-        if (cardNode != null)
+        if (delay > 0)
         {
-            cardNode.TransformTweenControl.Callback.Value = callback;
+            var timer = GetTree().CreateTimer(delay);
+            await ToSignal(timer, Timer.SignalName.Timeout);
         }
-        return cardNode;
-    }
-    
-    public CardNode DealCardAndReplace(CardNode node, float delay = 0f)
-    {
-        void ReplaceWithCardNode(CardNode cardNode)
-        {
-            cardNode.TweenTransform(node.Position, node.RotationDegrees, Configuration.AnimateCardTransformInterval);
-            cardNode.TransformTweenControl.Callback.Value = () =>
-            {
-                node.Content.Value = cardNode.Content.Value;
-                cardNode.QueueFree();
-            };
-        }
-        
-        var card = DrawCard();
-        if (card == null) return null;
-        var cardNode = CardPrefab.Instantiate<CardNode>();
-        DealCardPile.AddChild(cardNode);
-        
-        cardNode.Setup(new Dictionary<string, object>()
-        {
-            { "card", DealCardPile.Take() },
-            { "container", null },
-            { "faceDirection", node.FaceDirection.Value }
-        });
-        cardNode.Position = DealCardPile.TopCard.Position;
+        var card = await DrawCardFromPile(DealCardPile);
+        if (card == null) return;
+        var cardNode = CreateCardNodeOnPile(card, DealCardPile);
         if (node.Container != null)
         {
             var index = node.Container.ContentNodes.IndexOf(node);
-            AnimateDiscard(node, delay);
+            AnimateDiscard(node);
             node.Container.ContentNodes.Insert(index, cardNode);
-            return cardNode;
+            await ToSignal(cardNode.TweenControl.GetTween("transform"), Tween.SignalName.Finished);
         }
         else
         {
-            if (delay > 0)
-            {
-                var timer = GetTree().CreateTimer(delay);
-                timer.Timeout += () => ReplaceWithCardNode(cardNode);
-            }
-            else
-            {
-                ReplaceWithCardNode(cardNode);
-            }
-            return node;
+            cardNode.TweenTransform(node.Position, node.RotationDegrees, Configuration.AnimateCardTransformInterval);
+            await ToSignal(node.TweenControl.GetTween("transform"), Tween.SignalName.Finished);
+            node.Content.Value = cardNode.Content.Value;
+            cardNode.QueueFree();
         }
     }
 
-    public void AnimateDiscard(CardNode node, float delay = 0f)
+    public async void AnimateDiscard(CardNode node, float delay = 0f)
     {
-        void Run()
-        {
-            node.Container.Contents.Remove(node.Content.Value);
-            node.Reparent(DiscardCardPile);
-            node.TweenTransform(DiscardCardPile.TopCard.Position, DiscardCardPile.TopCard.RotationDegrees,
-                Configuration.AnimateCardTransformInterval, () => Discard(node));
-        }
-        GD.Print($"animate discard {node}");
         if (delay > 0)
         {
             var timer = GetTree().CreateTimer(delay);
-            timer.Timeout += Run;
+            await ToSignal(timer, Timer.SignalName.Timeout);
         }
-        else
-        {
-            Run();
-        }
+        
+        // GD.Print($"animate discard {node}");
+        node.Container.Contents.Remove(node.Content.Value);
+        node.Reparent(DiscardCardPile);
+        node.TweenTransform(DiscardCardPile.TopCard.Position, DiscardCardPile.TopCard.RotationDegrees,
+            Configuration.AnimateCardTransformInterval, () => Discard(node));
     }
 
-    protected BaseCard DrawCard()
+    protected async Task<BaseCard> DrawCardFromPile(CardPile pile)
     {
-        var card = DealCardPile.Take();
+        var card = pile.Take();
         if (card == null)
         {
-            Shuffle();
-            card = DealCardPile.Take();
+            if (pile == DealCardPile)
+            {
+                await AnimateShuffle();
+                card = pile.Take();
+            }
             if (card == null)
             {
                 GD.Print("No more cards to deal");
@@ -228,8 +204,22 @@ public partial class Dealer: Node2D, ISetup
 
     protected void Discard(CardNode cardNode)
     {
-        GD.Print($"discard {cardNode}");
+        // GD.Print($"discard {cardNode}");
         DiscardCardPile.Cards.Insert(0, cardNode.Content.Value);
         cardNode.QueueFree();
+    }
+    
+    protected CardNode CreateCardNodeOnPile(BaseCard card, CardPile pile)
+    {
+        var cardNode = CardPrefab.Instantiate<CardNode>();
+        pile.AddChild(cardNode);
+        cardNode.Setup(new Dictionary<string, object>()
+        {
+            { "card", card },
+            { "container", null },
+            { "faceDirection", pile.TopCardFaceDirection }
+        });
+        cardNode.Position = pile.TopCard.Position;
+        return cardNode;
     }
 }

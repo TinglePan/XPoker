@@ -7,83 +7,155 @@ namespace XCardGame.Scripts.Common;
 
 public class TweenControl
 {
-    public ObservableProperty<Tween> Tween;
-    public float Time;
-    public ObservableProperty<Action> Callback;
 
-    public TweenControl()
+    public enum ConflictTweenAction
     {
-        Tween = new ObservableProperty<Tween>(nameof(Tween), this, null);
-        Tween.DetailedValueChanged += TweenChanged;
-        Time = 0;
-        Callback = new ObservableProperty<Action>(nameof(Callback), this, null);
-        Callback.DetailedValueChanged += CallbackChanged;
+        FastForwardAndFinish,
+        Finish,
+        InterruptWithNewCallback,
+        Interrupt
     }
     
-    public bool IsRunning()
+    public class ControlledTween: IEquatable<ControlledTween>
     {
-        return Tween.Value != null && Tween.Value.IsRunning();
-    }
-    
-    public void FastForwardAndStop()
-    {
-        if (Tween.Value != null)
+        public string Tag;
+        public ObservableProperty<Tween> Tween;
+        public float Time;
+        public ObservableProperty<Action> Callback;
+        
+        public ControlledTween(string tag, Tween tween, float time, Action callback = null)
         {
-            Tween.Value.Pause();
-            Tween.Value.CustomStep(Time);
-            Tween.Value.Stop();
-            Callback.Value?.Invoke();
+            Tag = tag;
+            Tween = new ObservableProperty<Tween>(nameof(Tween), this, tween);
+            Tween.DetailedValueChanged += TweenChanged;
+            Time = time;
+            Callback = new ObservableProperty<Action>(nameof(Callback), this, callback);
+            Callback.DetailedValueChanged += CallbackChanged;
+            Tween.FireValueChangeEventsOnInit();
+            Callback.FireValueChangeEventsOnInit();
         }
-    }
 
-    public void InterruptAndStop()
-    {
-        if (Tween.Value != null)
+        public bool Equals(ControlledTween other)
         {
-            Tween.Value.Stop();
-            Callback.Value?.Invoke();
+            return Tag == other?.Tag;
         }
-    }
 
-    public void Interrupt()
-    {
-        if (Tween.Value != null)
+        public bool IsRunning()
         {
-            Tween.Value.Stop();
+            return Tween.Value != null && Tween.Value.IsRunning();
         }
-    }
 
-    protected void TweenChanged(object sender, ValueChangedEventDetailedArgs<Tween> valueChangedEventDetailedArgs)
-    {
-        if (valueChangedEventDetailedArgs.OldValue != null)
-        {
-            valueChangedEventDetailedArgs.OldValue.Stop();
-            if (Callback.Value != null)
-            {
-                valueChangedEventDetailedArgs.OldValue.Finished -= Callback.Value;
-            }
-        }
-        if (valueChangedEventDetailedArgs.NewValue != null)
-        {
-            if (Callback.Value != null)
-            {
-                valueChangedEventDetailedArgs.NewValue.Finished += Callback.Value;
-            }
-        }
-    }
-
-    protected void CallbackChanged(object sender, ValueChangedEventDetailedArgs<Action> valueChangedEventDetailedArgs)
-    {
-        if (Tween.Value != null)
+        protected void TweenChanged(object sender, ValueChangedEventDetailedArgs<Tween> valueChangedEventDetailedArgs)
         {
             if (valueChangedEventDetailedArgs.OldValue != null)
             {
-                Tween.Value.Finished -= valueChangedEventDetailedArgs.OldValue;
+                valueChangedEventDetailedArgs.OldValue.Stop();
+                if (Callback.Value != null)
+                {
+                    valueChangedEventDetailedArgs.OldValue.Finished -= Callback.Value;
+                }
             }
             if (valueChangedEventDetailedArgs.NewValue != null)
             {
-                Tween.Value.Finished += valueChangedEventDetailedArgs.NewValue;
+                if (Callback.Value != null)
+                {
+                    valueChangedEventDetailedArgs.NewValue.Finished += Callback.Value;
+                }
+            }
+        }
+
+        protected void CallbackChanged(object sender, ValueChangedEventDetailedArgs<Action> valueChangedEventDetailedArgs)
+        {
+            if (Tween.Value != null)
+            {
+                if (valueChangedEventDetailedArgs.OldValue != null)
+                {
+                    Tween.Value.Finished -= valueChangedEventDetailedArgs.OldValue;
+                }
+                if (valueChangedEventDetailedArgs.NewValue != null)
+                {
+                    Tween.Value.Finished += valueChangedEventDetailedArgs.NewValue;
+                }
             }
         }
     }
+    
+    public Dictionary<string, ControlledTween> TweenMap;
+
+    public TweenControl()
+    {
+        TweenMap = new Dictionary<string, ControlledTween>();
+    }
+
+    public void AddTween(string tag, Tween tween, float time, Action callback = null, ConflictTweenAction conflictAction = ConflictTweenAction.Interrupt)
+    {
+        if (TweenMap.ContainsKey(tag) && TweenMap[tag] is {} existingControlledTween)
+        {
+            if (existingControlledTween.IsRunning())
+            {
+                switch (conflictAction)
+                {
+                    case ConflictTweenAction.Interrupt:
+                        existingControlledTween.Tween.Value.Stop();
+                        break;
+                    case ConflictTweenAction.InterruptWithNewCallback:
+                        existingControlledTween.Tween.Value.Stop();
+                        if (callback != null)
+                        {
+                            existingControlledTween.Callback.Value = callback;
+                        }
+                        break;
+                    case ConflictTweenAction.Finish:
+                        existingControlledTween.Tween.Value.Stop();
+                        existingControlledTween.Callback.Value?.Invoke();
+                        if (callback != null)
+                        {
+                            existingControlledTween.Callback.Value = callback;
+                        }
+                        break;
+                    case ConflictTweenAction.FastForwardAndFinish:
+                        existingControlledTween.Tween.Value.Pause();
+                        existingControlledTween.Tween.Value.CustomStep(existingControlledTween.Time);
+                        existingControlledTween.Tween.Value.Stop();
+                        existingControlledTween.Callback.Value?.Invoke();
+                        if (callback != null)
+                        {
+                            existingControlledTween.Callback.Value = callback;
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                if (callback != null)
+                {
+                    existingControlledTween.Callback.Value = callback;
+                }
+            }
+            existingControlledTween.Tween.Value = tween;
+            existingControlledTween.Time = time;
+        }
+        else
+        {
+            var controlledTween = new ControlledTween(tag, tween, time, callback);
+            TweenMap.Add(tag, controlledTween);
+        }
+    }
+
+    public ControlledTween GetControlledTween(string tag)
+    {
+        return TweenMap.GetValueOrDefault(tag);
+    }
+
+    public Tween GetTween(string tag)
+    {
+        var controlledTween = GetControlledTween(tag);
+        return controlledTween?.Tween.Value;
+    }
+    
+    public bool IsRunning(string tag)
+    {
+        return TweenMap.ContainsKey(tag) && TweenMap[tag].IsRunning();
+    }
+
 }

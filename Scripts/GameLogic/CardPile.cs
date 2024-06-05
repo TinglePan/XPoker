@@ -45,6 +45,24 @@ public partial class CardPile: ManagedNode2D, ISetup
         return card;
     }
 
+    public List<BaseCard> TakeN(int n)
+    {
+        var res = new List<BaseCard>();
+        for (int i = 0; i < n; i++)
+        {
+            var card = Take();
+            if (card != null)
+            {
+                res.Add(card);
+            }
+            else
+            {
+                break;
+            }
+        }
+        return res;
+    }
+
     public BaseCard Take(Func<BaseCard, bool> filter)
     {
         var card = Cards.FirstOrDefault(filter);

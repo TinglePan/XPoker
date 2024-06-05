@@ -32,7 +32,7 @@ public class BalatrollCard: BaseUseCard
                 foreach (var selectedCardNode in SelectedCardNodes)
                 {
                     selectedCardNode.IsSelected = false;
-                    Card.Battle.Dealer.DealCardAndReplace(selectedCardNode, Configuration.AnimateCardTransformInterval * index);
+                    Card.Battle.Dealer.DealCardAndReplace(selectedCardNode, delay: Configuration.AnimateCardTransformInterval * index);
                     index++;
                 }
                 SelectedCardNodes.Clear();

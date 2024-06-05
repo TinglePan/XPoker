@@ -21,4 +21,5 @@ public static class Configuration
     public static readonly int ShockMaxStack = 10;
     public static readonly float AnimateCardTransformInterval = 0.1f;
     public static readonly float ContentContainerAdjustTweenTime = 0.2f;
+    public static readonly int ShuffleAnimateCards = 3;
 }

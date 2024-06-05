@@ -96,106 +96,72 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		}
 	}
 
-	public void TweenReveal(bool toState, float tweenTime)
+	public async void TweenReveal(bool toState, float tweenTime)
 	{
 		void UpdateRevealed()
 		{
 			IsRevealed = toState;
 		}
 		if (IsRevealed == toState) return;
-		TransformTweenControl.Tween.Value = CreateTween();
-		TransformTweenControl.Tween.Value.TweenProperty(Back, "modulate:a", !toState ? 1f : 0f, tweenTime);
-		TransformTweenControl.Tween.Value.TweenCallback(Callable.From(UpdateRevealed));
+		var newTween = CreateTween();
+		newTween.TweenProperty(Back, "modulate:a", !toState ? 1f : 0f, tweenTime);
+		TweenControl.AddTween("IsRevealed", newTween, tweenTime, UpdateRevealed);
+		await ToSignal(TweenControl.TweenMap["isRevealed"].Tween.Value, Tween.SignalName.Finished);
 	}
 
-	// public async void TweenFlip(Enums.CardFace toFaceDir, float tweenTime)
-	// {
-	// 	if (FaceDirection == toFaceDir) return;
-	// 	var tween = GetTree().CreateTween();
-	// 	tween.TweenProperty(this, "rotation:y", toFaceDir == Enums.CardFace.Down ? 180f : 0f, tweenTime);
-	// 	await ToSignal(tween, Tween.SignalName.Finished);
-	// 	FaceDirection = toFaceDir;
-	// 	if (FaceDirection == Enums.CardFace.Down)
-	// 	{
-	// 		Content.Value.OnStop(Content.Value.Battle);
-	// 	}
-	// 	else
-	// 	{
-	// 		Content.Value.OnStart(Content.Value.Battle);
-	// 	}
-	// }
-
-	public void AnimateFlip(Enums.CardFace toFaceDir, float delay = 0f)
+	public async void AnimateFlip(Enums.CardFace toFaceDir, float delay = 0f)
 	{
-		void PlayAnimation()
-		{
-			AnimationPlayer.Play("flip");
-		}
-
-		void AnimationFinished(StringName clipName)
-		{
-			if (clipName == "flip")
-			{
-				UpdateFaceDirection();
-			}
-		}
-
-		void UpdateFaceDirection()
-		{
-			if (FaceDirection.Value == Enums.CardFace.Down)
-			{
-				Content.Value.OnStop(Content.Value.Battle);
-			}
-			else
-			{
-				Content.Value.OnStart(Content.Value.Battle);
-			}
-		}
-		
 		if (FaceDirection.Value == toFaceDir) return;
 		if (delay > 0f)
 		{
 			var timer = GetTree().CreateTimer(delay);
-			timer.Timeout += PlayAnimation;
-			AnimationPlayer.AnimationFinished += AnimationFinished;
+			await ToSignal(timer, Timer.SignalName.Timeout);
+		}
+		AnimationPlayer.Play("flip");
+		if (toFaceDir == Enums.CardFace.Down)
+		{
+			Content.Value.OnStop(Content.Value.Battle);
 		}
 		else
 		{
-			PlayAnimation();
-			AnimationPlayer.AnimationFinished += AnimationFinished;
+			Content.Value.OnStart(Content.Value.Battle);
 		}
+		await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
 	}
 
 	public void OnFlipAnimationToggleCardFace()
 	{
-		if (FaceDirection.Value == Enums.CardFace.Down)
-		{
-			FaceDirection.Value = Enums.CardFace.Up;
-			Back.Hide();
-			Front.Show();
-		}
-		else
-		{
-			FaceDirection.Value = Enums.CardFace.Down;
-			Front.Hide();
-			Back.Show();
-		}
+		FaceDirection.Value = FaceDirection.Value == Enums.CardFace.Down ? Enums.CardFace.Up : Enums.CardFace.Down;
 	}
 
-	public void TweenTap(bool toState, float tweenTime)
+	public async void TweenTap(bool toState, float tweenTime, float delay = 0f)
 	{
 		if (IsTapped == toState) return;
+		if (delay > 0f)
+		{
+			var timer = GetTree().CreateTimer(delay);
+			await ToSignal(timer, Timer.SignalName.Timeout);
+		}
 		IsTapped = toState;
-		TweenTransform(Position, toState ? 90f : 0, tweenTime);
+		var newTween = CreateTween();
+		newTween.TweenProperty(this, "rotation_degrees", toState ? 90f : 0, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+		TweenControl.AddTween("tap", newTween, tweenTime);
+		await ToSignal(newTween, Tween.SignalName.Finished);
 	}
 
-	public void TweenNegate(bool toState, float tweenTime)
+	public async void TweenNegate(bool toState, float tweenTime, float delay = 0f)
 	{
 		if (IsNegated == toState) return;
+		if (delay > 0f)
+		{
+			var timer = GetTree().CreateTimer(delay);
+			await ToSignal(timer, Timer.SignalName.Timeout);
+		}
 		IsNegated = toState;
-		var tween = CreateTween();
-		tween.TweenProperty(this, "modulate", toState ? Colors.DimGray : Colors.White, tweenTime);
-		// await ToSignal(tween, Tween.SignalName.Finished);
+		var newTween = CreateTween();
+		newTween.TweenProperty(this, "modulate", toState ? Colors.DimGray : Colors.White, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+		TweenControl.AddTween("negate", newTween, tweenTime);
+		await ToSignal(newTween, Tween.SignalName.Finished);
 	}
 
 	protected void InputEventHandler(Node viewport, InputEvent @event, long shapeIdx)

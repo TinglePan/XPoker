@@ -5,12 +5,13 @@ namespace XCardGame.Scripts;
 
 public partial class Intro: Node
 {
-    [Export] public BaseButton StartButton;
     public GameMgr GameMgr;
+    public BaseButton StartButton;
     
     public override void _Ready()
     {
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
+        StartButton = GetNode<BaseButton>("StartButton");
         StartButton.Pressed += GameMgr.StartBattle;
     }
 

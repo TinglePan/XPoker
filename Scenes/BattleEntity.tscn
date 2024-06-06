@@ -20,25 +20,13 @@ corner_radius_top_right = 1
 corner_radius_bottom_right = 1
 corner_radius_bottom_left = 1
 
-[node name="BattleEntity" type="Node2D" node_paths=PackedStringArray("HoleCardContainer", "SkillCardContainer", "BuffContainer", "NameLabel", "Portrait", "HpLabel", "MaxHpLabel")]
+[node name="BattleEntity" type="Node2D"]
 script = ExtResource("1_2py8r")
-HoleCardContainer = NodePath("HoleCards")
-SkillCardContainer = NodePath("SkillCards")
-BuffContainer = NodePath("Buffs")
-NameLabel = NodePath("CharacterCard/Panel/Name")
-Portrait = NodePath("CharacterCard/Panel/Portrait")
-HpLabel = NodePath("CharacterCard/Panel/Hp")
-MaxHpLabel = NodePath("CharacterCard/Panel/MaxHp")
 
 [node name="HoleCards" parent="." groups=["markerCardContainer"] instance=ExtResource("2_5h213")]
 position = Vector2(48, -48)
 
 [node name="Card" parent="HoleCards" instance=ExtResource("3_k1fdh")]
-
-[node name="SkillCards" parent="." groups=["skillCardContainer"] instance=ExtResource("2_5h213")]
-position = Vector2(48, 210)
-
-[node name="Card" parent="SkillCards" instance=ExtResource("3_k1fdh")]
 
 [node name="Buffs" parent="." instance=ExtResource("4_jb6u6")]
 position = Vector2(48, 156)

@@ -11,7 +11,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
     where TNode: BaseContentNode<TNode, TContent>
     where TContent: IContent<TNode, TContent>
 {
-    [Export] public Area2D Area;
+    public Area2D Area;
     
     public ContentContainer<TNode, TContent> Container;
     public bool HasSetup { get; set; }
@@ -22,6 +22,8 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 
     public override void _Ready()
     {
+        base._Ready();
+        Area = GetNode<Area2D>("Area");
         HasSetup = false;
         IsFocused = new ObservableProperty<bool>(nameof(IsFocused), this, false);
         Content = new ObservableProperty<TContent>(nameof(Content), this, default);

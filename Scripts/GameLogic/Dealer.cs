@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
-
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Nodes;
 
@@ -14,9 +14,9 @@ namespace XCardGame.Scripts.GameLogic;
 
 public partial class Dealer: Node2D, ISetup
 {
-    [Export] public CardPile DealCardPile;
-    [Export] public CardPile DiscardCardPile;
-    [Export] public PackedScene CardPrefab;
+    public CardPile DealCardPile;
+    public CardPile DiscardCardPile;
+    public PackedScene CardPrefab;
     
     public bool HasSetup { get; set; }
 
@@ -28,8 +28,11 @@ public partial class Dealer: Node2D, ISetup
     public override void _Ready()
     {
         base._Ready();
-        HasSetup = false;
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
+        DealCardPile = GetNode<CardPile>("DealPile");
+        DiscardCardPile = GetNode<CardPile>("DiscardPile");
+        CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
+        HasSetup = false;
         Battle = GameMgr.CurrentBattle;
         SourceDecks = new List<Deck>();
     }

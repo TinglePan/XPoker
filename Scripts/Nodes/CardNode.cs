@@ -11,17 +11,16 @@ namespace XCardGame.Scripts.Nodes;
 
 public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 {
-	[Export] public Node2D Front;
-    [Export] public Node2D Back;
-
-    [Export] public IconWithTextFallback MainIcon;
-    
-    [Export]
+	public GameMgr GameMgr;
+	public Battle Battle;
+	public Node2D Front;
+    public Node2D Back;
+    public IconWithTextFallback MainIcon;
     public Sprite2D SuitIcon;
-    [Export] public Label RankLabel;
-    [Export] public Sprite2D JokerMark;
-    [Export] public Label CostLabel;
-    [Export] public AnimationPlayer AnimationPlayer;
+    public Label RankLabel;
+    public Sprite2D JokerMark;
+    public Label CostLabel;
+    public AnimationPlayer AnimationPlayer;
     
     public Action<CardNode> OnPressed;
 
@@ -32,15 +31,19 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
     public bool IsRevealed;
     public bool IsSelected;
 
-    protected GameMgr GameMgr;
-    protected Battle Battle;
 
 	public override void _Ready()
 	{
 		base._Ready();
-
 		GameMgr = GetNode<GameMgr>("/root/GameMgr");
-		Battle = GameMgr.CurrentBattle;
+		Front = GetNode<Node2D>("Outline/Front");
+		Back = GetNode<Node2D>("Outline/Back");
+		MainIcon = GetNode<IconWithTextFallback>("Outline/Front/IconWithTextFallback");
+		SuitIcon = GetNode<Sprite2D>("Outline/Front/Suit");
+		RankLabel = GetNode<Label>("Outline/Front/Rank");
+		JokerMark = GetNode<Sprite2D>("Outline/Front/Joker");
+		CostLabel = GetNode<Label>("Outline/Front/Cost");
+		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		Area.InputEvent += InputEventHandler;
 		FaceDirection = new ObservableProperty<Enums.CardFace>(nameof(FaceDirection), this, Enums.CardFace.Down);
 		FaceDirection.DetailedValueChanged += OnCardFaceChanged;
@@ -63,6 +66,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	public override void Setup(Dictionary<string, object> args)
     {
 	    base.Setup(args);
+	    Battle = GameMgr.CurrentBattle;
 	    Content.Value = (BaseCard)args["card"];
 	    MainIcon.Setup(new Dictionary<string, object>()
 	    {

@@ -17,23 +17,19 @@ namespace XCardGame.Scripts.GameLogic;
 
 public partial class BattleEntity: Node, ISetup
 {
-    [Export] public CardContainer HoleCardContainer;
-    [Export] public CardContainer SkillCardContainer;
-    [Export] public BuffContainer BuffContainer;
-    
-    [Export] public Label NameLabel;
-    [Export] public TextureRect Portrait;
-    [Export] public Label HpLabel;
-    [Export] public Label MaxHpLabel;
+    public GameMgr GameMgr;
+    public Battle Battle;
+    public CardContainer HoleCardContainer;
+    public BuffContainer BuffContainer;
+    public Label NameLabel;
+    public TextureRect Portrait;
+    public Label HpLabel;
+    public Label MaxHpLabel;
     
     public Action<BattleEntity, int> OnHpChanged;
     public Action<BattleEntity> OnDefeated;
     
-    public GameMgr GameMgr;
-    public Battle Battle;
-    
     public bool HasSetup { get; set; }
-    
     
     public string DisplayName;
     public string PortraitPath;
@@ -55,6 +51,12 @@ public partial class BattleEntity: Node, ISetup
     {
         base._Ready();
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
+        HoleCardContainer = GetNode<CardContainer>("HoleCards");
+        BuffContainer = GetNode<BuffContainer>("Buffs");
+        NameLabel = GetNode<Label>("CharacterCard/Panel/Name");
+        Portrait = GetNode<TextureRect>("CharacterCard/Panel/Portrait");
+        HpLabel = GetNode<Label>("CharacterCard/Panel/Hp");
+        MaxHpLabel = GetNode<Label>("CharacterCard/Panel/MaxHp");
         HasSetup = false;
     }
 
@@ -89,14 +91,6 @@ public partial class BattleEntity: Node, ISetup
             { "defaultCardFaceDirection", IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down } 
         });
         SkillCards = (ObservableCollection<BaseCard>)args["skillCards"];
-        SkillCardContainer.Setup(new Dictionary<string, object>()
-        {
-            { "allowInteract", false },
-            { "cards", SkillCards },
-            { "contentNodeSize", Configuration.CardSize },
-            { "separation", Configuration.CardContainerSeparation },
-            { "defaultCardFaceDirection", Enums.CardFace.Up } 
-        });
         Buffs = new ObservableCollection<BaseBuff>();
         BuffContainer.Setup(new Dictionary<string, object>()
         {

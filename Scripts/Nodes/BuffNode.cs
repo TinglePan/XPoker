@@ -8,8 +8,13 @@ namespace XCardGame.Scripts.Nodes;
 
 public partial class BuffNode: BaseContentNode<BuffNode, BaseBuff>
 {
-    [Export]
     public Sprite2D Icon;
+
+    public override void _Ready()
+    {
+        base._Ready();
+        Icon = GetNode<Sprite2D>("Icon");
+    }
 
     public override void _Notification(int what)
     {

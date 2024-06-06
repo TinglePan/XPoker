@@ -14,7 +14,7 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public partial class Battle: ManagedNode2D, ISetup
+public partial class Battle: Node2D, ISetup
 {
 
     public enum State
@@ -25,10 +25,10 @@ public partial class Battle: ManagedNode2D, ISetup
         AfterShowDown
     }
     
-    [Export] public Dealer Dealer;
-    [Export] public CardContainer CommunityCardContainer;
-    [Export] public CardContainer FieldCardContainer;
-    // [Export] public Godot.Collections.Array<BattleEntity> Entities;
+    public GameMgr GameMgr;
+    public Dealer Dealer;
+    public CardContainer CommunityCardContainer;
+    public CardContainer FieldCardContainer;
     public Array<BattleEntity> Entities;
 
     public BaseButton ProceedButton;
@@ -61,11 +61,15 @@ public partial class Battle: ManagedNode2D, ISetup
     
     public List<BaseEffect> Effects;
     public State CurrentState;
-    
+
     
     public override void _Ready()
     {
         base._Ready();
+        GameMgr = GetNode<GameMgr>("/root/GameMgr");
+        Dealer = GetNode<Dealer>("Dealer");
+        CommunityCardContainer = GetNode<CardContainer>("CommunityCards");
+        FieldCardContainer = GetNode<CardContainer>("FieldCards");
         HasSetup = false;
         RoundHands = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
         CommunityCards = new ObservableCollection<BaseCard>();

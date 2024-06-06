@@ -2,9 +2,8 @@
 
 [ext_resource type="Script" path="res://Scripts/Intro.cs" id="1_gf41f"]
 
-[node name="Intro" type="Node" node_paths=PackedStringArray("StartButton")]
+[node name="Intro" type="Node"]
 script = ExtResource("1_gf41f")
-StartButton = NodePath("StartButton")
 
 [node name="StartButton" type="Button" parent="."]
 offset_right = 46.0

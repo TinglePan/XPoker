@@ -3,20 +3,17 @@ using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Nodes;
 
-public partial class DialogueBox: Container, IManagedNode
+public partial class DialogueBox: Container
 {
-    [Export] public string Identifier { get; set; }
-    [Export] public Label TextWidget;
-    public GameMgr GameMgr { get; private set; }
+    public Label TextWidget;
     public SceneMgr SceneMgr { get; private set; }
 
     public ObservableProperty<string> Content;
     
     public override void _Ready()
     {
-        GameMgr = GetNode<GameMgr>("/root/GameMgr");
-        SceneMgr = GetNode<SceneMgr>("/root/SceneMgr");
-        SceneMgr.Register(this);
+        base._Ready();
+        TextWidget = GetNode<Label>("MarginContainer/ScrollContainer/LineEdit");
         Content = new ObservableProperty<string>(nameof(Content), this, "");
         Content.DetailedValueChanged += OnContentChanged;
     }

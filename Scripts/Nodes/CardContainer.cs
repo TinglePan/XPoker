@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 
@@ -12,7 +13,6 @@ namespace XCardGame.Scripts.Nodes;
 
 public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 {
-	[Export]
 	public PackedScene CardPrefab;
 
 	public Enums.CardFace DefaultCardFaceDirection;
@@ -20,7 +20,13 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 
 	public bool AllowInteract;
 	
-	protected Battle Battle;
+	public Battle Battle;
+	
+	public override void _Ready()
+	{
+		base._Ready();
+		CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
+	}
 
 	public override void Setup(Dictionary<string, object> args)
 	{

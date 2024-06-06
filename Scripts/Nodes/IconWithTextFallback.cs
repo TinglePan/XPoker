@@ -7,8 +7,8 @@ namespace XCardGame.Scripts.Nodes;
 
 public partial class IconWithTextFallback: Node2D, ISetup
 {
-    [Export] public Sprite2D Icon;
-    [Export] public Label FallbackLabel;
+    public Sprite2D Icon;
+    public Label FallbackLabel;
     
     public bool HasSetup { get; set; }
 
@@ -18,6 +18,8 @@ public partial class IconWithTextFallback: Node2D, ISetup
     public override void _Ready()
     {
         base._Ready();
+        Icon = GetNode<Sprite2D>("Icon");
+        FallbackLabel = GetNode<Label>("Label");
         HasSetup = false;
         FallbackLabel.Hide();
     }

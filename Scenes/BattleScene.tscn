@@ -1,14 +1,14 @@
 [gd_scene load_steps=7 format=3 uid="uid://nko5a5mn6ufg"]
 
 [ext_resource type="Script" path="res://Scripts/Nodes/BattleScene.cs" id="1_54v76"]
-[ext_resource type="PackedScene" uid="uid://cu8cytigbn45" path="res://Scenes/DialogueBoxUi.tscn" id="1_jwsve"]
 [ext_resource type="PackedScene" uid="uid://cmlbufighcu1t" path="res://Scenes/Battle.tscn" id="2_b2wp5"]
+[ext_resource type="PackedScene" uid="uid://cu8cytigbn45" path="res://Scenes/DialogueBox.tscn" id="2_drmk1"]
 [ext_resource type="FontFile" uid="uid://cy2x5d3tsilqd" path="res://Fonts/ark-pixel-12px-proportional-zh_cn.woff2" id="3_dv7il"]
 [ext_resource type="StyleBox" uid="uid://bo4r6ump32vlx" path="res://Resources/BorderBox.tres" id="4_h726f"]
 
 [sub_resource type="Theme" id="Theme_rrsrm"]
 
-[node name="BattleScene" type="Control" node_paths=PackedStringArray("Battle", "ProceedButton", "InspectorDialogueBox", "LogDialogueBox")]
+[node name="BattleScene" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -17,27 +17,21 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_rrsrm")
 script = ExtResource("1_54v76")
-Battle = NodePath("BattleUi/SubViewportContainer/SubViewport/Battle")
-ProceedButton = NodePath("BattleUi/ProceedButton")
-InspectorDialogueBox = NodePath("InspectorUi")
-LogDialogueBox = NodePath("DialogueBoxUi")
 
-[node name="DialogueBoxUi" parent="." instance=ExtResource("1_jwsve")]
+[node name="LogBox" parent="." instance=ExtResource("2_drmk1")]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 offset_top = -120.0
 offset_right = -300.0
 grow_vertical = 0
-Identifier = "logDialogueBox"
 
-[node name="InspectorUi" parent="." instance=ExtResource("1_jwsve")]
+[node name="InspectorBox" parent="." instance=ExtResource("2_drmk1")]
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
 offset_left = -300.0
 grow_horizontal = 0
-Identifier = "InspectorDialogueBox"
 
 [node name="BattleUi" type="Control" parent="."]
 layout_mode = 1

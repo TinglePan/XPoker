@@ -4,17 +4,23 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Godot;
 using XCardGame.Scripts.Buffs;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Nodes;
 
 public partial class BuffContainer: ContentContainer<BuffNode, BaseBuff>
 {
-    [Export]
     public PackedScene BuffPrefab;
 
     protected Battle Battle;
-    
+
+    public override void _Ready()
+    {
+        base._Ready();
+        BuffPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Buff.tscn");
+    }
+
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);

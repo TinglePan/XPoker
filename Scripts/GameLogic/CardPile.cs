@@ -10,14 +10,21 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
-public partial class CardPile: ManagedNode2D, ISetup
+public partial class CardPile: Node2D, ISetup
 {
-    [Export] public CardNode TopCard;
-    [Export] public NinePatchRect PileImage;
+    public CardNode TopCard;
+    public NinePatchRect PileImage;
     public ObservableCollection<BaseCard> Cards;
     public Enums.CardFace TopCardFaceDirection;
 
     public bool HasSetup { get; set; }
+
+    public override void _Ready()
+    {
+        base._Ready();
+        TopCard = GetNode<CardNode>("Card");
+        PileImage = GetNode<NinePatchRect>("PileImage");
+    }
 
     public void Setup(Dictionary<string, object> args)
     {

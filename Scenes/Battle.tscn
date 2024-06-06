@@ -1,28 +1,22 @@
 [gd_scene load_steps=8 format=3 uid="uid://cmlbufighcu1t"]
 
 [ext_resource type="Script" path="res://Scripts/GameLogic/Battle.cs" id="1_xec1t"]
-[ext_resource type="Script" path="res://Scripts/Nodes/CardContainer.cs" id="2_lbdrp"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="3_0wwqy"]
 [ext_resource type="PackedScene" uid="uid://blyra6wixgoc7" path="res://Scenes/BattleEntity.tscn" id="4_pgdh2"]
 [ext_resource type="PackedScene" uid="uid://q1m4avgc5ecx" path="res://Scenes/PlayerBattleEntity.tscn" id="6_65vqs"]
+[ext_resource type="PackedScene" uid="uid://cub8jt2t1bsgi" path="res://Scenes/ManagedBySceneMgrComp.tscn" id="6_j44hp"]
 [ext_resource type="PackedScene" uid="uid://4gturyb6lq6" path="res://Scenes/Dealer.tscn" id="7_ppf5v"]
 [ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="7_xlxsy"]
 
-[node name="Battle" type="Node2D" node_paths=PackedStringArray("Dealer", "CommunityCardContainer", "FieldCardContainer")]
+[node name="Battle" type="Node2D"]
 script = ExtResource("1_xec1t")
-Dealer = NodePath("Dealer")
-CommunityCardContainer = NodePath("CommunityCardContainer")
-FieldCardContainer = NodePath("FieldCards")
-Identifier = null
 
-[node name="CommunityCardContainer" type="Node2D" parent="." groups=["cardContainer", "markerCardContainer"]]
-position = Vector2(0, 68)
-script = ExtResource("2_lbdrp")
-CardPrefab = ExtResource("3_0wwqy")
-ContentNodeTransformTweenTime = null
-Identifier = "communityCardContainer"
+[node name="CommunityCards" parent="." groups=["markerCardContainer"] instance=ExtResource("7_xlxsy")]
+position = Vector2(0, 168)
 
-[node name="Card" parent="CommunityCardContainer" instance=ExtResource("3_0wwqy")]
+[node name="Card" parent="CommunityCards" instance=ExtResource("3_0wwqy")]
+
+[node name="ManagedBySceneMgrComp3" parent="CommunityCards" instance=ExtResource("6_j44hp")]
 
 [node name="Enemy" parent="." instance=ExtResource("4_pgdh2")]
 position = Vector2(256, 0)
@@ -31,10 +25,12 @@ position = Vector2(256, 0)
 position = Vector2(-352, 0)
 
 [node name="FieldCards" parent="." instance=ExtResource("7_xlxsy")]
-position = Vector2(0, 256)
-Identifier = "fieldCardContainer"
+position = Vector2(0, 288)
 
 [node name="Card" parent="FieldCards" instance=ExtResource("3_0wwqy")]
 
+[node name="ManagedBySceneMgrComp2" parent="FieldCards" instance=ExtResource("6_j44hp")]
+Identifier = "fieldCardContainer"
+
 [node name="Dealer" parent="." instance=ExtResource("7_ppf5v")]
-position = Vector2(0, -156)
+position = Vector2(592, 224)

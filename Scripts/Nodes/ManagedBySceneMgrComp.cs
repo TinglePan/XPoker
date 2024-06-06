@@ -2,18 +2,18 @@ using Godot;
 
 namespace XCardGame.Scripts.Nodes;
 
-public partial class ManagedNode2D: Node2D, IManagedNode
+public partial class ManagedBySceneMgrComp: Node
 {
 	[Export]
 	public string Identifier { get; set; }
-	public GameMgr GameMgr { get; private set; }
 	public SceneMgr SceneMgr { get; private set;  }
-	
+
+	protected Node Parent;
 	
 	public override void _Ready()
 	{
-		GameMgr = GetNode<GameMgr>("/root/GameMgr");
 		SceneMgr = GetNode<SceneMgr>("/root/SceneMgr");
-		SceneMgr.Register(this);
+		Parent = GetParent<Node>();
+		SceneMgr.Register(this, Parent);
 	}
 }

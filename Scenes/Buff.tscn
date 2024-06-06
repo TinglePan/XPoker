@@ -7,10 +7,8 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mo33m"]
 size = Vector2(16, 16)
 
-[node name="Buff" type="Node2D" node_paths=PackedStringArray("Icon", "Area")]
+[node name="Buff" type="Node2D"]
 script = ExtResource("1_qlfvg")
-Icon = NodePath("Icon")
-Area = NodePath("Area2D")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 texture_filter = 1
@@ -37,7 +35,7 @@ texture_filter = 1
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("3_o12ud")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area" type="Area2D" parent="."]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area"]
 shape = SubResource("RectangleShape2D_mo33m")

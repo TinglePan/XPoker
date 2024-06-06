@@ -15,8 +15,8 @@ namespace XCardGame.Scripts;
 
 public partial class GameMgr : Node
 {
-	[Export] public PackedScene IntroScene;
-	[Export] public PackedScene BattleScene;
+	public PackedScene IntroScene;
+	public PackedScene BattleScene;
 	
 	public InputMgr InputMgr;
 	public SceneMgr SceneMgr;
@@ -29,6 +29,9 @@ public partial class GameMgr : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		base._Ready();
+		IntroScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Intro.tscn");
+		BattleScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/BattleScene.tscn");
 		InputMgr = GetNode<InputMgr>("/root/InputMgr");
 		SceneMgr = GetNode<SceneMgr>("/root/SceneMgr");
 		Rand = new Random();

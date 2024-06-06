@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://cu8cytigbn45"]
 
-[ext_resource type="Script" path="res://Scripts/Nodes/DialogueBox.cs" id="1_x2gea"]
+[ext_resource type="Script" path="res://Scripts/Nodes/DialogueBox.cs" id="1_x0diu"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xr7yc"]
 bg_color = Color(0, 0, 0, 1)
@@ -42,16 +42,14 @@ VScrollBar/styles/grabber_pressed = SubResource("StyleBoxEmpty_ijt8y")
 VScrollBar/styles/scroll = SubResource("StyleBoxEmpty_mchix")
 VScrollBar/styles/scroll_focus = SubResource("StyleBoxEmpty_wmjwq")
 
-[node name="DialogueBoxUi" type="PanelContainer" node_paths=PackedStringArray("TextWidget") groups=["dialogueBox"]]
+[node name="DialogueBox" type="PanelContainer" groups=["dialogueBox"]]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_xr7yc")
-script = ExtResource("1_x2gea")
-Identifier = null
-TextWidget = NodePath("MarginContainer/ScrollContainer/LineEdit")
+script = ExtResource("1_x0diu")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2

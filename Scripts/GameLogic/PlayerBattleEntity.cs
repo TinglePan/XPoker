@@ -49,7 +49,7 @@ public partial class PlayerBattleEntity: BattleEntity
                             Deck.CardList.Add(markerCard);
                         } else if (card is BaseSkillCard skillCard)
                         {
-                            SkillCardContainer.Contents.Add(skillCard);
+                            SkillCards.Add(skillCard);
                         }
                         else if (card is BaseAbilityCard abilityCard)
                         {

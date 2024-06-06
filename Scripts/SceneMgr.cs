@@ -11,15 +11,15 @@ namespace XCardGame.Scripts;
 public partial class SceneMgr: Node
 {
     private GameMgr _gameMgr;
-    private Dictionary<string, IManagedNode> _nodes;
-    private List<IManagedNode> _anonymousNodes;
+    private Dictionary<string, Node> _nodes;
+    private List<Node> _anonymousNodes;
 
     
     public override void _Ready()
     {
         _gameMgr = GetNode<GameMgr>("/root/GameMgr");
-        _nodes = new Dictionary<string, IManagedNode>();
-        _anonymousNodes = new List<IManagedNode>();
+        _nodes = new Dictionary<string, Node>();
+        _anonymousNodes = new List<Node>();
     }
 
     public T GetNodeById<T>(string nodeIdentifier) where T: Node
@@ -33,7 +33,7 @@ public partial class SceneMgr: Node
 
     public List<T> GetNodes<T>(string groupName) where T : Node
     {
-        bool IsNodeInGroup(IManagedNode node, string gn)
+        bool IsNodeInGroup(Node node, string gn)
         {
             return node is T typedNode && typedNode.IsInGroup(gn);
         }
@@ -55,17 +55,17 @@ public partial class SceneMgr: Node
         return res;
     }
     
-    public void Register(IManagedNode node)
+    public void Register(ManagedBySceneMgrComp comp, Node managedNode)
     {
-        if (string.IsNullOrEmpty(node.Identifier))
+        if (string.IsNullOrEmpty(comp.Identifier))
         {
-            if (!_anonymousNodes.Contains(node))
+            if (!_anonymousNodes.Contains(managedNode))
             {
-                _anonymousNodes.Add(node);
+                _anonymousNodes.Add(managedNode);
             }
-        } else if (!_nodes.TryAdd(node.Identifier, node))
+        } else if (!_nodes.TryAdd(comp.Identifier, managedNode))
         {
-            GD.PrintErr($"Duplicate node identifier:{node.Identifier} by {node}, existing {_nodes[node.Identifier]}");
+            GD.PrintErr($"Duplicate node identifier:{comp.Identifier} by {managedNode}, existing {_nodes[comp.Identifier]}");
         }
     }
 }

@@ -1,10 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bmkxps5u10t7k"]
+[gd_scene load_steps=2 format=3 uid="uid://bmkxps5u10t7k"]
 
 [ext_resource type="Script" path="res://Scripts/Nodes/CardContainer.cs" id="1_7d008"]
-[ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="2_8ajwj"]
 
 [node name="Cards" type="Node2D" groups=["cardContainer"]]
 script = ExtResource("1_7d008")
-CardPrefab = ExtResource("2_8ajwj")
-ContentNodeTransformTweenTime = 0.3
-Identifier = null

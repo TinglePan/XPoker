@@ -4,12 +4,10 @@
 [ext_resource type="Texture2D" uid="uid://8nooaaepsol3" path="res://Sprites/Suits/clubs.png" id="2_vuxcb"]
 [ext_resource type="LabelSettings" uid="uid://sh00qgk8hmqa" path="res://Resources/24pxLabelSetting.tres" id="3_dj2oy"]
 
-[node name="IconWithTextFallback" type="Node2D" node_paths=PackedStringArray("Icon", "FallbackLabel")]
+[node name="IconWithTextFallback" type="Node2D"]
 script = ExtResource("1_vidh8")
-Icon = NodePath("Sprite2D")
-FallbackLabel = NodePath("Label")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Icon" type="Sprite2D" parent="."]
 texture_filter = 1
 texture = ExtResource("2_vuxcb")
 

@@ -8,7 +8,7 @@ using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.Nodes;
 
-public abstract partial class ContentContainer<TContentNode, TContent>: ManagedNode2D, ISetup 
+public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, ISetup 
     where TContentNode: BaseContentNode<TContentNode, TContent>
     where TContent: IContent<TContentNode, TContent>
 {
@@ -20,12 +20,15 @@ public abstract partial class ContentContainer<TContentNode, TContent>: ManagedN
     public Vector2 ContentNodeSize;
     public int Separation;
 
+    public GameMgr GameMgr;
+    
     protected bool SuppressNotifications;
     
     public override void _Ready()
     {
         base._Ready();
         ClearChildren();
+        GameMgr = GetNode<GameMgr>("/root/GameMgr");
         Contents = new ObservableCollection<TContent>();
         Contents.CollectionChanged += OnContentsChanged;
         ContentNodes = new ObservableCollection<TContentNode>();
@@ -232,7 +235,10 @@ public abstract partial class ContentContainer<TContentNode, TContent>: ManagedN
     {
         foreach (var child in GetChildren())
         {
-            child.QueueFree();
+            if (child is TContentNode)
+            {
+                child.QueueFree();
+            }
         }
     }
 

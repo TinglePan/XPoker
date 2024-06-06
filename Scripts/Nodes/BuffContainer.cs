@@ -10,7 +10,7 @@ using XCardGame.Scripts.GameLogic;
 namespace XCardGame.Scripts.Nodes;
 
 public partial class BuffContainer: ContentContainer<BuffNode, BaseBuff>
-{
+{ 
     public PackedScene BuffPrefab;
 
     protected Battle Battle;
@@ -51,7 +51,6 @@ public partial class BuffContainer: ContentContainer<BuffNode, BaseBuff>
                 buff.Setup(new Dictionary<string, object>()
                 {
                     { "gameMgr", GameMgr },
-                    { "battle", Battle },
                     { "node", buffNode }
                 });
                 ContentNodes.Insert(index, buffNode);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
@@ -23,14 +24,11 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
     public AnimationPlayer AnimationPlayer;
     
     public Action<CardNode> OnPressed;
-
+    
     public Enums.CardFace OriginalFaceDirection;
     public ObservableProperty<Enums.CardFace> FaceDirection;
-    public bool IsTapped;
-    public bool IsNegated;
-    public bool IsRevealed;
     public bool IsSelected;
-
+    public bool IsRevealed;
 
 	public override void _Ready()
 	{
@@ -44,22 +42,21 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		JokerMark = GetNode<Sprite2D>("Outline/Front/Joker");
 		CostLabel = GetNode<Label>("Outline/Front/Cost");
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+		
 		Area.InputEvent += InputEventHandler;
+		
 		FaceDirection = new ObservableProperty<Enums.CardFace>(nameof(FaceDirection), this, Enums.CardFace.Down);
 		FaceDirection.DetailedValueChanged += OnCardFaceChanged;
-		IsTapped = false;
-		IsNegated = false;
-		IsRevealed = false;
+		FaceDirection.FireValueChangeEventsOnInit();
 		IsSelected = false;
+		IsRevealed = false;
 	}
 	
 	public override void _Notification(int what)
 	{
 		if (what == NotificationPredelete && Content.Value != null)
 		{
-			var card = Content.Value;
 			Content.Value = null;
-			card.OnDisposal(card.Battle);
 		}
 	}
 
@@ -75,7 +72,6 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	    });
 	    OriginalFaceDirection = (Enums.CardFace)args["faceDirection"];
 	    FaceDirection.Value = OriginalFaceDirection;
-	    FaceDirection.FireValueChangeEventsOnInit();
     }
 
 	public void Reset(bool useTween = true)
@@ -95,8 +91,6 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		{
 			IsRevealed = false;
 			FaceDirection.Value = OriginalFaceDirection;
-			IsTapped = false;
-			IsNegated = false;
 		}
 	}
 
@@ -140,13 +134,13 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 
 	public async void TweenTap(bool toState, float tweenTime, float delay = 0f)
 	{
-		if (IsTapped == toState) return;
+		if (Content.Value.IsTapped == toState) return;
 		if (delay > 0f)
 		{
 			var timer = GetTree().CreateTimer(delay);
 			await ToSignal(timer, Timer.SignalName.Timeout);
 		}
-		IsTapped = toState;
+		Content.Value.IsTapped = toState;
 		var newTween = CreateTween();
 		newTween.TweenProperty(this, "rotation_degrees", toState ? 90f : 0, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
 		TweenControl.AddTween("tap", newTween, tweenTime);
@@ -155,13 +149,13 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 
 	public async void TweenNegate(bool toState, float tweenTime, float delay = 0f)
 	{
-		if (IsNegated == toState) return;
+		if (Content.Value.IsNegated == toState) return;
 		if (delay > 0f)
 		{
 			var timer = GetTree().CreateTimer(delay);
 			await ToSignal(timer, Timer.SignalName.Timeout);
 		}
-		IsNegated = toState;
+		Content.Value.IsNegated = toState;
 		var newTween = CreateTween();
 		newTween.TweenProperty(this, "modulate", toState ? Colors.DimGray : Colors.White, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
 		TweenControl.AddTween("negate", newTween, tweenTime);
@@ -239,7 +233,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 			{ "battle", Battle },
 			{ "node", this }
 		});
-		card.Node = this;
+		card.Nodes.Add(this);
 		card.Rank.DetailedValueChanged += OnCardRankChanged;
 		card.Rank.FireValueChangeEventsOnInit();
 		card.Suit.DetailedValueChanged += OnCardSuitChanged;
@@ -251,6 +245,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	protected override void OnContentDetached(BaseCard card)
 	{
 		// GD.Print($"On card detached {card}");
+		card.Nodes.Remove(this);
 		card.Rank.DetailedValueChanged -= OnCardRankChanged;
 		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
 		MainIcon.ResetIconPath(null);

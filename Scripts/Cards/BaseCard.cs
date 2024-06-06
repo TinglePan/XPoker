@@ -9,21 +9,24 @@ using CardNode = XCardGame.Scripts.Nodes.CardNode;
 
 namespace XCardGame.Scripts.Cards;
 
-public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<CardNode, BaseCard>, IComparable<BaseCard>
+public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, IComparable<BaseCard>
 {
-    public CardNode Node { get; set; }
-    public GameMgr GameMgr;
-    public Battle Battle;
     public BattleEntity Owner;
-    public bool HasSetup { get; set; }
-    
     public string Name;
     public string Description;
-    public ObservableProperty<string> IconPath;
+    public string OriginalIconPath;
     public Enums.CardSuit OriginalSuit;
-    public ObservableProperty<Enums.CardSuit> Suit;
     public Enums.CardRank OriginalRank;
+    
+    public HashSet<BaseContentNode<BaseCard>> Nodes { get; private set; }
+    public GameMgr GameMgr;
+    public Battle Battle;
+    public bool HasSetup { get; set; }
+    public ObservableProperty<string> IconPath;
+    public ObservableProperty<Enums.CardSuit> Suit;
     public ObservableProperty<Enums.CardRank> Rank;
+    public bool IsTapped;
+    public bool IsNegated;
     
     public Enums.CardColor CardColor => Suit.Value switch
     {
@@ -37,26 +40,37 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<CardNode, B
     public BaseCard(string name, string description, string iconPath, Enums.CardSuit suit = Enums.CardSuit.None,
         Enums.CardRank rank = Enums.CardRank.None, BattleEntity owner = null)
     {
+        Nodes = new HashSet<BaseContentNode<BaseCard>>();
         Name = name;
         Description = description;
+        OriginalIconPath = iconPath;
         IconPath = new ObservableProperty<string>(nameof(IconPath), this, iconPath);
         OriginalSuit = suit;
         Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, suit);
         OriginalRank = rank;
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);
         Owner = owner;
+        IsTapped = false;
+        IsNegated = false;
     }
 
-    public override string ToString()
+    public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode<TContentNode, BaseCard>
     {
-        return $"{Name}({Description})";
+        foreach (var node in Nodes)
+        {
+            if (node is TContentNode contentNode)
+            {
+                return contentNode;
+            }
+        }
+        return null;
     }
 
     public virtual void Setup(Dictionary<string, object> args)
     {
         GameMgr = (GameMgr)args["gameMgr"];
         Battle = (Battle)args["battle"];
-        Node = (CardNode)args["node"];
+        Nodes.Add((CardNode)args["node"]);
     }
 
     public void EnsureSetup()
@@ -65,6 +79,11 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<CardNode, B
         {
             GD.PrintErr($"{this} not setup yet");
         }
+    }
+    
+    public override string ToString()
+    {
+        return $"{Name}({Description})";
     }
 
     public virtual void OnStart(Battle battle)

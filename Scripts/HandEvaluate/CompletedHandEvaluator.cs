@@ -8,6 +8,7 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
+using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.HandEvaluate;
 
@@ -32,8 +33,8 @@ public class CompletedHandEvaluator: BaseHandEvaluator
     public CompletedHand EvaluateBestHand(List<BaseCard> communityCards, List<BaseCard> holeCards)
     {
         CalculatedHands.Clear();
-        var validHoleCards = holeCards.Where(x => !x.Node.IsTapped).ToList();
-        var validCommunityCards = communityCards.Where(x => !x.Node.IsTapped).ToList();
+        var validHoleCards = holeCards.Where(x => !x.IsTapped).ToList();
+        var validCommunityCards = communityCards.Where(x => !x.IsTapped).ToList();
         // GD.Print($"valid Community cards: {validCommunityCards.Count}");
         // Profile.StartWatch("evaluate best hand 1");
         foreach (var cards in Utils.GetCombinationsWithXToYFromA(validHoleCards, validCommunityCards, 

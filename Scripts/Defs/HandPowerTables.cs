@@ -27,6 +27,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.StraightFlush, 8 },
 
+        
         { Enums.HandTier.RoyalFlush, 999 }
     };
     

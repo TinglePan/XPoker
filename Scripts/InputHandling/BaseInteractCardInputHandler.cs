@@ -8,6 +8,7 @@ namespace XCardGame.Scripts.InputHandling;
 public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler where TCard: BaseInteractCard
 {
     public TCard Card;
+    public CardNode CardNode;
     public List<CardNode> SelectedCardNodes;
     public BaseButton ProceedButton;
     
@@ -27,7 +28,7 @@ public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler wher
             selectTarget.OnPressed += ClickCard;
             selectTarget.IsSelected = false;
         }
-        Card.Node.OnPressed += ClickSelf;
+        CardNode.OnPressed += ClickSelf;
         // GD.Print("Enter NetherSwapCardInputHandler");
     }
 
@@ -39,7 +40,7 @@ public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler wher
         {
             selectTarget.OnPressed -= ClickCard;
         }
-        Card.Node.OnPressed -= ClickSelf;
+        CardNode.OnPressed -= ClickSelf;
     }
 
     protected abstract IEnumerable<CardNode> GetValidSelectTargets();

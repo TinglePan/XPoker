@@ -36,10 +36,10 @@ public class D6Card: BaseUseCard
         var index = 0;
         foreach (var cardContainer in CardContainers)
         {
-            foreach (var card in cardContainer.Contents.ToList())
+            foreach (var cardNode in cardContainer.ContentNodes)
             {
-                if (card.Node.FaceDirection.Value != Enums.CardFace.Up) continue;
-                Battle.Dealer.DealCardAndReplace(card.Node, delay:Configuration.AnimateCardTransformInterval * index);
+                if (cardNode.FaceDirection.Value != Enums.CardFace.Up) continue;
+                Battle.Dealer.DealCardAndReplace(cardNode, delay:Configuration.AnimateCardTransformInterval * index);
                 index++;
             }
         }

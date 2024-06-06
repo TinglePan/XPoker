@@ -31,23 +31,30 @@ public class BaseTapCard: BaseInteractCard, ITapCard
     
     public override bool CanInteract()
     {
-        return ((CardContainer)Node.Container).AllowInteract && 
-               (!Node.IsTapped && Battle.Player.Cost.Value + TapCostChange <= Battle.Player.MaxCost.Value ||
-                Node.IsTapped && Battle.Player.Cost.Value + UnTapCostChange <= Battle.Player.MaxCost.Value);
+        var node = Node<CardNode>();
+        if (node.Container is CardContainer { AllowInteract: false })
+        {
+            return false;
+        }
+        return !IsTapped && Battle.Player.Cost.Value + TapCostChange <= Battle.Player.MaxCost.Value ||
+                IsTapped && Battle.Player.Cost.Value + UnTapCostChange <= Battle.Player.MaxCost.Value;
     }
 
     public void StartEffect()
     {
-        if (((CardContainer)Node.Container).AllowInteract)
+        var node = Node<CardNode>();
+        if (node.Container is CardContainer { AllowInteract: true })
         {
             Battle.StartEffect(Effect);
         }
     }
 
-    public void ToggleTap()
+    public async void ToggleTap()
     {
-        Node.TweenTap(!Node.IsTapped, Configuration.TapTweenTime);
-        Battle.Player.Cost.Value += Node.IsTapped ? TapCostChange : UnTapCostChange;
+        var node = Node<CardNode>();
+        var targetTapValue = !IsTapped;
+        Battle.Player.Cost.Value += targetTapValue ? TapCostChange : UnTapCostChange;
+        node.TweenTap(targetTapValue, Configuration.TapTweenTime);
     }
 
     // NOTE: Effect manages its stop on its own. And check if its source card in in position to decide whether its effect is skipped.
@@ -58,7 +65,7 @@ public class BaseTapCard: BaseInteractCard, ITapCard
     
     protected void OnRoundStart(Battle battle)
     {
-        if (!Node.IsTapped && !Node.IsNegated && Effect != null)
+        if (!IsTapped && !IsNegated && Effect != null)
         {
             Battle.StartEffect(Effect);
         } 

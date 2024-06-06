@@ -20,6 +20,6 @@ public partial class TestMouseEventInSubViewport : Control
 			{ "faceDirection", Enums.CardFace.Up },
 			{ "container", null }
 		});
-		GD.Print($"Animate flip called {CardNode.FaceDirection}");
+		GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");
 	}
 }

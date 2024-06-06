@@ -248,16 +248,20 @@ public partial class Battle: Node2D, ISetup
 
         foreach (var entity in Entities)
         {
-            foreach (var card in entity.HoleCardContainer.Contents)
+            foreach (var cardNode in entity.HoleCardContainer.ContentNodes)
             {
-                // card.Node.TweenFlip(Enums.CardFace.Up, Configuration.FlipTweenTime);
-                card.Node.AnimateFlip(Enums.CardFace.Up);
+                if (cardNode.FaceDirection.Value == Enums.CardFace.Down)
+                {
+                    cardNode.AnimateFlip(Enums.CardFace.Up);
+                }
             }
         }
-        foreach (var card in CommunityCardContainer.Contents)
+        foreach (var cardNode in CommunityCardContainer.ContentNodes)
         {
-            // card.Node.TweenFlip(Enums.CardFace.Up, Configuration.FlipTweenTime);
-            card.Node.AnimateFlip(Enums.CardFace.Up);
+            if (cardNode.FaceDirection.Value == Enums.CardFace.Down)
+            {
+                cardNode.AnimateFlip(Enums.CardFace.Up);
+            }
         }
 
         BeforeEngage?.Invoke(this);

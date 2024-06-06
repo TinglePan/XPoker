@@ -8,9 +8,9 @@ using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.Nodes;
 
-public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, ISetup 
+public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, ISetup
     where TContentNode: BaseContentNode<TContentNode, TContent>
-    where TContent: IContent<TContentNode, TContent>
+    where TContent: IContent<TContent>
 {
     public bool HasSetup { get; set; }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.Cards.CardMarkers;
 
@@ -19,45 +20,47 @@ public class ChangeCardsMarker: BaseCardMarker
         
     }
     
-    
-    
     public static IEnumerable<MarkerCard> SelectLeftNeighbour(Battle battle, MarkerCard card)
     {
-        var neighbourIndex = card.Node.Container.Contents.IndexOf(card) - 1;
+        var cardNode = card.Node<CardNode>();
+        var neighbourIndex = cardNode.Container.Contents.IndexOf(card) - 1;
         if (neighbourIndex >= 0)
         {
-            yield return card.Node.Container.Contents[neighbourIndex] as MarkerCard;
+            yield return cardNode.Container.Contents[neighbourIndex] as MarkerCard;
         }
     }
     
     public static IEnumerable<MarkerCard> SelectRightNeighbour(Battle battle, MarkerCard card)
     {
-        var neighbourIndex = card.Node.Container.Contents.IndexOf(card) + 1;
-        if (neighbourIndex < card.Node.Container.Contents.Count)
+        var cardNode = card.Node<CardNode>();
+        var neighbourIndex = cardNode.Container.Contents.IndexOf(card) + 1;
+        if (neighbourIndex < cardNode.Container.Contents.Count)
         {
-            yield return card.Node.Container.Contents[neighbourIndex] as MarkerCard;
+            yield return cardNode.Container.Contents[neighbourIndex] as MarkerCard;
         }
     }
     
     public static IEnumerable<MarkerCard> SelectBothNeighbours(Battle battle, MarkerCard card)
     {
-        var index = card.Node.Container.Contents.IndexOf(card);
+        var cardNode = card.Node<CardNode>();
+        var index = cardNode.Container.Contents.IndexOf(card);
         var leftIndex = index - 1;
         var rightIndex = index + 1;
-        if (leftIndex >= 0 && leftIndex < card.Node.Container.Contents.Count)
+        if (leftIndex >= 0 && leftIndex < cardNode.Container.Contents.Count)
         {
-            yield return card.Node.Container.Contents[leftIndex] as MarkerCard;
+            yield return cardNode.Container.Contents[leftIndex] as MarkerCard;
         }
-        if (rightIndex >= 0 && rightIndex < card.Node.Container.Contents.Count)
+        if (rightIndex >= 0 && rightIndex < cardNode.Container.Contents.Count)
         {
-            yield return card.Node.Container.Contents[rightIndex] as MarkerCard;
+            yield return cardNode.Container.Contents[rightIndex] as MarkerCard;
         }
     }
 
     public static IEnumerable<MarkerCard> SelectUniqueMostCommonSuitCards(Battle battle, MarkerCard card)
     {
         var suitCount = new Dictionary<Enums.CardSuit, int>();
-        foreach (var cardInContainer in card.Node.Container.Contents)
+        var cardNode = card.Node<CardNode>();
+        foreach (var cardInContainer in cardNode.Container.Contents)
         {
             if (cardInContainer is MarkerCard pokerCard)
             {
@@ -73,7 +76,7 @@ public class ChangeCardsMarker: BaseCardMarker
             if (sortedSuitCount.Count == 1 || sortedSuitCount[0].Value > sortedSuitCount[1].Value)
             {
                 var uniqueMostCommonSuit = sortedSuitCount[0].Key;
-                foreach (var cardInContainer in card.Node.Container.Contents)
+                foreach (var cardInContainer in cardNode.Container.Contents)
                 {
                     if (cardInContainer is MarkerCard pokerCard && pokerCard.Suit.Value == uniqueMostCommonSuit)
                     {

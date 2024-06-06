@@ -29,7 +29,12 @@ public class BaseUseCard: BaseInteractCard, IUseCard
 
     public override bool CanInteract()
     {
-        return ((CardContainer)Node.Container).AllowInteract && !IsRecharging;
+        var node = Node<CardNode>();
+        if (node.Container is CardContainer { AllowInteract: false })
+        {
+            return false;
+        }
+        return !IsRecharging;
     }
     
     public override void Interact()
@@ -68,12 +73,14 @@ public class BaseUseCard: BaseInteractCard, IUseCard
     protected void StartRecharge()
     {
         IsRecharging = true;
-        Node.TweenTap(true, Configuration.TapTweenTime);
+        var node = Node<CardNode>();
+        node.TweenTap(true, Configuration.TapTweenTime);
     }
     
     protected void DoneRecharge()
     {
         IsRecharging = false;
-        Node.TweenTap(false, Configuration.TapTweenTime);
+        var node = Node<CardNode>();
+        node.TweenTap(false, Configuration.TapTweenTime);
     }
 }

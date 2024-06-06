@@ -12,10 +12,10 @@ public class MillenniumEyeCard: BaseUseCard
 {
     class MillenniumEyeEffect : BaseSingleTurnEffect
     {
-        public List<BaseCard> RevealedCards;
+        public List<CardNode> RevealedCardNodes;
         public MillenniumEyeEffect(string name, string description, string iconPath, BaseCard createdByCard) : base(name, description, iconPath, createdByCard)
         {
-            RevealedCards = new List<BaseCard>();
+            RevealedCardNodes = new List<CardNode>();
         }
 
         public override void OnStart(Battle battle)
@@ -26,12 +26,12 @@ public class MillenniumEyeCard: BaseUseCard
             {
                 foreach (var container in millenniumEyeCard.CardContainers)
                 {
-                    foreach (var card in container.Contents)
+                    foreach (var cardNode in container.ContentNodes)
                     {
-                        if (card.Node.FaceDirection.Value == Enums.CardFace.Down && !card.Node.IsRevealed)
+                        if (cardNode.FaceDirection.Value == Enums.CardFace.Down && !cardNode.IsRevealed)
                         {
-                            card.Node.TweenReveal(true, Configuration.RevealTweenTime);
-                            RevealedCards.Add(card);
+                            cardNode.TweenReveal(true, Configuration.RevealTweenTime);
+                            RevealedCardNodes.Add(cardNode);
                         }
                     }
                 }
@@ -41,9 +41,9 @@ public class MillenniumEyeCard: BaseUseCard
         public override void OnStop(Battle battle)
         {
             base.OnStop(battle);
-            foreach (var card in RevealedCards)
+            foreach (var cardNode in RevealedCardNodes)
             {
-                card.Node.TweenReveal(false, Configuration.RevealTweenTime);
+                cardNode.TweenReveal(false, Configuration.RevealTweenTime);
             }
         }
     }

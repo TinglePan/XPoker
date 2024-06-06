@@ -23,10 +23,10 @@ public class MainInputHandler: BaseInputHandler
     {
         base.OnEnter();
         ProceedButton.Pressed += GameMgr.CurrentBattle.Proceed;
-        FieldCardContainer.Contents.CollectionChanged += OnFieldCardCollectionChanged;
-        foreach (var card in FieldCardContainer.Contents)
+        FieldCardContainer.ContentNodes.CollectionChanged += OnFieldCardNodesCollectionChanged;
+        foreach (var cardNode in FieldCardContainer.ContentNodes)
         {
-            card.Node.OnPressed += ClickCard;
+            cardNode.OnPressed += ClickCard;
         }
     }
     
@@ -34,10 +34,10 @@ public class MainInputHandler: BaseInputHandler
     {
         base.OnExit();
         ProceedButton.Pressed -= GameMgr.CurrentBattle.Proceed;
-        FieldCardContainer.Contents.CollectionChanged -= OnFieldCardCollectionChanged;
-        foreach (var card in FieldCardContainer.Contents)
+        FieldCardContainer.ContentNodes.CollectionChanged -= OnFieldCardNodesCollectionChanged;
+        foreach (var cardNode in FieldCardContainer.ContentNodes)
         {
-            card.Node.OnPressed -= ClickCard;
+            cardNode.OnPressed -= ClickCard;
         }
     }
     
@@ -50,7 +50,7 @@ public class MainInputHandler: BaseInputHandler
         }
     }
     
-    protected void OnFieldCardCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+    protected void OnFieldCardNodesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
     {
         switch (args.Action)
         {
@@ -58,9 +58,9 @@ public class MainInputHandler: BaseInputHandler
                 if (args.NewItems != null)
                     foreach (var t in args.NewItems)
                     {
-                        if (t is BaseCard card)
+                        if (t is CardNode cardNode)
                         {
-                            card.Node.OnPressed += ClickCard;
+                            cardNode.OnPressed += ClickCard;
                         }
                     }
                 break;
@@ -68,9 +68,9 @@ public class MainInputHandler: BaseInputHandler
                 if (args.OldItems != null)
                     foreach (var t in args.OldItems)
                     {
-                        if (t is BaseCard card)
+                        if (t is CardNode cardNode)
                         {
-                            card.Node.OnPressed -= ClickCard;
+                            cardNode.OnPressed -= ClickCard;
                         }
                     }
                 break;

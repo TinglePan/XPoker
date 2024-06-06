@@ -7,14 +7,10 @@ using XCardGame.Scripts.Common.DataBinding;
 
 namespace XCardGame.Scripts.Nodes;
 
-public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
-    where TNode: BaseContentNode<TNode, TContent>
-    where TContent: IContent<TNode, TContent>
+public abstract partial class BaseContentNode<TContent> : Node2D
+    where TContent: IContent<TContent>
 {
     public Area2D Area;
-    
-    public ContentContainer<TNode, TContent> Container;
-    public bool HasSetup { get; set; }
 
     public ObservableProperty<TContent> Content;
     public ObservableProperty<bool> IsFocused;
@@ -24,7 +20,6 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
     {
         base._Ready();
         Area = GetNode<Area2D>("Area");
-        HasSetup = false;
         IsFocused = new ObservableProperty<bool>(nameof(IsFocused), this, false);
         Content = new ObservableProperty<TContent>(nameof(Content), this, default);
         Content.DetailedValueChanged += OnContentChanged;
@@ -37,22 +32,7 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
     {
         if (what == NotificationPredelete && Content.Value != null)
         {
-            var card = Content.Value;
             Content.Value = default;
-        }
-    }
-
-    public virtual void Setup(Dictionary<string, object> args)
-    {
-        Container = (ContentContainer<TNode, TContent>)args["container"];
-        HasSetup = true;
-    }
-
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
-        {
-            GD.PrintErr($"{this} not setup yet");
         }
     }
 
@@ -67,19 +47,13 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
     protected void OnMouseEnter()
     {
         GD.Print($"{this} OnMouseEnter");
-        if (HasSetup)
-        {
-            IsFocused.Value = true;
-        }
+        IsFocused.Value = true;
     }
 
     protected void OnMouseExit()
     {
         GD.Print($"{this} OnMouseExit");
-        if (HasSetup)
-        {
-            IsFocused.Value = false;
-        }
+        IsFocused.Value = false;
     }
 
     protected void OnContentChanged(object sender, ValueChangedEventDetailedArgs<TContent> args)
@@ -90,12 +64,39 @@ public abstract partial class BaseContentNode<TNode, TContent> : Node2D, ISetup
 
     protected virtual void OnContentAttached(TContent content)
     {
-        content.Node = (TNode)this;
+        content.Nodes.Add(this);
     }
 
     protected virtual void OnContentDetached(TContent content)
     {
-        content.Node = null;
+        content.Nodes.Remove(this);
+    }
+}
+
+public abstract partial class BaseContentNode<TContentNode, TContent> : BaseContentNode<TContent>, ISetup
+    where TContentNode: BaseContentNode<TContentNode, TContent>
+    where TContent: IContent<TContent>
+{
+    public ContentContainer<TContentNode, TContent> Container;
+    public bool HasSetup { get; set; }
+
+    public override void _Ready()
+    {
+        base._Ready();
+        HasSetup = false;
     }
 
+    public virtual void Setup(Dictionary<string, object> args)
+    {
+        Container = (ContentContainer<TContentNode, TContent>)args["container"];
+        HasSetup = true;
+    }
+
+    public void EnsureSetup()
+    {
+        if (!HasSetup)
+        {
+            GD.PrintErr($"{this} not setup yet");
+        }
+    }
 }

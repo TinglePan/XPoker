@@ -10,38 +10,50 @@ using BuffNode = XCardGame.Scripts.Nodes.BuffNode;
 
 namespace XCardGame.Scripts.Buffs;
 
-public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BuffNode, BaseBuff>, IEquatable<BaseBuff>
+public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, IEquatable<BaseBuff>
 {
-    public BuffNode Node { get; set; }
-    public GameMgr GameMgr;
-    public Battle Battle;
-    public BattleEntity Entity;
-
-    public BattleEntity InflictedBy;
-    public BaseCard InflictedByCard;
-    
-    public bool HasSetup { get; set; }
-    
     public string Name;
     public string Description;
     public string IconPath;
+    public BattleEntity Entity;
+    public BattleEntity InflictedBy;
+    public BaseCard InflictedByCard;
+    
+    public HashSet<BaseContentNode<BaseBuff>> Nodes { get; private set; }
+
+    public GameMgr GameMgr;
+    public Battle Battle;
+    public bool HasSetup { get; set; }
 
     public BaseBuff(string name, string description, string iconPath, BattleEntity entity, BattleEntity inflictedBy, BaseCard inflictedByCard)
     {
-        HasSetup = false;
+        Nodes = new HashSet<BaseContentNode<BaseBuff>>();
         Name = name;
         Description = description;
         IconPath = iconPath;
         Entity = entity;
         InflictedBy = inflictedBy;
         InflictedByCard = inflictedByCard;
+        HasSetup = false;
+    }
+    
+    public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode<TContentNode, BaseBuff>
+    {
+        foreach (var node in Nodes)
+        {
+            if (node is TContentNode contentNode)
+            {
+                return contentNode;
+            }
+        }
+        return null;
     }
 
     public void Setup(Dictionary<string, object> args)
     {
-        Node = (BuffNode)args["node"];
+        Nodes.Add((BuffNode)args["node"]);
         GameMgr = (GameMgr)args["gameMgr"];
-        Battle = (Battle)args["battle"];
+        Battle = GameMgr.CurrentBattle;
         HasSetup = true;
     }
 

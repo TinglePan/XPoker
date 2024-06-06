@@ -20,9 +20,7 @@ public partial class BuffNode: BaseContentNode<BuffNode, BaseBuff>
     {
         if (what == NotificationPredelete && Content.Value != null)
         {
-            var buff = Content.Value;
             Content.Value = null;
-            buff.OnDisposal(buff.Battle);
         }
     }
     

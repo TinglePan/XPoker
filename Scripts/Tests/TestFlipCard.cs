@@ -21,6 +21,6 @@ public partial class TestFlipCard: Node
             { "container", null }
         });
         CardNode.AnimateFlip(Enums.CardFace.Down);
-        GD.Print($"Animate flip called {CardNode.FaceDirection}");
+        GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");
     }
 }

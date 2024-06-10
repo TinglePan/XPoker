@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://d15koa5r20a2i"
-path="res://.godot/imported/ark-pixel-12px-proportional-zh_tw.woff2-5822a41360aa6a2693fdb39f30e86cb2.fontdata"
+uid="uid://caqcipcyf4osx"
+path="res://.godot/imported/ark-pixel-12px-proportional-zh_hk.woff2-ff27f1e69abe54fad9ad11eead5ca7ea.fontdata"
 
 [deps]
 
-source_file="res://Fonts/ark-pixel-12px-proportional-zh_tw.woff2"
-dest_files=["res://.godot/imported/ark-pixel-12px-proportional-zh_tw.woff2-5822a41360aa6a2693fdb39f30e86cb2.fontdata"]
+source_file="res://Fonts/ark-pixel-12px/ark-pixel-12px-proportional-zh_hk.woff2"
+dest_files=["res://.godot/imported/ark-pixel-12px-proportional-zh_hk.woff2-ff27f1e69abe54fad9ad11eead5ca7ea.fontdata"]
 
 [params]
 

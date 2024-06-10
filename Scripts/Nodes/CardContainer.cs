@@ -11,21 +11,23 @@ using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Nodes;
 
-public partial class CardContainer: ContentContainer<CardNode, BaseCard>
+public partial class CardContainer: ContentContainerWithBorder<CardNode, BaseCard>
 {
 	public PackedScene CardPrefab;
+	public Label ContainerNameLabel;
+	public Battle Battle;
 
 	public Enums.CardFace DefaultCardFaceDirection;
 	public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
 
+	public string ContainerName;
 	public bool AllowInteract;
-	
-	public Battle Battle;
 	
 	public override void _Ready()
 	{
 		base._Ready();
 		CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
+		ContainerNameLabel = GetNode<Label>("Name");
 	}
 
 	public override void Setup(Dictionary<string, object> args)
@@ -33,6 +35,8 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		base.Setup(args);
 		Battle = GameMgr.CurrentBattle;
 		AllowInteract = (bool)args["allowInteract"];
+		ContainerName = (string)args["containerName"];
+		ContainerNameLabel.Text = ContainerName;
 		if (args["cards"] is ObservableCollection<BaseCard> cards && cards != Contents)
 		{
 			Contents = cards;
@@ -97,11 +101,27 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		{
 			AdjustContentNode(i, true);
 		}
+		AdjustBorder();
 		SuppressNotifications = false;
 	}
 
 	protected Enums.CardFace GetCardFaceDirection(int index)
 	{
 		return GetCardFaceDirectionFunc?.Invoke(index) ?? DefaultCardFaceDirection;
+	}
+
+	protected override void AdjustBorder()
+	{
+		base.AdjustBorder();
+		if (ActualNodeCount() != 0)
+		{
+			ContainerNameLabel.Show();
+			ContainerNameLabel.Position =
+				-(GetPivotOffset() + new Vector2(StyleBox.ContentMarginLeft, StyleBox.ContentMarginTop + ContainerNameLabel.Size.Y));
+		}
+		else
+		{
+			ContainerNameLabel.Hide();
+		}
 	}
 }

@@ -10,7 +10,7 @@ public class TwoHandedSkillCard: BaseSkillCard
     
     public TwoHandedSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity owner) : 
         base("Two handed", "Adds up the ranks of each pair to attack damage", "res://Sprites/Cards/two_handed.png", suit, rank, 
-            Enums.HandTier.TwoPair, 0, -1, 0, null, null, null, owner)
+            Enums.HandTier.TwoPairs, 0, -1, 0, null, null, null, owner)
     {
     }
 

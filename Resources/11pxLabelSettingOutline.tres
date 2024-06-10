@@ -1,0 +1,9 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://ch1l3y7aj324"]
+
+[ext_resource type="FontFile" uid="uid://dd5v55urjvkvb" path="res://Fonts/lanapixel_everything/LanaPixel.ttf" id="1_1sod8"]
+
+[resource]
+font = ExtResource("1_1sod8")
+font_size = 11
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)

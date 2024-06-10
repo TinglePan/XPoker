@@ -22,4 +22,3 @@ axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
 [node name="Card" parent="." instance=ExtResource("2_u3vkn")]
-rotation = 0.0

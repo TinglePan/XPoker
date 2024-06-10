@@ -21,10 +21,10 @@ public partial class BattleEntity: Node, ISetup
     public Battle Battle;
     public CardContainer HoleCardContainer;
     public BuffContainer BuffContainer;
-    public Label NameLabel;
-    public TextureRect Portrait;
+    public CardContainer SkillCardContainer;
+    public Sprite2D Sprite;
+    public ProgressBar HpBar;
     public Label HpLabel;
-    public Label MaxHpLabel;
     
     public Action<BattleEntity, int> OnHpChanged;
     public Action<BattleEntity> OnDefeated;
@@ -52,11 +52,13 @@ public partial class BattleEntity: Node, ISetup
         base._Ready();
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
         HoleCardContainer = GetNode<CardContainer>("HoleCards");
+        SkillCardContainer = GetNode<CardContainer>("SkillCards");
         BuffContainer = GetNode<BuffContainer>("Buffs");
-        NameLabel = GetNode<Label>("CharacterCard/Panel/Name");
-        Portrait = GetNode<TextureRect>("CharacterCard/Panel/Portrait");
-        HpLabel = GetNode<Label>("CharacterCard/Panel/Hp");
-        MaxHpLabel = GetNode<Label>("CharacterCard/Panel/MaxHp");
+        Sprite = GetNode<Sprite2D>("Sprite");
+        HpBar = GetNode<ProgressBar>("HpBar/Bar");
+        HpBar.MinValue = 0;
+        HpBar.Step = 1;
+        HpLabel = GetNode<Label>("HpBar/Hp");
         HasSetup = false;
     }
 
@@ -88,9 +90,27 @@ public partial class BattleEntity: Node, ISetup
             { "cards", HoleCards },
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
+            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
+            { "nodesPerRow", Configuration.HoleCardCount },
+            { "expectedContentNodeCount", Configuration.HoleCardCount },
+            { "growBorder", false },
+            { "containerName", "Hole cards" },
             { "defaultCardFaceDirection", IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down } 
         });
         SkillCards = (ObservableCollection<BaseCard>)args["skillCards"];
+        SkillCardContainer.Setup(new Dictionary<string, object>()
+        {
+            { "allowInteract", false },
+            { "cards", SkillCards },
+            { "contentNodeSize", Configuration.CardSize },
+            { "separation", Configuration.CardContainerSeparation },
+            { "pivotDirection", Enums.Direction2D8Ways.Up },
+            { "nodesPerRow", Configuration.SkillCardCountPerRow },
+            { "expectedContentNodeCount", 1 },
+            { "growBorder", true },
+            { "containerName", "Skill cards" },
+            { "defaultCardFaceDirection", Enums.CardFace.Up } 
+        });
         Buffs = new ObservableCollection<BaseBuff>();
         BuffContainer.Setup(new Dictionary<string, object>()
         {
@@ -98,14 +118,12 @@ public partial class BattleEntity: Node, ISetup
             { "buffs", Buffs },
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
-            { "defaultCardFaceDirection", Enums.CardFace.Up } 
+            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
+            { "nodesPerRow", Configuration.BuffCountPerRow },
         });
-        NameLabel.Text = DisplayName;
-        Portrait.Texture = ResourceCache.Instance.Load<Texture2D>(PortraitPath);
-        Hp.DetailedValueChanged += HpChanged;
+        Hp.ValueChanged += HpChanged;
+        MaxHp.ValueChanged += HpChanged;
         Hp.FireValueChangeEventsOnInit();
-        MaxHp.DetailedValueChanged += MaxHpChanged;
-        MaxHp.FireValueChangeEventsOnInit();
         
         HasSetup = true;
     }
@@ -161,15 +179,14 @@ public partial class BattleEntity: Node, ISetup
         }
     }
     
-    protected void HpChanged(object sender, ValueChangedEventDetailedArgs<int> args)
+    protected void HpChanged(object sender, ValueChangedEventArgs args)
     {
-        // TODO: Animate number change here 
-        HpLabel.Text = args.NewValue.ToString();
-    }
-	
-    protected void MaxHpChanged(object sender, ValueChangedEventDetailedArgs<int> args)
-    {
-        // TODO: Animate number change here 
-        MaxHpLabel.Text = args.NewValue.ToString();
+        string GetHpText(int hp, int maxHp)
+        {
+            return $"{hp} / {maxHp}";
+        }
+        HpLabel.Text = GetHpText(Hp.Value, MaxHp.Value);
+        HpBar.Value = Hp.Value;
+        HpBar.MaxValue = MaxHp.Value;
     }
 }

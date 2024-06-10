@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="3_k1fdh"]
 [ext_resource type="Texture2D" uid="uid://oldgvrsgrmpi" path="res://Sprites/GodotHead.svg" id="4_1ofts"]
 [ext_resource type="PackedScene" uid="uid://2yj0yi24lkar" path="res://Scenes/BuffTabUi.tscn" id="4_jb6u6"]
-[ext_resource type="FontFile" uid="uid://cy2x5d3tsilqd" path="res://Fonts/ark-pixel-12px-proportional-zh_cn.woff2" id="5_7ckbk"]
+[ext_resource type="FontFile" uid="uid://cy2x5d3tsilqd" path="res://Fonts/ark-pixel-12px/ark-pixel-12px-proportional-zh_cn.woff2" id="5_7ckbk"]
 [ext_resource type="PackedScene" uid="uid://cfh3qchowgcu0" path="res://Scenes/Buff.tscn" id="5_oeiac"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8fxvn"]

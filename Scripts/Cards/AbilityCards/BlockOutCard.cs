@@ -37,6 +37,7 @@ public class BlockOutCard: BaseTapCard
         {
             return card.Suit.Value == Suit;
         }
+        
     }
     
     public class FilterByRankRule: BaseAbsenceCardRule
@@ -55,10 +56,10 @@ public class BlockOutCard: BaseTapCard
     
     public class AbsenceEffect: BaseSingleTurnEffect
     {
-        public List<BaseCard> NegatedCards;
+        public List<CardNode> NegatedCardNodes;
         public AbsenceEffect(string name, string description, string iconPath, BaseCard createdByCard) : base(name, description, iconPath, createdByCard)
         {
-            NegatedCards = new List<BaseCard>();
+            NegatedCardNodes = new List<CardNode>();
         }
 
         public override void OnStart(Battle battle)
@@ -68,12 +69,12 @@ public class BlockOutCard: BaseTapCard
             {
                 foreach (var container in absenceCard.CardContainers)
                 {
-                    foreach (var card in container.Contents)
+                    foreach (var cardNode in container.ContentNodes)
                     {
-                        if (absenceCard.Rule.Filter(card))
+                        if (absenceCard.Rule.Filter(cardNode.Content.Value))
                         {
-                            card.Node.TweenNegate(true, Configuration.NegateTweenTime);
-                            NegatedCards.Add(card);
+                            cardNode.TweenNegate(true, Configuration.NegateTweenTime);
+                            NegatedCardNodes.Add(cardNode);
                         }
                     }
                 }
@@ -82,11 +83,11 @@ public class BlockOutCard: BaseTapCard
         
         public override void OnStop(Battle battle)
         {
-            foreach (var card in NegatedCards)
+            foreach (var cardNode in NegatedCardNodes)
             {
-                card.Node.TweenNegate(false, Configuration.NegateTweenTime);
+                cardNode.TweenNegate(false, Configuration.NegateTweenTime);
             }
-            NegatedCards.Clear();
+            NegatedCardNodes.Clear();
         }
     }
 

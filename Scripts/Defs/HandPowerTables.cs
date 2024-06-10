@@ -13,7 +13,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.Pair, 1 },
 
-        { Enums.HandTier.TwoPair, 2 },
+        { Enums.HandTier.TwoPairs, 2 },
 
         { Enums.HandTier.ThreeOfAKind, 3 },
 
@@ -23,10 +23,9 @@ public static class HandPowerTables
 
         { Enums.HandTier.FullHouse, 6 },
 
-        { Enums.HandTier.FourOfAKind, 7 },
+        { Enums.HandTier.Quads, 7 },
 
         { Enums.HandTier.StraightFlush, 8 },
-
         
         { Enums.HandTier.RoyalFlush, 999 }
     };
@@ -37,7 +36,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.Pair, 3 },
 
-        { Enums.HandTier.TwoPair, 0 },
+        { Enums.HandTier.TwoPairs, 0 },
 
         { Enums.HandTier.ThreeOfAKind, 0 },
 
@@ -47,7 +46,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.FullHouse, 0 },
 
-        { Enums.HandTier.FourOfAKind, 0 },
+        { Enums.HandTier.Quads, 0 },
 
         { Enums.HandTier.StraightFlush, 0 },
 
@@ -60,7 +59,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.Pair, 0 },
 
-        { Enums.HandTier.TwoPair, 0 },
+        { Enums.HandTier.TwoPairs, 0 },
 
         { Enums.HandTier.ThreeOfAKind, 0 },
 
@@ -70,7 +69,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.FullHouse, 0 },
 
-        { Enums.HandTier.FourOfAKind, 0 },
+        { Enums.HandTier.Quads, 0 },
 
         { Enums.HandTier.StraightFlush, 0 },
 
@@ -83,7 +82,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.Pair, 2 },
 
-        { Enums.HandTier.TwoPair, 0 },
+        { Enums.HandTier.TwoPairs, 0 },
 
         { Enums.HandTier.ThreeOfAKind, 4 },
 
@@ -93,7 +92,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.FullHouse, 0 },
 
-        { Enums.HandTier.FourOfAKind, 8 },
+        { Enums.HandTier.Quads, 8 },
 
         { Enums.HandTier.StraightFlush, 0 },
 
@@ -106,7 +105,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.Pair, 0 },
 
-        { Enums.HandTier.TwoPair, 0 },
+        { Enums.HandTier.TwoPairs, 0 },
 
         { Enums.HandTier.ThreeOfAKind, 0 },
 
@@ -116,7 +115,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.FullHouse, 0 },
 
-        { Enums.HandTier.FourOfAKind, 0 },
+        { Enums.HandTier.Quads, 0 },
 
         { Enums.HandTier.StraightFlush, 12 },
 
@@ -130,7 +129,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.Pair, 0 },
 
-        { Enums.HandTier.TwoPair, 0 },
+        { Enums.HandTier.TwoPairs, 0 },
 
         { Enums.HandTier.ThreeOfAKind, 0 },
 
@@ -140,7 +139,7 @@ public static class HandPowerTables
 
         { Enums.HandTier.FullHouse, 0 },
 
-        { Enums.HandTier.FourOfAKind, 0 },
+        { Enums.HandTier.Quads, 0 },
 
         { Enums.HandTier.StraightFlush, 12 },
 

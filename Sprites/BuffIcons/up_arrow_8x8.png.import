@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c0wko2x0urfpg"
-path="res://.godot/imported/up_arrow.png-f062f1c6335194800e7ae1a2d53e5200.ctex"
+uid="uid://fmig87mavmir"
+path="res://.godot/imported/up_arrow_8x8.png-97eae2cee6455f644032f774d8aaf039.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/BuffIcons/up_arrow.png"
-dest_files=["res://.godot/imported/up_arrow.png-f062f1c6335194800e7ae1a2d53e5200.ctex"]
+source_file="res://Sprites/BuffIcons/up_arrow_8x8.png"
+dest_files=["res://.godot/imported/up_arrow_8x8.png-97eae2cee6455f644032f774d8aaf039.ctex"]
 
 [params]
 

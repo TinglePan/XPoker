@@ -50,21 +50,44 @@ public static class Enums
 
     public enum Direction1D
     {
-        None,
+        Neutral,
         Left,
         Right
     }
+
+    public enum Direction2D4Ways
+    {
+        Neutral,
+        Up,
+        Down,
+        Left,
+        Right
+    }
+
+    public enum Direction2D8Ways
+    {
+        Neutral,
+        Up,
+        Down,
+        Left,
+        Right,
+        UpLeft,
+        UpRight,
+        DownLeft,
+        DownRight
+    }
+    
     
     public enum HandTier
     {
         HighCard,
         Pair,
-        TwoPair,
+        TwoPairs,
         ThreeOfAKind,
         Straight,
         Flush,
         FullHouse,
-        FourOfAKind,
+        Quads,
         StraightFlush,
         RoyalFlush
     }

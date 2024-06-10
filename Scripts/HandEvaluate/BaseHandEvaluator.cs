@@ -37,12 +37,12 @@ public class BaseHandEvaluator
     {
         new RoyalFlushRule(5, false, true),
         new StraightFlushRule(5, false, false),
-        new NOfAKindRule(Enums.HandTier.FourOfAKind, 4, NumericCardRanks),
+        new NOfAKindRule(Enums.HandTier.Quads, 4, NumericCardRanks),
         new NPlusMRule(Enums.HandTier.FullHouse, 3, 2, NumericCardRanks),
         new FlushRule(5, SuitWithColor),
         new StraightRule(5, false, true),
         new NOfAKindRule(Enums.HandTier.ThreeOfAKind, 3, NumericCardRanks),
-        new NPlusMRule(Enums.HandTier.TwoPair, 2, 2, NumericCardRanks),
+        new NPlusMRule(Enums.HandTier.TwoPairs, 2, 2, NumericCardRanks),
         new NOfAKindRule(Enums.HandTier.Pair, 2, NumericCardRanks),
         new NOfAKindRule(Enums.HandTier.HighCard, 1, NumericCardRanks),
     };

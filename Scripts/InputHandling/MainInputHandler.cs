@@ -2,6 +2,8 @@
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
+using XCardGame.Scripts.Cards.SkillCards;
+using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Nodes;
 using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 using CardNode = XCardGame.Scripts.Nodes.CardNode;
@@ -23,12 +25,19 @@ public class MainInputHandler: BaseInputHandler
     {
         base.OnEnter();
         ProceedButton.Pressed += GameMgr.CurrentBattle.Proceed;
+        // ProceedButton.Pressed += AddSkillCard;
         FieldCardContainer.ContentNodes.CollectionChanged += OnFieldCardNodesCollectionChanged;
         foreach (var cardNode in FieldCardContainer.ContentNodes)
         {
             cardNode.OnPressed += ClickCard;
         }
     }
+
+    // protected void AddSkillCard()
+    // {
+    //     var playerSkillCardContainer = GameMgr.CurrentBattle.Player.SkillCardContainer;
+    //     playerSkillCardContainer.Contents.Add(new DualWieldSkillCard(Enums.CardSuit.Spades, Enums.CardRank.Two, GameMgr.CurrentBattle.Player));
+    // }
     
     public override void OnExit()
     {

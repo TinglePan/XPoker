@@ -9,15 +9,15 @@ using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Nodes;
 
-public class CardEntry: BaseContentNode<CardEntry, BaseCard>
+public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
 {
     public GameMgr GameMgr;
     public Battle Battle;
     public Sprite2D SuitIcon;
     public Label RankLabel;
     public Label JokerLabel;
-    public Label CostLabel;
     public Label NameLabel;
+    public Line2D NegateLine;
     
     public Action<CardEntry> OnPressed;
 
@@ -29,10 +29,12 @@ public class CardEntry: BaseContentNode<CardEntry, BaseCard>
     {
         base._Ready();
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
-        SuitIcon = GetNode<Sprite2D>("Outline/Front/Suit");
-        RankLabel = GetNode<Label>("Outline/Front/Rank");
-        JokerLabel = GetNode<Label>("Outline/Front/Joker");
-        CostLabel = GetNode<Label>("Outline/Front/Cost");
+        SuitIcon = GetNode<Sprite2D>("Suit");
+        RankLabel = GetNode<Label>("Rank");
+        JokerLabel = GetNode<Label>("Joker");
+        NameLabel = GetNode<Label>("Name");
+        NegateLine = GetNode<Line2D>("NegateLine");
+        
         
         Area.InputEvent += InputEventHandler;
         IsNegated = false;

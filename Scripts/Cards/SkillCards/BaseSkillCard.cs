@@ -29,9 +29,20 @@ public class BaseSkillCard: BaseCard
         BuffSelf = buffSelf;
         BuffOpponent = buffOpponent;
         Effects = effects;
+    }
+
+    public override void OnStart(Battle battle)
+    {
+        base.OnStart(battle);
         Battle.BeforeApplyAttack += BeforeApplyAttack;
     }
-    
+
+    public override void OnStop(Battle battle)
+    {
+        base.OnStop(battle);
+        Battle.BeforeApplyAttack -= BeforeApplyAttack;
+    }
+
     public virtual void AfterDamageDealt(Attack attack, int actualDamageDealt)
     {
         if (BuffSelf is { Count: > 0 })

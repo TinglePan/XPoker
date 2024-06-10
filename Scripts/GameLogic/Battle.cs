@@ -98,6 +98,11 @@ public partial class Battle: Node2D, ISetup
             { "cards", CommunityCards },
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
+            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
+            { "nodesPerRow", Configuration.CommunityCardCount },
+            { "expectedContentNodeCount", Configuration.CommunityCardCount },
+            { "growBorder", false },
+            { "containerName", "Community cards"},
             { "getCardFaceDirectionFunc", (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc }
         });
         
@@ -107,6 +112,11 @@ public partial class Battle: Node2D, ISetup
             { "cards", FieldCards },
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
+            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
+            { "nodesPerRow", Configuration.FieldCardCountPerRow },
+            { "expectedContentNodeCount", 0 },
+            { "growBorder", false },
+            { "containerName", "Field cards"},
             { "defaultCardFaceDirection", Enums.CardFace.Up } 
         });
         

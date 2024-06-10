@@ -1,0 +1,92 @@
+[gd_scene load_steps=10 format=3 uid="uid://b5ckc3msigv6m"]
+
+[ext_resource type="Script" path="res://Scripts/GameLogic/PlayerBattleEntity.cs" id="1_bow21"]
+[ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="2_3nqyy"]
+[ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="3_4i2i6"]
+[ext_resource type="PackedScene" uid="uid://2yj0yi24lkar" path="res://Scenes/BuffTabUi.tscn" id="4_v7dil"]
+[ext_resource type="PackedScene" uid="uid://cfh3qchowgcu0" path="res://Scenes/Buff.tscn" id="5_jb356"]
+[ext_resource type="LabelSettings" uid="uid://ch1l3y7aj324" path="res://Resources/11pxLabelSettingOutline.tres" id="7_6c07j"]
+[ext_resource type="Texture2D" uid="uid://b3ktwe6xf0o5c" path="res://Sprites/duster_guy.png" id="7_tqj8q"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lwhme"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o17m"]
+bg_color = Color(1, 1, 0.988235, 0.996078)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+anti_aliasing = false
+
+[node name="BattleEntity" type="Node2D"]
+script = ExtResource("1_bow21")
+
+[node name="HoleCards" parent="." groups=["markerCardContainer"] instance=ExtResource("2_3nqyy")]
+position = Vector2(0, -104)
+
+[node name="Card" parent="HoleCards" instance=ExtResource("3_4i2i6")]
+
+[node name="SkillCards" parent="." groups=["skillCardContainer"] instance=ExtResource("2_3nqyy")]
+position = Vector2(0, -178)
+
+[node name="Card" parent="SkillCards" instance=ExtResource("3_4i2i6")]
+
+[node name="Buffs" parent="." instance=ExtResource("4_v7dil")]
+position = Vector2(0, -28)
+
+[node name="Buff" parent="Buffs" instance=ExtResource("5_jb356")]
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("7_tqj8q")
+
+[node name="HpBar" type="Node2D" parent="."]
+
+[node name="Bar" type="ProgressBar" parent="HpBar"]
+texture_filter = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -64.0
+offset_top = -56.0
+offset_right = 64.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/background = SubResource("StyleBoxFlat_lwhme")
+theme_override_styles/fill = SubResource("StyleBoxFlat_2o17m")
+step = 1.0
+value = 50.0
+show_percentage = false
+
+[node name="Hp" type="Label" parent="HpBar"]
+texture_filter = 1
+custom_minimum_size = Vector2(64, 22)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -13.0
+offset_top = -62.0
+offset_right = 13.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "12/70"
+label_settings = ExtResource("7_6c07j")
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -27,8 +27,8 @@ public static class Decks
                 {
                     continue;
                 }
-                MarkerCard markerCard = new MarkerCard(null, (Enums.CardSuit)suit, (Enums.CardRank)rank);
-                deck.CardList.Add(markerCard);
+                PokerCard pokerCard = new PokerCard(null, (Enums.CardSuit)suit, (Enums.CardRank)rank);
+                deck.CardList.Add(pokerCard);
             }
         }
 

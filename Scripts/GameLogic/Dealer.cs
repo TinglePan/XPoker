@@ -143,7 +143,7 @@ public partial class Dealer: Node2D, ISetup
         var card = await DrawCardFromPile(DealCardPile);
         if (card == null) return;
         var cardNode = CreateCardNodeOnPile(card, DealCardPile);
-        targetContainer.ContentNodes.Insert(targetContainer.ContentNodes.Count, cardNode);
+        targetContainer.ContentNodes.Add(cardNode);
     }
 
     public async void DealCardAndReplace(CardNode node, float delay = 0f)

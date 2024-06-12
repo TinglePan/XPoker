@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using XCardGame.Scripts.Cards.CardMarkers;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
@@ -10,19 +11,12 @@ namespace XCardGame.Scripts.Cards;
 
 public class MarkerCard: BaseCard
 {
-	protected static string GetCardName(Enums.CardSuit suit, Enums.CardRank rank)
-	{
-		return $"{rank} of {suit}";
-	}
+	public ObservableCollection<BaseCardMarker> Markers;
 	
-	public List<BaseCardMarker> Markers;
-	
-	public MarkerCard(string texturePath, Enums.CardSuit suit, Enums.CardRank rank,
-		List<BaseCardMarker> markers = null, bool suitAsSecondComparer = false):
-		base(GetCardName(suit, rank), GetCardName(suit, rank), texturePath, suit, rank)
+	public MarkerCard(string name, string description, string texturePath, Enums.CardSuit suit, Enums.CardRank rank,
+		BattleEntity ownerEntity): base(name, description, texturePath, suit, rank, ownerEntity)
 	{
-		Markers = markers;
-		Suit.DetailedValueChanged += OnSuitChanged;
+		Markers = new ObservableCollection<BaseCardMarker>();
 	}
 
 	public override void OnStart(Battle battle)
@@ -52,10 +46,5 @@ public class MarkerCard: BaseCard
 	public override string ToString()
 	{
 		return $"{Rank.Value} of {Suit.Value}";
-	}
-	
-	protected virtual void OnSuitChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardSuit> args)
-	{
-		IconPath.Value = Utils.GetCardTexturePath(args.NewValue);
 	}
 }

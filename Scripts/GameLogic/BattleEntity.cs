@@ -23,6 +23,8 @@ public partial class BattleEntity: Node, ISetup
     public BuffContainer BuffContainer;
     public CardContainer SkillCardContainer;
     public Sprite2D Sprite;
+    public Node2D DefenceIcon;
+    public Label DefenceLabel;
     public ProgressBar HpBar;
     public Label HpLabel;
     
@@ -36,8 +38,9 @@ public partial class BattleEntity: Node, ISetup
     public Deck Deck;
     public int DealCardCount;
     public int FactionId;
-    public Dictionary<Enums.HandTier, int> HandPowers;
     public int BaseHandPower;
+    public Dictionary<Enums.HandTier, int> HandPowers;
+    public ObservableProperty<int> Defence;
     public ObservableProperty<int> Hp;
     public ObservableProperty<int> MaxHp;
     public ObservableProperty<int> Level;
@@ -55,6 +58,8 @@ public partial class BattleEntity: Node, ISetup
         SkillCardContainer = GetNode<CardContainer>("SkillCards");
         BuffContainer = GetNode<BuffContainer>("Buffs");
         Sprite = GetNode<Sprite2D>("Sprite");
+        DefenceLabel = GetNode<Label>("Defence/Value");
+        DefenceIcon = GetNode<Sprite2D>("Defence");
         HpBar = GetNode<ProgressBar>("HpBar/Bar");
         HpBar.MinValue = 0;
         HpBar.Step = 1;
@@ -70,7 +75,7 @@ public partial class BattleEntity: Node, ISetup
         Deck = (Deck)args["deck"];
         foreach (var card in Deck.CardList)
         {
-            card.Owner = this;
+            card.OwnerEntity = this;
         }
 
         DealCardCount = (int)args["dealCardCount"];
@@ -121,6 +126,8 @@ public partial class BattleEntity: Node, ISetup
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
             { "nodesPerRow", Configuration.BuffCountPerRow },
         });
+        Defence.DetailedValueChanged += DefenceChanged;
+        Defence.FireValueChangeEventsOnInit();
         Hp.ValueChanged += HpChanged;
         MaxHp.ValueChanged += HpChanged;
         Hp.FireValueChangeEventsOnInit();
@@ -154,11 +161,55 @@ public partial class BattleEntity: Node, ISetup
         // HoleCardContainer.ContentNodes.Clear();
     }
 
+    public int GetPower(Enums.HandTier handTier, bool useCharge = true)
+    {
+        var power = BaseHandPower + HandPowers[handTier];
+        foreach (var buff in Buffs)
+        {
+            if (buff is ChargePowerBuff chargePowerBuff)
+            {
+                if (useCharge)
+                {
+                    power += chargePowerBuff.Stack.Value;
+                    chargePowerBuff.Consume();
+                }
+            } else if (buff is PermanentPowerBuff permanentPowerBuff)
+            {
+                power += permanentPowerBuff.Stack.Value;
+            }
+        }
+        return power;
+    }
+
     public override string ToString()
     {
         return DisplayName;
     }
 
+    public void ChangeDefence(int amount)
+    {
+        Defence.Value = Mathf.Clamp(Defence.Value + amount, 0, Configuration.MaxDefence);
+    }
+
+    public int TakeDamage(int damage, bool bypassDefence = false)
+    {
+        if (bypassDefence)
+        {
+            return ChangeHp(-damage);
+        }
+        else
+        {
+            var reduceDefence = Mathf.Min(damage, Defence.Value);
+            ChangeDefence(-reduceDefence);
+            damage -= reduceDefence;
+            if (damage > 0)
+            {
+                return ChangeHp(damage);
+            }
+            return 0;
+        }
+    }
+    
     public int ChangeHp(int delta)
     {
         var actualDelta = Mathf.Clamp(delta, -Hp.Value, MaxHp.Value - Hp.Value);
@@ -188,5 +239,18 @@ public partial class BattleEntity: Node, ISetup
         HpLabel.Text = GetHpText(Hp.Value, MaxHp.Value);
         HpBar.Value = Hp.Value;
         HpBar.MaxValue = MaxHp.Value;
+    }
+
+    protected void DefenceChanged(object sender, ValueChangedEventDetailedArgs<int> args)
+    {
+        if (args.NewValue <= 0)
+        {
+            DefenceIcon.Hide();
+        }
+        else
+        {
+            DefenceIcon.Show();
+            DefenceLabel.Text = args.NewValue.ToString();
+        }
     }
 }

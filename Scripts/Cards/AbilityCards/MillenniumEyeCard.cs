@@ -13,7 +13,7 @@ public class MillenniumEyeCard: BaseUseCard
     class MillenniumEyeEffect : BaseSingleTurnEffect
     {
         public List<CardNode> RevealedCardNodes;
-        public MillenniumEyeEffect(string name, string description, string iconPath, BaseCard createdByCard) : base(name, description, iconPath, createdByCard)
+        public MillenniumEyeEffect(string name, string description, BaseCard createdByCard) : base(name, description, createdByCard)
         {
             RevealedCardNodes = new List<CardNode>();
         }
@@ -69,7 +69,7 @@ public class MillenniumEyeCard: BaseUseCard
 
     public override void Use()
     {
-        var effect = new MillenniumEyeEffect(Name, Description, IconPath.Value, this);
+        var effect = new MillenniumEyeEffect(Name, Description, this);
         Battle.StartEffect(effect);
         StartRecharge();
     }

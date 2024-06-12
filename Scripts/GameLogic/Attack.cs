@@ -1,71 +1,97 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Godot;
 using XCardGame.Scripts.Buffs;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.SkillCards;
-using XCardGame.Scripts.Effects;
-using XCardGame.Scripts.HandEvaluate;
+using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.GameLogic;
 
 public class Attack
 {
-    public BattleEntity Source;
-    public BattleEntity Target;
-    public CompletedHand SourceHand;
-    public CompletedHand TargetHand;
-    public int Power;
-    public List<BaseSkillCard> RelevantSkillCards;
-    public List<(int, string)> ExtraDamages;
-    public List<(float, string)> ExtraMultipliers;
-    public bool IsNegated;
+    public BattleEntity Attacker;
+    public BattleEntity Defender;
+    public int RawAttackValue;
     
-    protected GameMgr GameMgr;
-    protected Battle Battle;
-    
-    public Attack(GameMgr gameMgr, Battle battle, BattleEntity source, BattleEntity target, CompletedHand sourceHand, CompletedHand targetHand)
+    public Attack(BattleEntity attacker, BattleEntity defender, int rawAttackValue)
     {
-        GameMgr = gameMgr;
-        Battle = battle;
-        Source = source;
-        Target = target;
-        SourceHand = sourceHand;
-        TargetHand = targetHand;
-        Power = Source.HandPowers[SourceHand.Tier] + source.BaseHandPower;
-        ExtraDamages = new List<(int, string)>();
-        ExtraMultipliers = new List<(float, string)>();
-        RelevantSkillCards = new List<BaseSkillCard>();
-        IsNegated = false;
-    }
-
-    public int Damage()
-    {
-        var damage = Power;
-        foreach (var (damageValue, _) in ExtraDamages)
-        {
-            damage += damageValue;
-        }
-
-        float multiplyDamage = damage;
-        foreach (var (multiplier, _) in ExtraMultipliers)
-        {
-            multiplyDamage *= multiplier;
-        }
-        return Mathf.RoundToInt(multiplyDamage);
+        Attacker = attacker;
+        Defender = defender;
+        RawAttackValue = rawAttackValue;
     }
     
-    public void Apply()
+    public void Resolve()
     {
-        if (!IsNegated)
+        var attackerDamageModifier = GetAttackerDamageModifier(Attacker);
+        var attackerDamageMultipliers = GetAttackerDamageMultipliers(Attacker);
+
+        float attackValue = RawAttackValue + attackerDamageModifier;
+        foreach (var attackMultiplier in attackerDamageMultipliers)
         {
-            var actualDamage = Mathf.Clamp(Damage(), 0, Target.Hp.Value);
-            Target.Hp.Value -= actualDamage;
-            foreach (var skillCard in RelevantSkillCards)
+            attackValue *= attackMultiplier;
+        }
+        
+        var roundedAttackValue = (int)attackValue;
+
+        float damageValue = roundedAttackValue;
+        var defenderDamageModifier = GetDefenderDamageModifier(Defender);
+        var defendDamageMultipliers = GetDefenderDamageMultipliers(Defender);
+        damageValue += defenderDamageModifier;
+        foreach (var defendMultiplier in defendDamageMultipliers)
+        {
+            damageValue *= defendMultiplier;
+        }
+        var roundedDamageValue = (int)damageValue;
+        Defender.TakeDamage(roundedDamageValue);
+    }
+    
+    
+    protected int GetAttackerDamageModifier(BattleEntity attacker)
+    {
+        var res = 0;
+        foreach (var buff in attacker.Buffs)
+        {
+            if (buff is FeebleDeBuff)
             {
-                skillCard.AfterDamageDealt(this, actualDamage);
+                res -= buff.Stack.Value;
             }
         }
+        return res;
+    }
+
+    protected List<float> GetAttackerDamageMultipliers(BattleEntity attacker)
+    {
+        List<float> res = new();
+        foreach (var buff in attacker.Buffs)
+        {
+            if (buff is WeakenDeBuff)
+            {
+                res.Add(1 - (float)Configuration.WeakenMultiplier / 100);
+            }
+        }
+        return res;
+    }
+
+    protected int GetDefenderDamageModifier(BattleEntity defender)
+    {
+        var res = 0;
+        foreach (var buff in defender.Buffs)
+        {
+            if (buff is FragileDeBuff)
+            {
+                res += buff.Stack.Value;
+            }
+        }
+        return res;
+    }
+
+    protected List<float> GetDefenderDamageMultipliers(BattleEntity defender)
+    {
+        List<float> res = new();
+        foreach (var buff in defender.Buffs)
+        {
+            if (buff is VulnerableDeBuff)
+            {
+                res.Add(1 + (float)Configuration.VulnerableMultiplier / 100);
+            }
+        }
+        return res;
     }
 }

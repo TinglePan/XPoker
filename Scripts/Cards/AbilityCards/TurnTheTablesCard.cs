@@ -6,52 +6,48 @@ using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.HandEvaluate;
+using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class TurnTheTablesCard: BaseTapCard
+public class TurnTheTablesCard: BaseUseCard
 {
-    class TurnTheTablesEffect: BaseSingleTurnEffect
-    {
-        public TurnTheTablesEffect(string name, string description, string iconPath, BaseCard createdByCard) : base(name, description, iconPath, createdByCard)
-        {
-        }
-
-        public override void OnStart(Battle battle)
-        {
-            CreatedByCard.Battle.BeforeEngage += BeforeEngage;
-        }
-        
-        public override void OnStop(Battle battle)
-        {
-            CreatedByCard.Battle.BeforeEngage -= BeforeEngage;
-        }
-
-        protected void BeforeEngage(Battle battle)
-        {
-            var card = (TurnTheTablesCard)CreatedByCard;
-            if (battle.RoundHands.ContainsKey(card.Source) && battle.RoundHands.ContainsKey(card.Target))
-            {
-                (battle.RoundHands[card.Source], battle.RoundHands[card.Target]) = 
-                    (battle.RoundHands[card.Target], battle.RoundHands[card.Source]);
-            }
-        }
-    }
+    public CardContainer PlayerHoleCardContainer;
+    public CardContainer EnemyHoleCardContainer;
     
-    public BattleEntity Source;
-    public BattleEntity Target;
-    
-    public TurnTheTablesCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost) : base("Turn The Tables", 
-        "When you proceed a round with this card faced up, you showdown with your opponent's hole cards, and vice versa.", 
-        "res://Sprites/Cards/turn_the_tables.png", suit, rank, tappedCost, unTappedCost)
+    public TurnTheTablesCard(Enums.CardSuit suit, Enums.CardRank rank, int cost, int unTappedCost) : base("Turn The Tables", 
+        "Swap your hole cards with your opponents.", 
+        "res://Sprites/Cards/turn_the_tables.png", suit, rank, cost)
     {
     }
 
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        Source = Battle.Player;
-        Target = Battle.Entities.FirstOrDefault(entity => entity != Source);
-        Effect = new TurnTheTablesEffect(Name, Description, IconPath.Value, this);
+        PlayerHoleCardContainer = Battle.Player.HoleCardContainer;
+        EnemyHoleCardContainer = Battle.Enemy.HoleCardContainer;
+    }
+    
+    
+    public override bool CanInteract()
+    {
+        return base.CanInteract() && Battle.CurrentState == Battle.State.BeforeShowDown;
+    }
+
+    public override void Use()
+    {
+        base.Use();
+        var playerHoleCardNodes = new List<CardNode>(PlayerHoleCardContainer.ContentNodes);
+        var enemyHoleCardNodes = new List<CardNode>(EnemyHoleCardContainer.ContentNodes);
+        foreach (var cardNode in playerHoleCardNodes)
+        {
+            PlayerHoleCardContainer.ContentNodes.Remove(cardNode);
+            EnemyHoleCardContainer.ContentNodes.Add(cardNode);
+        }
+        foreach (var cardNode in enemyHoleCardNodes)
+        {
+            EnemyHoleCardContainer.ContentNodes.Remove(cardNode);
+            PlayerHoleCardContainer.ContentNodes.Add(cardNode);
+        }
     }
 }

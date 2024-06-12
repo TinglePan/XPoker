@@ -1,13 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://d4h70xggbmu6r"]
+[gd_scene load_steps=3 format=3 uid="uid://d4h70xggbmu6r"]
 
+[ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="1_77no6"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="1_jaca4"]
 
 [node name="SkillDisplay" type="Node2D"]
 
+[node name="PlayerRoundSkills" parent="." groups=["skillCardContainer"] instance=ExtResource("1_77no6")]
+position = Vector2(-96, 0)
+
+[node name="PlayerSkillCard" parent="PlayerRoundSkills" instance=ExtResource("1_jaca4")]
+
+[node name="EnemyRoundSkills" parent="." groups=["skillCardContainer"] instance=ExtResource("1_77no6")]
+position = Vector2(96, 0)
+
+[node name="EnemySkillCard" parent="EnemyRoundSkills" instance=ExtResource("1_jaca4")]
+
 [node name="SwordIcon" type="Sprite2D" parent="."]
-
-[node name="PlayerSkillCard" parent="." instance=ExtResource("1_jaca4")]
-position = Vector2(-80, 0)
-
-[node name="EnemySkillCard" parent="." instance=ExtResource("1_jaca4")]
-position = Vector2(80, 0)

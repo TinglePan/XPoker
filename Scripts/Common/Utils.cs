@@ -2,6 +2,7 @@
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Common;
 

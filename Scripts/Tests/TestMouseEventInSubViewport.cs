@@ -13,7 +13,7 @@ public partial class TestMouseEventInSubViewport : Control
 	public override void _Ready()
 	{
 		base._Ready();
-		var card = new MarkerCard(Utils.GetCardTexturePath(Enums.CardSuit.Clubs), Enums.CardSuit.Clubs, Enums.CardRank.Ace);
+		var card = new PokerCard(Utils.GetCardTexturePath(Enums.CardSuit.Clubs), Enums.CardSuit.Clubs, Enums.CardRank.Ace);
 		CardNode.Setup(new Dictionary<string, object>()
 		{
 			{ "card", card },

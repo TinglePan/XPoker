@@ -25,8 +25,4 @@ public class BaseCardMarker: ILifeCycleTriggeredInBattle
     public virtual void OnStop(Battle battle)
     {
     }
-    
-    public virtual void OnDisposal(Battle battle)
-    {
-    }
 }

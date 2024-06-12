@@ -120,4 +120,16 @@ public static class Enums
         Tapped,
         UnTapped
     }
+
+    public enum EngageRole
+    {
+        Attacker,
+        Defender
+    }
+
+    public enum SkillType
+    {
+        Main,
+        Extra
+    }
 }

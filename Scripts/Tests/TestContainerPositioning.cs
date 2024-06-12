@@ -33,7 +33,7 @@ public partial class TestContainerPositioning: Node
 
     public void SpawnCardNodeAndAppend()
     {
-        var card = new MarkerCard(Utils.GetCardTexturePath(Enums.CardSuit.Clubs), Enums.CardSuit.Clubs, Enums.CardRank.Ace);
+        var card = new PokerCard(Utils.GetCardTexturePath(Enums.CardSuit.Clubs), Enums.CardSuit.Clubs, Enums.CardRank.Ace);
         var cardNode = CardPrefab.Instantiate<CardNode>();
         AddChild(cardNode);
         cardNode.Setup(new Dictionary<string, object>()

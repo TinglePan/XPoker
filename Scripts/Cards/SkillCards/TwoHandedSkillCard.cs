@@ -1,36 +1,27 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Effects.SkillEffects;
 using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.Cards.SkillCards;
 
 public class TwoHandedSkillCard: BaseSkillCard
 {
-    
-    public TwoHandedSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity owner) : 
-        base("Two handed", "Adds up the ranks of each pair to attack damage", "res://Sprites/Cards/two_handed.png", suit, rank, 
-            Enums.HandTier.TwoPairs, 0, -1, 0, null, null, null, owner)
+    public TwoHandedSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity ownerEntity) : 
+        base("Two handed", "Make an attack that scales more with power", "res://Sprites/Cards/two_handed.png", suit, rank, 
+            Enums.HandTier.TwoPairs, null, ownerEntity)
     {
-    }
-
-    protected override void InnerBeforeDamageDealt(Attack attack)
-    {
-        base.InnerBeforeDamageDealt(attack);
-        if (attack.Source == Owner)
+        Contents = new Dictionary<Enums.EngageRole, List<BaseSkillEffect>>()
         {
-            var hand = attack.SourceHand;
-            HashSet<Enums.CardRank> ranks = new HashSet<Enums.CardRank>();
-            foreach (var card in hand.PrimaryCards)
             {
-                ranks.Add(card.Rank.Value);
+                Enums.EngageRole.Attacker, new List<BaseSkillEffect>()
+                {
+                    new DamageSkillEffect(this, 0, 2),
+                }
             }
-            var extraDamage = 0;
-            foreach (var rank in ranks)
-            {
-                extraDamage += Utils.GetCardRankValue(rank);
-            }
-            attack.ExtraDamages.Add((extraDamage, Name));
-        }
+        };
     }
 }

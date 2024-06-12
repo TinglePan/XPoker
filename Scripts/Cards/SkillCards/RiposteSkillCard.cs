@@ -3,20 +3,42 @@ using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Effects;
+using XCardGame.Scripts.Effects.SkillEffects;
 using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.Cards.SkillCards;
 
 public class RiposteSkillCard: BaseSkillCard
 {
-    public RiposteSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity owner, Enums.HandTier tier) : 
-        base("Riposte", "Grants vulnerable instead of dealing damage", "res://Sprites/feint", suit, 
-            rank, tier, 0, 0, 0, null, null, null, owner)
+    
+    public class RiposteSkillEffect: BuffSkillEffect
     {
-        BuffSelf = new List<BaseBuff>()
+        public RiposteSkillEffect(BattleEntity target, BaseCard createdByCard) : base(target, createdByCard)
         {
-            new RiposteBuff(TriggerHandTier, Utils.GetCardRankValue(Rank.Value), 1, 
-                Battle.GetOpponentOf(owner), owner, this)
+        }
+
+        public override BaseBuff PrepareBuff(CompletedHand hand, BattleEntity self, BattleEntity opponent)
+        {
+            var power = self.GetPower(hand.Tier);
+            return new RiposteBuff(power);
+        }
+    }
+    
+    public RiposteSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity ownerEntity) : 
+        base("Riposte", "Negate the next incoming attack, then counter attacks", "res://Sprites/riposte.png", suit, 
+            rank, Enums.HandTier.HighCard, null, ownerEntity)
+    {
+        IsExpanding = true;
+        var opponent = Battle.GetOpponentOf(ownerEntity);
+        Contents = new Dictionary<Enums.EngageRole, List<BaseSkillEffect>>()
+        {
+            {
+                Enums.EngageRole.Attacker, new List<BaseSkillEffect>()
+                {
+                    new RiposteSkillEffect(opponent, this),
+                }
+            }
         };
     }
 }

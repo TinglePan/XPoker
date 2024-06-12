@@ -2,19 +2,27 @@
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Effects;
+using XCardGame.Scripts.Effects.SkillEffects;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.SkillCards;
 
 public class FeintSkillCard: BaseSkillCard
 {
-    public FeintSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity owner) : 
+    public FeintSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity ownerEntity) : 
         base("Feint", "Grants vulnerable instead of dealing damage", "res://Sprites/feint", suit, 
-            rank, Enums.HandTier.HighCard, 0, 0, 0, null, null, null, owner)
+            rank, Enums.HandTier.HighCard, null, ownerEntity)
     {
-        BuffOpponent = new List<BaseBuff>()
+
+        var opponent = Battle.GetOpponentOf(ownerEntity);
+        Contents = new Dictionary<Enums.EngageRole, List<BaseSkillEffect>>()
         {
-            new VulnerableDeBuff(1, Battle.GetOpponentOf(owner), owner, this)
+            {
+                Enums.EngageRole.Attacker, new List<BaseSkillEffect>()
+                {
+                    new BuffSkillEffect(opponent, this, new VulnerableDeBuff(1)),
+                }
+            }
         };
     }
 }

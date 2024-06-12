@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
@@ -16,6 +17,7 @@ public partial class CardContainer: ContentContainerWithBorder<CardNode, BaseCar
 	public PackedScene CardPrefab;
 	public Label ContainerNameLabel;
 	public Battle Battle;
+	public BattleEntity OwnerEntity;
 
 	public Enums.CardFace DefaultCardFaceDirection;
 	public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
@@ -51,6 +53,28 @@ public partial class CardContainer: ContentContainerWithBorder<CardNode, BaseCar
 		{
 			GetCardFaceDirectionFunc = (Func<int, Enums.CardFace>)arg;
 		}
+	}
+
+	public async void MoveCardNodesToContainer(CardContainer targetContainer)
+	{
+		var cardNodes = new List<CardNode>(ContentNodes);
+		int index = 0;
+		foreach (var cardNode in cardNodes)
+		{
+			MoveCardNodeToContainer(cardNode, targetContainer, Configuration.AnimateCardTransformInterval * index);
+		}
+	}
+	
+	public async void MoveCardNodeToContainer(CardNode skillCardNode, CardContainer targetContainer, float delay = 0f)
+	{
+		if (delay > 0)
+		{
+			var timer = GetTree().CreateTimer(delay);
+			await ToSignal(timer, Timer.SignalName.Timeout);
+		}
+		var sourceContainer = skillCardNode.Container;
+		sourceContainer.ContentNodes.Remove(skillCardNode);
+		targetContainer.ContentNodes.Add(skillCardNode);
 	}
 
 	protected override void OnV2MAddNodes(int startingIndex, IList nodes)

@@ -57,7 +57,7 @@ public class BlockOutCard: BaseTapCard
     public class AbsenceEffect: BaseSingleTurnEffect
     {
         public List<CardNode> NegatedCardNodes;
-        public AbsenceEffect(string name, string description, string iconPath, BaseCard createdByCard) : base(name, description, iconPath, createdByCard)
+        public AbsenceEffect(string name, string description, BaseCard createdByCard) : base(name, description, createdByCard)
         {
             NegatedCardNodes = new List<CardNode>();
         }
@@ -104,6 +104,6 @@ public class BlockOutCard: BaseTapCard
     {
         base.Setup(args);
         CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer"); 
-        Effect = new AbsenceEffect(Name, Description, IconPath.Value, this);
+        Effect = new AbsenceEffect(Name, Description, this);
     }
 }

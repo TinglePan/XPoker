@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using Godot;
-using Godot.Collections;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
@@ -22,18 +21,20 @@ public partial class Battle: Node2D, ISetup
         Finished,
         BeforeDealCards,
         BeforeShowDown,
-        AfterShowDown
+        BeforeResolve,
+        AfterResolve,
     }
     
     public GameMgr GameMgr;
     public Dealer Dealer;
+    public SkillDisplay SkillDisplay;
     public CardContainer CommunityCardContainer;
     public CardContainer FieldCardContainer;
-    public Array<BattleEntity> Entities;
+    public PlayerBattleEntity Player;
+    public BattleEntity Enemy;
+    public BattleEntity[] Entities;
 
     public BaseButton ProceedButton;
-    
-    public PlayerBattleEntity Player => Entities[0] as PlayerBattleEntity;
     
     public bool HasSetup { get; set; }
     
@@ -42,8 +43,7 @@ public partial class Battle: Node2D, ISetup
     public Action<Battle> OnRoundStart;
     public Action<Battle> OnRoundEnd;
     public Action<Battle> BeforeShowDown;
-    public Action<Battle> BeforeEngage;
-    public Action<Battle, Attack> BeforeApplyAttack;
+    public Action<Battle, Engage> BeforeEngage;
     public Action<Battle> OnBattleFinished;
 
     public ObservableCollection<BaseCard> CommunityCards;
@@ -57,7 +57,8 @@ public partial class Battle: Node2D, ISetup
     public int RequiredHoleCardCountMax;
     
     public int RoundCount;
-    public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHands;
+    public Dictionary<BattleEntity, CompletedHand> RoundHands;
+    public Engage RoundEngage;
     
     public List<BaseEffect> Effects;
     public State CurrentState;
@@ -68,15 +69,19 @@ public partial class Battle: Node2D, ISetup
         base._Ready();
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
         Dealer = GetNode<Dealer>("Dealer");
+        SkillDisplay = GetNode<SkillDisplay>("SkillDisplay");
         CommunityCardContainer = GetNode<CardContainer>("CommunityCards");
         FieldCardContainer = GetNode<CardContainer>("FieldCards");
+        Player = GetNode<PlayerBattleEntity>("Player");
+        Enemy = GetNode<BattleEntity>("Enemy");
+        Entities = new [] { Player, Enemy };
         HasSetup = false;
-        RoundHands = new System.Collections.Generic.Dictionary<BattleEntity, CompletedHand>();
+        RoundHands = new Dictionary<BattleEntity, CompletedHand>();
         CommunityCards = new ObservableCollection<BaseCard>();
         FieldCards = new ObservableCollection<BaseCard>();
     }
 
-    public virtual void Setup(System.Collections.Generic.Dictionary<string, object> args)
+    public virtual void Setup(Dictionary<string, object> args)
     {
         DealCommunityCardCount = (int)args["dealCommunityCardCount"];
         FaceDownCommunityCardCount = (int)args["faceDownCommunityCardCount"];
@@ -85,14 +90,7 @@ public partial class Battle: Node2D, ISetup
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, 
             RequiredHoleCardCountMin, RequiredHoleCardCountMax);
 
-        // FIXME: Weird. The exported array suddenly does not work any more. The nodes dropped in editor Array do not exist here. So I have to manually add them.
-        Entities = new Array<BattleEntity>
-        {
-            FindChild("Player") as PlayerBattleEntity,
-            FindChild("Enemy") as BattleEntity
-        };
-
-        CommunityCardContainer.Setup(new System.Collections.Generic.Dictionary<string, object>()
+        CommunityCardContainer.Setup(new Dictionary<string, object>()
         {
             { "allowInteract", false },
             { "cards", CommunityCards },
@@ -106,7 +104,7 @@ public partial class Battle: Node2D, ISetup
             { "getCardFaceDirectionFunc", (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc }
         });
         
-        FieldCardContainer.Setup(new System.Collections.Generic.Dictionary<string, object>()
+        FieldCardContainer.Setup(new Dictionary<string, object>()
         {
             { "allowInteract", true },
             { "cards", FieldCards },
@@ -120,8 +118,8 @@ public partial class Battle: Node2D, ISetup
             { "defaultCardFaceDirection", Enums.CardFace.Up } 
         });
         
-        var entitiesSetupArgs = (List<System.Collections.Generic.Dictionary<string, object>>)args["entities"];
-        for (int i = 0; i < Entities.Count; i++)
+        var entitiesSetupArgs = (List<Dictionary<string, object>>)args["entities"];
+        for (int i = 0; i < Entities.Length; i++)
         {
             var entity = Entities[i];
             entity.Setup(entitiesSetupArgs[i]);
@@ -133,7 +131,7 @@ public partial class Battle: Node2D, ISetup
             }
         }
         
-        Dealer.Setup(new System.Collections.Generic.Dictionary<string, object>()
+        Dealer.Setup(new Dictionary<string, object>()
         {
             { "sourceDecks" , Entities.Select(e => e.Deck).ToList() },
             { "excludedCards" , null }
@@ -182,7 +180,10 @@ public partial class Battle: Node2D, ISetup
             case State.BeforeShowDown:
                 ShowDown();
                 break;
-            case State.AfterShowDown:
+            case State.BeforeResolve:
+                ResolveSkills();
+                break;
+            case State.AfterResolve:
                 NewRound();
                 break;
         }
@@ -207,6 +208,7 @@ public partial class Battle: Node2D, ISetup
         }
         // CommunityCardContainer.ContentNodes.Clear();
         RoundHands.Clear();
+        RoundEngage = null;
         CurrentState = State.BeforeDealCards;
     }
     
@@ -273,43 +275,24 @@ public partial class Battle: Node2D, ISetup
                 cardNode.AnimateFlip(Enums.CardFace.Up);
             }
         }
+        
 
-        BeforeEngage?.Invoke(this);
-        for (int i = 0; i < Entities.Count; i++)
-        {
-            var entity = Entities[i];
-            for (int j = i + 1; j < Entities.Count; j++)
-            {
-                var otherEntity = Entities[j];
-                if (entity.FactionId == otherEntity.FactionId)
-                {
-                    continue;
-                }
-                var hand = RoundHands[entity];
-                var otherHand = RoundHands[otherEntity];
-                
-                if (HandEvaluator.Compare(hand, otherHand) >= 0)
-                {
-                    Attack attack = new Attack(GameMgr, this, entity, otherEntity, hand,
-                        otherHand);
-                    BeforeApplyAttack?.Invoke(this, attack);
-                    attack.Apply();
-                }
-                if (HandEvaluator.Compare(hand, otherHand) <= 0)
-                {
-                    Attack attack = new Attack(GameMgr, this, otherEntity, entity, otherHand, 
-                        hand);
-                    BeforeApplyAttack?.Invoke(this, attack);
-                    attack.Apply();
-                }
-            }
-        }
-        OnRoundEnd?.Invoke(this);
-        CurrentState = State.AfterShowDown;
+        var playerHand = RoundHands[Player];
+        var enemyHand = RoundHands[Enemy];
+        RoundEngage = new Engage(GameMgr, playerHand, enemyHand);
+        BeforeEngage?.Invoke(this, RoundEngage);
+        RoundEngage.PrepareRoundSkills();
+        CurrentState = State.BeforeResolve;
         // var endTime = Time.GetTicksUsec();
         // GD.Print($"Hand evaluation time: {endTime - startTime} us");
         // GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
         // GD.Print($"{Players[1]} Best Hand: {opponentBestHand.Rank}, {string.Join(",", opponentBestHand.PrimaryCards)}, Kickers: {string.Join(",", opponentBestHand.Kickers)}");
+    }
+
+    public void ResolveSkills()
+    {
+        RoundEngage.Resolve();
+        CurrentState = State.AfterResolve;
     }
 
     public BattleEntity GetOpponentOf(BattleEntity entity)
@@ -330,17 +313,12 @@ public partial class Battle: Node2D, ISetup
         if (e == Player)
         {
             GD.Print($"You lose");
-            OnBattleFinished?.Invoke(this);
         }
         else
         {
-            Entities.Remove(e);
-            if (Entities.Count == 1)
-            {
-                GD.Print($"{Entities[0]} wins");
-                OnBattleFinished?.Invoke(this);
-            }
+            GD.Print($"You win");
         }
+        OnBattleFinished?.Invoke(this);
     }
     
     public void StartEffect(BaseEffect effect)
@@ -361,15 +339,15 @@ public partial class Battle: Node2D, ISetup
         }
     }
 
-    public void InflictBuffOn(BaseBuff buff, BattleEntity target)
+    public void InflictBuffOn(BaseBuff buff, BattleEntity target, BattleEntity source, BaseCard sourceCard = null)
     {
         if (target.Buffs.Contains(buff))
         {
-            buff.Repeat(this, target);
+            buff.Repeat(this, target, source, sourceCard);
         }
         else
         {
-            target.Buffs.Add(buff);
+            buff.InflictOn(target, source, sourceCard);
         }
     }
 

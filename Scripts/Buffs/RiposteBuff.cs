@@ -4,27 +4,13 @@ using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Buffs;
 
-public class RiposteBuff: BaseTemporaryBuff
+public class RiposteBuff: BaseBuff
 {
-    public Enums.HandTier HandTier;
-    public int Power;
+    public RiposteBuff(int power) : 
+        base("Riposte", null, "res://Sprites/BuffIcons/vulnerable.png",
+            isStackable:true, stackOnRepeat:false, stack:power, isTemporary:true)
+    {
+        Description = $"Negate the incoming attack with power less than {power}, if that succeeds, make a counter attack.";
+    }
     
-    public RiposteBuff(Enums.HandTier handTier, int power, int duration, BattleEntity entity, BattleEntity inflictedBy, BaseCard inflictedByCard) : base(
-        "Riposte", null, "res://Sprites/BuffIcons/vulnerable.png",
-        duration, entity, inflictedBy, inflictedByCard)
-    {
-        Description = $"Negate {handTier} attacks and deal {power} damage to the attacker.";
-        HandTier = handTier;
-        Power = power;
-        Battle.BeforeApplyAttack += OnBeforeApplyAttack;
-    }
-
-    protected void OnBeforeApplyAttack(Battle battle, Attack attack)
-    {
-        if (attack.Target == Entity && attack.SourceHand.Tier == HandTier)
-        {
-            attack.IsNegated = true;
-            attack.Source.ChangeHp(-Power);
-        }
-    }
 }

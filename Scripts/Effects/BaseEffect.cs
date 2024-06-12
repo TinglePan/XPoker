@@ -13,38 +13,22 @@ namespace XCardGame.Scripts.Effects;
 public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
 {
     public BaseCard CreatedByCard;
-    
-    public bool HasSetup { get; set; }
+    public Battle Battle;
     
     public string Name;
     public string Description;
-    public string IconPath;
 
-    public BaseEffect(string name, string description, string iconPath, BaseCard createdByCard)
+    public BaseEffect(string name, string description, BaseCard createdByCard)
     {
-        HasSetup = false;
         Name = name;
         Description = description;
-        IconPath = iconPath;
         CreatedByCard = createdByCard;
+        Battle = createdByCard.Battle;
     }
 
     public bool Equals(BaseEffect other)
     {
         return GetType() == other?.GetType();
-    }
-
-    ~BaseEffect()
-    {
-        OnDisposal(CreatedByCard.Battle);
-    }
-
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
-        {
-            GD.PrintErr($"{this} not setup yet");
-        }
     }
 
     public virtual void OnStart(Battle battle)
@@ -53,10 +37,5 @@ public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
 
     public virtual void OnStop(Battle battle)
     {
-    }
-
-    public void OnDisposal(Battle battle)
-    {
-        OnStop(battle);
     }
 }

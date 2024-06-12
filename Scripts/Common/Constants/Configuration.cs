@@ -18,14 +18,18 @@ public static class Configuration
     public static readonly float InvalidConfirmTweenTime = 0.5f;
     public static readonly Vector2 CardSize = new Vector2(48, 68);
     public static readonly Vector2 CardContainerSeparation = new Vector2(12, 8);
-    public static readonly int VulnerableMultiplier = 50;
     public static readonly int ShockDecreaseDamageDealtMultiplierPerStack = -10;
     public static readonly int ShockIncreaseDamageReceivedMultiplierPerStack = 10;
-    public static readonly int ShockMaxStack = 10;
     public static readonly float AnimateCardTransformInterval = 0.1f;
     public static readonly float ContentContainerAdjustTweenTime = 0.2f;
     public static readonly int ShuffleAnimateCards = 3;
     public static readonly int FieldCardCountPerRow = 12;
     public static readonly int SkillCardCountPerRow = 6;
     public static readonly int BuffCountPerRow = 12;
+    public static readonly int MaxDefence = 999;
+
+    public static readonly int CommonBuffMaxStack = 99;
+
+    public static readonly int VulnerableMultiplier = 50;
+    public static readonly int WeakenMultiplier = 25;
 }

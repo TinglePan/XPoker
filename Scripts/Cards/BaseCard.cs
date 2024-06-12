@@ -11,7 +11,10 @@ namespace XCardGame.Scripts.Cards;
 
 public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, IComparable<BaseCard>
 {
-    public BattleEntity Owner;
+    public GameMgr GameMgr;
+    public Battle Battle;
+    public BattleEntity OwnerEntity;
+    
     public string Name;
     public string Description;
     public string OriginalIconPath;
@@ -19,8 +22,6 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     public Enums.CardRank OriginalRank;
     
     public HashSet<BaseContentNode<BaseCard>> Nodes { get; private set; }
-    public GameMgr GameMgr;
-    public Battle Battle;
     public bool HasSetup { get; set; }
     public ObservableProperty<string> IconPath;
     public ObservableProperty<Enums.CardSuit> Suit;
@@ -38,7 +39,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     };
     
     public BaseCard(string name, string description, string iconPath, Enums.CardSuit suit = Enums.CardSuit.None,
-        Enums.CardRank rank = Enums.CardRank.None, BattleEntity owner = null)
+        Enums.CardRank rank = Enums.CardRank.None, BattleEntity ownerEntity = null)
     {
         Nodes = new HashSet<BaseContentNode<BaseCard>>();
         Name = name;
@@ -49,7 +50,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, suit);
         OriginalRank = rank;
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);
-        Owner = owner;
+        OwnerEntity = ownerEntity;
         IsTapped = false;
         IsNegated = false;
     }
@@ -94,11 +95,6 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     public virtual void OnStop(Battle battle)
     {
         
-    }
-    
-    public virtual void OnDisposal(Battle battle)
-    {
-        OnStop(battle);
     }
     
     public int CompareTo(BaseCard other)

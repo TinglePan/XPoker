@@ -63,8 +63,7 @@ public class Engage
             foreach (var cardNode in entity.SkillCardContainer.ContentNodes)
             {
                 var skillCard = (BaseSkillCard)cardNode.Content.Value;
-                if (skillCard.TriggerHandTier == hand.Tier &&
-                    skillCard.Contents.TryGetValue(role, out var content))
+                if (skillCard.CanTrigger(role, hand))
                 {
                     SkillDisplay.PrepareRoundSkill(cardNode, roundSkillContainer, Configuration.AnimateCardTransformInterval * index);
                 }
@@ -86,10 +85,9 @@ public class Engage
             foreach (var cardNode in entity.SkillCardContainer.ContentNodes)
             {
                 var skillCard = (BaseSkillCard)cardNode.Content.Value;
-                if (skillCard.TriggerHandTier == hand.Tier &&
-                    skillCard.Contents.TryGetValue(role, out var content))
+                if (skillCard.CanTrigger(role, hand))
                 {
-                    skillResolver.Resolve(skillCard, content, hand, self, opponent);
+                    skillResolver.Resolve(skillCard, role, hand, self, opponent);
                 }
             }
         }

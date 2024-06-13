@@ -11,13 +11,10 @@ public class BuffSkillEffect: BaseSkillEffect
     public BaseBuff Buff;
     public BattleEntity Target;
 
-    public BuffSkillEffect(BattleEntity target, BaseCard createdByCard, BaseBuff passInBuff = null) : base("Inflict", null, createdByCard)
+    public BuffSkillEffect(BattleEntity target, BaseCard createdByCard, Enums.HandTier triggerHandTier, BaseBuff passInBuff = null, int expanding = 0) : 
+        base("Inflict", "Inflict {}", createdByCard, triggerHandTier, expanding)
     {
         Buff = passInBuff;
-        if (Buff != null)
-        {
-            Description = $"Inflict {Buff}";
-        }
         Target = target;
     }
     
@@ -29,5 +26,10 @@ public class BuffSkillEffect: BaseSkillEffect
     public virtual BaseBuff PrepareBuff(CompletedHand hand, BattleEntity self, BattleEntity opponent)
     {
         return Buff;
+    }
+
+    public override string GetDescription()
+    {
+        return Buff == null ? string.Empty : string.Format(Description, Buff);
     }
 }

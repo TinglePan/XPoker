@@ -20,9 +20,9 @@ public class SkillResolver
         Engage = engage;
     }
 
-    public void Resolve(BaseSkillCard skillCard, List<BaseSkillEffect> effects, CompletedHand hand, BattleEntity self, BattleEntity opponent)
+    public void Resolve(BaseSkillCard skillCard, Enums.EngageRole role, CompletedHand hand, BattleEntity self, BattleEntity opponent)
     {
-        foreach (var effect in effects)
+        foreach (var effect in skillCard.Contents[role])
         {
             effect.Resolve(this, hand, self, opponent);
         }

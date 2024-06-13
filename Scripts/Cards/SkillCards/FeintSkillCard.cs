@@ -11,7 +11,7 @@ public class FeintSkillCard: BaseSkillCard
 {
     public FeintSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity ownerEntity) : 
         base("Feint", "Grants vulnerable instead of dealing damage", "res://Sprites/feint", suit, 
-            rank, Enums.HandTier.HighCard, null, ownerEntity)
+            rank, null, ownerEntity)
     {
 
         var opponent = Battle.GetOpponentOf(ownerEntity);
@@ -20,7 +20,7 @@ public class FeintSkillCard: BaseSkillCard
             {
                 Enums.EngageRole.Attacker, new List<BaseSkillEffect>()
                 {
-                    new BuffSkillEffect(opponent, this, new VulnerableDeBuff(1)),
+                    new BuffSkillEffect(opponent, this, Enums.HandTier.HighCard, new VulnerableDeBuff(1)),
                 }
             }
         };

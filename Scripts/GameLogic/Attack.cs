@@ -6,21 +6,27 @@ namespace XCardGame.Scripts.GameLogic;
 
 public class Attack
 {
+    public Battle Battle;
+    public Engage Engage;
     public BattleEntity Attacker;
     public BattleEntity Defender;
+    public int Power;
     public int RawAttackValue;
     
-    public Attack(BattleEntity attacker, BattleEntity defender, int rawAttackValue)
+    public Attack(Battle battle, BattleEntity attacker, BattleEntity defender, int power, int rawAttackValue)
     {
+        Battle = battle;
+        Engage = Battle.RoundEngage;
         Attacker = attacker;
         Defender = defender;
+        Power = power;
         RawAttackValue = rawAttackValue;
     }
     
     public void Resolve()
     {
-        var attackerDamageModifier = GetAttackerDamageModifier(Attacker);
-        var attackerDamageMultipliers = GetAttackerDamageMultipliers(Attacker);
+        var attackerDamageModifier = Attacker.GetAttackerDamageModifier();
+        var attackerDamageMultipliers = Attacker.GetAttackerDamageMultipliers();
 
         float attackValue = RawAttackValue + attackerDamageModifier;
         foreach (var attackMultiplier in attackerDamageMultipliers)
@@ -30,68 +36,44 @@ public class Attack
         
         var roundedAttackValue = (int)attackValue;
 
+        // Blockers
+        foreach (var buff in Defender.Buffs)
+        {
+            if (buff is RiposteBuff riposteBuff)
+            {
+                if (Power <= riposteBuff.Stack.Value)
+                {
+                    var riposteCounterAttack = riposteBuff.CounterAttack();
+                    riposteBuff.Consume();
+                    riposteCounterAttack.Resolve();
+                    return;
+                }
+            } else if (buff is InvincibleBuff)
+            {
+                return;
+            } else if (buff is BlockBuff blockBuff)
+            {
+                if (Power <= blockBuff.Stack.Value)
+                {
+                    return;
+                }
+            } else if (buff is EvadeBuff evadeBuff)
+            {
+                evadeBuff.Consume();
+                return;
+            }
+        }
+        
         float damageValue = roundedAttackValue;
-        var defenderDamageModifier = GetDefenderDamageModifier(Defender);
-        var defendDamageMultipliers = GetDefenderDamageMultipliers(Defender);
+        var defenderDamageModifier = Defender.GetDefenderDamageModifier();
+        var defendDamageMultipliers = Defender.GetDefenderDamageMultipliers();
         damageValue += defenderDamageModifier;
         foreach (var defendMultiplier in defendDamageMultipliers)
         {
             damageValue *= defendMultiplier;
         }
         var roundedDamageValue = (int)damageValue;
+        
         Defender.TakeDamage(roundedDamageValue);
-    }
-    
-    
-    protected int GetAttackerDamageModifier(BattleEntity attacker)
-    {
-        var res = 0;
-        foreach (var buff in attacker.Buffs)
-        {
-            if (buff is FeebleDeBuff)
-            {
-                res -= buff.Stack.Value;
-            }
-        }
-        return res;
-    }
-
-    protected List<float> GetAttackerDamageMultipliers(BattleEntity attacker)
-    {
-        List<float> res = new();
-        foreach (var buff in attacker.Buffs)
-        {
-            if (buff is WeakenDeBuff)
-            {
-                res.Add(1 - (float)Configuration.WeakenMultiplier / 100);
-            }
-        }
-        return res;
-    }
-
-    protected int GetDefenderDamageModifier(BattleEntity defender)
-    {
-        var res = 0;
-        foreach (var buff in defender.Buffs)
-        {
-            if (buff is FragileDeBuff)
-            {
-                res += buff.Stack.Value;
-            }
-        }
-        return res;
-    }
-
-    protected List<float> GetDefenderDamageMultipliers(BattleEntity defender)
-    {
-        List<float> res = new();
-        foreach (var buff in defender.Buffs)
-        {
-            if (buff is VulnerableDeBuff)
-            {
-                res.Add(1 + (float)Configuration.VulnerableMultiplier / 100);
-            }
-        }
-        return res;
     }
 }

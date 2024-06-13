@@ -147,6 +147,11 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
     {
         return Name == other?.Name;
     }
+
+    public virtual string GetDescription()
+    {
+        return Description;
+    }
     
     protected virtual int StackDecreasePerRound()
     {

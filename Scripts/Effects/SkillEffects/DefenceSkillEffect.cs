@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
@@ -11,8 +12,8 @@ public class DefenceSkillEffect: BaseSkillEffect, IPowerScaledEffect
     public int RawValue { get; }
     public float PowerScale { get; }
     
-    public DefenceSkillEffect(BaseCard createdByCard, int rawValue,
-        float powerScale) : base("Grant defence", $"Grant {rawValue} defence, every 1 power Grants {powerScale} more defence", createdByCard)
+    public DefenceSkillEffect(BaseCard createdByCard, Enums.HandTier triggerHandTier, int rawValue, float powerScale) : 
+        base("Grant defence", $"Grant {rawValue} defence, every 1 power Grants {powerScale} more defence", createdByCard, triggerHandTier)
     {
         RawValue = rawValue;
         PowerScale = powerScale;
@@ -39,9 +40,9 @@ public class DefenceSkillEffect: BaseSkillEffect, IPowerScaledEffect
     protected int GetDefenceModifier(BattleEntity self)
     {
         var res = 0;
-        foreach (var buff in self.Buffs)
-        {
-        }
+        // foreach (var buff in self.Buffs)
+        // {
+        // }
         return res;
     }
     
@@ -50,6 +51,10 @@ public class DefenceSkillEffect: BaseSkillEffect, IPowerScaledEffect
         List<float> res = new();
         foreach (var buff in self.Buffs)
         {
+            if (buff is FragileDeBuff)
+            {
+                res.Add(1 - (float)Configuration.FragileMultiplier / 100);
+            }
         }
         return res;
     }

@@ -29,7 +29,9 @@ public static class Configuration
     public static readonly int MaxDefence = 999;
 
     public static readonly int CommonBuffMaxStack = 99;
+    public static readonly int PowerBasedBuffMaxStack = 999;
 
     public static readonly int VulnerableMultiplier = 50;
     public static readonly int WeakenMultiplier = 25;
+    public static readonly int FragileMultiplier = 50;
 }

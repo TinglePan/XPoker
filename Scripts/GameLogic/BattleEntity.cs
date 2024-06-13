@@ -166,19 +166,79 @@ public partial class BattleEntity: Node, ISetup
         var power = BaseHandPower + HandPowers[handTier];
         foreach (var buff in Buffs)
         {
-            if (buff is ChargePowerBuff chargePowerBuff)
+            if (buff is ChargeBuff chargePowerBuff)
             {
                 if (useCharge)
                 {
                     power += chargePowerBuff.Stack.Value;
                     chargePowerBuff.Consume();
                 }
-            } else if (buff is PermanentPowerBuff permanentPowerBuff)
+            } else if (buff is FeebleDeBuff feebleDeBuff)
             {
-                power += permanentPowerBuff.Stack.Value;
+                if (useCharge)
+                {
+                    power -= feebleDeBuff.Stack.Value;
+                    feebleDeBuff.Consume();
+                }
+            } else if (buff is EmpowerBuff empowerBuff)
+            {
+                power += empowerBuff.Stack.Value;
+            } else if (buff is CrippleDeBuff crippleDeBuff)
+            {
+                power -= crippleDeBuff.Stack.Value;
             }
         }
         return power;
+    }
+    
+    public int GetAttackerDamageModifier()
+    {
+        var res = 0;
+        // foreach (var buff in attacker.Buffs)
+        // {
+        // }
+        return res;
+    }
+
+    public List<float> GetAttackerDamageMultipliers()
+    {
+        List<float> res = new();
+        foreach (var buff in Buffs)
+        {
+            if (buff is WeakenDeBuff)
+            {
+                res.Add(1 - (float)Configuration.WeakenMultiplier / 100);
+                buff.Consume();
+            }
+        }
+        return res;
+    }
+
+    public int GetDefenderDamageModifier()
+    {
+        var res = 0;
+        foreach (var buff in Buffs)
+        {
+            if (buff is ResistBuff)
+            {
+                res -= buff.Stack.Value;
+            }
+        }
+        return res;
+    }
+
+    public List<float> GetDefenderDamageMultipliers()
+    {
+        List<float> res = new();
+        foreach (var buff in Buffs)
+        {
+            if (buff is VulnerableDeBuff)
+            {
+                res.Add(1 + (float)Configuration.VulnerableMultiplier / 100);
+                buff.Consume();
+            }
+        }
+        return res;
     }
 
     public override string ToString()

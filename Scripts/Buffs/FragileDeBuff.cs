@@ -1,14 +1,17 @@
-﻿using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.GameLogic;
+﻿using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.Buffs;
 
 public class FragileDeBuff: BaseBuff
 {
-    public FragileDeBuff(int stack) : 
-        base("Fragile", "Receives 1 more damage per stack from incoming attack", "res://Sprites/BuffIcons/fragile.png",
-            true, stack:stack, maxStack:Configuration.CommonBuffMaxStack, isTemporary:true)
+    public FragileDeBuff(int stack) : base(
+        "Fragile", $"Reduce defence gain by {Configuration.FragileMultiplier} percent, consumes 1 stack on taking effect",
+        "res://Sprites/BuffIcons/fragile.png", true, stack:stack, maxStack:Configuration.CommonBuffMaxStack)
     {
+    }
+
+    public override void Consume()
+    {
+        ChangeStack(-1);
     }
 }

@@ -14,7 +14,7 @@ public class RiposteSkillCard: BaseSkillCard
     
     public class RiposteSkillEffect: BuffSkillEffect
     {
-        public RiposteSkillEffect(BattleEntity target, BaseCard createdByCard) : base(target, createdByCard)
+        public RiposteSkillEffect(BattleEntity target, BaseCard createdByCard, Enums.HandTier triggerHandTier) : base(target, createdByCard, triggerHandTier, expanding:0)
         {
         }
 
@@ -26,17 +26,16 @@ public class RiposteSkillCard: BaseSkillCard
     }
     
     public RiposteSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity ownerEntity) : 
-        base("Riposte", "Negate the next incoming attack, then counter attacks", "res://Sprites/riposte.png", suit, 
-            rank, Enums.HandTier.HighCard, null, ownerEntity)
+        base("Riposte", "Negate the next incoming attack, then counter attack", "res://Sprites/riposte.png", suit, 
+            rank, null, ownerEntity)
     {
-        IsExpanding = true;
         var opponent = Battle.GetOpponentOf(ownerEntity);
         Contents = new Dictionary<Enums.EngageRole, List<BaseSkillEffect>>()
         {
             {
                 Enums.EngageRole.Attacker, new List<BaseSkillEffect>()
                 {
-                    new RiposteSkillEffect(opponent, this),
+                    new RiposteSkillEffect(opponent, this, Enums.HandTier.HighCard),
                 }
             }
         };

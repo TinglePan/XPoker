@@ -10,18 +10,21 @@ namespace XCardGame.Scripts.Cards.SkillCards;
 
 public class BaseSkillCard: MarkerCard
 {
-    
-    public Enums.HandTier TriggerHandTier;
     public Dictionary<Enums.EngageRole, List<BaseSkillEffect>> Contents;
     
-    public bool IsExpanding;
-    
     public BaseSkillCard(string name, string description, string iconPath, Enums.CardSuit suit, Enums.CardRank rank, 
-        Enums.HandTier triggerHandTier, Dictionary<Enums.EngageRole, List<BaseSkillEffect>> contents, BattleEntity ownerEntity) : 
+        Dictionary<Enums.EngageRole, List<BaseSkillEffect>> contents, BattleEntity ownerEntity) : 
         base(name, description, iconPath, suit, rank, ownerEntity)
     {
-        TriggerHandTier = triggerHandTier;
         Contents = contents;
-        IsExpanding = false;
+    }
+
+    public bool CanTrigger(Enums.EngageRole role, CompletedHand hand)
+    {
+        foreach (var content in Contents[role])
+        {
+            if (content.CanTrigger(hand)) return true;
+        }
+        return false;
     }
 }

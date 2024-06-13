@@ -4,10 +4,10 @@ using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Buffs;
 
-public class FeebleDeBuff: BaseBuff
+public class EmpowerBuff: BaseBuff
 {
-    public FeebleDeBuff(int stack) : 
-        base("Feeble", $"Reduce power of following skill by 1 per stack", "res://Sprites/BuffIcons/feeble.png", 
+    public EmpowerBuff(int stack) :
+        base("Empower", $"Grants 1 extra power per stack.", "res://Sprites/BuffIcons/permanent_power.png",
             true, stack:stack, maxStack:Configuration.CommonBuffMaxStack, isTemporary:true)
     {
     }

@@ -10,8 +10,8 @@ public class DamageSkillEffect: BaseSkillEffect, IPowerScaledEffect
     public int RawValue { get; }
     public float PowerScale { get; }
     
-    public DamageSkillEffect(BaseCard createdByCard, int rawValue,
-        float powerScale) : base("Deal damage", $"Deal {rawValue} damage, every 1 power deals {powerScale} more damage", createdByCard)
+    public DamageSkillEffect(BaseCard createdByCard, Enums.HandTier triggerHandTier, int rawValue, float powerScale) : 
+        base("Deal damage", $"Deal {rawValue} damage, every 1 power deals {powerScale} more damage", createdByCard, triggerHandTier)
     {
         RawValue = rawValue;
         PowerScale = powerScale;
@@ -21,7 +21,7 @@ public class DamageSkillEffect: BaseSkillEffect, IPowerScaledEffect
     {
         var power = self.GetPower(hand.Tier);
         var rawAttackValue = CalculateValue(power);
-        var attack = new Attack(self, opponent, rawAttackValue);
+        var attack = new Attack(Battle, self, opponent, power, rawAttackValue);
         attack.Resolve();
     }
     

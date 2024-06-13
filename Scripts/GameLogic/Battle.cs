@@ -7,6 +7,7 @@ using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.HandEvaluate;
 using XCardGame.Scripts.Nodes;
@@ -59,6 +60,8 @@ public partial class Battle: Node2D, ISetup
     public int RoundCount;
     public Dictionary<BattleEntity, CompletedHand> RoundHands;
     public Engage RoundEngage;
+
+    public ObservableCollection<Enums.HandTier> HandTierOrderAscend;
     
     public List<BaseEffect> Effects;
     public State CurrentState;
@@ -79,6 +82,7 @@ public partial class Battle: Node2D, ISetup
         RoundHands = new Dictionary<BattleEntity, CompletedHand>();
         CommunityCards = new ObservableCollection<BaseCard>();
         FieldCards = new ObservableCollection<BaseCard>();
+        HandTierOrderAscend = new ObservableCollection<Enums.HandTier>();
     }
 
     public virtual void Setup(Dictionary<string, object> args)
@@ -136,6 +140,11 @@ public partial class Battle: Node2D, ISetup
             { "sourceDecks" , Entities.Select(e => e.Deck).ToList() },
             { "excludedCards" , null }
         });
+
+        foreach (var handTierValue in Enum.GetValues(typeof(Enums.HandTier)))
+        {
+            HandTierOrderAscend.Add((Enums.HandTier)handTierValue);
+        }
         
         // Player.Setup((Dictionary<string, object>)args["playerSetupArgs"]);
         // var iEnemy = 0;
@@ -349,6 +358,11 @@ public partial class Battle: Node2D, ISetup
         {
             buff.InflictOn(target, source, sourceCard);
         }
+    }
+
+    public int GetHandTierValue(Enums.HandTier handTier)
+    {
+        return HandTierOrderAscend.IndexOf(handTier);
     }
 
     protected Enums.CardFace GetCommunityCardFaceDirectionFunc(int i)

@@ -84,7 +84,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     
     public override string ToString()
     {
-        return $"{Name}({Description})";
+        return $"{Name}({GetDescription()})";
     }
 
     public virtual void OnStart(Battle battle)
@@ -111,4 +111,9 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         }
         return res;
     }
+
+    public virtual string GetDescription()
+    {
+        return Description;
+    } 
 }

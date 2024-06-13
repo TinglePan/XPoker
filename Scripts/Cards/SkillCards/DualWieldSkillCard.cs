@@ -11,15 +11,15 @@ public class DualWieldSkillCard: BaseSkillCard
 {
     public DualWieldSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity ownerEntity) : 
         base("Dual wield", "Attack twice", "res://Sprites/Cards/dual_wield.png", suit, rank, 
-            Enums.HandTier.TwoPairs, null,  ownerEntity)
+            null,  ownerEntity)
     {
         Contents = new Dictionary<Enums.EngageRole, List<BaseSkillEffect>>()
         {
             {
                 Enums.EngageRole.Attacker, new List<BaseSkillEffect>()
                 {
-                    new DamageSkillEffect(this, 0, 1),
-                    new DamageSkillEffect(this, 0, 1),
+                    new DamageSkillEffect(this, Enums.HandTier.TwoPairs, 0, 1),
+                    new DamageSkillEffect(this, Enums.HandTier.TwoPairs, 0, 1),
                 }
             }
         };

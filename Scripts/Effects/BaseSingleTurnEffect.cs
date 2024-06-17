@@ -6,7 +6,8 @@ namespace XCardGame.Scripts.Effects;
 // NOTE: This effect lasts for the entire round. If an effect is going to stop when its creator card is stopped, we will have to call StopEffect in the OnStop method of the creator card.
 public class BaseSingleTurnEffect: BaseEffect
 {
-    public BaseSingleTurnEffect(string name, string description, BaseCard createdByCard) : base(name, description, createdByCard)
+    public BaseSingleTurnEffect(string name, string description, Battle battle, BaseCard createdByCard) :
+        base(name, description, battle, createdByCard)
     {
         createdByCard.Battle.OnRoundEnd += OnRoundEnd;
     }

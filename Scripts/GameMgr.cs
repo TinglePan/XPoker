@@ -6,6 +6,7 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
@@ -19,10 +20,11 @@ public partial class GameMgr : Node
 	public PackedScene BattleScene;
 	
 	public InputMgr InputMgr;
-	public SceneMgr SceneMgr;
 	
 	public Node CurrentScene;
 	public Battle CurrentBattle;
+
+	public ObservableProperty<int> ProgressCounter;
 
 	public Random Rand;
 	
@@ -33,7 +35,7 @@ public partial class GameMgr : Node
 		IntroScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Intro.tscn");
 		BattleScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/BattleScene.tscn");
 		InputMgr = GetNode<InputMgr>("/root/InputMgr");
-		SceneMgr = GetNode<SceneMgr>("/root/SceneMgr");
+		ProgressCounter = new ObservableProperty<int>(nameof(ProgressCounter), this, 0);
 		Rand = new Random();
 	}
 
@@ -44,7 +46,6 @@ public partial class GameMgr : Node
 
 	public void StartBattle()
 	{
-		ChangeScene(BattleScene);
 		CurrentBattle = ((BattleScene)CurrentScene).Battle;
 		CurrentBattle.Setup(new Dictionary<string, object>
 		{
@@ -64,7 +65,7 @@ public partial class GameMgr : Node
 						{ "factionId", Enums.FactionId.Player },
 						{ "handPowers", HandPowerTables.DefaultPlayerHandPowerTable },
 						{ "baseHandPower", 0 },
-						{ "maxHp", 20 },
+						{ "maxHp", 10 },
 						{ "maxCost", 3 },
 						{ "level", 1 },
 						{ "levelUpTable", LevelUpTables.DefaultPlayerLevelUpTable },
@@ -72,8 +73,8 @@ public partial class GameMgr : Node
 						{
 							"abilityCards", new ObservableCollection<BaseCard>
 							{
-								new D6Card(Enums.CardSuit.Diamonds, Enums.CardRank.Six),
-								new NetherSwapCard(Enums.CardSuit.Hearts, Enums.CardRank.Six)
+								new D6Card(Defs.Cards.D6),
+								new MagicalHatCard(Defs.Cards.MagicalHat)
 							}
 						},
 						{
@@ -91,7 +92,7 @@ public partial class GameMgr : Node
 						{ "factionId", Enums.FactionId.Enemy },
 						{ "handPowers", HandPowerTables.DefaultEnemyHandPowerTable },
 						{ "baseHandPower", 0 },
-						{ "maxHp", 20 },
+						{ "maxHp", 10 },
 						{ "level", 1 },
 						{ "isHoleCardDealtVisible", false },
 						{
@@ -109,7 +110,7 @@ public partial class GameMgr : Node
 			}
 		});
 		
-		InputMgr.SwitchToInputHandler(new MainInputHandler(this));
+		InputMgr.SwitchToInputHandler(new BattleMainInputHandler(this, CurrentBattle));
 		CurrentBattle.Start();
 	}
 
@@ -117,13 +118,24 @@ public partial class GameMgr : Node
 	{
 		GD.Print("Changing scene...");
 		var root = GetTree().Root;
-		var node = Utils.InstantiatePrefab(scene, root);
 		if (CurrentScene != null)
 		{
+			GD.Print($"remove {CurrentScene}");
 			root.RemoveChild(CurrentScene);
 			CurrentScene.QueueFree();
 		}
+		var node = Utils.InstantiatePrefab(scene, root);
 		CurrentScene = node;
 		return CurrentScene;
+	}
+
+	public void Quit()
+	{
+		GetTree().Quit();
+	}
+
+	public void GameEnd()
+	{
+		
 	}
 }

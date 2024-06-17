@@ -1,63 +1,22 @@
-[gd_scene load_steps=9 format=3 uid="uid://cgejj7uvud2qj"]
+[gd_scene load_steps=5 format=3 uid="uid://cgejj7uvud2qj"]
 
-[ext_resource type="Texture2D" uid="uid://bg62p1k31wppa" path="res://Sprites/flame_smoke_transparent.png" id="1_3k12w"]
+[ext_resource type="Shader" path="res://VFXs/TestVFX.gdshader" id="1_h5vvj"]
 
-[sub_resource type="Gradient" id="Gradient_67bqp"]
-offsets = PackedFloat32Array(0.015873, 0.185185, 0.248677, 0.359788, 0.555556, 1)
-colors = PackedColorArray(1, 0.682353, 0.262745, 0, 1, 0.683065, 0.264099, 1, 0.952761, 0.480807, 0.149281, 1, 0.867086, 0.353898, 0.0091897, 1, 0.866472, 0.198787, 1.92523e-07, 1, 0.866667, 0.2, 0, 0)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dle6g"]
+render_priority = 0
+shader = ExtResource("1_h5vvj")
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_0r2r3"]
-gradient = SubResource("Gradient_67bqp")
-use_hdr = true
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xde07"]
+gravity = Vector3(0, 0, 0)
 
-[sub_resource type="Curve" id="Curve_b1hiw"]
-_data = [Vector2(0, 0.296703), 0.0, 0.0, 0, 0, Vector2(0.25, 1), 0.0, 0.0, 0, 0, Vector2(0.5, 0.5), 0.0, 0.0, 0, 0, Vector2(0.746544, 0.703297), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 5
-
-[sub_resource type="CurveTexture" id="CurveTexture_4keul"]
-curve = SubResource("Curve_b1hiw")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_pkpui"]
-lifetime_randomness = 0.1
-particle_flag_rotate_y = true
-angle_max = 360.0
-direction = Vector3(0, 1, 0)
-spread = 20.0
-initial_velocity_min = 5.0
-initial_velocity_max = 10.0
-angular_velocity_max = 180.0
-gravity = Vector3(0, 1, 0)
-scale_min = 2.0
-scale_max = 4.0
-scale_curve = SubResource("CurveTexture_4keul")
-color = Color(2, 1.5, 1, 1)
-color_ramp = SubResource("GradientTexture1D_0r2r3")
-turbulence_enabled = true
-turbulence_noise_scale = 4.0
-turbulence_noise_speed = Vector3(0.5, 1, 0.5)
-turbulence_noise_speed_random = 0.0
-turbulence_influence_min = 0.0
-turbulence_influence_max = 0.05
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2kjos"]
-transparency = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("1_3k12w")
-billboard_mode = 3
-billboard_keep_scale = true
-particles_anim_h_frames = 1
-particles_anim_v_frames = 1
-particles_anim_loop = false
-proximity_fade_enabled = true
-
-[sub_resource type="QuadMesh" id="QuadMesh_682cn"]
-material = SubResource("StandardMaterial3D_2kjos")
+[sub_resource type="QuadMesh" id="QuadMesh_ts0on"]
 
 [node name="TestVfx" type="Node3D"]
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="."]
-amount = 24
+material_override = SubResource("ShaderMaterial_dle6g")
+amount = 1
+lifetime = 5.0
 speed_scale = 0.5
-process_material = SubResource("ParticleProcessMaterial_pkpui")
-draw_pass_1 = SubResource("QuadMesh_682cn")
+process_material = SubResource("ParticleProcessMaterial_xde07")
+draw_pass_1 = SubResource("QuadMesh_ts0on")

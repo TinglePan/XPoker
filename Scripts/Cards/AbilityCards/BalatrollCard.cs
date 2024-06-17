@@ -2,6 +2,7 @@
 using Godot;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Nodes;
@@ -12,7 +13,7 @@ public class BalatrollCard: BaseUseCard
 {
     public class BalatrollCardInputHandler : BaseInteractCardInputHandler<BalatrollCard>
     {
-        public BalatrollCardInputHandler(BalatrollCard card) : base(card)
+        public BalatrollCardInputHandler(GameMgr gameMgr, Battle battle, BalatrollCard card) : base(gameMgr, battle, card)
         {
         }
 
@@ -48,16 +49,14 @@ public class BalatrollCard: BaseUseCard
     
     public CardContainer PlayerCardContainer; 
     
-    public BalatrollCard(Enums.CardSuit suit, Enums.CardRank rank) : base("Balatroll", 
-        "Discard your hole cards at will, like in Balatro.", "res://Sprites/Cards/balatroll.png", 
-        suit, rank, 1)
+    public BalatrollCard(UseCardDef def): base(def)
     {
     }
 
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        PlayerCardContainer = GameMgr.SceneMgr.GetNode<CardContainer>("playerHoleCardContainer"); 
+        PlayerCardContainer = Battle.Player.HoleCardContainer;
     }
     
     public override bool CanInteract()
@@ -68,7 +67,7 @@ public class BalatrollCard: BaseUseCard
     public override void ChooseTargets()
     {
         var inputHandler =
-            new BalatrollCardInputHandler(this);
+            new BalatrollCardInputHandler(GameMgr, Battle, this);
         GameMgr.InputMgr.SwitchToInputHandler(inputHandler);
     }
 }

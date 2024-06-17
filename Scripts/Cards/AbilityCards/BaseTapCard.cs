@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
@@ -8,19 +9,23 @@ namespace XCardGame.Scripts.Cards.AbilityCards;
 
 public class BaseTapCard: BaseInteractCard, ITapCard
 {
-    public int TappedCost { get; private set; }
-    public int UnTappedCost { get; private set; }
 
-    public int TapCostChange => TappedCost - UnTappedCost;
+    public readonly TapCardDef TapCardDef;
     
-    public int UnTapCostChange => UnTappedCost - TappedCost;
+    public int TappedCost => TapCardDef.TappedCost;
+    public int UnTappedCost => TapCardDef.Cost;
+
+    public int TapCostChange;
+    
+    public int UnTapCostChange;
     
     public BaseEffect Effect { get; protected set; }
     
-    public BaseTapCard(string name, string description, string iconPath, Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost) : base(name, description, iconPath, suit, rank)
+    public BaseTapCard(TapCardDef def) : base(def)
     {
-        TappedCost = tappedCost;
-        UnTappedCost = unTappedCost;
+        TapCardDef = def;
+        TapCostChange = TappedCost - UnTappedCost;
+        UnTapCostChange = UnTappedCost - TappedCost;
     }
     
     public override void Setup(Dictionary<string, object> args)
@@ -49,14 +54,6 @@ public class BaseTapCard: BaseInteractCard, ITapCard
         }
     }
 
-    public async void ToggleTap()
-    {
-        var node = Node<CardNode>();
-        var targetTapValue = !IsTapped;
-        Battle.Player.Cost.Value += targetTapValue ? TapCostChange : UnTapCostChange;
-        node.TweenTap(targetTapValue, Configuration.TapTweenTime);
-    }
-
     // NOTE: Effect manages its stop on its own. And check if its source card in in position to decide whether its effect is skipped.
     // public override void OnStop(Battle battle)
     // {
@@ -67,7 +64,22 @@ public class BaseTapCard: BaseInteractCard, ITapCard
     {
         if (!IsTapped && !IsNegated && Effect != null)
         {
-            Battle.StartEffect(Effect);
+            StartEffect();
         } 
+    }
+
+
+    public override void ToggleTap()
+    {
+        base.ToggleTap();
+        if (IsTapped)
+        {
+            Battle.Player.Cost.Value += TapCostChange;
+        }
+        else
+        {
+            Battle.Player.Cost.Value += UnTapCostChange;
+            StartEffect();
+        }
     }
 }

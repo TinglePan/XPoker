@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
@@ -9,21 +10,21 @@ using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
 
-public class BlockOutCard: BaseTapCard
+public class KeepOutCard: BaseTapCard
 {
     
-    public abstract class BaseAbsenceCardRule
+    public abstract class BaseKeepOutCardRule
     {
         public string Description;
         public abstract bool Filter(BaseCard card);
         
-        protected BaseAbsenceCardRule(string description)
+        protected BaseKeepOutCardRule(string description)
         {
             Description = description;
         }
     }
     
-    public class FilterBySuitRule: BaseAbsenceCardRule
+    public class FilterBySuitRule: BaseKeepOutCardRule
     {
         public Enums.CardSuit Suit;
         
@@ -40,7 +41,7 @@ public class BlockOutCard: BaseTapCard
         
     }
     
-    public class FilterByRankRule: BaseAbsenceCardRule
+    public class FilterByRankRule: BaseKeepOutCardRule
     {
         public HashSet<Enums.CardRank> Ranks;
         public FilterByRankRule(HashSet<Enums.CardRank> ranks, string description): base(description)
@@ -54,10 +55,10 @@ public class BlockOutCard: BaseTapCard
         }
     }
     
-    public class AbsenceEffect: BaseSingleTurnEffect
+    public class KeepOutEffect: BaseSingleTurnEffect
     {
         public List<CardNode> NegatedCardNodes;
-        public AbsenceEffect(string name, string description, BaseCard createdByCard) : base(name, description, createdByCard)
+        public KeepOutEffect(string name, string description, Battle battle, BaseCard createdByCard) : base(name, description, battle, createdByCard)
         {
             NegatedCardNodes = new List<CardNode>();
         }
@@ -65,7 +66,7 @@ public class BlockOutCard: BaseTapCard
         public override void OnStart(Battle battle)
         {
             base.OnStart(battle);
-            if (CreatedByCard is BlockOutCard absenceCard)
+            if (CreatedByCard is KeepOutCard absenceCard)
             {
                 foreach (var container in absenceCard.CardContainers)
                 {
@@ -91,11 +92,10 @@ public class BlockOutCard: BaseTapCard
         }
     }
 
-    public BaseAbsenceCardRule Rule;
+    public BaseKeepOutCardRule Rule;
     public List<CardContainer> CardContainers;
     
-    public BlockOutCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost, BaseAbsenceCardRule rule): 
-        base("Absence", "Certain cards do not count, the rule alters each round.", "res://Sprites/Cards/absence.png", suit, rank, tappedCost, unTappedCost)
+    public KeepOutCard(TapCardDef def, BaseKeepOutCardRule rule): base(def)
     {
         Rule = rule;
     }
@@ -103,7 +103,12 @@ public class BlockOutCard: BaseTapCard
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer"); 
-        Effect = new AbsenceEffect(Name, Description, this);
+        CardContainers = new List<CardContainer>
+        {
+            Battle.CommunityCardContainer,
+            Battle.Player.HoleCardContainer,
+            Battle.Enemy.HoleCardContainer
+        };
+        Effect = new KeepOutEffect(Def.Name, GetDescription(), Battle, this);
     }
 }

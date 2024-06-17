@@ -4,20 +4,21 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Cards.SkillCards;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
 using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 using CardNode = XCardGame.Scripts.Nodes.CardNode;
 
 namespace XCardGame.Scripts.InputHandling;
 
-public class MainInputHandler: BaseInputHandler
+public class BattleMainInputHandler: BaseInputHandler
 {
     public BaseButton ProceedButton;
     public CardContainer FieldCardContainer;
     
-    public MainInputHandler(GameMgr gameMgr) : base(gameMgr)
+    public BattleMainInputHandler(GameMgr gameMgr, Battle battle) : base(gameMgr)
     {
-        FieldCardContainer = GameMgr.SceneMgr.GetNodeById<CardContainer>("fieldCardContainer");
+        FieldCardContainer = battle.FieldCardContainer;
         ProceedButton = GameMgr.CurrentBattle.ProceedButton;
     }
     

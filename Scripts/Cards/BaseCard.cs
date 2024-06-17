@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
 using CardNode = XCardGame.Scripts.Nodes.CardNode;
@@ -11,16 +12,18 @@ namespace XCardGame.Scripts.Cards;
 
 public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, IComparable<BaseCard>
 {
+    // public string Name;
+    // public string Description;
+    // public string OriginalIconPath;
+    // public Enums.CardSuit OriginalSuit;
+    // public Enums.CardRank OriginalRank;
+    // public int BaseCredit;
+
+    public BaseCardDef Def;
+    
     public GameMgr GameMgr;
     public Battle Battle;
     public BattleEntity OwnerEntity;
-    
-    public string Name;
-    public string Description;
-    public string OriginalIconPath;
-    public Enums.CardSuit OriginalSuit;
-    public Enums.CardRank OriginalRank;
-    
     public HashSet<BaseContentNode<BaseCard>> Nodes { get; private set; }
     public bool HasSetup { get; set; }
     public ObservableProperty<string> IconPath;
@@ -38,19 +41,13 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         _ => Enums.CardColor.None
     };
     
-    public BaseCard(string name, string description, string iconPath, Enums.CardSuit suit = Enums.CardSuit.None,
-        Enums.CardRank rank = Enums.CardRank.None, BattleEntity ownerEntity = null)
+    public BaseCard(BaseCardDef def)
     {
+        Def = def;
         Nodes = new HashSet<BaseContentNode<BaseCard>>();
-        Name = name;
-        Description = description;
-        OriginalIconPath = iconPath;
-        IconPath = new ObservableProperty<string>(nameof(IconPath), this, iconPath);
-        OriginalSuit = suit;
-        Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, suit);
-        OriginalRank = rank;
-        Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, rank);
-        OwnerEntity = ownerEntity;
+        IconPath = new ObservableProperty<string>(nameof(IconPath), this, def.IconPath);
+        Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, def.Suit);
+        Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, def.Rank);
         IsTapped = false;
         IsNegated = false;
     }
@@ -71,6 +68,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     {
         GameMgr = (GameMgr)args["gameMgr"];
         Battle = (Battle)args["battle"];
+        OwnerEntity = (BattleEntity)args["ownerEntity"];
         Nodes.Add((CardNode)args["node"]);
     }
 
@@ -84,7 +82,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     
     public override string ToString()
     {
-        return $"{Name}({GetDescription()})";
+        return $"{Def.Name}({GetDescription()})";
     }
 
     public virtual void OnStart(Battle battle)
@@ -114,6 +112,13 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
 
     public virtual string GetDescription()
     {
-        return Description;
-    } 
+        return Def.DescriptionTemplate;
+    }
+    
+    public virtual async void ToggleTap()
+    {
+        var targetTapValue = !IsTapped;
+        var node = Node<CardNode>();
+        node.TweenTap(targetTapValue, Configuration.TapTweenTime);
+    }
 }

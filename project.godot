@@ -20,7 +20,6 @@ config/icon="res://icon.svg"
 Panku="*res://addons/panku_console/console.tscn"
 GameMgr="*res://Scenes/GameMgr.tscn"
 InputMgr="*res://Scripts/InputMgr.cs"
-SceneMgr="*res://Scripts/SceneMgr.cs"
 
 [display]
 

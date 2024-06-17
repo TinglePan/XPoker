@@ -2,6 +2,7 @@
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.Effects.SkillEffects;
 using XCardGame.Scripts.GameLogic;
@@ -11,10 +12,9 @@ namespace XCardGame.Scripts.Cards.SkillCards;
 
 public class RiposteSkillCard: BaseSkillCard
 {
-    
     public class RiposteSkillEffect: BuffSkillEffect
     {
-        public RiposteSkillEffect(BattleEntity target, BaseCard createdByCard, Enums.HandTier triggerHandTier) : base(target, createdByCard, triggerHandTier, expanding:0)
+        public RiposteSkillEffect(BattleEntity target, Battle battle, BaseCard createdByCard, Enums.HandTier triggerHandTier) : base(target, battle, createdByCard, triggerHandTier, expanding:0)
         {
         }
 
@@ -25,17 +25,22 @@ public class RiposteSkillCard: BaseSkillCard
         }
     }
     
-    public RiposteSkillCard(Enums.CardSuit suit, Enums.CardRank rank, BattleEntity ownerEntity) : 
-        base("Riposte", "Negate the next incoming attack, then counter attack", "res://Sprites/riposte.png", suit, 
-            rank, null, ownerEntity)
+    public RiposteSkillCard(BaseCardDef def): base(def)
     {
-        var opponent = Battle.GetOpponentOf(ownerEntity);
+        Def.Name = "Riposte";
+        Def.DescriptionTemplate = "Negate the next incoming attack, then counter attack";
+        Def.IconPath = "res://Sprites/Cards/riposte.png";
+    }
+
+    protected override void SetUpContents(Dictionary<string, object> args)
+    {
+        var opponent = Battle.GetOpponentOf(OwnerEntity);
         Contents = new Dictionary<Enums.EngageRole, List<BaseSkillEffect>>()
         {
             {
                 Enums.EngageRole.Attacker, new List<BaseSkillEffect>()
                 {
-                    new RiposteSkillEffect(opponent, this, Enums.HandTier.HighCard),
+                    new RiposteSkillEffect(opponent, Battle, this, Enums.HandTier.HighCard),
                 }
             }
         };

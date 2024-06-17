@@ -68,7 +68,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	    MainIcon.Setup(new Dictionary<string, object>()
 	    {
 		    { "iconPath", Content.Value.IconPath },
-		    { "displayName", Content.Value.Name }
+		    { "displayName", Content.Value.Def.Name }
 	    });
 	    OriginalFaceDirection = (Enums.CardFace)args["faceDirection"];
 	    FaceDirection.Value = OriginalFaceDirection;
@@ -76,8 +76,8 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 
 	public void Reset(bool useTween = true)
 	{
-		Content.Value.Suit.Value = Content.Value.OriginalSuit;
-		Content.Value.Rank.Value = Content.Value.OriginalRank;
+		Content.Value.Suit.Value = Content.Value.Def.Suit;
+		Content.Value.Rank.Value = Content.Value.Def.Rank;
 		IsSelected = false;
 		if (useTween)
 		{
@@ -135,12 +135,12 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	public async void TweenTap(bool toState, float tweenTime, float delay = 0f)
 	{
 		if (Content.Value.IsTapped == toState) return;
+		Content.Value.IsTapped = toState;
 		if (delay > 0f)
 		{
 			var timer = GetTree().CreateTimer(delay);
 			await ToSignal(timer, Timer.SignalName.Timeout);
 		}
-		Content.Value.IsTapped = toState;
 		var newTween = CreateTween();
 		newTween.TweenProperty(this, "rotation_degrees", toState ? 90f : 0, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
 		TweenControl.AddTween("tap", newTween, tweenTime);

@@ -1,19 +1,17 @@
 ﻿using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class UnpredictableDestinyCard: BaseTapCard
+public class EyePatchCard: BaseTapCard
 {
 
     public int Count;
     
-    public UnpredictableDestinyCard(Enums.CardSuit suit, Enums.CardRank rank, int tappedCost, int unTappedCost) :
-        base("Unpredictable destiny", "Add more face-down community cards", 
-            "res://Sprites/Cards/unpredictable_destiny.png", suit, rank, tappedCost, unTappedCost)
+    public EyePatchCard(TapCardDef def): base(def)
     {
-        Count = 0;
     }
     
     public override void OnStart(Battle battle)

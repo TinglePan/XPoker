@@ -6,7 +6,6 @@ namespace XCardGame.Scripts.Nodes;
 public partial class DialogueBox: Container
 {
     public Label TextWidget;
-    public SceneMgr SceneMgr { get; private set; }
 
     public ObservableProperty<string> Content;
     

@@ -6,8 +6,10 @@ using System.Linq;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.HandEvaluate;
 using XCardGame.Scripts.Nodes;
@@ -19,7 +21,6 @@ public partial class Battle: Node2D, ISetup
 
     public enum State
     {
-        Finished,
         BeforeDealCards,
         BeforeShowDown,
         BeforeResolve,
@@ -36,6 +37,8 @@ public partial class Battle: Node2D, ISetup
     public BattleEntity[] Entities;
 
     public BaseButton ProceedButton;
+    public PackedScene GameOverScene;
+    public PackedScene GameWinScene;
     
     public bool HasSetup { get; set; }
     
@@ -45,6 +48,8 @@ public partial class Battle: Node2D, ISetup
     public Action<Battle> OnRoundEnd;
     public Action<Battle> BeforeShowDown;
     public Action<Battle, Engage> BeforeEngage;
+    public Action<Battle> OnPlayerDefeated;
+    public Action<Battle> OnEnemyDefeated;
     public Action<Battle> OnBattleFinished;
 
     public ObservableCollection<BaseCard> CommunityCards;
@@ -77,6 +82,8 @@ public partial class Battle: Node2D, ISetup
         FieldCardContainer = GetNode<CardContainer>("FieldCards");
         Player = GetNode<PlayerBattleEntity>("Player");
         Enemy = GetNode<BattleEntity>("Enemy");
+        GameOverScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/GameOver.tscn");
+        GameWinScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/GameWin.tscn");
         Entities = new [] { Player, Enemy };
         HasSetup = false;
         RoundHands = new Dictionary<BattleEntity, CompletedHand>();
@@ -122,6 +129,12 @@ public partial class Battle: Node2D, ISetup
             { "defaultCardFaceDirection", Enums.CardFace.Up } 
         });
         
+        SkillDisplay.Setup(new Dictionary<string, object>()
+        {
+            { "playerSkillCardContainer", Player.SkillCardContainer },
+            { "enemySkillCardContainer", Enemy.SkillCardContainer },
+        });
+        
         var entitiesSetupArgs = (List<Dictionary<string, object>>)args["entities"];
         for (int i = 0; i < Entities.Length; i++)
         {
@@ -145,6 +158,7 @@ public partial class Battle: Node2D, ISetup
         {
             HandTierOrderAscend.Add((Enums.HandTier)handTierValue);
         }
+        
         
         // Player.Setup((Dictionary<string, object>)args["playerSetupArgs"]);
         // var iEnemy = 0;
@@ -179,10 +193,6 @@ public partial class Battle: Node2D, ISetup
     {
         switch (CurrentState)
         {
-            case State.Finished:
-                Start();
-                DealCards();
-                break;
             case State.BeforeDealCards:
                 DealCards();
                 break;
@@ -193,7 +203,27 @@ public partial class Battle: Node2D, ISetup
                 ResolveSkills();
                 break;
             case State.AfterResolve:
-                NewRound();
+                if (Player.IsDefeated())
+                {
+                    GameOver();
+                    return;
+                }
+                if (Enemy.IsDefeated())
+                {
+                    if (GameMgr.ProgressCounter.Value >= Configuration.ProgressCountRequiredToWin)
+                    {
+                        GameWin();
+                    }
+                    else
+                    {
+                        NewChallenger();
+                        Start();
+                    }
+                }
+                else
+                {
+                    NewRound();
+                }
                 break;
         }
         OnBattleProceed?.Invoke(this);
@@ -224,7 +254,7 @@ public partial class Battle: Node2D, ISetup
     public void Reset()
     {
         RoundCount = 0;
-        CurrentState = State.Finished;
+        CurrentState = State.BeforeDealCards;
         foreach (var entity in Entities)
         {
             entity.Reset();
@@ -322,10 +352,13 @@ public partial class Battle: Node2D, ISetup
         if (e == Player)
         {
             GD.Print($"You lose");
+            OnPlayerDefeated?.Invoke(this);
         }
         else
         {
             GD.Print($"You win");
+            GameMgr.ProgressCounter.Value++;
+            OnEnemyDefeated?.Invoke(this);
         }
         OnBattleFinished?.Invoke(this);
     }
@@ -420,4 +453,42 @@ public partial class Battle: Node2D, ISetup
         }
     }
 
+    protected void GameOver()
+    {
+        GameMgr.InputMgr.QuitCurrentInputHandler();
+        GameMgr.ChangeScene(GameOverScene);
+    }
+
+    protected void GameWin()
+    {
+        GameMgr.InputMgr.QuitCurrentInputHandler();
+        GameMgr.ChangeScene(GameWinScene);
+    }
+
+    protected void NewChallenger()
+    {
+        Enemy.Setup(new Dictionary<string, object>()
+        {
+            { "name", "cpu" },
+            { "portraitPath", "res://Sprites/cloak_guy.png" },
+            { "deck", Decks.EnemyInitialDeck },
+            { "dealCardCount", 2 },
+            { "factionId", Enums.FactionId.Enemy },
+            { "handPowers", HandPowerTables.DefaultEnemyHandPowerTable },
+            { "baseHandPower", 0 },
+            { "maxHp", 10 },
+            { "level", 1 },
+            { "isHoleCardDealtVisible", false },
+            {
+                "abilityCards", new ObservableCollection<BaseCard>
+                {
+                }
+            },
+            {
+                "skillCards", new ObservableCollection<BaseCard>()
+                {
+                }
+            }
+        });
+    }
 }

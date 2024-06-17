@@ -12,20 +12,20 @@ namespace XCardGame.Scripts.Effects;
 
 public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
 {
-    public BaseCard CreatedByCard;
     public Battle Battle;
+    public BaseCard CreatedByCard;
     
     public string Name;
     public string Description;
 
-    public BaseEffect(string name, string description, BaseCard createdByCard)
+    public BaseEffect(string name, string description, Battle battle, BaseCard createdByCard)
     {
         Name = name;
         Description = description;
+        Battle = battle;
         CreatedByCard = createdByCard;
-        Battle = createdByCard.Battle;
     }
-
+    
     public bool Equals(BaseEffect other)
     {
         return GetType() == other?.GetType();

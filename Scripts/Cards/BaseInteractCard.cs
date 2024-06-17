@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
+using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards;
 
@@ -7,9 +9,7 @@ public abstract class BaseInteractCard: BaseCard, IInteractCard
 {
     public List<Enums.CardInteractions> Interactions { get; }
     
-    public BaseInteractCard(string name, string description, string iconPath, Enums.CardSuit suit,
-        Enums.CardRank rank) : 
-        base(name, description, iconPath, suit, rank)
+    public BaseInteractCard(BaseCardDef def) : base(def)
     {
         Interactions = new List<Enums.CardInteractions>();
     }

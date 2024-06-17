@@ -3,6 +3,7 @@ using System.Linq;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.HandEvaluate;
@@ -15,9 +16,7 @@ public class TurnTheTablesCard: BaseUseCard
     public CardContainer PlayerHoleCardContainer;
     public CardContainer EnemyHoleCardContainer;
     
-    public TurnTheTablesCard(Enums.CardSuit suit, Enums.CardRank rank, int cost, int unTappedCost) : base("Turn The Tables", 
-        "Swap your hole cards with your opponents.", 
-        "res://Sprites/Cards/turn_the_tables.png", suit, rank, cost)
+    public TurnTheTablesCard(UseCardDef def) : base(def)
     {
     }
 

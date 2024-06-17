@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
 
@@ -8,17 +9,13 @@ namespace XCardGame.Scripts.Cards.AbilityCards;
 
 public class BaseUseCard: BaseInteractCard, IUseCard
 {
+    public readonly UseCardDef UseCardDef;
     public bool IsRecharging { get; private set; }
-    public int RankChangePerUse { get; private set; }
-    public int Cost { get; }
     
-    public BaseUseCard(string name, string description, string iconPath, Enums.CardSuit suit, Enums.CardRank rank,
-        int cost, int rankChangePerUse = -1) : 
-        base(name, description, iconPath, suit, rank)
+    public BaseUseCard(UseCardDef def): base(def)
     {
-        Cost = cost;
+        UseCardDef = def;
         IsRecharging = false;
-        RankChangePerUse = rankChangePerUse;
     }
     
     public override void Setup(Dictionary<string, object> args)
@@ -50,7 +47,7 @@ public class BaseUseCard: BaseInteractCard, IUseCard
 
     public virtual void Use()
     {
-        var newRank = Utils.GetCardRank(Utils.GetCardRankValue(Rank.Value) + RankChangePerUse);
+        var newRank = Utils.GetCardRank(Utils.GetCardRankValue(Rank.Value) + UseCardDef.RankChangePerUse);
         if (newRank == Enums.CardRank.None)
         {
             StartRecharge();
@@ -67,7 +64,7 @@ public class BaseUseCard: BaseInteractCard, IUseCard
         {
             DoneRecharge();
         }
-        Rank.Value = OriginalRank;
+        Rank.Value = Def.Rank;
     }
 
     protected void StartRecharge()

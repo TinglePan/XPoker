@@ -8,6 +8,7 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.SkillCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Effects;
+using XCardGame.Scripts.Effects.SkillEffects;
 using XCardGame.Scripts.HandEvaluate;
 using XCardGame.Scripts.Nodes;
 
@@ -82,13 +83,21 @@ public class Engage
             var skillResolver = new SkillResolver(GameMgr, this);
             var self = entity;
             var opponent = self == Battle.Player ? Battle.Enemy : Battle.Player;
-            foreach (var cardNode in entity.SkillCardContainer.ContentNodes)
+            if (entity.SkillCardContainer.ContentNodes.Count > 0)
             {
-                var skillCard = (BaseSkillCard)cardNode.Content.Value;
-                if (skillCard.CanTrigger(role, hand))
+                foreach (var cardNode in entity.SkillCardContainer.ContentNodes)
                 {
-                    skillResolver.Resolve(skillCard, role, hand, self, opponent);
+                    var skillCard = (BaseSkillCard)cardNode.Content.Value;
+                    if (skillCard.CanTrigger(role, hand))
+                    {
+                        skillResolver.Resolve(skillCard, role, hand, self, opponent);
+                    }
                 }
+            }
+            else if (role == Enums.EngageRole.Attacker)
+            {
+                var defaultAttackEffect = new DamageSkillEffect(Battle, null, hand.Tier, 0, 1);
+                defaultAttackEffect.Resolve(skillResolver, hand, self, opponent);
             }
         }
         if (PlayerRole == EnemyRole || PlayerRole == Enums.EngageRole.Defender)

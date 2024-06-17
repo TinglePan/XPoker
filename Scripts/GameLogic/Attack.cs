@@ -68,6 +68,7 @@ public class Attack
         var defenderDamageModifier = Defender.GetDefenderDamageModifier();
         var defendDamageMultipliers = Defender.GetDefenderDamageMultipliers();
         damageValue += defenderDamageModifier;
+        
         foreach (var defendMultiplier in defendDamageMultipliers)
         {
             damageValue *= defendMultiplier;

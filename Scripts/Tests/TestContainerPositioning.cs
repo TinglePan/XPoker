@@ -5,6 +5,7 @@ using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.Tests;
@@ -33,7 +34,12 @@ public partial class TestContainerPositioning: Node
 
     public void SpawnCardNodeAndAppend()
     {
-        var card = new PokerCard(Utils.GetCardTexturePath(Enums.CardSuit.Clubs), Enums.CardSuit.Clubs, Enums.CardRank.Ace);
+        var card = new PokerCard(new BaseCardDef()
+        {
+            BaseCredit = 0,
+            Rank = Enums.CardRank.Ace,
+            Suit = Enums.CardSuit.Clubs
+        });
         var cardNode = CardPrefab.Instantiate<CardNode>();
         AddChild(cardNode);
         cardNode.Setup(new Dictionary<string, object>()

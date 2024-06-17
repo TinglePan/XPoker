@@ -1,19 +1,22 @@
 ﻿using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.InputHandling;
 
 public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler where TCard: BaseInteractCard
 {
+    public Battle Battle;
     public TCard Card;
     public CardNode CardNode;
     public List<CardNode> SelectedCardNodes;
     public BaseButton ProceedButton;
     
-    public BaseInteractCardInputHandler(TCard card) : base(card.GameMgr)
+    public BaseInteractCardInputHandler(GameMgr gameMgr, Battle battle, TCard card) : base(gameMgr)
     {
+        Battle = battle;
         Card = card;
         SelectedCardNodes = new List<CardNode>();
         ProceedButton = GameMgr.CurrentBattle.ProceedButton;
@@ -29,7 +32,6 @@ public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler wher
             selectTarget.IsSelected = false;
         }
         CardNode.OnPressed += ClickSelf;
-        // GD.Print("Enter NetherSwapCardInputHandler");
     }
 
     public override void OnExit()

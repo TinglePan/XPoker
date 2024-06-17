@@ -13,8 +13,8 @@ public class BaseSkillEffect: BaseEffect
     public Enums.HandTier TriggerHandTier;
     public int Expanding;
     
-    public BaseSkillEffect(string name, string description, BaseCard createdByCard, Enums.HandTier triggerHandTier, int expanding = 0) : 
-        base(name, description, createdByCard)
+    public BaseSkillEffect(string name, string description, Battle battle, BaseCard createdByCard, Enums.HandTier triggerHandTier, int expanding = 0) : 
+        base(name, description, battle, createdByCard)
     {
         TriggerHandTier = triggerHandTier;
         Expanding = expanding;

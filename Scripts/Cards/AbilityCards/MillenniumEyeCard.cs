@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
@@ -13,7 +14,7 @@ public class MillenniumEyeCard: BaseUseCard
     class MillenniumEyeEffect : BaseSingleTurnEffect
     {
         public List<CardNode> RevealedCardNodes;
-        public MillenniumEyeEffect(string name, string description, BaseCard createdByCard) : base(name, description, createdByCard)
+        public MillenniumEyeEffect(string name, string description, Battle battle, BaseCard createdByCard) : base(name, description, battle, createdByCard)
         {
             RevealedCardNodes = new List<CardNode>();
         }
@@ -50,16 +51,19 @@ public class MillenniumEyeCard: BaseUseCard
     
     public List<CardContainer> CardContainers;
     
-    public MillenniumEyeCard(Enums.CardSuit suit, Enums.CardRank rank) : 
-        base("Millennium Eye", "All knowing at the cost of all power.", "res://Sprites/Cards/millennium_eye.png", 
-            suit, rank, 3, -99)
+    public MillenniumEyeCard(UseCardDef def): base(def)
     {
     }
     
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer");
+        CardContainers = new List<CardContainer>
+        {
+            Battle.CommunityCardContainer,
+            Battle.Player.HoleCardContainer,
+            Battle.Enemy.HoleCardContainer
+        };
     }
 
     public override bool CanInteract()
@@ -69,7 +73,7 @@ public class MillenniumEyeCard: BaseUseCard
 
     public override void Use()
     {
-        var effect = new MillenniumEyeEffect(Name, Description, this);
+        var effect = new MillenniumEyeEffect(Def.Name, GetDescription(), Battle, this);
         Battle.StartEffect(effect);
         StartRecharge();
     }

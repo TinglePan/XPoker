@@ -35,6 +35,32 @@ public partial class SkillDisplay : Node2D, ISetup
 	{
 		PlayerSkillContainer = (CardContainer)args["playerSkillCardContainer"];
 		EnemySkillContainer = (CardContainer)args["enemySkillCardContainer"];
+		PlayerRoundSkillContainer.Setup(new Dictionary<string, object>()
+		{
+			{ "allowInteract", false },
+			{ "cards", PlayerRoundSkills },
+			{ "contentNodeSize", Configuration.CardSize },
+			{ "separation", Configuration.CardContainerSeparation },
+			{ "pivotDirection", Enums.Direction2D8Ways.Neutral },
+			{ "nodesPerRow", Configuration.RoundSkillsCount },
+			{ "expectedContentNodeCount", 1 },
+			{ "growBorder", true },
+			{ "containerName", "Your prepared skills" },
+			{ "defaultCardFaceDirection", Enums.CardFace.Up }
+		});
+		EnemyRoundSkillContainer.Setup(new Dictionary<string, object>()
+		{
+			{ "allowInteract", false },
+			{ "cards", EnemyRoundSkills },
+			{ "contentNodeSize", Configuration.CardSize },
+			{ "separation", Configuration.CardContainerSeparation },
+			{ "pivotDirection", Enums.Direction2D8Ways.Neutral },
+			{ "nodesPerRow", Configuration.RoundSkillsCount },
+			{ "expectedContentNodeCount", 1 },
+			{ "growBorder", true },
+			{ "containerName", "Enemy's prepared skills" },
+			{ "defaultCardFaceDirection", Enums.CardFace.Up }
+		});
 		HasSetup = true;
 	}
 

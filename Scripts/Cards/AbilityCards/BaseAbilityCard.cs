@@ -1,16 +1,16 @@
 ﻿using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
+using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
 public class BaseAbilityCard: BaseCard
 {
 
-    public int Cost;
+    public readonly AbilityCardDef AbilityCardDef;
     
-    public BaseAbilityCard(string name, string description, string iconPath, Enums.CardSuit suit, Enums.CardRank rank, int cost) : base(name, description, iconPath, suit, rank)
+    public BaseAbilityCard(AbilityCardDef def): base(def)
     {
-        Cost = cost;
+        AbilityCardDef = def;
     }
-    
-    
 }

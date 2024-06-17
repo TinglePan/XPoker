@@ -59,7 +59,7 @@ public partial class BattleEntity: Node, ISetup
         BuffContainer = GetNode<BuffContainer>("Buffs");
         Sprite = GetNode<Sprite2D>("Sprite");
         DefenceLabel = GetNode<Label>("Defence/Value");
-        DefenceIcon = GetNode<Sprite2D>("Defence");
+        DefenceIcon = GetNode<Node2D>("Defence");
         HpBar = GetNode<ProgressBar>("HpBar/Bar");
         HpBar.MinValue = 0;
         HpBar.Step = 1;
@@ -85,6 +85,7 @@ public partial class BattleEntity: Node, ISetup
         MaxHp = new ObservableProperty<int>(nameof(MaxHp), this, (int)args["maxHp"]);
         Hp = new ObservableProperty<int>(nameof(Hp), this, MaxHp.Value);
         Level = new ObservableProperty<int>(nameof(Level), this, (int)args["level"]);
+        Defence = new ObservableProperty<int>(nameof(Defence), this, 0);
         IsHoleCardDealtVisible = (bool)args["isHoleCardDealtVisible"];
         AbilityCards = (ObservableCollection<BaseCard>)args["abilityCards"];
 
@@ -209,6 +210,9 @@ public partial class BattleEntity: Node, ISetup
             {
                 res.Add(1 - (float)Configuration.WeakenMultiplier / 100);
                 buff.Consume();
+            } else if (buff is BigShieldCard.BigShieldBuff)
+            {
+                res.Add(0);
             }
         }
         return res;
@@ -237,6 +241,10 @@ public partial class BattleEntity: Node, ISetup
                 res.Add(1 + (float)Configuration.VulnerableMultiplier / 100);
                 buff.Consume();
             }
+            else if (buff is BigShieldCard.BigShieldBuff)
+            {
+                res.Add(0);
+            }
         }
         return res;
     }
@@ -264,7 +272,7 @@ public partial class BattleEntity: Node, ISetup
             damage -= reduceDefence;
             if (damage > 0)
             {
-                return ChangeHp(damage);
+                return ChangeHp(-damage);
             }
             return 0;
         }
@@ -288,6 +296,11 @@ public partial class BattleEntity: Node, ISetup
         {
             ChangeHp(Hp.Value - maxHp);
         }
+    }
+
+    public bool IsDefeated()
+    {
+        return Hp.Value <= 0;
     }
     
     protected void HpChanged(object sender, ValueChangedEventArgs args)

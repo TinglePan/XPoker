@@ -12,8 +12,8 @@ public class DefenceSkillEffect: BaseSkillEffect, IPowerScaledEffect
     public int RawValue { get; }
     public float PowerScale { get; }
     
-    public DefenceSkillEffect(BaseCard createdByCard, Enums.HandTier triggerHandTier, int rawValue, float powerScale) : 
-        base("Grant defence", $"Grant {rawValue} defence, every 1 power Grants {powerScale} more defence", createdByCard, triggerHandTier)
+    public DefenceSkillEffect(Battle battle, BaseCard createdByCard, Enums.HandTier triggerHandTier, int rawValue, float powerScale) : 
+        base("Grant defence", $"Grant {rawValue} defence, every 1 power Grants {powerScale} more defence", battle, createdByCard, triggerHandTier)
     {
         RawValue = rawValue;
         PowerScale = powerScale;

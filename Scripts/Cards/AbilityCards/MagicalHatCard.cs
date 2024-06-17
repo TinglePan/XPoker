@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Nodes;
@@ -10,11 +11,11 @@ using CardNode = XCardGame.Scripts.Nodes.CardNode;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class NetherSwapCard: BaseUseCard
+public class MagicalHatCard: BaseUseCard
 {
-    public class NetherSwapCardInputHandler : BaseInteractCardInputHandler<NetherSwapCard>
+    public class MagicalHatCardInputHandler : BaseInteractCardInputHandler<MagicalHatCard>
     {
-        public NetherSwapCardInputHandler(NetherSwapCard card) : base(card)
+        public MagicalHatCardInputHandler(GameMgr gameMgr, Battle battle, MagicalHatCard card) : base(gameMgr, battle, card)
         {
         }
 
@@ -55,15 +56,22 @@ public class NetherSwapCard: BaseUseCard
     
     public List<CardContainer> CardContainers;
     
-    public NetherSwapCard(Enums.CardSuit suit, Enums.CardRank rank) : base("Nether swap",
-        "Swap any two cards you can see.", "res://Sprites/Cards/nether_swap.png", suit, rank, 1)
+    public MagicalHatCard(UseCardDef def) : base(def)
     {
+        Def.Name = "Magical hat";
+        Def.DescriptionTemplate = "Swap two cards in hole card area or community card area.";
+        Def.IconPath = "res://Sprites/Cards/magical_hat.png";
     }
 
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        CardContainers = GameMgr.SceneMgr.GetNodes<CardContainer>("markerCardContainer");
+        CardContainers = new List<CardContainer>
+        {
+            Battle.CommunityCardContainer,
+            Battle.Player.HoleCardContainer,
+            Battle.Enemy.HoleCardContainer
+        };
     }
 
     public override bool CanInteract()
@@ -73,8 +81,7 @@ public class NetherSwapCard: BaseUseCard
     
     public override void ChooseTargets()
     {
-        var inputHandler =
-            new NetherSwapCardInputHandler(this);
+        var inputHandler = new MagicalHatCardInputHandler(GameMgr, Battle, this);
         GameMgr.InputMgr.SwitchToInputHandler(inputHandler);
     }
 }

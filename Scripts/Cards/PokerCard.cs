@@ -1,15 +1,23 @@
 ﻿using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards;
 
 public class PokerCard: MarkerCard
 {
-    public PokerCard(string texturePath, Enums.CardSuit suit, Enums.CardRank rank, BattleEntity ownerEntity = null) : 
-        base(GetCardName(suit, rank), GetCardName(suit, rank), texturePath, suit, rank, ownerEntity)
+    
+    public static string GetCardName(Enums.CardSuit suit, Enums.CardRank rank)
     {
+        return $"{rank} of {suit}";
+    }
+    
+    public PokerCard(BaseCardDef def) : base(def)
+    {
+        def.Name = GetCardName(def.Suit, def.Rank);
+        def.DescriptionTemplate = def.Name;
     }
     
     public override void OnStart(Battle battle)
@@ -22,11 +30,6 @@ public class PokerCard: MarkerCard
     {
         base.OnStop(battle);
         Suit.DetailedValueChanged -= OnSuitChanged;
-    }
-    
-    protected static string GetCardName(Enums.CardSuit suit, Enums.CardRank rank)
-    {
-        return $"{rank} of {suit}";
     }
     
     protected virtual void OnSuitChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardSuit> args)

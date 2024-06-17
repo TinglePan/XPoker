@@ -5,6 +5,7 @@ using XCardGame.Scripts.Cards.CardMarkers;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards;
@@ -13,8 +14,7 @@ public class MarkerCard: BaseCard
 {
 	public ObservableCollection<BaseCardMarker> Markers;
 	
-	public MarkerCard(string name, string description, string texturePath, Enums.CardSuit suit, Enums.CardRank rank,
-		BattleEntity ownerEntity): base(name, description, texturePath, suit, rank, ownerEntity)
+	public MarkerCard(BaseCardDef def): base(def)
 	{
 		Markers = new ObservableCollection<BaseCardMarker>();
 	}

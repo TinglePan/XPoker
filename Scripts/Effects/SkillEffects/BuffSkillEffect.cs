@@ -11,8 +11,8 @@ public class BuffSkillEffect: BaseSkillEffect
     public BaseBuff Buff;
     public BattleEntity Target;
 
-    public BuffSkillEffect(BattleEntity target, BaseCard createdByCard, Enums.HandTier triggerHandTier, BaseBuff passInBuff = null, int expanding = 0) : 
-        base("Inflict", "Inflict {}", createdByCard, triggerHandTier, expanding)
+    public BuffSkillEffect(BattleEntity target, Battle battle, BaseCard createdByCard, Enums.HandTier triggerHandTier, BaseBuff passInBuff = null, int expanding = 0) : 
+        base("Inflict", "Inflict {}", battle, createdByCard, triggerHandTier, expanding)
     {
         Buff = passInBuff;
         Target = target;

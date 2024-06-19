@@ -42,12 +42,12 @@ public partial class Dealer: Node2D, ISetup
         SourceDecks = (List<Deck>)args["sourceDecks"];
         DealCardPile.Setup(new Dictionary<string, object>()
         {
-            { "cards", new ObservableCollection<BaseCard>() },
+            { "cards", new List<BaseCard>() },
             { "topCardFaceDirection", Enums.CardFace.Down }
         });
         DiscardCardPile.Setup(new Dictionary<string, object>()
         {
-            { "cards", new ObservableCollection<BaseCard>() },
+            { "cards", new List<BaseCard>() },
             { "topCardFaceDirection", Enums.CardFace.Up }
         });
         Reset();
@@ -158,9 +158,10 @@ public partial class Dealer: Node2D, ISetup
         var cardNode = CreateCardNodeOnPile(card, DealCardPile);
         if (node.Container != null)
         {
-            var index = node.Container.ContentNodes.IndexOf(node);
+            var cardContainer = (CardContainer)node.Container; 
+            var index = cardContainer.ContentNodes.IndexOf(node);
             AnimateDiscard(node);
-            node.Container.ContentNodes.Insert(index, cardNode);
+            cardContainer.ContentNodes.Insert(index, cardNode);
             await ToSignal(cardNode.TweenControl.GetTween("transform"), Tween.SignalName.Finished);
         }
         else

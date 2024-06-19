@@ -39,6 +39,7 @@ public partial class Battle: Node2D, ISetup
     public BaseButton ProceedButton;
     public PackedScene GameOverScene;
     public PackedScene GameWinScene;
+    public PackedScene SelectRewardCardScene;
     
     public bool HasSetup { get; set; }
     
@@ -84,6 +85,7 @@ public partial class Battle: Node2D, ISetup
         Enemy = GetNode<BattleEntity>("Enemy");
         GameOverScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/GameOver.tscn");
         GameWinScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/GameWin.tscn");
+        SelectRewardCardScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/SelectRewardCard.tscn");
         Entities = new [] { Player, Enemy };
         HasSetup = false;
         RoundHands = new Dictionary<BattleEntity, CompletedHand>();
@@ -109,8 +111,9 @@ public partial class Battle: Node2D, ISetup
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
             { "nodesPerRow", Configuration.CommunityCardCount },
+            { "hasBorder", true },
             { "expectedContentNodeCount", Configuration.CommunityCardCount },
-            { "growBorder", false },
+            { "hasName", true },
             { "containerName", "Community cards"},
             { "getCardFaceDirectionFunc", (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc }
         });
@@ -123,8 +126,9 @@ public partial class Battle: Node2D, ISetup
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
             { "nodesPerRow", Configuration.FieldCardCountPerRow },
+            { "hasBorder", true },
             { "expectedContentNodeCount", 0 },
-            { "growBorder", false },
+            { "hasName", true },
             { "containerName", "Field cards"},
             { "defaultCardFaceDirection", Enums.CardFace.Up } 
         });
@@ -216,8 +220,8 @@ public partial class Battle: Node2D, ISetup
                     }
                     else
                     {
-                        NewChallenger();
-                        Start();
+                        var selectRewardCard = GameMgr.OverlayScene(SelectRewardCardScene) as SelectRewardCard;
+                        selectRewardCard.CardSelected += AfterSelectRewardCard;
                     }
                 }
                 else
@@ -332,6 +336,7 @@ public partial class Battle: Node2D, ISetup
     {
         RoundEngage.Resolve();
         CurrentState = State.AfterResolve;
+        OnRoundEnd?.Invoke(this);
     }
 
     public BattleEntity GetOpponentOf(BattleEntity entity)
@@ -357,6 +362,7 @@ public partial class Battle: Node2D, ISetup
         else
         {
             GD.Print($"You win");
+            Player.Credit.Value += Mathf.Abs(Player.Hp.Value - Player.MaxHp.Value / 2);
             GameMgr.ProgressCounter.Value++;
             OnEnemyDefeated?.Invoke(this);
         }
@@ -407,7 +413,6 @@ public partial class Battle: Node2D, ISetup
     {
         switch (args.Action)
         {
-            
             case NotifyCollectionChangedAction.Add:
                 if (args.NewItems != null)
                     foreach (var t in args.NewItems)
@@ -480,15 +485,21 @@ public partial class Battle: Node2D, ISetup
             { "level", 1 },
             { "isHoleCardDealtVisible", false },
             {
-                "abilityCards", new ObservableCollection<BaseCard>
+                "abilityCards", new List<BaseCard>
                 {
                 }
             },
             {
-                "skillCards", new ObservableCollection<BaseCard>()
+                "skillCards", new List<BaseCard>
                 {
                 }
             }
         });
+    }
+
+    protected void AfterSelectRewardCard()
+    {
+        NewChallenger();
+        Start();
     }
 }

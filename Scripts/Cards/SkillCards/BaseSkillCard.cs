@@ -13,7 +13,7 @@ public class BaseSkillCard: MarkerCard
 {
     public Dictionary<Enums.EngageRole, List<BaseSkillEffect>> Contents;
     
-    public BaseSkillCard(BaseCardDef def) : 
+    public BaseSkillCard(SkillCardDef def) : 
         base(def)
     {
     }

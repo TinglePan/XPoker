@@ -25,11 +25,8 @@ public class RiposteSkillCard: BaseSkillCard
         }
     }
     
-    public RiposteSkillCard(BaseCardDef def): base(def)
+    public RiposteSkillCard(SkillCardDef def): base(def)
     {
-        Def.Name = "Riposte";
-        Def.DescriptionTemplate = "Negate the next incoming attack, then counter attack";
-        Def.IconPath = "res://Sprites/Cards/riposte.png";
     }
 
     protected override void SetUpContents(Dictionary<string, object> args)

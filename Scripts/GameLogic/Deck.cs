@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using Godot;
 using XCardGame.Scripts.Cards;
@@ -15,6 +16,13 @@ public class Deck
 
     public Deck(List<MarkerCard> cards=null)
     {
-        CardList = cards == null ? new ObservableCollection<BaseCard>() : new ObservableCollection<BaseCard>(cards);
+        CardList = new ObservableCollection<BaseCard>();
+        if (cards != null)
+        {
+            foreach (var card in cards)
+            {
+                CardList.Add(card);
+            }
+        }
     }
 }

@@ -43,9 +43,10 @@ public partial class SkillDisplay : Node2D, ISetup
 			{ "separation", Configuration.CardContainerSeparation },
 			{ "pivotDirection", Enums.Direction2D8Ways.Neutral },
 			{ "nodesPerRow", Configuration.RoundSkillsCount },
+			{ "hasBorder", true },
 			{ "expectedContentNodeCount", 1 },
-			{ "growBorder", true },
-			{ "containerName", "Your prepared skills" },
+			{ "hasName", true },
+			{ "containerName", "Prepared skills" },
 			{ "defaultCardFaceDirection", Enums.CardFace.Up }
 		});
 		EnemyRoundSkillContainer.Setup(new Dictionary<string, object>()
@@ -56,9 +57,10 @@ public partial class SkillDisplay : Node2D, ISetup
 			{ "separation", Configuration.CardContainerSeparation },
 			{ "pivotDirection", Enums.Direction2D8Ways.Neutral },
 			{ "nodesPerRow", Configuration.RoundSkillsCount },
+			{ "hasBorder", true },
 			{ "expectedContentNodeCount", 1 },
-			{ "growBorder", true },
-			{ "containerName", "Enemy's prepared skills" },
+			{ "hasName", true },
+			{ "containerName", "Prepared skills" },
 			{ "defaultCardFaceDirection", Enums.CardFace.Up }
 		});
 		HasSetup = true;

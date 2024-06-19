@@ -24,7 +24,9 @@ public partial class TestContainerPositioning: Node
             { "cards", new ObservableCollection<CardNode>() },
             { "contentNodeSize", new Vector2(48, 68) },
             { "separation", 12 },
-            { "defaultCardFaceDirection", Enums.CardFace.Up }
+            { "defaultCardFaceDirection", Enums.CardFace.Up },
+            { "hasBorder", false },
+            { "hasName", false }
         });
         SpawnCardNodeAndAppend();
         GD.Print("task start");
@@ -36,7 +38,7 @@ public partial class TestContainerPositioning: Node
     {
         var card = new PokerCard(new BaseCardDef()
         {
-            BaseCredit = 0,
+            BasePrice = 0,
             Rank = Enums.CardRank.Ace,
             Suit = Enums.CardSuit.Clubs
         });

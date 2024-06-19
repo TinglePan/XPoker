@@ -11,12 +11,9 @@ namespace XCardGame.Scripts.Cards.SkillCards;
 
 public class TwoHandedSkillCard: BaseSkillCard
 {
-    public TwoHandedSkillCard(BaseCardDef def) : 
+    public TwoHandedSkillCard(SkillCardDef def) : 
         base(def)
     {
-        Def.Name = "Two handed";
-        Def.DescriptionTemplate = "Make an attack that scales more with power";
-        Def.IconPath = "res://Sprites/Cards/two_handed.png";
     }
 
     protected override void SetUpContents(Dictionary<string, object> args)

@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://dwpbfhy3isgh5"]
+
+[ext_resource type="FontFile" uid="uid://dd5v55urjvkvb" path="res://Fonts/lanapixel_everything/LanaPixel.ttf" id="1_n4b2o"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_84vjd"]
+
+[resource]
+default_font = ExtResource("1_n4b2o")
+default_font_size = 22
+Button/styles/focus = SubResource("StyleBoxEmpty_84vjd")

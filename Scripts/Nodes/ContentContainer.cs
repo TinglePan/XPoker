@@ -15,18 +15,27 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
     where TContentNode: BaseContentNode<TContentNode, TContent>
     where TContent: IContent<TContent>
 {
+    [Export] public StyleBox StyleBox;
+    
     public GameMgr GameMgr;
     public NinePatchRect Border;
+    public Label ContainerNameLabel;
+    
     public bool HasSetup { get; set; }
-
-    public ObservableCollection<TContent> Contents;
-    public ObservableCollection<TContentNode> ContentNodes;
-
+    
     public Vector2 ContentNodeSize;
     public Vector2 Separation;
     public Enums.Direction2D8Ways PivotDirection;
     public int NodesPerRow;
+
+    public bool HasBorder;
+    public int ExpectedContentNodeCount;
+
+    public bool HasName;
+    public string ContainerName;
     
+    public ObservableCollection<TContent> Contents;
+    public ObservableCollection<TContentNode> ContentNodes;
     protected bool SuppressNotifications;
     
     public override void _Ready()
@@ -38,6 +47,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         Contents.CollectionChanged += OnContentsChanged;
         ContentNodes = new ObservableCollection<TContentNode>();
         ContentNodes.CollectionChanged += OnContentNodesChanged;
+        HasBorder = false;
         SuppressNotifications = false;
         HasSetup = false;
     }
@@ -48,6 +58,20 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         Separation = (Vector2)args["separation"];
         PivotDirection = (Enums.Direction2D8Ways)args["pivotDirection"]; 
         NodesPerRow = (int)args["nodesPerRow"];
+        HasName = (bool)args["hasName"];
+        if (HasName)
+        {
+            ContainerName = (string)args["containerName"];
+            ContainerNameLabel = GetNode<Label>("Name");
+            ContainerNameLabel.Text = ContainerName;
+        }
+        HasBorder = (bool)args["hasBorder"];
+        if (HasBorder)
+        {
+            Border = GetNode<NinePatchRect>("Border");
+            ExpectedContentNodeCount = (int)args["expectedContentNodeCount"];
+            AdjustBorder();
+        }
         HasSetup = true;
     }
     
@@ -106,6 +130,10 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         {
             AdjustContentNode(i, true);
         }
+        if (HasBorder)
+        {
+            AdjustBorder();
+        }
         SuppressNotifications = false;
     }
 
@@ -128,6 +156,10 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         for (int i = 0; i < ContentNodes.Count; i++)
         {
             AdjustContentNode(i, true);
+        }
+        if (HasBorder)
+        {
+            AdjustBorder();
         }
         SuppressNotifications = false;
     }
@@ -162,6 +194,10 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         ClearChildren();
         Contents.Clear();
         SuppressNotifications = false;
+        if (HasBorder)
+        {
+            AdjustBorder();
+        }
     }
 
     protected Vector2 CalculateContentNodePosition(int index, bool globalPosition = false)
@@ -188,6 +224,10 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
 
     protected virtual int ActualNodeCount()
     {
+        if (HasBorder)
+        {
+            return Mathf.Max(ExpectedContentNodeCount, ContentNodes.Count);
+        }
         return ContentNodes.Count;
     }
     
@@ -328,6 +368,28 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         {
             node.Position = position;
             node.Rotation = rotation;
+        }
+    }
+
+    protected virtual void AdjustBorder()
+    {
+        if (ActualNodeCount() == 0)
+        {
+            // GD.Print($"hide {Border}");
+            Border.Hide();
+            ContainerNameLabel.Hide();
+        }
+        else
+        {
+            // GD.Print($"show {Border}");
+            var size = Size();
+            Border.Size = new Vector2(size.X + StyleBox.ContentMarginLeft + StyleBox.ContentMarginRight, size.Y + StyleBox.ContentMarginBottom + StyleBox.ContentMarginTop);
+            // var pivotOffsetFromTopLeft = pivotOffsetFromBottomLeft + new Vector2(0, size.Y);
+            Border.Position = -(GetPivotOffset() + new Vector2(StyleBox.ContentMarginLeft, StyleBox.ContentMarginTop));
+            Border.Show();
+            ContainerNameLabel.Show();
+            ContainerNameLabel.Position =
+                -(GetPivotOffset() + new Vector2(StyleBox.ContentMarginLeft, StyleBox.ContentMarginTop + ContainerNameLabel.Size.Y));
         }
     }
 }

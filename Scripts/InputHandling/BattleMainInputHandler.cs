@@ -6,7 +6,6 @@ using XCardGame.Scripts.Cards.SkillCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
-using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 using CardNode = XCardGame.Scripts.Nodes.CardNode;
 
 namespace XCardGame.Scripts.InputHandling;
@@ -30,7 +29,7 @@ public class BattleMainInputHandler: BaseInputHandler
         FieldCardContainer.ContentNodes.CollectionChanged += OnFieldCardNodesCollectionChanged;
         foreach (var cardNode in FieldCardContainer.ContentNodes)
         {
-            cardNode.OnPressed += ClickCard;
+            cardNode.OnPressed += OnCardNodePressed;
         }
     }
 
@@ -47,11 +46,11 @@ public class BattleMainInputHandler: BaseInputHandler
         FieldCardContainer.ContentNodes.CollectionChanged -= OnFieldCardNodesCollectionChanged;
         foreach (var cardNode in FieldCardContainer.ContentNodes)
         {
-            cardNode.OnPressed -= ClickCard;
+            cardNode.OnPressed -= OnCardNodePressed;
         }
     }
     
-    protected void ClickCard(CardNode node)
+    protected void OnCardNodePressed(CardNode node)
     {
         GD.Print($"ClickCard {node.Content.Value}");
         if (node.Content.Value is BaseInteractCard card && card.CanInteract())
@@ -70,7 +69,7 @@ public class BattleMainInputHandler: BaseInputHandler
                     {
                         if (t is CardNode cardNode)
                         {
-                            cardNode.OnPressed += ClickCard;
+                            cardNode.OnPressed += OnCardNodePressed;
                         }
                     }
                 break;
@@ -80,7 +79,7 @@ public class BattleMainInputHandler: BaseInputHandler
                     {
                         if (t is CardNode cardNode)
                         {
-                            cardNode.OnPressed -= ClickCard;
+                            cardNode.OnPressed -= OnCardNodePressed;
                         }
                     }
                 break;
@@ -89,7 +88,7 @@ public class BattleMainInputHandler: BaseInputHandler
                 {
                     if (node is CardNode card)
                     {
-                        card.OnPressed -= ClickCard;
+                        card.OnPressed -= OnCardNodePressed;
                     }
                 }
                 break;

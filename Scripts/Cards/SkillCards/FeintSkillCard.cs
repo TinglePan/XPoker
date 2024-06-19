@@ -10,11 +10,8 @@ namespace XCardGame.Scripts.Cards.SkillCards;
 
 public class FeintSkillCard: BaseSkillCard
 {
-    public FeintSkillCard(BaseCardDef def): base(def)
+    public FeintSkillCard(SkillCardDef def): base(def)
     {
-        Def.Name = "Feint";
-        Def.DescriptionTemplate = "Grants vulnerable instead of dealing damage";
-        Def.IconPath = "res://Sprites/Cards/feint.png";
     }
 
     protected override void SetUpContents(Dictionary<string, object> args)

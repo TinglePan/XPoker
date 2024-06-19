@@ -8,7 +8,6 @@ using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Nodes;
-using CardContainer = XCardGame.Scripts.Nodes.CardContainer;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 

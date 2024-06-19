@@ -18,6 +18,7 @@ public class BigShieldCard: BaseTapCard
 
     public BigShieldCard(TapCardDef def) : base(def)
     {
+        
     }
     
     public override void OnStart(Battle battle)

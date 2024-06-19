@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
@@ -21,11 +22,13 @@ public partial class GameMgr : Node
 	
 	public InputMgr InputMgr;
 	
-	public Node CurrentScene;
+	public Node CurrentScene => SceneStack[^1];
 	public Battle CurrentBattle;
 
 	public ObservableProperty<int> ProgressCounter;
 
+	public List<Node> SceneStack;
+	
 	public Random Rand;
 	
 	// Called when the node enters the scene tree for the first time.
@@ -37,6 +40,7 @@ public partial class GameMgr : Node
 		InputMgr = GetNode<InputMgr>("/root/InputMgr");
 		ProgressCounter = new ObservableProperty<int>(nameof(ProgressCounter), this, 0);
 		Rand = new Random();
+		SceneStack = new List<Node> { GetTree().Root };
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -71,14 +75,14 @@ public partial class GameMgr : Node
 						{ "levelUpTable", LevelUpTables.DefaultPlayerLevelUpTable },
 						{ "isHoleCardDealtVisible", true },
 						{
-							"abilityCards", new ObservableCollection<BaseCard>
+							"abilityCards", new List<BaseCard>
 							{
 								new D6Card(Defs.Cards.D6),
 								new MagicalHatCard(Defs.Cards.MagicalHat)
 							}
 						},
 						{
-							"skillCards", new ObservableCollection<BaseCard>()
+							"skillCards", new List<BaseCard>()
 							{
 							}
 						}
@@ -96,12 +100,12 @@ public partial class GameMgr : Node
 						{ "level", 1 },
 						{ "isHoleCardDealtVisible", false },
 						{
-							"abilityCards", new ObservableCollection<BaseCard>
+							"abilityCards", new List<BaseCard>
 							{
 							}
 						},
 						{
-							"skillCards", new ObservableCollection<BaseCard>()
+							"skillCards", new List<BaseCard>()
 							{
 							}
 						}
@@ -117,16 +121,36 @@ public partial class GameMgr : Node
 	public Node ChangeScene(PackedScene scene)
 	{
 		GD.Print("Changing scene...");
-		var root = GetTree().Root;
-		if (CurrentScene != null)
+		Node parent;
+		if (SceneStack.Count == 1)
 		{
-			GD.Print($"remove {CurrentScene}");
-			root.RemoveChild(CurrentScene);
-			CurrentScene.QueueFree();
+			parent = CurrentScene;
 		}
-		var node = Utils.InstantiatePrefab(scene, root);
-		CurrentScene = node;
+		else
+		{
+			parent = SceneStack[^2];
+			QuitCurrentScene();
+		}
+		var node = Utils.InstantiatePrefab(scene, parent);
+		SceneStack.Add(node);
 		return CurrentScene;
+	}
+
+	public Node OverlayScene(PackedScene scene)
+	{
+		var parent = CurrentScene;
+		var node = Utils.InstantiatePrefab(scene, parent);
+		SceneStack.Add(node);
+		return CurrentScene;
+	}
+
+	public void QuitCurrentScene()
+	{
+		var parent = CurrentScene.GetParent();
+		var current = CurrentScene;
+		parent.RemoveChild(current);
+		SceneStack.Remove(current);
+		current.QueueFree();
 	}
 
 	public void Quit()

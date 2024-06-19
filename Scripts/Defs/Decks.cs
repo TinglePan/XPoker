@@ -29,7 +29,7 @@ public static class Decks
                 }
                 PokerCard pokerCard = new PokerCard(new BaseCardDef()
                 {
-                    BaseCredit = 0,
+                    BasePrice = 0,
                     Rank = (Enums.CardRank)rank,
                     Suit = (Enums.CardSuit)suit
                 });

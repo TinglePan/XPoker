@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Buffs;
@@ -45,10 +46,10 @@ public partial class BattleEntity: Node, ISetup
     public ObservableProperty<int> MaxHp;
     public ObservableProperty<int> Level;
     public bool IsHoleCardDealtVisible;
-    public ObservableCollection<BaseCard> SkillCards;
     public ObservableCollection<BaseCard> HoleCards;
-    public ObservableCollection<BaseBuff> Buffs;
+    public ObservableCollection<BaseCard> SkillCards;
     public ObservableCollection<BaseCard> AbilityCards;
+    public ObservableCollection<BaseBuff> Buffs;
 
     public override void _Ready()
     {
@@ -64,6 +65,18 @@ public partial class BattleEntity: Node, ISetup
         HpBar.MinValue = 0;
         HpBar.Step = 1;
         HpLabel = GetNode<Label>("HpBar/Hp");
+        
+        MaxHp = new ObservableProperty<int>(nameof(MaxHp), this, 0);
+        Hp = new ObservableProperty<int>(nameof(Hp), this, 0);
+        Level = new ObservableProperty<int>(nameof(Level), this, 0);
+        Defence = new ObservableProperty<int>(nameof(Defence), this, 0);
+        Defence.DetailedValueChanged += DefenceChanged;
+        Hp.ValueChanged += HpChanged;
+        MaxHp.ValueChanged += HpChanged;
+        HoleCards = new ObservableCollection<BaseCard>();
+        SkillCards = new ObservableCollection<BaseCard>();
+        AbilityCards = new ObservableCollection<BaseCard>();
+        Buffs = new ObservableCollection<BaseBuff>();
         HasSetup = false;
     }
 
@@ -77,19 +90,19 @@ public partial class BattleEntity: Node, ISetup
         {
             card.OwnerEntity = this;
         }
-
         DealCardCount = (int)args["dealCardCount"];
         FactionId = (int)args["factionId"];
         HandPowers = (Dictionary<Enums.HandTier, int>)args["handPowers"];
         BaseHandPower = (int)args["baseHandPower"];
-        MaxHp = new ObservableProperty<int>(nameof(MaxHp), this, (int)args["maxHp"]);
-        Hp = new ObservableProperty<int>(nameof(Hp), this, MaxHp.Value);
-        Level = new ObservableProperty<int>(nameof(Level), this, (int)args["level"]);
-        Defence = new ObservableProperty<int>(nameof(Defence), this, 0);
+        MaxHp.Value =(int)args["maxHp"];
+        Hp.Value = MaxHp.Value;
+        Level.Value = (int)args["level"];
         IsHoleCardDealtVisible = (bool)args["isHoleCardDealtVisible"];
-        AbilityCards = (ObservableCollection<BaseCard>)args["abilityCards"];
-
-        HoleCards = new ObservableCollection<BaseCard>();
+        foreach (var card in (List<BaseCard>)args["abilityCards"])
+        {
+            AbilityCards.Add(card);
+            card.OwnerEntity = this;
+        }
         HoleCardContainer.Setup(new Dictionary<string, object>()
         {
             { "allowInteract", false },
@@ -98,12 +111,17 @@ public partial class BattleEntity: Node, ISetup
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
             { "nodesPerRow", Configuration.HoleCardCount },
+            { "hasBorder", true },
             { "expectedContentNodeCount", Configuration.HoleCardCount },
-            { "growBorder", false },
+            { "hasName", true },
             { "containerName", "Hole cards" },
             { "defaultCardFaceDirection", IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down } 
         });
-        SkillCards = (ObservableCollection<BaseCard>)args["skillCards"];
+        foreach (var card in (List<BaseCard>)args["skillCards"])
+        {
+            SkillCards.Add(card);
+            card.OwnerEntity = this;
+        }
         SkillCardContainer.Setup(new Dictionary<string, object>()
         {
             { "allowInteract", false },
@@ -112,12 +130,12 @@ public partial class BattleEntity: Node, ISetup
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Up },
             { "nodesPerRow", Configuration.SkillCardCountPerRow },
+            { "hasBorder", true },
             { "expectedContentNodeCount", 1 },
-            { "growBorder", true },
+            { "hasName", true },
             { "containerName", "Skill cards" },
             { "defaultCardFaceDirection", Enums.CardFace.Up } 
         });
-        Buffs = new ObservableCollection<BaseBuff>();
         BuffContainer.Setup(new Dictionary<string, object>()
         {
             { "allowInteract", false },
@@ -126,12 +144,9 @@ public partial class BattleEntity: Node, ISetup
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
             { "nodesPerRow", Configuration.BuffCountPerRow },
+            { "hasBorder", false },
+            { "hasName", false }
         });
-        Defence.DetailedValueChanged += DefenceChanged;
-        Defence.FireValueChangeEventsOnInit();
-        Hp.ValueChanged += HpChanged;
-        MaxHp.ValueChanged += HpChanged;
-        Hp.FireValueChangeEventsOnInit();
         
         HasSetup = true;
     }

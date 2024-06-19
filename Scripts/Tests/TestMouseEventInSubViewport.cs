@@ -16,7 +16,7 @@ public partial class TestMouseEventInSubViewport : Control
 		base._Ready();
 		var card = new PokerCard(new BaseCardDef()
 		{
-			BaseCredit = 0,
+			BasePrice = 0,
 			Rank = Enums.CardRank.Ace,
 			Suit = Enums.CardSuit.Clubs
 		});

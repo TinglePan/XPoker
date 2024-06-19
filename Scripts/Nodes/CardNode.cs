@@ -21,6 +21,8 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
     public Label RankLabel;
     public Sprite2D JokerMark;
     public Label CostLabel;
+    public Node2D PriceNode;
+    public Label PriceLabel;
     public AnimationPlayer AnimationPlayer;
     
     public Action<CardNode> OnPressed;
@@ -29,6 +31,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
     public ObservableProperty<Enums.CardFace> FaceDirection;
     public bool IsSelected;
     public bool IsRevealed;
+    public ObservableProperty<bool> IsBought;
 
 	public override void _Ready()
 	{
@@ -72,6 +75,16 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 	    });
 	    OriginalFaceDirection = (Enums.CardFace)args["faceDirection"];
 	    FaceDirection.Value = OriginalFaceDirection;
+
+	    if (args.ContainsKey("DisplayPrice"))
+	    {
+		    PriceNode = GetNode<Node2D>("Price");
+		    PriceNode.Show();
+		    PriceLabel = GetNode<Label>("Price/Value");
+		    IsBought = new ObservableProperty<bool>(nameof(IsBought), this, false);
+		    IsBought.DetailedValueChanged += OnIsBoughtChanged;
+		    IsBought.FireValueChangeEventsOnInit();
+	    }
     }
 
 	public void Reset(bool useTween = true)
@@ -250,5 +263,17 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
 		MainIcon.ResetIconPath(null);
 		card.OnStop(card.Battle);
+	}
+
+	protected void OnIsBoughtChanged(object sender, ValueChangedEventDetailedArgs<bool> args)
+	{
+		if (args.NewValue)
+		{
+			PriceLabel.Text = "Bought";
+		}
+		else
+		{
+			PriceLabel.Text = Content.Value.Def.BasePrice.ToString();
+		}
 	}
 }

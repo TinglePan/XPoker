@@ -1,3 +1,172 @@
-[gd_scene format=3 uid="uid://chvatylwem6j0"]
+[gd_scene load_steps=6 format=3 uid="uid://chvatylwem6j0"]
 
-[node name="Control" type="Node2D"]
+[ext_resource type="Texture2D" uid="uid://cct87hjq0q0qu" path="res://Sprites/shield.png" id="1_njq7x"]
+[ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="1_vd1qc"]
+[ext_resource type="LabelSettings" uid="uid://8qnntxqwa647" path="res://Resources/11pxLabelSetting.tres" id="2_nj0me"]
+[ext_resource type="Texture2D" uid="uid://bd0cm1hbyj2th" path="res://Sprites/box_covered.png" id="4_av0vg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kd352"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 1)
+
+[node name="Shop" type="Control"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_kd352")
+
+[node name="Marks" type="Node2D" parent="Panel"]
+position = Vector2(0, 400)
+
+[node name="RemoveCards" type="TextureButton" parent="Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -77.0
+offset_top = -90.0
+offset_right = -45.0
+offset_bottom = -58.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("1_njq7x")
+
+[node name="Label" type="Label" parent="Panel/RemoveCards"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = -23.0
+offset_right = 20.0
+grow_horizontal = 2
+text = "Remove Cards"
+label_settings = ExtResource("2_nj0me")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Price" type="Label" parent="Panel/RemoveCards"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "5 Cr"
+label_settings = ExtResource("2_nj0me")
+horizontal_alignment = 1
+
+[node name="PowerUp" type="TextureButton" parent="Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -90.0
+offset_right = -118.0
+offset_bottom = -58.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("1_njq7x")
+
+[node name="Label" type="Label" parent="Panel/PowerUp"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = -23.0
+offset_right = 20.0
+grow_horizontal = 2
+text = "Power Up"
+label_settings = ExtResource("2_nj0me")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Price" type="Label" parent="Panel/PowerUp"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "5 Cr"
+label_settings = ExtResource("2_nj0me")
+horizontal_alignment = 1
+
+[node name="Close" type="TextureButton" parent="Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -33.0
+offset_top = -399.0
+offset_right = -1.0
+offset_bottom = -367.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("1_njq7x")
+
+[node name="PokerCards" parent="Panel" instance=ExtResource("1_vd1qc")]
+position = Vector2(30, 280)
+
+[node name="SkillCards" parent="Panel" instance=ExtResource("1_vd1qc")]
+position = Vector2(30, 30)
+
+[node name="AbilityCards" parent="Panel" instance=ExtResource("1_vd1qc")]
+position = Vector2(200, 30)
+
+[node name="Pocket" type="TextureRect" parent="Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource("4_av0vg")

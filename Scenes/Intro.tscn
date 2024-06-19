@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://77vdut83237t"]
+[gd_scene load_steps=5 format=3 uid="uid://77vdut83237t"]
 
 [ext_resource type="Script" path="res://Scripts/GameLogic/Intro.cs" id="1_0oriv"]
 [ext_resource type="FontFile" uid="uid://dd5v55urjvkvb" path="res://Fonts/lanapixel_everything/LanaPixel.ttf" id="2_7salj"]
+[ext_resource type="Theme" uid="uid://dwpbfhy3isgh5" path="res://Resources/button_theme.tres" id="3_buvnf"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_nij8f"]
 font = ExtResource("2_7salj")
@@ -51,15 +52,13 @@ alignment = 2
 [node name="StartButton" type="Button" parent="MainMenu"]
 texture_filter = 1
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_7salj")
-theme_override_font_sizes/font_size = 33
+theme = ExtResource("3_buvnf")
+theme_type_variation = &"FlatButton"
 text = "Start"
-flat = true
 
 [node name="QuitButton" type="Button" parent="MainMenu"]
 texture_filter = 1
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_7salj")
-theme_override_font_sizes/font_size = 33
+theme = ExtResource("3_buvnf")
+theme_type_variation = &"FlatButton"
 text = "Quit"
-flat = true

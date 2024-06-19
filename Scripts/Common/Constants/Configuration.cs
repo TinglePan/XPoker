@@ -30,6 +30,12 @@ public static class Configuration
     public static readonly int MaxDefence = 999;
     public static readonly int ProgressCountRequiredToWin = 8;
 
+    public static readonly int ShopPokerCardCount = 3;
+    public static readonly int ShopSkillCardCount = 2;
+    public static readonly int ShopAbilityCardCount = 2;
+    public static readonly int ShopMarkerCount = 3;
+    public static readonly int ShopRemoveCardPriceIncrease = 5;
+
     public static readonly int CommonBuffMaxStack = 99;
     public static readonly int PowerBasedBuffMaxStack = 999;
 

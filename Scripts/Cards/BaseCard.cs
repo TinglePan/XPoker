@@ -17,7 +17,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     // public string OriginalIconPath;
     // public Enums.CardSuit OriginalSuit;
     // public Enums.CardRank OriginalRank;
-    // public int BaseCredit;
+    // public int BasePrice;
 
     public BaseCardDef Def;
     
@@ -68,7 +68,6 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     {
         GameMgr = (GameMgr)args["gameMgr"];
         Battle = (Battle)args["battle"];
-        OwnerEntity = (BattleEntity)args["ownerEntity"];
         Nodes.Add((CardNode)args["node"]);
     }
 

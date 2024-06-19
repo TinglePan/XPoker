@@ -8,6 +8,7 @@ using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Cards.SkillCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
 
@@ -15,15 +16,22 @@ public partial class PlayerBattleEntity: BattleEntity
 {
     public ObservableProperty<int> Cost;
     public ObservableProperty<int> MaxCost;
+    public ObservableProperty<int> Credit;
     public Dictionary<int, LevelUpInfo> LevelUpTable;
-    
+
+    public override void _Ready()
+    {
+        base._Ready();
+        Level.DetailedValueChanged += LevelChanged;
+    }
+
     public override void Setup(Dictionary<string, object> args)
     {
+        LevelUpTable = (Dictionary<int, LevelUpInfo>)args["levelUpTable"];
         base.Setup(args);
         Cost = new ObservableProperty<int>(nameof(Cost), this, 0);
         MaxCost = new ObservableProperty<int>(nameof(MaxCost), this, (int)args["maxCost"]);
-        LevelUpTable = (Dictionary<int, LevelUpInfo>)args["levelUpTable"];
-        Level.DetailedValueChanged += LevelChanged;
+        Credit = new ObservableProperty<int>(nameof(Credit), this, 0);
     }
 
     public override void RoundReset(float delay = 0f)
@@ -32,19 +40,24 @@ public partial class PlayerBattleEntity: BattleEntity
         Cost.Value = MaxCost.Value;
     }
 
+    public bool CanBuy(CardNode cardNode)
+    {
+        return Credit.Value >= cardNode.Content.Value.Def.BasePrice;
+    }
+
     protected void LevelChanged(object obj, ValueChangedEventDetailedArgs<int> args)
     {
         Debug.Assert(args.OldValue < args.NewValue);
         for (int i = args.OldValue; i < args.NewValue; i++)
         {
-            if (LevelUpTable.TryGetValue(i, out var levelUpInfo))
+            if (LevelUpTable != null && LevelUpTable.TryGetValue(i, out var levelUpInfo))
             {
                 // TODO: Choose one from cards in list?
                 if (levelUpInfo.GrantCards is { Count: > 0 })
                 {
                     foreach (var card in levelUpInfo.GrantCards)
                     {
-                        if (card is MarkerCard markerCard)
+                        if (card is PokerCard markerCard)
                         {
                             Deck.CardList.Add(markerCard);
                         } else if (card is BaseSkillCard skillCard)

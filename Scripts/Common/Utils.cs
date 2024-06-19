@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
@@ -66,6 +67,42 @@ public static class Utils
         // Profile.EndWatch("get comb", true, 0);
         // GD.Print($"combination count: {res.Count}");
         return res;
+    }
+
+    public static List<T> RandMFrom<T>(List<T> source, int m, Random rand)
+    {
+        if (m < source.Count)
+        {
+            var tmp = new List<T>(source);
+            var res = new List<T>();
+            var n = tmp.Count;
+            for (int i = 0; i < m; i++)
+            {
+                var randValue = rand.Next(n - i);
+                var pick = tmp[randValue];
+                res.Add(pick);
+                (tmp[randValue], tmp[n - i - 1]) = (tmp[n - i - 1], tmp[randValue]);
+            }
+            return res;
+        }
+        else
+        {
+            return source;
+        }
+    }
+
+    public static int RandOnThresholds(List<int> thresholds, Random rand)
+    {
+        int max = thresholds.Max();
+        var randValue = rand.Next(0, max);
+        for (int i = 0; i < thresholds.Count; i++)
+        {
+            if (randValue < thresholds[i])
+            {
+                return i;
+            }
+        }
+        return thresholds.Count - 1;
     }
 
     public static string PrettyPrintCardSuit(Enums.CardSuit suit)

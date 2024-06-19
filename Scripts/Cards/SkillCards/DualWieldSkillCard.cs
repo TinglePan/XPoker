@@ -10,7 +10,7 @@ namespace XCardGame.Scripts.Cards.SkillCards;
 
 public class DualWieldSkillCard: BaseSkillCard
 {
-    public DualWieldSkillCard(BaseCardDef def): base(def)
+    public DualWieldSkillCard(SkillCardDef def): base(def)
     {
         Def.Name = "Dual wield";
         Def.DescriptionTemplate = "Attack twice";

@@ -1,4 +1,7 @@
-﻿using XCardGame.Scripts.Common.Constants;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.Defs;
 
@@ -9,7 +12,13 @@ public class BaseCardDef
     public string IconPath;
     public Enums.CardSuit Suit;
     public Enums.CardRank Rank;
-    public int BaseCredit;
+    public int BasePrice;
+    public int Rarity;
+}
+
+public class SkillCardDef : BaseCardDef
+{
+    public int Cost;
 }
 
 public class AbilityCardDef: BaseCardDef
@@ -36,7 +45,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/d6.png",
         RankChangePerUse = -1,
         Cost = 5,
-        BaseCredit = 5,
+        BasePrice = 5,
+        Rarity = 1,
         Rank = Enums.CardRank.Six,
         Suit = Enums.CardSuit.Diamonds
     };
@@ -48,7 +58,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/capitalism.png",
         TappedCost = 2,
         Cost = 0,
-        BaseCredit = 5,
+        BasePrice = 5,
+        Rarity = 1,
         Rank = Enums.CardRank.Ace,
         Suit = Enums.CardSuit.Diamonds
     };
@@ -60,7 +71,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/socialism.png",
         TappedCost = 2,
         Cost = 0,
-        BaseCredit = 5,
+        BasePrice = 5,
+        Rarity = 1,
         Rank = Enums.CardRank.Ace,
         Suit = Enums.CardSuit.Clubs
     };
@@ -72,7 +84,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/magical_hat.png",
         RankChangePerUse = -1,
         Cost = 5,
-        BaseCredit = 5,
+        BasePrice = 5,
+        Rarity = 1,
         Rank = Enums.CardRank.Three,
         Suit = Enums.CardSuit.Spades
     };
@@ -84,7 +97,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/balatroll.png",
         RankChangePerUse = -1,
         Cost = 4,
-        BaseCredit = 4,
+        BasePrice = 4,
+        Rarity = 1,
         Rank = Enums.CardRank.Three,
         Suit = Enums.CardSuit.Hearts
     };
@@ -96,7 +110,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/big_shield.png",
         TappedCost = 0,
         Cost = 5,
-        BaseCredit = 5,
+        BasePrice = 5,
+        Rarity = 1,
         Rank = Enums.CardRank.King,
         Suit = Enums.CardSuit.Hearts
     };
@@ -108,7 +123,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/keep_out.png",
         TappedCost = 2,
         Cost = 0,
-        BaseCredit = 5,
+        BasePrice = 5,
+        Rarity = 1,
         Rank = Enums.CardRank.King,
         Suit = Enums.CardSuit.Spades
     };
@@ -120,7 +136,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/millennium_eye.png",
         RankChangePerUse = -1,
         Cost = 5,
-        BaseCredit = 5,
+        BasePrice = 5,
+        Rarity = 1,
         Rank = Enums.CardRank.Ace,
         Suit = Enums.CardSuit.Spades
     };
@@ -132,7 +149,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/the_tie_breaker.png",
         TappedCost = 2,
         Cost = 0,
-        BaseCredit = 5,
+        BasePrice = 5,
+        Rarity = 1,
         Rank = Enums.CardRank.Ace,
         Suit = Enums.CardSuit.Spades
     };
@@ -144,9 +162,10 @@ public static class Cards
         IconPath = "res://Sprites/Cards/turn_the_tables.png",
         RankChangePerUse = -10,
         Cost = 5,
-        BaseCredit = 5,
+        BasePrice = 5,
+        Rarity = 1,
         Rank = Enums.CardRank.Ten,
-        Suit = Enums.CardSuit.Spades
+        Suit = Enums.CardSuit.Spades,
     };
     
     public static TapCardDef EyePatch = new ()
@@ -156,7 +175,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/eye_patch.png",
         TappedCost = 4,
         Cost = 0,
-        BaseCredit = 0,
+        BasePrice = 0,
+        Rarity = 1,
         Rank = Enums.CardRank.Jack,
         Suit = Enums.CardSuit.Spades
     };
@@ -168,7 +188,8 @@ public static class Cards
         IconPath = "res://Sprites/Cards/xom.png",
         TappedCost = 5,
         Cost = 0,
-        BaseCredit = 0,
+        BasePrice = 0,
+        Rarity = 1,
         Rank = Enums.CardRank.BlackJoker,
         Suit = Enums.CardSuit.BlackJoker
     };
@@ -180,8 +201,85 @@ public static class Cards
         IconPath = "res://Sprites/Cards/hand_shake.png",
         TappedCost = 2,
         Cost = 0,
-        BaseCredit = 0,
+        BasePrice = 0,
+        Rarity = 1,
         Rank = Enums.CardRank.Five,
         Suit = Enums.CardSuit.Hearts
     };
+
+    
+    // Skills
+    public static SkillCardDef Feint = new ()
+    {
+        Name = "Feint",
+        DescriptionTemplate = "Grants vulnerable instead of dealing damage",
+        IconPath = "res://Sprites/Cards/feint.png",
+        Rarity = 1,
+        Cost = 5,
+        BasePrice = 5,
+        Rank = Enums.CardRank.Ace,
+        Suit = Enums.CardSuit.Spades
+    };
+    
+    public static SkillCardDef DualWield = new ()
+    {
+        Name = "Dual wield",
+        DescriptionTemplate = "Attack twice",
+        IconPath = "res://Sprites/Cards/dual_wield.png",
+        Rarity = 1,
+        Cost = 5,
+        BasePrice = 5,
+        Rank = Enums.CardRank.Two,
+        Suit = Enums.CardSuit.Clubs
+    };
+    
+    public static SkillCardDef Riposte = new ()
+    {
+        Name = "Riposte",
+        DescriptionTemplate = "Negate the next incoming attack, then counter attack",
+        IconPath = "res://Sprites/Cards/riposte.png",
+        Rarity = 1,
+        Cost = 5,
+        BasePrice = 5,
+        Rank = Enums.CardRank.Eight,
+        Suit = Enums.CardSuit.Hearts
+    };
+    
+    public static SkillCardDef SuckerPunch = new ()
+    {
+        Name = "Sucker Punch",
+        DescriptionTemplate = "Attack as a defender",
+        IconPath = "res://Sprites/Cards/sucker_punch.png",
+        Rarity = 1,
+        Cost = 5,
+        BasePrice = 5,
+        Rank = Enums.CardRank.Seven,
+        Suit = Enums.CardSuit.Clubs
+    };
+    
+    public static SkillCardDef TwoHanded = new ()
+    {
+        Name = "Two handed",
+        DescriptionTemplate = "Make an attack that scales more with power",
+        IconPath = "res://Sprites/Cards/two_handed.png",
+        Rarity = 1,
+        Cost = 5,
+        BasePrice = 5,
+        Rank = Enums.CardRank.Two,
+        Suit = Enums.CardSuit.Clubs
+    };
+        
+    public static List<BaseCardDef> All()
+    {
+        Type cards = typeof(Cards);
+        var res = new List<BaseCardDef>();
+        FieldInfo[] staticFields = cards.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+        foreach (FieldInfo field in staticFields)
+        {
+            var value = field.GetValue(null);
+            var cardDef = (BaseCardDef)value;
+            res.Add(cardDef);
+        }
+        return res;
+    }
 }

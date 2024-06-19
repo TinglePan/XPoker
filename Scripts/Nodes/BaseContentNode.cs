@@ -52,7 +52,7 @@ public abstract partial class BaseContentNode<TContent> : Node2D
 
     protected void OnMouseExit()
     {
-        GD.Print($"{this} OnMouseExit");
+        // GD.Print($"{this} OnMouseExit");
         IsFocused.Value = false;
     }
 

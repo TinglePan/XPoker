@@ -1,10 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://nko5a5mn6ufg"]
+[gd_scene load_steps=6 format=3 uid="uid://nko5a5mn6ufg"]
 
 [ext_resource type="Script" path="res://Scripts/Nodes/BattleScene.cs" id="1_54v76"]
 [ext_resource type="PackedScene" uid="uid://cmlbufighcu1t" path="res://Scenes/Battle.tscn" id="2_b2wp5"]
 [ext_resource type="PackedScene" uid="uid://cu8cytigbn45" path="res://Scenes/DialogueBox.tscn" id="2_drmk1"]
-[ext_resource type="FontFile" uid="uid://cy2x5d3tsilqd" path="res://Fonts/ark-pixel-12px-proportional-zh_cn.woff2" id="3_dv7il"]
-[ext_resource type="StyleBox" uid="uid://bo4r6ump32vlx" path="res://Resources/BorderBox.tres" id="4_h726f"]
+[ext_resource type="Theme" uid="uid://dwpbfhy3isgh5" path="res://Resources/button_theme.tres" id="4_lascm"]
 
 [sub_resource type="Theme" id="Theme_rrsrm"]
 
@@ -78,7 +77,6 @@ offset_right = -316.0
 offset_bottom = -136.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_fonts/font = ExtResource("3_dv7il")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = ExtResource("4_h726f")
+theme = ExtResource("4_lascm")
+theme_type_variation = &"FlatButton"
 text = "Proceed"

@@ -19,7 +19,12 @@ public partial class Intro: Node
         BattleScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/BattleScene.tscn");
         StartButton.Pressed += Start;
         QuitButton.Pressed += GameMgr.Quit;
-        GameMgr.CurrentScene = this;
+        
+        // NOTE: On load main scene workaround.
+        if (GameMgr.SceneStack.Count == 1)
+        {
+            GameMgr.SceneStack.Add(this);
+        }
     }
 
     protected void Start()

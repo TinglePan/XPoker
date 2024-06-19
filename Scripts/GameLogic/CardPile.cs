@@ -24,12 +24,16 @@ public partial class CardPile: Node2D, ISetup
         base._Ready();
         TopCard = GetNode<CardNode>("Card");
         PileImage = GetNode<NinePatchRect>("PileImage");
+        Cards = new ObservableCollection<BaseCard>();
+        Cards.CollectionChanged += OnCardsChanged;
     }
 
     public void Setup(Dictionary<string, object> args)
     {
-        Cards = (ObservableCollection<BaseCard>)args["cards"];
-        Cards.CollectionChanged += OnCardsChanged;
+        foreach (var card in (List<BaseCard>)args["cards"])
+        {
+            Cards.Add(card);
+        }
         TopCardFaceDirection = (Enums.CardFace)args["topCardFaceDirection"];
     }
 

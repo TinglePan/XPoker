@@ -53,9 +53,9 @@ public class BattleMainInputHandler: BaseInputHandler
     protected void OnCardNodePressed(CardNode node)
     {
         GD.Print($"ClickCard {node.Content.Value}");
-        if (node.Content.Value is BaseInteractCard card && card.CanInteract())
+        if (node.Content.Value is IInteractCard interactCard && interactCard.CanInteract())
         {
-            card.Interact();
+            interactCard.Interact();
         }
     }
     

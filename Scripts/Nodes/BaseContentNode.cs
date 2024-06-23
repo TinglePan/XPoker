@@ -36,12 +36,13 @@ public abstract partial class BaseContentNode<TContent> : Node2D
         }
     }
 
-    public void TweenTransform(Vector2 position, float rotationDegrees, float tweenTime, Action callback = null)
+    public void TweenTransform(Vector2 position, float rotationDegrees, float tweenTime, Action callback = null,
+        TweenControl.ConflictTweenAction conflictTweenAction = TweenControl.ConflictTweenAction.Interrupt)
     {
         var newTween = CreateTween().SetParallel();
         newTween.TweenProperty(this, "position", position, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
         newTween.TweenProperty(this, "rotation_degrees", rotationDegrees, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
-        TweenControl.AddTween("transform", newTween, tweenTime, callback);
+        TweenControl.AddTween("transform", newTween, tweenTime, callback, conflictTweenAction);
     }
 
     protected void OnMouseEnter()

@@ -7,7 +7,7 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class BaseUseCard: BaseInteractCard, IUseCard
+public class BaseUseCard: BaseAbilityCard, IUseCard
 {
     public readonly UseCardDef UseCardDef;
     public bool IsRecharging { get; private set; }
@@ -16,6 +16,7 @@ public class BaseUseCard: BaseInteractCard, IUseCard
     {
         UseCardDef = def;
         IsRecharging = false;
+        Interactions.Add(Enums.CardInteractions.Use);
     }
     
     public override void Setup(Dictionary<string, object> args)
@@ -33,10 +34,9 @@ public class BaseUseCard: BaseInteractCard, IUseCard
         }
         return !IsRecharging;
     }
-    
+
     public override void Interact()
     {
-        base.Interact();
         ChooseTargets();
     }
 

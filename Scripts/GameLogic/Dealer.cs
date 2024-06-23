@@ -88,26 +88,28 @@ public partial class Dealer: Node2D, ISetup
         var takeCountForEachAnimatedShuffleCard = DiscardCardPile.Cards.Count / shuffleAnimateCardCount;
         for (int i = 0; i < shuffleAnimateCardCount; i++)
         {
-            var delay = Configuration.AnimateCardTransformInterval * i;
-            var timer = GetTree().CreateTimer(delay);
+            var timer = GetTree().CreateTimer(Configuration.AnimateCardTransformInterval);
             await ToSignal(timer, Timer.SignalName.Timeout);
             var card = await DrawCardFromPile(DiscardCardPile);
             if (card == null) return;
             var cardNode = CreateCardNodeOnPile(card, DiscardCardPile);
             cardNode.Reparent(DealCardPile);
-            cardNode.TweenTransform(DealCardPile.TopCard.Position, DealCardPile.TopCard.RotationDegrees, Configuration.AnimateCardTransformInterval);
-            await ToSignal(cardNode.TweenControl.GetTween("transform"), Tween.SignalName.Finished);
-            DealCardPile.Cards.Add(card);
-            var cards = DiscardCardPile.TakeN(takeCountForEachAnimatedShuffleCard);
-            foreach (var takenCard in cards)
-            {
-                DealCardPile.Cards.Add(takenCard);
-            }
-            if (DiscardCardPile.Cards.Count == 0)
-            {
-                Shuffle();
-            }
-            cardNode.QueueFree();
+            cardNode.TweenTransform(DealCardPile.TopCard.Position, DealCardPile.TopCard.RotationDegrees, 
+                Configuration.AnimateCardTransformInterval, () =>
+                {
+                    DealCardPile.Cards.Add(card);
+                    var cards = DiscardCardPile.TakeN(takeCountForEachAnimatedShuffleCard);
+                    foreach (var takenCard in cards)
+                    {
+                        DealCardPile.Cards.Add(takenCard);
+                    }
+                    cardNode.QueueFree();
+                    if (DiscardCardPile.Cards.Count == 0)
+                    {
+                        Shuffle();
+                    }
+                });
+            // await ToSignal(cardNode.TweenControl.GetTween("transform"), Tween.SignalName.Finished);
         }
     }
     
@@ -146,7 +148,7 @@ public partial class Dealer: Node2D, ISetup
         targetContainer.ContentNodes.Add(cardNode);
     }
 
-    public async void DealCardAndReplace(CardNode node, float delay = 0f)
+    public async Task DealCardAndReplace(CardNode node, float delay = 0f)
     {
         if (delay > 0)
         {
@@ -162,30 +164,30 @@ public partial class Dealer: Node2D, ISetup
             var index = cardContainer.ContentNodes.IndexOf(node);
             AnimateDiscard(node);
             cardContainer.ContentNodes.Insert(index, cardNode);
-            await ToSignal(cardNode.TweenControl.GetTween("transform"), Tween.SignalName.Finished);
         }
         else
         {
-            cardNode.TweenTransform(node.Position, node.RotationDegrees, Configuration.AnimateCardTransformInterval);
-            await ToSignal(node.TweenControl.GetTween("transform"), Tween.SignalName.Finished);
-            node.Content.Value = cardNode.Content.Value;
-            cardNode.QueueFree();
+            cardNode.TweenTransform(node.Position, node.RotationDegrees, Configuration.AnimateCardTransformInterval,
+                () =>
+                {
+                    node.Content.Value = cardNode.Content.Value;
+                    cardNode.QueueFree();
+                }, TweenControl.ConflictTweenAction.Finish);
         }
     }
 
-    public async void AnimateDiscard(CardNode node, float delay = 0f)
+    public async Task AnimateDiscard(CardNode node, float delay = 0f)
     {
         if (delay > 0)
         {
             var timer = GetTree().CreateTimer(delay);
             await ToSignal(timer, Timer.SignalName.Timeout);
         }
-        
         // GD.Print($"animate discard {node}");
         node.Container.Contents.Remove(node.Content.Value);
         node.Reparent(DiscardCardPile);
         node.TweenTransform(DiscardCardPile.TopCard.Position, DiscardCardPile.TopCard.RotationDegrees,
-            Configuration.AnimateCardTransformInterval, () => Discard(node));
+            Configuration.AnimateCardTransformInterval, () => Discard(node), TweenControl.ConflictTweenAction.Finish);
     }
 
     protected async Task<BaseCard> DrawCardFromPile(CardPile pile)
@@ -208,7 +210,7 @@ public partial class Dealer: Node2D, ISetup
 
     protected void Discard(CardNode cardNode)
     {
-        // GD.Print($"discard {cardNode}");
+        GD.Print($"discard {cardNode}");
         DiscardCardPile.Cards.Insert(0, cardNode.Content.Value);
         cardNode.QueueFree();
     }

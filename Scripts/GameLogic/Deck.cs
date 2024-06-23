@@ -7,6 +7,7 @@ using Godot;
 using XCardGame.Scripts.Cards;
 
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs;
 
 namespace XCardGame.Scripts.GameLogic;
 
@@ -14,13 +15,14 @@ public class Deck
 {
     public ObservableCollection<BaseCard> CardList;
 
-    public Deck(List<MarkerCard> cards=null)
+    public Deck(DeckDef def)
     {
         CardList = new ObservableCollection<BaseCard>();
-        if (cards != null)
+        if (def.CardDefs != null)
         {
-            foreach (var card in cards)
+            foreach (var cardDef in def.CardDefs)
             {
+                var card = new PokerCard(cardDef);
                 CardList.Add(card);
             }
         }

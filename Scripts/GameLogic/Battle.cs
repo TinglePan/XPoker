@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.HandEvaluate;
+using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.GameLogic;
@@ -92,6 +95,7 @@ public partial class Battle: Node2D, ISetup
         CommunityCards = new ObservableCollection<BaseCard>();
         FieldCards = new ObservableCollection<BaseCard>();
         HandTierOrderAscend = new ObservableCollection<Enums.HandTier>();
+        Effects = new List<BaseEffect>();
     }
 
     public virtual void Setup(Dictionary<string, object> args)
@@ -193,7 +197,7 @@ public partial class Battle: Node2D, ISetup
         NewRound();
     }
 
-    public void Proceed()
+    public async void Proceed()
     {
         switch (CurrentState)
         {
@@ -207,12 +211,15 @@ public partial class Battle: Node2D, ISetup
                 ResolveSkills();
                 break;
             case State.AfterResolve:
-                if (Player.IsDefeated())
+                var isPlayerDefeated = Player.IsDefeated();
+                var isEnemyDefeated = Enemy.IsDefeated();
+                await NewRound();
+                if (isPlayerDefeated)
                 {
                     GameOver();
                     return;
                 }
-                if (Enemy.IsDefeated())
+                if (isEnemyDefeated)
                 {
                     if (GameMgr.ProgressCounter.Value >= Configuration.ProgressCountRequiredToWin)
                     {
@@ -220,34 +227,34 @@ public partial class Battle: Node2D, ISetup
                     }
                     else
                     {
+                        Dealer.AnimateShuffle();
                         var selectRewardCard = GameMgr.OverlayScene(SelectRewardCardScene) as SelectRewardCard;
                         selectRewardCard.CardSelected += AfterSelectRewardCard;
+                        selectRewardCard.Setup(new Dictionary<string, object>()
+                        {
+                            { "rewardCardCount", Configuration.DefaultRewardCardCount },
+                            { "rewardCardDefType", typeof(AbilityCardDef) },
+                            { "reRollPriceIncrease", Configuration.DefaultReRollPriceIncrease },
+                            { "skipReward", Configuration.DefaultSkipReward }
+                        });
                     }
-                }
-                else
-                {
-                    NewRound();
                 }
                 break;
         }
         OnBattleProceed?.Invoke(this);
     }
     
-    public void NewRound()
+    public async Task NewRound()
     {
         RoundCount++;
         OnRoundStart?.Invoke(this);
-        var index = 0;
         foreach (var entity in Entities)
         {
-            var delay = Configuration.AnimateCardTransformInterval * index;
-            index += entity.HoleCards.Count;
-            entity.RoundReset(delay);
+            await entity.RoundReset(Configuration.AnimateCardTransformInterval);
         }
         foreach (var cardNode in CommunityCardContainer.ContentNodes.ToList())
         {
-            Dealer.AnimateDiscard(cardNode, Configuration.AnimateCardTransformInterval * index);
-            index++;
+            await Dealer.AnimateDiscard(cardNode, Configuration.AnimateCardTransformInterval);
         }
         // CommunityCardContainer.ContentNodes.Clear();
         RoundHands.Clear();
@@ -326,6 +333,7 @@ public partial class Battle: Node2D, ISetup
         BeforeEngage?.Invoke(this, RoundEngage);
         RoundEngage.PrepareRoundSkills();
         CurrentState = State.BeforeResolve;
+        GameMgr.InputMgr.SwitchToInputHandler(new PrepareRoundSkillInputHandler(GameMgr));
         // var endTime = Time.GetTicksUsec();
         // GD.Print($"Hand evaluation time: {endTime - startTime} us");
         // GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
@@ -472,29 +480,7 @@ public partial class Battle: Node2D, ISetup
 
     protected void NewChallenger()
     {
-        Enemy.Setup(new Dictionary<string, object>()
-        {
-            { "name", "cpu" },
-            { "portraitPath", "res://Sprites/cloak_guy.png" },
-            { "deck", Decks.EnemyInitialDeck },
-            { "dealCardCount", 2 },
-            { "factionId", Enums.FactionId.Enemy },
-            { "handPowers", HandPowerTables.DefaultEnemyHandPowerTable },
-            { "baseHandPower", 0 },
-            { "maxHp", 10 },
-            { "level", 1 },
-            { "isHoleCardDealtVisible", false },
-            {
-                "abilityCards", new List<BaseCard>
-                {
-                }
-            },
-            {
-                "skillCards", new List<BaseCard>
-                {
-                }
-            }
-        });
+        Enemy.Setup(BattleEntity.InitArgs(BattleEntityDefs.DefaultEnemyBattleEntityDef));
     }
 
     protected void AfterSelectRewardCard()

@@ -6,7 +6,7 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.InputHandling;
 
-public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler where TCard: BaseInteractCard
+public abstract class BaseInteractCardInputHandler<TCard>: BaseInputHandler where TCard: BaseCard, IInteractCard
 {
     public Battle Battle;
     public TCard Card;

@@ -18,18 +18,7 @@ public class PokerCard: MarkerCard
     {
         def.Name = GetCardName(def.Suit, def.Rank);
         def.DescriptionTemplate = def.Name;
-    }
-    
-    public override void OnStart(Battle battle)
-    {
-        base.OnStart(battle);
         Suit.DetailedValueChanged += OnSuitChanged;
-    }
-
-    public override void OnStop(Battle battle)
-    {
-        base.OnStop(battle);
-        Suit.DetailedValueChanged -= OnSuitChanged;
     }
     
     protected virtual void OnSuitChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardSuit> args)

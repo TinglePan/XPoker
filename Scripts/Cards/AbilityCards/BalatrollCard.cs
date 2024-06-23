@@ -25,16 +25,14 @@ public class BalatrollCard: BaseUseCard
             }
         }
 
-        protected override void Confirm()
+        protected override async void Confirm()
         {
             if (SelectedCardNodes.Count != 0)
             {
-                var index = 0;
                 foreach (var selectedCardNode in SelectedCardNodes)
                 {
                     selectedCardNode.IsSelected = false;
-                    Card.Battle.Dealer.DealCardAndReplace(selectedCardNode, delay: Configuration.AnimateCardTransformInterval * index);
-                    index++;
+                    await Card.Battle.Dealer.DealCardAndReplace(selectedCardNode, Configuration.AnimateCardTransformInterval);
                 }
                 SelectedCardNodes.Clear();
                 Card.Use();

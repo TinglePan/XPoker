@@ -60,56 +60,8 @@ public partial class GameMgr : Node
 			{
 				"entities", new List<Dictionary<string, object>>
 				{
-					new()
-					{
-						{ "name", "you" },
-						{ "portraitPath", "res://Sprites/duster_guy.png" },
-						{ "deck", Decks.PlayerInitialDeck },
-						{ "dealCardCount", 2 },
-						{ "factionId", Enums.FactionId.Player },
-						{ "handPowers", HandPowerTables.DefaultPlayerHandPowerTable },
-						{ "baseHandPower", 0 },
-						{ "maxHp", 10 },
-						{ "maxCost", 3 },
-						{ "level", 1 },
-						{ "levelUpTable", LevelUpTables.DefaultPlayerLevelUpTable },
-						{ "isHoleCardDealtVisible", true },
-						{
-							"abilityCards", new List<BaseCard>
-							{
-								new D6Card(Defs.Cards.D6),
-								new MagicalHatCard(Defs.Cards.MagicalHat)
-							}
-						},
-						{
-							"skillCards", new List<BaseCard>()
-							{
-							}
-						}
-					},
-					new()
-					{
-						{ "name", "cpu" },
-						{ "portraitPath", "res://Sprites/cloak_guy.png" },
-						{ "deck", Decks.EnemyInitialDeck },
-						{ "dealCardCount", 2 },
-						{ "factionId", Enums.FactionId.Enemy },
-						{ "handPowers", HandPowerTables.DefaultEnemyHandPowerTable },
-						{ "baseHandPower", 0 },
-						{ "maxHp", 10 },
-						{ "level", 1 },
-						{ "isHoleCardDealtVisible", false },
-						{
-							"abilityCards", new List<BaseCard>
-							{
-							}
-						},
-						{
-							"skillCards", new List<BaseCard>()
-							{
-							}
-						}
-					}
+					PlayerBattleEntity.InitArgs(BattleEntityDefs.DefaultPlayerBattleEntityDef),
+					BattleEntity.InitArgs(BattleEntityDefs.DefaultEnemyBattleEntityDef)
 				}
 			}
 		});

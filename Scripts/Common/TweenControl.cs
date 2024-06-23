@@ -12,7 +12,7 @@ public class TweenControl
     {
         FastForwardAndFinish,
         Finish,
-        InterruptWithNewCallback,
+        InterruptEnsureOldCallback,
         Interrupt
     }
     
@@ -32,7 +32,7 @@ public class TweenControl
             Callback = new ObservableProperty<Action>(nameof(Callback), this, callback);
             Callback.DetailedValueChanged += CallbackChanged;
             Tween.FireValueChangeEventsOnInit();
-            Callback.FireValueChangeEventsOnInit();
+            // Callback.FireValueChangeEventsOnInit();
         }
 
         public bool Equals(ControlledTween other)
@@ -87,7 +87,8 @@ public class TweenControl
         TweenMap = new Dictionary<string, ControlledTween>();
     }
 
-    public void AddTween(string tag, Tween tween, float time, Action callback = null, ConflictTweenAction conflictAction = ConflictTweenAction.Interrupt)
+    public void AddTween(string tag, Tween tween, float time, Action callback = null,
+        ConflictTweenAction conflictAction = ConflictTweenAction.InterruptEnsureOldCallback)
     {
         if (TweenMap.ContainsKey(tag) && TweenMap[tag] is {} existingControlledTween)
         {
@@ -98,17 +99,18 @@ public class TweenControl
                     case ConflictTweenAction.Interrupt:
                         existingControlledTween.Tween.Value.Stop();
                         break;
-                    case ConflictTweenAction.InterruptWithNewCallback:
+                    case ConflictTweenAction.InterruptEnsureOldCallback:
                         existingControlledTween.Tween.Value.Stop();
-                        if (callback != null)
+                        if (callback != existingControlledTween.Callback.Value)
                         {
+                            existingControlledTween.Callback.Value?.Invoke();
                             existingControlledTween.Callback.Value = callback;
                         }
                         break;
                     case ConflictTweenAction.Finish:
                         existingControlledTween.Tween.Value.Stop();
                         existingControlledTween.Callback.Value?.Invoke();
-                        if (callback != null)
+                        if (callback != existingControlledTween.Callback.Value)
                         {
                             existingControlledTween.Callback.Value = callback;
                         }
@@ -118,7 +120,7 @@ public class TweenControl
                         existingControlledTween.Tween.Value.CustomStep(existingControlledTween.Time);
                         existingControlledTween.Tween.Value.Stop();
                         existingControlledTween.Callback.Value?.Invoke();
-                        if (callback != null)
+                        if (callback != existingControlledTween.Callback.Value)
                         {
                             existingControlledTween.Callback.Value = callback;
                         }

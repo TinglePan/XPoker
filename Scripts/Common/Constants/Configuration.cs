@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Godot;
 
 namespace XCardGame.Scripts.Common.Constants;
@@ -7,7 +8,7 @@ public static class Configuration
 {
     public static readonly int CompletedHandCardCount = 5;
     public static readonly int CommunityCardCount = 5;
-    public static readonly int HoleCardCount = 2;
+    public static readonly int DefaultHoleCardCount = 2;
     public static readonly int RoundSkillsCount = 1;
     
     public static readonly float RevealTweenTime = 1f;
@@ -29,6 +30,10 @@ public static class Configuration
     public static readonly int BuffCountPerRow = 12;
     public static readonly int MaxDefence = 999;
     public static readonly int ProgressCountRequiredToWin = 8;
+
+    public static readonly int DefaultRewardCardCount = 3;
+    public static readonly int DefaultReRollPriceIncrease = 5;
+    public static readonly int DefaultSkipReward = 30;
 
     public static readonly int ShopPokerCardCount = 3;
     public static readonly int ShopSkillCardCount = 2;

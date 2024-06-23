@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
@@ -11,6 +12,7 @@ using XCardGame.Scripts.Cards.SkillCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.HandEvaluate;
 using XCardGame.Scripts.Nodes;
 
@@ -33,23 +35,54 @@ public partial class BattleEntity: Node, ISetup
     public Action<BattleEntity> OnDefeated;
     
     public bool HasSetup { get; set; }
-    
-    public string DisplayName;
-    public string PortraitPath;
+
+    public BattleEntityDef Def;
     public Deck Deck;
     public int DealCardCount;
-    public int FactionId;
+    public int Speed;
     public int BaseHandPower;
     public Dictionary<Enums.HandTier, int> HandPowers;
     public ObservableProperty<int> Defence;
     public ObservableProperty<int> Hp;
     public ObservableProperty<int> MaxHp;
-    public ObservableProperty<int> Level;
+    // public ObservableProperty<int> Level;
     public bool IsHoleCardDealtVisible;
     public ObservableCollection<BaseCard> HoleCards;
     public ObservableCollection<BaseCard> SkillCards;
     public ObservableCollection<BaseCard> AbilityCards;
     public ObservableCollection<BaseBuff> Buffs;
+
+    public static Dictionary<string, object> InitArgs(BattleEntityDef def)
+    {
+        var res = new Dictionary<string, object>();
+        res["def"] = def;
+        res["deck"] = new Deck(def.InitDeckDef);
+        res["dealCardCount"] = Configuration.DefaultHoleCardCount;
+        res["speed"] = def.InitSpeed;
+        res["handPowers"] = def.InitHandPowers;
+        res["maxHp"] = def.InitHp;
+        res["baseHandPower"] = def.InitBaseHandPower;
+        res["isHoleCardDealtVisible"] = def is PlayerBattleEntityDef;
+        var abilityCards = new List<BaseCard>();
+        if (def.InitAbilityCardDefs != null)
+        {
+            foreach (var cardDef in def.InitAbilityCardDefs)
+            {
+                abilityCards.Add((BaseAbilityCard)CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef));
+            }
+        }
+        res["abilityCards"] = abilityCards;
+        var skillCards = new List<BaseCard>();
+        if (def.InitSkillCardDefs != null)
+        {
+            foreach (var cardDef in def.InitSkillCardDefs)
+            {
+                skillCards.Add((BaseSkillCard)CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef));
+            }
+        }
+        res["skillCards"] = skillCards;
+        return res;
+    }
 
     public override void _Ready()
     {
@@ -68,7 +101,7 @@ public partial class BattleEntity: Node, ISetup
         
         MaxHp = new ObservableProperty<int>(nameof(MaxHp), this, 0);
         Hp = new ObservableProperty<int>(nameof(Hp), this, 0);
-        Level = new ObservableProperty<int>(nameof(Level), this, 0);
+        // Level = new ObservableProperty<int>(nameof(Level), this, 0);
         Defence = new ObservableProperty<int>(nameof(Defence), this, 0);
         Defence.DetailedValueChanged += DefenceChanged;
         Hp.ValueChanged += HpChanged;
@@ -83,24 +116,23 @@ public partial class BattleEntity: Node, ISetup
     public virtual void Setup(Dictionary<string, object> args)
     {
         Battle = GameMgr.CurrentBattle;
-        DisplayName = (string)args["name"];
-        PortraitPath = (string)args["portraitPath"];
+        Def = (BattleEntityDef)args["def"];
         Deck = (Deck)args["deck"];
         foreach (var card in Deck.CardList)
         {
             card.OwnerEntity = this;
         }
         DealCardCount = (int)args["dealCardCount"];
-        FactionId = (int)args["factionId"];
+        Speed = (int)args["speed"];
         HandPowers = (Dictionary<Enums.HandTier, int>)args["handPowers"];
         BaseHandPower = (int)args["baseHandPower"];
         MaxHp.Value =(int)args["maxHp"];
         Hp.Value = MaxHp.Value;
-        Level.Value = (int)args["level"];
         IsHoleCardDealtVisible = (bool)args["isHoleCardDealtVisible"];
         foreach (var card in (List<BaseCard>)args["abilityCards"])
         {
             AbilityCards.Add(card);
+            // GD.Print(AbilityCards.Count);
             card.OwnerEntity = this;
         }
         HoleCardContainer.Setup(new Dictionary<string, object>()
@@ -110,9 +142,9 @@ public partial class BattleEntity: Node, ISetup
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-            { "nodesPerRow", Configuration.HoleCardCount },
+            { "nodesPerRow", Configuration.DefaultHoleCardCount },
             { "hasBorder", true },
-            { "expectedContentNodeCount", Configuration.HoleCardCount },
+            { "expectedContentNodeCount", Configuration.DefaultHoleCardCount },
             { "hasName", true },
             { "containerName", "Hole cards" },
             { "defaultCardFaceDirection", IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down } 
@@ -166,13 +198,11 @@ public partial class BattleEntity: Node, ISetup
         BuffContainer.ContentNodes.Clear();
     }
     
-    public virtual void RoundReset(float animateCardDelay = 0f)
+    public virtual async Task RoundReset(float animateCardDelay = 0f)
     {
-        var index = 0;
         foreach (var contentNode in HoleCardContainer.ContentNodes.ToList())
         {
-            Battle.Dealer.AnimateDiscard(contentNode, Configuration.AnimateCardTransformInterval * index + animateCardDelay);
-            index++;
+            await Battle.Dealer.AnimateDiscard(contentNode, animateCardDelay);
         }
         // HoleCardContainer.ContentNodes.Clear();
     }
@@ -266,7 +296,7 @@ public partial class BattleEntity: Node, ISetup
 
     public override string ToString()
     {
-        return DisplayName;
+        return Def.Name;
     }
 
     public void ChangeDefence(int amount)

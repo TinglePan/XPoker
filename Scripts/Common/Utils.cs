@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
@@ -9,6 +10,7 @@ namespace XCardGame.Scripts.Common;
 
 public static class Utils
 {
+    
     public static Node InstantiatePrefab(PackedScene prefab, Node parent)
     {
         var node = prefab.Instantiate<Node>();
@@ -148,6 +150,33 @@ public static class Utils
         }
         return 0;
     }
+
+    public static int[] GetCardBlackJackValue(Enums.CardRank rank)
+    {
+        switch (rank)
+        {
+            case Enums.CardRank.Ace:
+                return new [] { 1, 11 };
+            case Enums.CardRank.Two:
+            case Enums.CardRank.Three:
+            case Enums.CardRank.Four:
+            case Enums.CardRank.Five:
+            case Enums.CardRank.Six:
+            case Enums.CardRank.Seven:
+            case Enums.CardRank.Eight:
+            case Enums.CardRank.Nine:
+            case Enums.CardRank.Ten:
+                return new[] { GetCardRankValue(rank) };
+            case Enums.CardRank.Jack:
+            case Enums.CardRank.Queen:
+            case Enums.CardRank.King:
+            case Enums.CardRank.Joker:
+                return new[] { 10 };
+            default:
+                return null;
+        }
+    }
+    
     
     public static Enums.CardRank GetCardRank(int value)
     {

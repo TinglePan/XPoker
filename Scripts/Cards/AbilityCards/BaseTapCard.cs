@@ -7,9 +7,8 @@ using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.Cards.AbilityCards;
 
-public class BaseTapCard: BaseInteractCard, ITapCard
+public class BaseTapCard: BaseAbilityCard, ITapCard
 {
-
     public readonly TapCardDef TapCardDef;
     
     public int TappedCost => TapCardDef.TappedCost;
@@ -31,7 +30,6 @@ public class BaseTapCard: BaseInteractCard, ITapCard
     public override void Setup(Dictionary<string, object> args)
     {
         base.Setup(args);
-        Battle.OnRoundStart += OnRoundStart;
     }
     
     public override bool CanInteract()
@@ -54,21 +52,20 @@ public class BaseTapCard: BaseInteractCard, ITapCard
         }
     }
 
-    // NOTE: Effect manages its stop on its own. And check if its source card in in position to decide whether its effect is skipped.
-    // public override void OnStop(Battle battle)
-    // {
-    //     battle.StopEffect(Effect);
-    // }
-    
-    protected void OnRoundStart(Battle battle)
+    public override void OnStart(Battle battle)
     {
-        if (!IsTapped && !IsNegated && Effect != null)
-        {
-            StartEffect();
-        } 
+        base.OnStart(battle);
+        Battle.OnRoundStart += OnRoundStart;
     }
 
-
+    public override void OnStop(Battle battle)
+    {
+        base.OnStop(battle);
+        Battle.OnRoundStart -= OnRoundStart;
+        // NOTE: Effect manages its stop on its own. And check if its source card in in position to decide whether its effect is skipped.
+        // battle.StopEffect(Effect);
+    }
+    
     public override void ToggleTap()
     {
         base.ToggleTap();
@@ -82,4 +79,13 @@ public class BaseTapCard: BaseInteractCard, ITapCard
             StartEffect();
         }
     }
+    
+    protected void OnRoundStart(Battle battle)
+    {
+        if (!IsTapped && !IsNegated && Effect != null)
+        {
+            StartEffect();
+        } 
+    }
+
 }

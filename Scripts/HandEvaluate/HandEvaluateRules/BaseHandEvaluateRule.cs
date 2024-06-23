@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using XCardGame.Scripts.Cards;
 
 using XCardGame.Scripts.Common.Constants;
@@ -51,6 +52,20 @@ public class BaseHandEvaluateRule
     protected virtual List<BaseCard> GetKickers(List<BaseCard> pick, List<BaseCard> cards)
     {
         var res = cards.Except(pick).OrderByDescending(c => c).ToList();
+        if (res.Count == 0 && pick.Count != 5)
+        {
+            GD.Print("kicker error: pick:");
+            foreach (var card in pick)
+            {
+                GD.Print(card);
+            }
+            GD.Print("cards:");
+            foreach (var card in cards)
+            {
+                GD.Print(card);
+            }
+            
+        }
         return res;
     }
 

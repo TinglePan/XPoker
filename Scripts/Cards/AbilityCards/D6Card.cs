@@ -34,17 +34,16 @@ public class D6Card: BaseUseCard
         return base.CanInteract() && Battle.CurrentState == Battle.State.BeforeShowDown;
     }
 
-    public override void Use()
+    public override async void Use()
     {
         base.Use();
-        var index = 0;
         foreach (var cardContainer in CardContainers)
         {
-            foreach (var cardNode in cardContainer.ContentNodes)
+            var cardNodes = new List<CardNode>(cardContainer.ContentNodes);
+            foreach (var cardNode in cardNodes)
             {
                 if (cardNode.FaceDirection.Value != Enums.CardFace.Up) continue;
-                Battle.Dealer.DealCardAndReplace(cardNode, delay:Configuration.AnimateCardTransformInterval * index);
-                index++;
+                await Battle.Dealer.DealCardAndReplace(cardNode, Configuration.AnimateCardTransformInterval);
             }
         }
     }

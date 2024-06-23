@@ -70,7 +70,7 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
     
     protected void OnCardRankChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardRank> args)
     {
-	    if (args.NewValue is Enums.CardRank.BlackJoker or Enums.CardRank.RedJoker or Enums.CardRank.RainbowJoker)
+	    if (args.NewValue is Enums.CardRank.Joker)
 	    {
 		    RankLabel.Hide();
 		    SuitIcon.Hide();
@@ -87,7 +87,7 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
     
     protected void OnCardSuitChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardSuit> args)
     {
-	    if (args.NewValue is Enums.CardSuit.RedJoker or Enums.CardSuit.BlackJoker or Enums.CardSuit.RainbowJoker)
+	    if (args.NewValue is Enums.CardSuit.Joker)
 	    {
 		    RankLabel.Hide();
 		    SuitIcon.Hide();

@@ -94,9 +94,9 @@ public class KeepOutCard: BaseTapCard
     public BaseKeepOutCardRule Rule;
     public List<CardContainer> CardContainers;
     
-    public KeepOutCard(TapCardDef def, BaseKeepOutCardRule rule): base(def)
+    public KeepOutCard(TapCardDef def): base(def)
     {
-        Rule = rule;
+        Rule = null;
     }
     
     public override void Setup(Dictionary<string, object> args)

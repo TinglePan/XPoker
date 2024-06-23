@@ -52,8 +52,7 @@ public static class CardExtensions
                 return "K";
             case Enums.CardRank.Ace:
                 return "A";
-            case Enums.CardRank.BlackJoker:
-            case Enums.CardRank.RedJoker:
+            case Enums.CardRank.Joker:
                 return "Joker";
             default:
                 throw new ArgumentException("Invalid cardRank");

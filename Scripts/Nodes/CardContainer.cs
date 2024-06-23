@@ -49,17 +49,16 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		}
 	}
 
-	public async void MoveCardNodesToContainer(CardContainer targetContainer)
+	public async void MoveCardNodesToContainer(CardContainer targetContainer, float delay = 0f)
 	{
 		var cardNodes = new List<CardNode>(ContentNodes);
-		int index = 0;
 		foreach (var cardNode in cardNodes)
 		{
-			MoveCardNodeToContainer(cardNode, targetContainer, Configuration.AnimateCardTransformInterval * index);
+			await MoveCardNodeToContainer(cardNode, targetContainer, delay);
 		}
 	}
 	
-	public async void MoveCardNodeToContainer(CardNode skillCardNode, CardContainer targetContainer, float delay = 0f)
+	public async Task MoveCardNodeToContainer(CardNode skillCardNode, CardContainer targetContainer, float delay = 0f)
 	{
 		if (delay > 0)
 		{

@@ -159,7 +159,7 @@ public partial class Shop: Control, ISetup
             { "defaultCardFaceDirection", Enums.CardFace.Up },
             { "getCardFaceDirectionFunc", null },
         });
-        AllCardDefs = Defs.Cards.All();
+        AllCardDefs = Defs.CardDefs.All();
     }
 
     public void EnsureSetup()

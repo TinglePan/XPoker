@@ -1,42 +1,51 @@
 ﻿using System;
+using System.Collections.Generic;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Defs;
 
-public static class Decks
+public class DeckDef
 {
-    public static Deck PlayerInitialDeck = LoadStandard52Deck();
-    public static Deck EnemyInitialDeck = LoadStandard52Deck();
+    public List<BaseCardDef> CardDefs;
+}
 
-    private static Deck LoadStandard52Deck()
+
+public static class DeckDefs
+{
+    public static DeckDef PlayerInitDeckDef = Standard52Deck();
+    public static DeckDef EnemyInitDeckDef = Standard52Deck();
+
+    public static DeckDef Standard52Deck()
     {
-        var deck = new Deck();
+        var cardDefs = new List<BaseCardDef>();
         foreach (var suit in Enum.GetValues(typeof(Enums.CardSuit)))
         {
             var unboxedSuit = (Enums.CardSuit)suit;
-            if (unboxedSuit == Enums.CardSuit.None || unboxedSuit == Enums.CardSuit.BlackJoker || unboxedSuit == Enums.CardSuit.RedJoker || unboxedSuit == Enums.CardSuit.RainbowJoker)
+            if (unboxedSuit is Enums.CardSuit.None or Enums.CardSuit.Joker)
             {
                 continue;
             }
             foreach (var rank in Enum.GetValues(typeof(Enums.CardRank)))
             {
                 var unboxedRank = (Enums.CardRank)rank;
-                if (unboxedRank == Enums.CardRank.None || unboxedRank == Enums.CardRank.BlackJoker || unboxedRank == Enums.CardRank.RedJoker || unboxedRank == Enums.CardRank.RainbowJoker)
+                if (unboxedRank is Enums.CardRank.None or Enums.CardRank.Joker)
                 {
                     continue;
                 }
-                PokerCard pokerCard = new PokerCard(new BaseCardDef()
+                cardDefs.Add(new BaseCardDef
                 {
                     BasePrice = 0,
                     Rank = (Enums.CardRank)rank,
                     Suit = (Enums.CardSuit)suit
                 });
-                deck.CardList.Add(pokerCard);
             }
         }
-
-        return deck;
+        return new DeckDef
+        {
+            CardDefs = cardDefs
+        };
     }
+    
 }

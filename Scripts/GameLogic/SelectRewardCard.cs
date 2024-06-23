@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
@@ -51,23 +52,27 @@ public partial class SelectRewardCard: Control
         {
             await SelectRewardCard.Select(node);
             GameMgr.InputMgr.QuitCurrentInputHandler();
+            GameMgr.QuitCurrentScene();
         }
     }
     
     public PackedScene CardPrefab;
     public GameMgr GameMgr;
     public Battle Battle;
-    public TextureButton CloseButton;
-    public TextureButton ReRollButton;
+    public BaseButton SkipButton;
+    public Label SkipRewardLabel;
+    public BaseButton ReRollButton;
     public Label ReRollPriceLabel;
     public CardContainer CardContainer;
     public AnimationPlayer AnimationPlayer;
     
-    public List<BaseCardDef> AllCardDefs;
+    public List<BaseCardDef> AllRewardCardDefs;
+    public Dictionary<int, List<BaseCardDef>> RewardCardDefPool;
     
-    public Type RewardCardType;
+    public Type RewardCardDefType;
     public ObservableProperty<int> ReRollPrice;
     public int ReRollPriceIncrease;
+    public ObservableProperty<int> SkipReward;
     public ObservableCollection<BaseCard> RewardCards;
     public Action CardSelected;
     
@@ -77,31 +82,36 @@ public partial class SelectRewardCard: Control
     {
         base._Ready();
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
-        CloseButton = GetNode<TextureButton>("Panel/Close");
-        ReRollButton = GetNode<TextureButton>("Panel/ReRoll");
-        ReRollPriceLabel = GetNode<Label>("Panel/ReRoll/Price");
-        CardContainer = GetNode<CardContainer>("Panel/CardContainer");
+        SkipButton = GetNode<BaseButton>("Skip");
+        SkipRewardLabel = GetNode<Label>("Skip/Price");
+        
+        ReRollButton = GetNode<BaseButton>("ReRoll");
+        ReRollPriceLabel = GetNode<Label>("ReRoll/Price");
+        CardContainer = GetNode<CardContainer>("CardsAnchor/Cards");
         CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         ReRollPrice = new ObservableProperty<int>(nameof(ReRollPrice), this, 0);
         ReRollPrice.DetailedValueChanged += OnReRollPriceChanged;
-        RewardCards = new ObservableCollection<BaseCard>();
         ReRollButton.Pressed += ReRoll;
-        GameMgr.InputMgr.SwitchToInputHandler(new SelectRewardCardInputHandler(GameMgr, this));
+        SkipReward = new ObservableProperty<int>(nameof(SkipReward), this, 0);
+        SkipReward.DetailedValueChanged += OnSkipRewardChanged;
+        SkipButton.Pressed += Skip;
+        RewardCards = new ObservableCollection<BaseCard>();
+        RewardCardDefPool = new Dictionary<int, List<BaseCardDef>>();
     }
 
     public void Setup(Dictionary<string, object> args)
     {
         Battle = GameMgr.CurrentBattle;
         var rewardCardCount = (int)args["rewardCardCount"];
-        RewardCardType = (Type)args["rewardCardType"];
+        RewardCardDefType = (Type)args["rewardCardDefType"];
         CardContainer.Setup(new Dictionary<string, object>()
         {
             { "allowInteract", true },
             { "cards", RewardCards },
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
-            { "pivotDirection", Enums.Direction2D8Ways.Left },
+            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
             { "nodesPerRow", rewardCardCount },
             { "hasBorder", true },
             { "expectedContentNodeCount", Configuration.ShopPokerCardCount },
@@ -110,9 +120,17 @@ public partial class SelectRewardCard: Control
             { "defaultCardFaceDirection", Enums.CardFace.Up },
             { "getCardFaceDirectionFunc", null },
         });
-        AllCardDefs = Defs.Cards.All();
+        AllRewardCardDefs = FilterCardDefs(CardDefs.All(), RewardCardDefType);
+        RewardCardDefPool = new Dictionary<int, List<BaseCardDef>>();
+        foreach (var cardDef in AllRewardCardDefs)
+        {
+            RewardCardDefPool.TryAdd(cardDef.Rarity, new List<BaseCardDef>());
+            RewardCardDefPool[cardDef.Rarity].Add(cardDef);
+        }
         ReRollPriceIncrease = (int)args["reRollPriceIncrease"];
+        SkipReward.Value = (int)args["skipReward"];
         ReRoll();
+        GameMgr.InputMgr.SwitchToInputHandler(new SelectRewardCardInputHandler(GameMgr, this));
     }
 
     public void EnsureSetup()
@@ -123,26 +141,59 @@ public partial class SelectRewardCard: Control
         }
     }
 
+    public void Skip()
+    {
+        Battle.Player.Credit.Value += SkipReward.Value;
+        GameMgr.InputMgr.QuitCurrentInputHandler();
+        GameMgr.QuitCurrentScene();
+    }
+
     public void ReRoll()
     {
         if (Battle.Player.Credit.Value >= ReRollPrice.Value)
         {
-            var rarity = RandRarity();
-            var cardDefs = FilterCardDefs(rarity);
-            int i = 0;
-            foreach (var cardDef in RandNCardDefsOfType(cardDefs, Configuration.ShopAbilityCardCount, RewardCardType))
+            var rarities = new Dictionary<int, int>();
+            for (int i = 0; i < Configuration.DefaultRewardCardCount; i++)
             {
-                var card = new BaseAbilityCard((AbilityCardDef)cardDef);
-                if (i < RewardCards.Count)
+                var rarity = RandRarity();
+                rarities.TryAdd(rarity, 0);
+                rarities[rarity]++;
+            }
+
+            var index = 0;
+            foreach (var (rarity, count) in rarities)
+            {
+                if (RewardCardDefPool.TryGetValue(rarity, out var value))
                 {
-                    RewardCards[i] = card;
+                    foreach (var cardDef in Utils.RandMFrom(value, count, GameMgr.Rand))
+                    {
+                        var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
+                        if (index < RewardCards.Count)
+                        {
+                            RewardCards[index] = card;
+                        }
+                        else
+                        {
+                            RewardCards.Add(card);
+                        }
+                        index++;
+                    }
+                }
+            }
+            foreach (var cardDef in Utils.RandMFrom(AllRewardCardDefs, Configuration.DefaultRewardCardCount - index, GameMgr.Rand))
+            {
+                var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
+                if (index < RewardCards.Count)
+                {
+                    RewardCards[index] = card;
                 }
                 else
                 {
                     RewardCards.Add(card);
                 }
-            }
 
+                index++;
+            }
             Battle.Player.Credit.Value -= ReRollPrice.Value;
             ReRollPrice.Value += ReRollPriceIncrease;
         }
@@ -161,10 +212,9 @@ public partial class SelectRewardCard: Control
         {
             Battle.Player.SkillCards.Add(card);
         }
-        AnimationPlayer.Play("close");
-        await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
+        // AnimationPlayer.Play("close");
+        // await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
         CardSelected?.Invoke();
-        GameMgr.QuitCurrentScene();
     }
 
     protected int RandRarity()
@@ -174,29 +224,35 @@ public partial class SelectRewardCard: Control
         return Utils.RandOnThresholds(thresholds, GameMgr.Rand);
     }
 
-    protected List<BaseCardDef> FilterCardDefs(int rarity)
+    protected List<BaseCardDef> FilterCardDefs(List<BaseCardDef> cardDefs, int rarity)
     {
-        return AllCardDefs.FindAll(x => rarity == x.Rarity).ToList();
+        return cardDefs.FindAll(x => rarity == x.Rarity).ToList();
     }
     
-    protected List<BaseCardDef> FilterCardDefs(Type type)
+    protected List<BaseCardDef> FilterCardDefs(List<BaseCardDef> cardDefs, Type type)
     {
-        return AllCardDefs.FindAll(x => x.GetType() == type).ToList();
+        return cardDefs.FindAll(x => x.GetType().IsAssignableTo(type)).ToList();
     }
     
-    protected List<BaseCardDef> FilterCardDefs(Type type, int rarity)
+    protected List<BaseCardDef> FilterCardDefs(List<BaseCardDef> cardDefs, Type type, int rarity)
     {
-        return AllCardDefs.FindAll(x => x.GetType() == type && rarity == x.Rarity).ToList();
+        return cardDefs.FindAll(x => x.GetType() == type && rarity == x.Rarity).ToList();
     }
-
-    protected List<BaseCardDef> RandNCardDefsOfType(List<BaseCardDef> cardDefs, int n, Type type)
-    {
-        var filteredCardDefs = cardDefs.FindAll(x => x.GetType() == type).ToList();
-        return Utils.RandMFrom(filteredCardDefs, n, GameMgr.Rand);
-    }
-
+    
     protected void OnReRollPriceChanged(object sender, ValueChangedEventDetailedArgs<int> args)
     {
-        ReRollPriceLabel.Text = ReRollPrice.Value.ToString();
+        if (args.NewValue <= Battle.Player.Credit.Value)
+        {
+            ReRollPriceLabel.Text = $"-{args.NewValue}";
+        }
+        else
+        {
+            ReRollPriceLabel.Text = "Not enough credit";
+        }
+    }
+
+    protected void OnSkipRewardChanged(object sender, ValueChangedEventDetailedArgs<int> args)
+    {
+        SkipRewardLabel.Text = $"+{args.NewValue}";
     }
 }

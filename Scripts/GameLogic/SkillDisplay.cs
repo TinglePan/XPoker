@@ -46,7 +46,7 @@ public partial class SkillDisplay : Node2D, ISetup
 			{ "hasBorder", true },
 			{ "expectedContentNodeCount", 1 },
 			{ "hasName", true },
-			{ "containerName", "Prepared skills" },
+			{ "containerName", "Skill sequence" },
 			{ "defaultCardFaceDirection", Enums.CardFace.Up }
 		});
 		EnemyRoundSkillContainer.Setup(new Dictionary<string, object>()
@@ -60,7 +60,7 @@ public partial class SkillDisplay : Node2D, ISetup
 			{ "hasBorder", true },
 			{ "expectedContentNodeCount", 1 },
 			{ "hasName", true },
-			{ "containerName", "Prepared skills" },
+			{ "containerName", "Skill sequence" },
 			{ "defaultCardFaceDirection", Enums.CardFace.Up }
 		});
 		HasSetup = true;

@@ -27,6 +27,9 @@ public partial class SelectRewardCard: Control
         public SelectRewardCardInputHandler(GameMgr gameMgr, SelectRewardCard selectRewardCard) : base(gameMgr)
         {
             SelectRewardCard = selectRewardCard;
+            SelectRewardCard.ReRollButton.Pressed += SelectRewardCard.ReRoll;
+            SelectRewardCard.SkipButton.Pressed += SelectRewardCard.Skip;
+            
         }
         
         public override void OnEnter()
@@ -51,8 +54,7 @@ public partial class SelectRewardCard: Control
         public async void OnCardNodePressed(CardNode node)
         {
             await SelectRewardCard.Select(node);
-            GameMgr.InputMgr.QuitCurrentInputHandler();
-            GameMgr.QuitCurrentScene();
+            SelectRewardCard.Quit();
         }
     }
     
@@ -74,7 +76,7 @@ public partial class SelectRewardCard: Control
     public int ReRollPriceIncrease;
     public ObservableProperty<int> SkipReward;
     public ObservableCollection<BaseCard> RewardCards;
-    public Action CardSelected;
+    public Action OnQuit;
     
     public bool HasSetup { get; set; }
 
@@ -92,10 +94,8 @@ public partial class SelectRewardCard: Control
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         ReRollPrice = new ObservableProperty<int>(nameof(ReRollPrice), this, 0);
         ReRollPrice.DetailedValueChanged += OnReRollPriceChanged;
-        ReRollButton.Pressed += ReRoll;
         SkipReward = new ObservableProperty<int>(nameof(SkipReward), this, 0);
         SkipReward.DetailedValueChanged += OnSkipRewardChanged;
-        SkipButton.Pressed += Skip;
         RewardCards = new ObservableCollection<BaseCard>();
         RewardCardDefPool = new Dictionary<int, List<BaseCardDef>>();
     }
@@ -107,18 +107,20 @@ public partial class SelectRewardCard: Control
         RewardCardDefType = (Type)args["rewardCardDefType"];
         CardContainer.Setup(new Dictionary<string, object>()
         {
-            { "allowInteract", true },
+            { "allowInteract", false },
             { "cards", RewardCards },
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-            { "nodesPerRow", rewardCardCount },
+            { "nodesPerRow", 0 },
             { "hasBorder", true },
-            { "expectedContentNodeCount", Configuration.ShopPokerCardCount },
+            { "expectedContentNodeCount", rewardCardCount },
             { "hasName", true },
             { "containerName", "Select a card..."},
             { "defaultCardFaceDirection", Enums.CardFace.Up },
             { "getCardFaceDirectionFunc", null },
+            { "margins", Configuration.DefaultContentContainerMargins },
+            { "withCardEffect", false }
         });
         AllRewardCardDefs = FilterCardDefs(CardDefs.All(), RewardCardDefType);
         RewardCardDefPool = new Dictionary<int, List<BaseCardDef>>();
@@ -127,9 +129,30 @@ public partial class SelectRewardCard: Control
             RewardCardDefPool.TryAdd(cardDef.Rarity, new List<BaseCardDef>());
             RewardCardDefPool[cardDef.Rarity].Add(cardDef);
         }
+        ReRollPrice.Value = (int)args["reRollPrice"];
         ReRollPriceIncrease = (int)args["reRollPriceIncrease"];
         SkipReward.Value = (int)args["skipReward"];
-        ReRoll();
+        if (args.TryGetValue("defs", out var value))
+        {
+            int index = 0;
+            foreach (var cardDef in (List<BaseCardDef>)value)
+            {
+                var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
+                if (index < RewardCards.Count)
+                {
+                    RewardCards[index] = card;
+                }
+                else
+                {
+                    RewardCards.Add(card);
+                }
+                index++;
+            }
+        }
+        else
+        {
+            RandRewardCards();
+        }
         GameMgr.InputMgr.SwitchToInputHandler(new SelectRewardCardInputHandler(GameMgr, this));
     }
 
@@ -144,56 +167,14 @@ public partial class SelectRewardCard: Control
     public void Skip()
     {
         Battle.Player.Credit.Value += SkipReward.Value;
-        GameMgr.InputMgr.QuitCurrentInputHandler();
-        GameMgr.QuitCurrentScene();
+        Quit();
     }
 
     public void ReRoll()
     {
         if (Battle.Player.Credit.Value >= ReRollPrice.Value)
         {
-            var rarities = new Dictionary<int, int>();
-            for (int i = 0; i < Configuration.DefaultRewardCardCount; i++)
-            {
-                var rarity = RandRarity();
-                rarities.TryAdd(rarity, 0);
-                rarities[rarity]++;
-            }
-
-            var index = 0;
-            foreach (var (rarity, count) in rarities)
-            {
-                if (RewardCardDefPool.TryGetValue(rarity, out var value))
-                {
-                    foreach (var cardDef in Utils.RandMFrom(value, count, GameMgr.Rand))
-                    {
-                        var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
-                        if (index < RewardCards.Count)
-                        {
-                            RewardCards[index] = card;
-                        }
-                        else
-                        {
-                            RewardCards.Add(card);
-                        }
-                        index++;
-                    }
-                }
-            }
-            foreach (var cardDef in Utils.RandMFrom(AllRewardCardDefs, Configuration.DefaultRewardCardCount - index, GameMgr.Rand))
-            {
-                var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
-                if (index < RewardCards.Count)
-                {
-                    RewardCards[index] = card;
-                }
-                else
-                {
-                    RewardCards.Add(card);
-                }
-
-                index++;
-            }
+            RandRewardCards();
             Battle.Player.Credit.Value -= ReRollPrice.Value;
             ReRollPrice.Value += ReRollPriceIncrease;
         }
@@ -214,7 +195,59 @@ public partial class SelectRewardCard: Control
         }
         // AnimationPlayer.Play("close");
         // await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
-        CardSelected?.Invoke();
+    }
+
+    public void Quit()
+    {
+        OnQuit?.Invoke();
+        GameMgr.InputMgr.QuitCurrentInputHandler();
+        GameMgr.QuitCurrentScene();
+    }
+
+    protected void RandRewardCards()
+    {
+        var rarities = new Dictionary<int, int>();
+        for (int i = 0; i < Configuration.DefaultRewardCardCount; i++)
+        {
+            var rarity = RandRarity();
+            rarities.TryAdd(rarity, 0);
+            rarities[rarity]++;
+        }
+
+        var index = 0;
+        foreach (var (rarity, count) in rarities)
+        {
+            if (RewardCardDefPool.TryGetValue(rarity, out var value))
+            {
+                foreach (var cardDef in Utils.RandMFrom(value, count, GameMgr.Rand))
+                {
+                    var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
+                    if (index < RewardCards.Count)
+                    {
+                        RewardCards[index] = card;
+                    }
+                    else
+                    {
+                        RewardCards.Add(card);
+                    }
+                    index++;
+                }
+            }
+        }
+        foreach (var cardDef in Utils.RandMFrom(AllRewardCardDefs, Configuration.DefaultRewardCardCount - index, GameMgr.Rand))
+        {
+            var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
+            if (index < RewardCards.Count)
+            {
+                RewardCards[index] = card;
+            }
+            else
+            {
+                RewardCards.Add(card);
+            }
+
+            index++;
+        }
     }
 
     protected int RandRarity()

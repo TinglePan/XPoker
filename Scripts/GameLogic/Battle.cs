@@ -54,6 +54,7 @@ public partial class Battle: Node2D, ISetup
     public Action<Battle, Engage> BeforeEngage;
     public Action<Battle> OnPlayerDefeated;
     public Action<Battle> OnEnemyDefeated;
+    public Action<Battle, BattleEntity> OnNewEnemy;
     public Action<Battle> OnBattleFinished;
 
     public ObservableCollection<BaseCard> CommunityCards;
@@ -114,12 +115,14 @@ public partial class Battle: Node2D, ISetup
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-            { "nodesPerRow", Configuration.CommunityCardCount },
+            { "nodesPerRow", 0 },
             { "hasBorder", true },
             { "expectedContentNodeCount", Configuration.CommunityCardCount },
             { "hasName", true },
             { "containerName", "Community cards"},
-            { "getCardFaceDirectionFunc", (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc }
+            { "getCardFaceDirectionFunc", (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc },
+            { "margins", Configuration.DefaultContentContainerMargins },
+            { "withCardEffect", true }
         });
         
         FieldCardContainer.Setup(new Dictionary<string, object>()
@@ -129,12 +132,14 @@ public partial class Battle: Node2D, ISetup
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-            { "nodesPerRow", Configuration.FieldCardCountPerRow },
+            { "nodesPerRow", 0 },
             { "hasBorder", true },
             { "expectedContentNodeCount", 0 },
             { "hasName", true },
             { "containerName", "Field cards"},
-            { "defaultCardFaceDirection", Enums.CardFace.Up } 
+            { "defaultCardFaceDirection", Enums.CardFace.Up },
+            { "margins", Configuration.DefaultContentContainerMargins },
+            { "withCardEffect", true }
         });
         
         SkillDisplay.Setup(new Dictionary<string, object>()
@@ -229,11 +234,12 @@ public partial class Battle: Node2D, ISetup
                     {
                         Dealer.AnimateShuffle();
                         var selectRewardCard = GameMgr.OverlayScene(SelectRewardCardScene) as SelectRewardCard;
-                        selectRewardCard.CardSelected += AfterSelectRewardCard;
+                        selectRewardCard.OnQuit += AfterSelectRewardCard;
                         selectRewardCard.Setup(new Dictionary<string, object>()
                         {
                             { "rewardCardCount", Configuration.DefaultRewardCardCount },
                             { "rewardCardDefType", typeof(AbilityCardDef) },
+                            { "reRollPrice", Configuration.DefaultReRollPrice },
                             { "reRollPriceIncrease", Configuration.DefaultReRollPriceIncrease },
                             { "skipReward", Configuration.DefaultSkipReward }
                         });
@@ -481,6 +487,7 @@ public partial class Battle: Node2D, ISetup
     protected void NewChallenger()
     {
         Enemy.Setup(BattleEntity.InitArgs(BattleEntityDefs.DefaultEnemyBattleEntityDef));
+        OnNewEnemy?.Invoke(this, Enemy);
     }
 
     protected void AfterSelectRewardCard()

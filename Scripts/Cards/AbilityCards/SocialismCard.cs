@@ -19,11 +19,13 @@ public class SocialismCard: BaseTapCard
         base.OnStart(battle);
         _count = Utils.GetCardRankValue(Rank.Value);
         battle.DealCommunityCardCount += _count;
+        battle.CommunityCardContainer.ExpectedContentNodeCount += _count;
     }
 
     public override void OnStop(Battle battle)
     {
         base.OnStop(battle);
         battle.DealCommunityCardCount -= _count;
+        battle.CommunityCardContainer.ExpectedContentNodeCount -= _count;
     }
 }

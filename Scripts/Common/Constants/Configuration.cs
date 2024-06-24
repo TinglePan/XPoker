@@ -25,13 +25,15 @@ public static class Configuration
     public static readonly float AnimateCardTransformInterval = 0.1f;
     public static readonly float ContentContainerAdjustTweenTime = 0.2f;
     public static readonly int ShuffleAnimateCards = 3;
-    public static readonly int FieldCardCountPerRow = 12;
-    public static readonly int SkillCardCountPerRow = 6;
+    // public static readonly int FieldCardCountPerRow = 4;
+    // public static readonly int SkillCardCountPerRow = 6;
     public static readonly int BuffCountPerRow = 12;
+    
     public static readonly int MaxDefence = 999;
     public static readonly int ProgressCountRequiredToWin = 8;
 
     public static readonly int DefaultRewardCardCount = 3;
+    public static readonly int DefaultReRollPrice = 5;
     public static readonly int DefaultReRollPriceIncrease = 5;
     public static readonly int DefaultSkipReward = 30;
 
@@ -47,4 +49,6 @@ public static class Configuration
     public static readonly int VulnerableMultiplier = 50;
     public static readonly int WeakenMultiplier = 25;
     public static readonly int FragileMultiplier = 50;
+
+    public static readonly Vector4 DefaultContentContainerMargins = new Vector4(8, 4, 8, 4);
 }

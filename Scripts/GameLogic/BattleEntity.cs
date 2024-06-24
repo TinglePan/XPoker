@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
+using hamsterbyte.DeveloperConsole;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
@@ -104,6 +105,7 @@ public partial class BattleEntity: Node, ISetup
         // Level = new ObservableProperty<int>(nameof(Level), this, 0);
         Defence = new ObservableProperty<int>(nameof(Defence), this, 0);
         Defence.DetailedValueChanged += DefenceChanged;
+        Defence.FireValueChangeEventsOnInit();
         Hp.ValueChanged += HpChanged;
         MaxHp.ValueChanged += HpChanged;
         HoleCards = new ObservableCollection<BaseCard>();
@@ -142,12 +144,14 @@ public partial class BattleEntity: Node, ISetup
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-            { "nodesPerRow", Configuration.DefaultHoleCardCount },
+            { "nodesPerRow", 0 },
             { "hasBorder", true },
             { "expectedContentNodeCount", Configuration.DefaultHoleCardCount },
             { "hasName", true },
             { "containerName", "Hole cards" },
-            { "defaultCardFaceDirection", IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down } 
+            { "defaultCardFaceDirection", IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down },
+            { "margins", Configuration.DefaultContentContainerMargins },
+            { "withCardEffect", true }
         });
         foreach (var card in (List<BaseCard>)args["skillCards"])
         {
@@ -161,12 +165,14 @@ public partial class BattleEntity: Node, ISetup
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Up },
-            { "nodesPerRow", Configuration.SkillCardCountPerRow },
+            { "nodesPerRow", 0 },
             { "hasBorder", true },
             { "expectedContentNodeCount", 1 },
             { "hasName", true },
             { "containerName", "Skill cards" },
-            { "defaultCardFaceDirection", Enums.CardFace.Up } 
+            { "defaultCardFaceDirection", Enums.CardFace.Up },
+            { "margins", Configuration.DefaultContentContainerMargins },
+            { "withCardEffect", true }
         });
         BuffContainer.Setup(new Dictionary<string, object>()
         {
@@ -177,7 +183,8 @@ public partial class BattleEntity: Node, ISetup
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
             { "nodesPerRow", Configuration.BuffCountPerRow },
             { "hasBorder", false },
-            { "hasName", false }
+            { "hasName", false },
+            { "margins", Configuration.DefaultContentContainerMargins }
         });
         
         HasSetup = true;

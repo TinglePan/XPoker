@@ -21,6 +21,7 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
     
     public Action<CardEntry> OnPressed;
 
+    public bool WithCardEffect;
     public bool IsNegated;
     public bool IsSelected;
     
@@ -34,9 +35,8 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
         JokerLabel = GetNode<Label>("Joker");
         NameLabel = GetNode<Label>("Name");
         NegateLine = GetNode<Line2D>("NegateLine");
-        
-        
         Area.InputEvent += InputEventHandler;
+        WithCardEffect = false;
         IsNegated = false;
         IsSelected = false;
     }
@@ -54,6 +54,7 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
         base.Setup(args);
         Battle = GameMgr.CurrentBattle;
         Content.Value = (BaseCard)args["card"];
+        WithCardEffect = (bool)args["withCardEffect"];
     }
     
     protected void InputEventHandler(Node viewport, InputEvent @event, long shapeIdx)
@@ -117,7 +118,10 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
 		card.Rank.FireValueChangeEventsOnInit();
 		card.Suit.DetailedValueChanged += OnCardSuitChanged;
 		card.Suit.FireValueChangeEventsOnInit();
-		card.OnStart(card.Battle);
+		if (WithCardEffect)
+		{
+			card.OnStart(card.Battle);
+		}
 	}
 
 	protected override void OnContentDetached(BaseCard card)
@@ -126,7 +130,10 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
 		card.Nodes.Remove(this);
 		card.Rank.DetailedValueChanged -= OnCardRankChanged;
 		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
-		card.OnStop(card.Battle);
+		if (WithCardEffect)
+		{
+			card.OnStop(card.Battle);
+		}
 	}
     
 }

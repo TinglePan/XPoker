@@ -42,12 +42,14 @@ public partial class SkillDisplay : Node2D, ISetup
 			{ "contentNodeSize", Configuration.CardSize },
 			{ "separation", Configuration.CardContainerSeparation },
 			{ "pivotDirection", Enums.Direction2D8Ways.Neutral },
-			{ "nodesPerRow", Configuration.RoundSkillsCount },
+			{ "nodesPerRow", 0 },
 			{ "hasBorder", true },
 			{ "expectedContentNodeCount", 1 },
 			{ "hasName", true },
 			{ "containerName", "Skill sequence" },
-			{ "defaultCardFaceDirection", Enums.CardFace.Up }
+			{ "defaultCardFaceDirection", Enums.CardFace.Up },
+			{ "margins", Configuration.DefaultContentContainerMargins },
+			{ "withCardEffect", true }
 		});
 		EnemyRoundSkillContainer.Setup(new Dictionary<string, object>()
 		{
@@ -56,12 +58,14 @@ public partial class SkillDisplay : Node2D, ISetup
 			{ "contentNodeSize", Configuration.CardSize },
 			{ "separation", Configuration.CardContainerSeparation },
 			{ "pivotDirection", Enums.Direction2D8Ways.Neutral },
-			{ "nodesPerRow", Configuration.RoundSkillsCount },
+			{ "nodesPerRow", 0 },
 			{ "hasBorder", true },
 			{ "expectedContentNodeCount", 1 },
 			{ "hasName", true },
 			{ "containerName", "Skill sequence" },
-			{ "defaultCardFaceDirection", Enums.CardFace.Up }
+			{ "defaultCardFaceDirection", Enums.CardFace.Up },
+			{ "margins", Configuration.DefaultContentContainerMargins },
+			{ "withCardEffect", true }
 		});
 		HasSetup = true;
 	}
@@ -81,7 +85,7 @@ public partial class SkillDisplay : Node2D, ISetup
 			var timer = GetTree().CreateTimer(delay);
 			await ToSignal(timer, Timer.SignalName.Timeout);
 		}
-		var sourceContainer = skillCardNode.Container;
+		var sourceContainer = skillCardNode.Container.Value;
 		sourceContainer.ContentNodes.Remove(skillCardNode);
 		targetContainer.ContentNodes.Add(skillCardNode);
 	}

@@ -160,7 +160,7 @@ public partial class Dealer: Node2D, ISetup
         var cardNode = CreateCardNodeOnPile(card, DealCardPile);
         if (node.Container != null)
         {
-            var cardContainer = (CardContainer)node.Container; 
+            var cardContainer = (CardContainer)node.Container.Value; 
             var index = cardContainer.ContentNodes.IndexOf(node);
             AnimateDiscard(node);
             cardContainer.ContentNodes.Insert(index, cardNode);
@@ -184,7 +184,7 @@ public partial class Dealer: Node2D, ISetup
             await ToSignal(timer, Timer.SignalName.Timeout);
         }
         // GD.Print($"animate discard {node}");
-        node.Container.Contents.Remove(node.Content.Value);
+        node.Container.Value.Contents.Remove(node.Content.Value);
         node.Reparent(DiscardCardPile);
         node.TweenTransform(DiscardCardPile.TopCard.Position, DiscardCardPile.TopCard.RotationDegrees,
             Configuration.AnimateCardTransformInterval, () => Discard(node), TweenControl.ConflictTweenAction.Finish);

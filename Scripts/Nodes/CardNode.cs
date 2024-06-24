@@ -29,6 +29,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
     
     public Enums.CardFace OriginalFaceDirection;
     public ObservableProperty<Enums.CardFace> FaceDirection;
+    public bool WithCardEffect;
     public bool IsSelected;
     public bool IsRevealed;
     public ObservableProperty<bool> IsBought;
@@ -51,8 +52,10 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		FaceDirection = new ObservableProperty<Enums.CardFace>(nameof(FaceDirection), this, Enums.CardFace.Down);
 		FaceDirection.DetailedValueChanged += OnCardFaceChanged;
 		FaceDirection.FireValueChangeEventsOnInit();
+		WithCardEffect = false;
 		IsSelected = false;
 		IsRevealed = false;
+		Container.DetailedValueChanged += OnContainerChanged;
 	}
 	
 	public override void _Notification(int what)
@@ -131,11 +134,11 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		AnimationPlayer.Play("flip");
 		if (toFaceDir == Enums.CardFace.Down)
 		{
-			Content.Value.OnStop(Content.Value.Battle);
+			TryStopCard();
 		}
 		else
 		{
-			Content.Value.OnStart(Content.Value.Battle);
+			TryStartCard();
 		}
 		await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
 	}
@@ -258,7 +261,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		card.Suit.DetailedValueChanged += OnCardSuitChanged;
 		card.Suit.FireValueChangeEventsOnInit();
 		MainIcon.ResetIconPath(card.IconPath);
-		card.OnStart(card.Battle);
+		TryStartCard();
 	}
 
 	protected override void OnContentDetached(BaseCard card)
@@ -268,7 +271,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		card.Rank.DetailedValueChanged -= OnCardRankChanged;
 		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
 		MainIcon.ResetIconPath(null);
-		card.OnStop(card.Battle);
+		TryStopCard();
 	}
 
 	protected void OnIsBoughtChanged(object sender, ValueChangedEventDetailedArgs<bool> args)
@@ -280,6 +283,40 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>
 		else
 		{
 			PriceLabel.Text = Content.Value.Def.BasePrice.ToString();
+		}
+	}
+
+	protected void OnContainerChanged(object sender,
+		ValueChangedEventDetailedArgs<ContentContainer<CardNode, BaseCard>> args)
+	{
+		var oldValue = (CardContainer)args.OldValue;
+		var newValue = (CardContainer)args.NewValue;
+		if (oldValue is { WithCardEffect: true } && newValue is not { WithCardEffect: true })
+		{
+			WithCardEffect = false;
+			TryStopCard();
+		}
+
+		if (oldValue is not { WithCardEffect: true } && newValue is { WithCardEffect: true })
+		{
+			WithCardEffect = newValue.WithCardEffect;
+			TryStartCard();
+		}
+	}
+
+	protected void TryStartCard()
+	{
+		if (WithCardEffect && Content.Value is {} card)
+		{
+			card.OnStart(card.Battle);
+		}
+	}
+
+	protected void TryStopCard()
+	{
+		if (WithCardEffect && Content.Value is {} card)
+		{
+			card.OnStop(card.Battle);
 		}
 	}
 }

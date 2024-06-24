@@ -35,8 +35,8 @@ public class MagicalHatCard: BaseUseCard
             {
                 var fromNode = SelectedCardNodes[0];
                 var toNode = SelectedCardNodes[1];
-                var fromContainer = fromNode.Container;
-                var toContainer = toNode.Container;
+                var fromContainer = fromNode.Container.Value;
+                var toContainer = toNode.Container.Value;
                 var fromIndex = fromContainer.ContentNodes.IndexOf(fromNode);
                 var toIndex = toContainer.ContentNodes.IndexOf(toNode);
                 (toContainer.ContentNodes[toIndex], fromContainer.ContentNodes[fromIndex]) = (fromContainer.ContentNodes[fromIndex], toContainer.ContentNodes[toIndex]);

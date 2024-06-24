@@ -35,7 +35,7 @@ public class BaseTapCard: BaseAbilityCard, ITapCard
     public override bool CanInteract()
     {
         var node = Node<CardNode>();
-        if (node.Container is CardContainer { AllowInteract: false })
+        if (node.Container.Value is CardContainer { AllowInteract: false })
         {
             return false;
         }
@@ -46,7 +46,7 @@ public class BaseTapCard: BaseAbilityCard, ITapCard
     public void StartEffect()
     {
         var node = Node<CardNode>();
-        if (node.Container is CardContainer { AllowInteract: true })
+        if (node.Container.Value is CardContainer { AllowInteract: true })
         {
             Battle.StartEffect(Effect);
         }

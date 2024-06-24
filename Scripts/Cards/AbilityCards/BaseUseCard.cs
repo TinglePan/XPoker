@@ -28,7 +28,7 @@ public class BaseUseCard: BaseAbilityCard, IUseCard
     public override bool CanInteract()
     {
         var node = Node<CardNode>();
-        if (node.Container is CardContainer { AllowInteract: false })
+        if (node.Container.Value is CardContainer { AllowInteract: false })
         {
             return false;
         }

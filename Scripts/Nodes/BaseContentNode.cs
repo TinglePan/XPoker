@@ -78,18 +78,19 @@ public abstract partial class BaseContentNode<TContentNode, TContent> : BaseCont
     where TContentNode: BaseContentNode<TContentNode, TContent>
     where TContent: IContent<TContent>
 {
-    public ContentContainer<TContentNode, TContent> Container;
+    public ObservableProperty<ContentContainer<TContentNode, TContent>> Container;
     public bool HasSetup { get; set; }
 
     public override void _Ready()
     {
         base._Ready();
         HasSetup = false;
+        Container = new ObservableProperty<ContentContainer<TContentNode, TContent>>(nameof(Container), this, null);
     }
 
     public virtual void Setup(Dictionary<string, object> args)
     {
-        Container = (ContentContainer<TContentNode, TContent>)args["container"];
+        Container.Value = (ContentContainer<TContentNode, TContent>)args["container"];
         HasSetup = true;
     }
 

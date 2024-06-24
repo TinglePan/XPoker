@@ -26,7 +26,9 @@ public partial class TestContainerPositioning: Node
             { "separation", 12 },
             { "defaultCardFaceDirection", Enums.CardFace.Up },
             { "hasBorder", false },
-            { "hasName", false }
+            { "hasName", false },
+            { "margins", Configuration.DefaultContentContainerMargins },
+            { "withCardEffect", true }
         });
         SpawnCardNodeAndAppend();
         GD.Print("task start");

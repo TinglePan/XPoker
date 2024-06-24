@@ -116,7 +116,7 @@ public partial class Shop: Control, ISetup
         Battle = GameMgr.CurrentBattle;
         PokerCardContainer.Setup(new Dictionary<string, object>()
         {
-            { "allowInteract", true },
+            { "allowInteract", false },
             { "cards", PokerCards },
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
@@ -128,10 +128,11 @@ public partial class Shop: Control, ISetup
             { "containerName", "Community cards"},
             { "defaultCardFaceDirection", Enums.CardFace.Up },
             { "getCardFaceDirectionFunc", null },
+            { "withCardEffect", false }
         });
         SkillCardContainer.Setup(new Dictionary<string, object>()
         {
-            { "allowInteract", true },
+            { "allowInteract", false },
             { "cards", SkillCards },
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
@@ -143,10 +144,11 @@ public partial class Shop: Control, ISetup
             { "containerName", "Skill cards"},
             { "defaultCardFaceDirection", Enums.CardFace.Up },
             { "getCardFaceDirectionFunc", null },
+            { "withCardEffect", false }
         });
         AbilityCardContainer.Setup(new Dictionary<string, object>()
         {
-            { "allowInteract", true },
+            { "allowInteract", false },
             { "cards", AbilityCards },
             { "contentNodeSize", Configuration.CardSize },
             { "separation", Configuration.CardContainerSeparation },
@@ -158,8 +160,9 @@ public partial class Shop: Control, ISetup
             { "containerName", "Ability cards"},
             { "defaultCardFaceDirection", Enums.CardFace.Up },
             { "getCardFaceDirectionFunc", null },
+            { "withCardEffect", false }
         });
-        AllCardDefs = Defs.CardDefs.All();
+        AllCardDefs = CardDefs.All();
     }
 
     public void EnsureSetup()
@@ -194,10 +197,10 @@ public partial class Shop: Control, ISetup
         // cardNode.AnimateFlip(Enums.CardFace.Down);
         cardNode.IsBought.Value = true;
         var card = cardNode.Content.Value;
-        if (cardNode.Container == AbilityCardContainer)
+        if (cardNode.Container.Value == AbilityCardContainer)
         {
             Battle.Player.AbilityCards.Add(card);
-        } else if (cardNode.Container == SkillCardContainer)
+        } else if (cardNode.Container.Value == SkillCardContainer)
         {
             Battle.Player.SkillCards.Add(card);
         }

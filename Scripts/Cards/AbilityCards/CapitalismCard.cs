@@ -18,14 +18,26 @@ public class CapitalismCard: BaseTapCard
     {
         base.OnStart(battle);
         _count = Utils.GetCardRankValue(Rank.Value);
-        battle.Player.DealCardCount += _count;
-        battle.Enemy.DealCardCount += _count;
+        battle.OnNewEnemy += OnNewEnemy;
+        ChangeEntityDealCardCount(battle.Player, _count);
+        ChangeEntityDealCardCount(battle.Enemy, _count);
     }
 
     public override void OnStop(Battle battle)
     {
         base.OnStop(battle);
-        battle.Player.DealCardCount -= _count;
-        battle.Enemy.DealCardCount -= _count;
+        ChangeEntityDealCardCount(battle.Player, -_count);
+        ChangeEntityDealCardCount(battle.Enemy, -_count);
+    }
+
+    protected void ChangeEntityDealCardCount(BattleEntity entity, int count)
+    {
+        entity.DealCardCount += count;
+        entity.HoleCardContainer.ExpectedContentNodeCount += count;
+    }
+    
+    protected void OnNewEnemy(Battle battle, BattleEntity enemy)
+    {
+        ChangeEntityDealCardCount(enemy, _count);
     }
 }

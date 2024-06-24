@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Godot;
+using hamsterbyte.DeveloperConsole;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Cards.SkillCards;

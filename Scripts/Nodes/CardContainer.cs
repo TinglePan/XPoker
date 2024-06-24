@@ -21,6 +21,7 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 	public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
 
 	public bool AllowInteract;
+	public bool WithCardEffect;
 	
 	public override void _Ready()
 	{
@@ -33,6 +34,7 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		base.Setup(args);
 		Battle = GameMgr.CurrentBattle;
 		AllowInteract = (bool)args["allowInteract"];
+		WithCardEffect = (bool)args["withCardEffect"];
 		if (args["cards"] is ObservableCollection<BaseCard> cards && cards != Contents)
 		{
 			Contents = cards;
@@ -65,7 +67,7 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 			var timer = GetTree().CreateTimer(delay);
 			await ToSignal(timer, Timer.SignalName.Timeout);
 		}
-		var sourceContainer = skillCardNode.Container;
+		var sourceContainer = skillCardNode.Container.Value;
 		sourceContainer.ContentNodes.Remove(skillCardNode);
 		targetContainer.ContentNodes.Add(skillCardNode);
 	}

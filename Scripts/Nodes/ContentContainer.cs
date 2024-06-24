@@ -8,6 +8,7 @@ using Godot;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using Vector2 = Godot.Vector2;
+using Vector4 = Godot.Vector4;
 
 namespace XCardGame.Scripts.Nodes;
 
@@ -15,8 +16,6 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
     where TContentNode: BaseContentNode<TContentNode, TContent>
     where TContent: IContent<TContent>
 {
-    [Export] public StyleBox StyleBox;
-    
     public GameMgr GameMgr;
     public NinePatchRect Border;
     public Label ContainerNameLabel;
@@ -33,6 +32,8 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
 
     public bool HasName;
     public string ContainerName;
+
+    public Vector4 Margins;
     
     public ObservableCollection<TContent> Contents;
     public ObservableCollection<TContentNode> ContentNodes;
@@ -65,6 +66,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
             ContainerNameLabel = GetNode<Label>("Name");
             ContainerNameLabel.Text = ContainerName;
         }
+        Margins = (Vector4)args["margins"];
         HasBorder = (bool)args["hasBorder"];
         if (HasBorder)
         {
@@ -72,6 +74,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
             ExpectedContentNodeCount = (int)args["expectedContentNodeCount"];
             AdjustBorder();
         }
+
         HasSetup = true;
     }
     
@@ -121,7 +124,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
                 Contents.Insert(index, contentNode.Content.Value);
                 contentNode.Reparent(this);
                 MoveChild(contentNode, index);
-                contentNode.Container = this;
+                contentNode.Container.Value = this;
                 // GD.Print($"{contentNode.Content.Value}({contentNode}) container added {this}");
             }
             index++;
@@ -177,7 +180,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
                 oldNode.Container = null;
                 newNode.Reparent(newNode);
                 MoveChild(newNode, oldNodesStartingIndex + i);
-                newNode.Container = this;
+                newNode.Container.Value = this;
             }
         }
         for (int i = 0; i < ContentNodes.Count; i++)
@@ -208,8 +211,8 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
 
     protected Vector2 CalculateContentNodeOffset(int index)
     {
-        var colIndex = index % NodesPerRow;
-        var rowIndex = index / NodesPerRow;
+        var colIndex = NodesPerRow != 0 ? index % NodesPerRow : index;
+        var rowIndex = NodesPerRow != 0 ? index / NodesPerRow : 0;
         Vector2 pivotOffsetFromBottomLeft = GetPivotOffset();
         var nodeOffsetFromBottomLeft = new Vector2(colIndex * (ContentNodeSize.X + Separation.X) + ContentNodeSize.X / 2,
             rowIndex * (ContentNodeSize.Y + Separation.Y) + ContentNodeSize.Y / 2);
@@ -234,9 +237,9 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
     protected Vector2 Size()
     {
         var actualNodeCount = ActualNodeCount();
-        var actualNodesPerRow = Mathf.Min(actualNodeCount, NodesPerRow);
-        var actualRowCount = actualNodeCount == 0 ? 0 : (actualNodeCount - 1) / actualNodesPerRow + 1;
         if (actualNodeCount == 0) return Vector2.Zero;
+        var actualNodesPerRow = NodesPerRow == 0 ? actualNodeCount : Mathf.Min(actualNodeCount, NodesPerRow);
+        var actualRowCount = actualNodesPerRow == 0 ? 0 : (actualNodeCount - 1) / actualNodesPerRow + 1;
         return new Vector2(ContentNodeSize.X * actualNodesPerRow + Separation.X * (actualNodesPerRow - 1),
             ContentNodeSize.Y * actualRowCount + Separation.Y * (actualRowCount - 1));
     }
@@ -383,13 +386,13 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         {
             // GD.Print($"show {Border}");
             var size = Size();
-            Border.Size = new Vector2(size.X + StyleBox.ContentMarginLeft + StyleBox.ContentMarginRight, size.Y + StyleBox.ContentMarginBottom + StyleBox.ContentMarginTop);
+            Border.Size = new Vector2(size.X + Margins.X + Margins.Z, size.Y + Margins.W + Margins.Y);
             // var pivotOffsetFromTopLeft = pivotOffsetFromBottomLeft + new Vector2(0, size.Y);
-            Border.Position = -(GetPivotOffset() + new Vector2(StyleBox.ContentMarginLeft, StyleBox.ContentMarginTop));
+            Border.Position = -(GetPivotOffset() + new Vector2(Margins.X, Margins.Y));
             Border.Show();
             ContainerNameLabel.Show();
             ContainerNameLabel.Position =
-                -(GetPivotOffset() + new Vector2(StyleBox.ContentMarginLeft, StyleBox.ContentMarginTop + ContainerNameLabel.Size.Y));
+                -(GetPivotOffset() + new Vector2(Margins.X,  Margins.Y + ContainerNameLabel.Size.Y));
         }
     }
 }

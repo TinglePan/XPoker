@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://77vdut83237t"]
 
-[ext_resource type="Script" path="res://Scripts/GameLogic/Intro.cs" id="1_0oriv"]
+[ext_resource type="Script" path="res://Scripts/Game/Intro.cs" id="1_0oriv"]
 [ext_resource type="FontFile" uid="uid://dd5v55urjvkvb" path="res://Fonts/lanapixel_everything/LanaPixel.ttf" id="2_7salj"]
 [ext_resource type="Theme" uid="uid://dwpbfhy3isgh5" path="res://Resources/button_theme.tres" id="3_buvnf"]
 

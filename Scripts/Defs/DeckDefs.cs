@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs.Def.Card;
+using XCardGame.Scripts.Defs.Def.Deck;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Defs;
-
-public class DeckDef
-{
-    public List<BaseCardDef> CardDefs;
-}
-
 
 public static class DeckDefs
 {
@@ -34,11 +30,11 @@ public static class DeckDefs
                 {
                     continue;
                 }
-                cardDefs.Add(new BaseCardDef
+                cardDefs.Add(new PokerCardDef()
                 {
                     BasePrice = 0,
                     Rank = (Enums.CardRank)rank,
-                    Suit = (Enums.CardSuit)suit
+                    Suit = (Enums.CardSuit)suit,
                 });
             }
         }

@@ -14,7 +14,7 @@ namespace XCardGame.Scripts.Buffs;
 public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, IEquatable<BaseBuff>
 {
     public string Name;
-    public string Description;
+    public string DescriptionTemplate;
     public string IconPath;
     
     public BattleEntity Entity;
@@ -34,11 +34,11 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
     public Battle Battle;
     public bool HasSetup { get; set; }
 
-    public BaseBuff(string name, string description, string iconPath, bool isStackable = false, bool stackOnRepeat = true, int stack = 0, int maxStack = 0, bool isTemporary = false)
+    public BaseBuff(string name, string descriptionTemplate, string iconPath, bool isStackable = false, bool stackOnRepeat = true, int stack = 0, int maxStack = 0, bool isTemporary = false)
     {
         Nodes = new HashSet<BaseContentNode<BaseBuff>>();
         Name = name;
-        Description = description;
+        DescriptionTemplate = descriptionTemplate;
         IconPath = iconPath;
         IsStackable = isStackable;
         StackOnRepeat = stackOnRepeat;
@@ -74,6 +74,11 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
         {
             GD.PrintErr($"{this} not setup yet");
         }
+    }
+
+    public override string ToString()
+    {
+        return Description();
     }
 
     public void InflictOn(BattleEntity target, BattleEntity source, BaseCard sourceCard)
@@ -148,9 +153,9 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
         return Name == other?.Name;
     }
 
-    public virtual string GetDescription()
+    public virtual string Description()
     {
-        return Description;
+        return DescriptionTemplate;
     }
     
     protected virtual int StackDecreasePerRound()

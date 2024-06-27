@@ -10,25 +10,44 @@ using BuffNode = XCardGame.Scripts.Nodes.BuffNode;
 
 namespace XCardGame.Scripts.Effects;
 
-public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
+public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>, ISetup
 {
     public Battle Battle;
-    public BaseCard CreatedByCard;
+    public BaseCard OriginateCard;
+
+    public bool HasSetup { get; set; }
     
     public string Name;
-    public string Description;
+    public string DescriptionTemplate;
 
-    public BaseEffect(string name, string description, Battle battle, BaseCard createdByCard)
+    public BaseEffect(string name, string descriptionTemplate, BaseCard originateCard)
     {
         Name = name;
-        Description = description;
-        Battle = battle;
-        CreatedByCard = createdByCard;
+        DescriptionTemplate = descriptionTemplate;
+        OriginateCard = originateCard;
+    }
+    
+    public virtual void Setup(Dictionary<string, object> args)
+    {
+        Battle = (Battle)args["battle"];
+    }
+    
+    public void EnsureSetup()
+    {
+        if (!HasSetup)
+        {
+            GD.PrintErr($"{this} not setup yet");
+        }
     }
     
     public bool Equals(BaseEffect other)
     {
         return GetType() == other?.GetType();
+    }
+
+    public virtual string Description()
+    {
+        return DescriptionTemplate;
     }
 
     public virtual void OnStart(Battle battle)
@@ -38,4 +57,5 @@ public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
     public virtual void OnStop(Battle battle)
     {
     }
+
 }

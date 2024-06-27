@@ -1,293 +1,184 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs.Def.Card;
 
 namespace XCardGame.Scripts.Defs;
 
-public class BaseCardDef
-{
-    public string Name;
-    public string ConcreteClassPath;
-    public string DescriptionTemplate;
-    public string IconPath;
-    public Enums.CardSuit Suit;
-    public Enums.CardRank Rank;
-    public int BasePrice;
-    public int Rarity;
-}
-
-public class SkillCardDef : BaseCardDef
-{
-    public int Cost;
-}
-
-public class AbilityCardDef: BaseCardDef
-{
-    public int Cost;
-}
-
-public class TapCardDef: AbilityCardDef
-{
-    public int TappedCost;
-}
-
-public class UseCardDef: AbilityCardDef
-{
-    public int RankChangePerUse;
-}
-
 public static class CardDefs
 {
-    public static UseCardDef D6 = new ()
+    public static InteractCardDef D6 = new ()
     {
-        Name = "D6",
-        ConcreteClassPath = "AbilityCards.D6Card",
-        DescriptionTemplate = "Reroll your destiny.",
+        Name = Utils._("D6"),
+        ConcreteClassPath = "AbilityCards.ItemCards.D6Card",
+        DescriptionTemplate = Utils._("Randomized destiny."),
         IconPath = "res://Sprites/Cards/d6.png",
-        RankChangePerUse = -1,
-        Cost = 5,
         BasePrice = 5,
         Rarity = 1,
         Rank = Enums.CardRank.Six,
-        Suit = Enums.CardSuit.Diamonds
+        
+        UseCost = 1,
+        RankChangePerUse = -2,
     };
     
-    public static TapCardDef Capitalism = new ()
+    public static InteractCardDef MagicalHat = new ()
     {
-        Name = "Capitalism",
-        ConcreteClassPath = "AbilityCards.CapitalismCard",
-        DescriptionTemplate = "Add hole cards dealt each round.",
-        IconPath = "res://Sprites/Cards/capitalism.png",
-        TappedCost = 2,
-        Cost = 0,
-        BasePrice = 5,
-        Rarity = 1,
-        Rank = Enums.CardRank.Ace,
-        Suit = Enums.CardSuit.Diamonds
-    };
-    
-    public static TapCardDef Socialism = new ()
-    {
-        Name = "Socialism",
-        ConcreteClassPath = "AbilityCards.SocialismCard",
-        DescriptionTemplate = "Add community cards dealt each round.",
-        IconPath = "res://Sprites/Cards/socialism.png",
-        TappedCost = 2,
-        Cost = 0,
-        BasePrice = 5,
-        Rarity = 1,
-        Rank = Enums.CardRank.Ace,
-        Suit = Enums.CardSuit.Clubs
-    };
-    
-    public static UseCardDef MagicalHat = new ()
-    {
-        Name = "Magical hat",
-        ConcreteClassPath = "AbilityCards.MagicalHatCard",
-        DescriptionTemplate = "Swap two cards in hole card area or community card area.",
+        Name = Utils._("Magical hat"),
+        ConcreteClassPath = "AbilityCards.ItemCards.MagicalHatCard",
+        DescriptionTemplate = Utils._("Swap two cards."),
         IconPath = "res://Sprites/Cards/magical_hat.png",
-        RankChangePerUse = -1,
-        Cost = 5,
         BasePrice = 5,
         Rarity = 1,
         Rank = Enums.CardRank.Three,
-        Suit = Enums.CardSuit.Spades
+        
+        UseCost = 1,
+        RankChangePerUse = -1,
     };
     
-    public static UseCardDef Balatroll = new ()
+    public static InteractCardDef BalaTrollHand = new ()
     {
-        Name = "Balatroll",
-        ConcreteClassPath = "AbilityCards.BalatrollCard",
-        DescriptionTemplate = "Discard and redraw.",
-        IconPath = "res://Sprites/Cards/balatroll.png",
-        RankChangePerUse = -1,
-        Cost = 4,
-        BasePrice = 4,
+        Name = Utils._("BalaTroll Hand"),
+        ConcreteClassPath = "AbilityCards.ItemCards.BalaTrollHandCard",
+        DescriptionTemplate = Utils._("Discard and redraw, like what you would do in balatro."),
+        IconPath = "res://Sprites/Cards/balatroll_hand.png",
+        BasePrice = 5,
         Rarity = 1,
         Rank = Enums.CardRank.Three,
-        Suit = Enums.CardSuit.Hearts
-    };
-    
-    public static TapCardDef BigShield = new ()
-    {
-        Name = "Big shield",
-        ConcreteClassPath = "AbilityCards.BigShieldCard",
-        DescriptionTemplate = "Deal and receive no damage for this round",
-        IconPath = "res://Sprites/Cards/big_shield.png",
-        TappedCost = 0,
-        Cost = 5,
-        BasePrice = 5,
-        Rarity = 1,
-        Rank = Enums.CardRank.King,
-        Suit = Enums.CardSuit.Hearts
-    };
-    
-    public static TapCardDef KeepOut = new ()
-    {
-        Name = "Keep out",
-        ConcreteClassPath = "AbilityCards.KeepOutCard",
-        DescriptionTemplate = "Certain cards do not count, the rule alters each round.",
-        IconPath = "res://Sprites/Cards/keep_out.png",
-        TappedCost = 2,
-        Cost = 0,
-        BasePrice = 5,
-        Rarity = 1,
-        Rank = Enums.CardRank.King,
-        Suit = Enums.CardSuit.Spades
-    };
-    
-    public static UseCardDef MillenniumEye = new ()
-    {
-        Name = "Millennium eye",
-        ConcreteClassPath = "AbilityCards.MillenniumEyeCard",
-        DescriptionTemplate = "All knowing at the cost of all power.",
-        IconPath = "res://Sprites/Cards/millennium_eye.png",
+        
+        UseCost = 1,
         RankChangePerUse = -1,
-        Cost = 5,
-        BasePrice = 5,
-        Rarity = 1,
-        Rank = Enums.CardRank.Ace,
-        Suit = Enums.CardSuit.Spades
     };
     
-    public static TapCardDef TheTieBreaker = new ()
+    public static InteractCardDef TurnTheTables = new ()
     {
-        Name = "The tie breaker",
-        ConcreteClassPath = "AbilityCards.TheTieBreakerCard",
-        DescriptionTemplate = "Card suit is used to break a tie, suit order from high to low: Spades, Hearts, Clubs, Diamonds",
-        IconPath = "res://Sprites/Cards/the_tie_breaker.png",
-        TappedCost = 2,
-        Cost = 0,
-        BasePrice = 5,
-        Rarity = 1,
-        Rank = Enums.CardRank.Ace,
-        Suit = Enums.CardSuit.Spades
-    };
-    
-    public static UseCardDef TurnTheTables = new ()
-    {
-        Name = "Turn the tables",
-        ConcreteClassPath = "AbilityCards.TurnTheTablesCard",
-        DescriptionTemplate = "Swap your hole cards with your opponents.",
+        Name = Utils._("Turn the tables"),
+        ConcreteClassPath = "AbilityCards.ItemCards.TurnTheTablesCard",
+        DescriptionTemplate = Utils._("Swap your hole cards with your opponents."),
         IconPath = "res://Sprites/Cards/turn_the_tables.png",
-        RankChangePerUse = -10,
-        Cost = 5,
         BasePrice = 5,
         Rarity = 1,
-        Rank = Enums.CardRank.Ten,
-        Suit = Enums.CardSuit.Spades,
+        
+        UseCost = 1,
+        RankChangePerUse = -99,
     };
     
-    public static TapCardDef EyePatch = new ()
+    public static InteractCardDef EyePatch = new ()
     {
-        Name = "Eye patch",
-        ConcreteClassPath = "AbilityCards.EyePatchCard",
-        DescriptionTemplate = "Add face-down community cards.",
+        Name = Utils._("Eye patch"),
+        ConcreteClassPath = "AbilityCards.EquipmentCards.EyePatchCard",
+        DescriptionTemplate = Utils._("Add face-down community cards."),
         IconPath = "res://Sprites/Cards/eye_patch.png",
-        TappedCost = 4,
-        Cost = 0,
-        BasePrice = 0,
+        BasePrice = 5,
         Rarity = 1,
-        Rank = Enums.CardRank.Jack,
-        Suit = Enums.CardSuit.Spades
     };
     
-    public static TapCardDef Xom = new ()
+    public static InteractCardDef BigShield = new ()
     {
-        Name = "Xom",
-        ConcreteClassPath = "AbilityCards.XomCard",
-        DescriptionTemplate = "Random effects that change every turn.",
+        Name = Utils._("Big shield"),
+        ConcreteClassPath = "AbilityCards.EquipmentCards.BigShieldCard",
+        DescriptionTemplate = Utils._("Increase defend value while decrease attack value"),
+        IconPath = "res://Sprites/Cards/big_shield.png",
+        BasePrice = 5,
+        Rarity = 1,
+        
+        UseCost = 1,
+        RankChangePerUse = -99,
+    };
+    
+    public static InteractCardDef MillenniumEye = new ()
+    {
+        Name = Utils._("Millennium eye"),
+        ConcreteClassPath = "AbilityCards.EquipmentCards.MillenniumEyeCard",
+        DescriptionTemplate = Utils._("I can see forever."),
+        IconPath = "res://Sprites/Cards/millennium_eye.png",
+        BasePrice = 5,
+        Rarity = 1,
+        
+        UnSealCost = 1,
+    };
+    
+    public static InteractCardDef Capitalism = new ()
+    {
+        Name = Utils._("Capitalism"),
+        ConcreteClassPath = "AbilityCards.RuleCards.CapitalismCard",
+        DescriptionTemplate = Utils._("Add hole cards dealt each round."),
+        IconPath = "res://Sprites/Cards/capitalism.png",
+        Rarity = 1,
+        
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef Socialism = new ()
+    {
+        Name = Utils._("Socialism"),
+        ConcreteClassPath = "AbilityCards.RuleCards.SocialismCard",
+        DescriptionTemplate = Utils._("Add community cards dealt each round."),
+        IconPath = "res://Sprites/Cards/socialism.png",
+        Rarity = 1,
+        
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef KeepOut = new ()
+    {
+        Name = Utils._("Keep out"),
+        ConcreteClassPath = "AbilityCards.RuleCards.KeepOutCard",
+        DescriptionTemplate = Utils._("Certain cards do not count. Current rule:\n{}"),
+        IconPath = "res://Sprites/Cards/keep_out.png",
+        Rarity = 1,
+        
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef TheTieBreaker = new ()
+    {
+        Name = Utils._("The tie breaker"),
+        ConcreteClassPath = "AbilityCards.RuleCards.TheTieBreakerCard",
+        DescriptionTemplate = Utils._("Card suit is used to break a tie. Current suit order:\n{}"),
+        IconPath = "res://Sprites/Cards/the_tie_breaker.png",
+        Rarity = 1,
+        
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef Xom = new ()
+    {
+        Name = Utils._("Xom"),
+        ConcreteClassPath = "AbilityCards.RuleCards.XomCard",
+        DescriptionTemplate = Utils._("Random effects that change every turn. Current effects:\n{}"),
         IconPath = "res://Sprites/Cards/xom.png",
-        TappedCost = 5,
-        Cost = 0,
-        BasePrice = 0,
         Rarity = 1,
         Rank = Enums.CardRank.Joker,
-        Suit = Enums.CardSuit.Joker
-    };
-    
-    public static TapCardDef HandShake = new ()
-    {
-        Name = "Hand shake",
-        ConcreteClassPath = "AbilityCards.HandShakeCard",
-        DescriptionTemplate = "You will be dealt cards in your opponent's deck and vice versa.",
-        IconPath = "res://Sprites/Cards/hand_shake.png",
-        TappedCost = 2,
-        Cost = 0,
-        BasePrice = 0,
-        Rarity = 1,
-        Rank = Enums.CardRank.Five,
-        Suit = Enums.CardSuit.Hearts
-    };
-
-    
-    // Skills
-    public static SkillCardDef Feint = new ()
-    {
-        Name = "Feint",
-        ConcreteClassPath = "SkillCards.FeintCard",
-        DescriptionTemplate = "Grants vulnerable instead of dealing damage",
-        IconPath = "res://Sprites/Cards/feint.png",
-        Rarity = 1,
-        Cost = 5,
-        BasePrice = 5,
-        Rank = Enums.CardRank.Ace,
-        Suit = Enums.CardSuit.Spades
-    };
-    
-    public static SkillCardDef DualWield = new ()
-    {
-        Name = "Dual wield",
-        ConcreteClassPath = "SkillCards.DualWieldCard",
-        DescriptionTemplate = "Attack twice",
-        IconPath = "res://Sprites/Cards/dual_wield.png",
-        Rarity = 1,
-        Cost = 5,
-        BasePrice = 5,
-        Rank = Enums.CardRank.Two,
-        Suit = Enums.CardSuit.Clubs
-    };
-    
-    public static SkillCardDef Riposte = new ()
-    {
-        Name = "Riposte",
-        ConcreteClassPath = "SkillCards.RiposteCard",
-        DescriptionTemplate = "Negate the next incoming attack, then counter attack",
-        IconPath = "res://Sprites/Cards/riposte.png",
-        Rarity = 1,
-        Cost = 5,
-        BasePrice = 5,
-        Rank = Enums.CardRank.Eight,
-        Suit = Enums.CardSuit.Hearts
-    };
-    
-    public static SkillCardDef SuckerPunch = new ()
-    {
-        Name = "Sucker punch",
-        ConcreteClassPath = "SkillCards.SuckerPunchCard",
-        DescriptionTemplate = "Attack as a defender",
-        IconPath = "res://Sprites/Cards/sucker_punch.png",
-        Rarity = 1,
-        Cost = 5,
-        BasePrice = 5,
-        Rank = Enums.CardRank.Seven,
-        Suit = Enums.CardSuit.Clubs
-    };
-    
-    public static SkillCardDef TwoHanded = new ()
-    {
-        Name = "Two handed",
-        ConcreteClassPath = "SkillCards.TwoHandedCard",
-        DescriptionTemplate = "Make an attack that scales more with power",
-        IconPath = "res://Sprites/Cards/two_handed.png",
-        Rarity = 1,
-        Cost = 5,
-        BasePrice = 5,
-        Rank = Enums.CardRank.Two,
-        Suit = Enums.CardSuit.Clubs
-    };
+        Suit = Enums.CardSuit.Joker,
         
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef Separation = new ()
+    {
+        Name = Utils._("Separation"),
+        ConcreteClassPath = "AbilityCards.RuleCards.SeparationCard",
+        DescriptionTemplate = Utils._("You will not be dealt cards from your opponent's deck, vice versa."),
+        IconPath = "res://Sprites/Cards/hand_shake.png",
+        Rarity = 1,
+        
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
     public static List<BaseCardDef> All()
     {
         Type cards = typeof(CardDefs);

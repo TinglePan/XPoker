@@ -15,9 +15,9 @@ public class RiposteBuff: BaseBuff
     {
     }
 
-    public override string GetDescription()
+    public override string Description()
     {
-        return string.Format(Description, Stack.Value);
+        return string.Format(DescriptionTemplate, Stack.Value);
     }
 
     public Attack CounterAttack()

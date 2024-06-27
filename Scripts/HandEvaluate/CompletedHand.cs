@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using XCardGame.Scripts.Cards;
 
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 
 namespace XCardGame.Scripts.HandEvaluate;
 
@@ -22,6 +24,30 @@ public class CompletedHand: IComparable<CompletedHand>
         Kickers = kickers;
     }
 
+    public void Sort()
+    {
+        switch (Tier)
+        {
+            case Enums.HandTier.FullHouse:
+                var groups = PrimaryCards.GroupBy(card => card.Rank.Value, (rank, groupCards) => new
+                {
+                    Rank = rank,
+                    Cards = groupCards,
+                }).ToDictionary(x => x.Rank, x => x.Cards);
+                PrimaryCards.Sort((x, y) =>
+                {
+                    var deltaCount = groups[y.Rank.Value].Count() - groups[x.Rank.Value].Count();
+                    if (deltaCount != 0) return deltaCount;
+                    return y.CompareTo(x, true);
+                });
+                break;
+            default:
+                PrimaryCards.Sort((x, y) => y.CompareTo(x, true));
+                break;
+        }
+        Kickers?.Sort((x, y) => y.CompareTo(x, true));
+    }
+
     public int CompareTo(CompletedHand other)
     {
         return CompareTo(other, false, false);
@@ -32,9 +58,9 @@ public class CompletedHand: IComparable<CompletedHand>
         if (Tier > other.Tier) return 1;
         if (Tier < other.Tier) return -1;
         if (isCompareTierOnly) return 0;
-        for (var i = 0; i < PrimaryCards.Count; i++)
+        for (var i = 0; i < PrimaryComparerCards.Count; i++)
         {
-            var compareRes = PrimaryCards[i].CompareTo(other.PrimaryCards[i], isSuitSecondComparer);
+            var compareRes = PrimaryComparerCards[i].CompareTo(other.PrimaryComparerCards[i], isSuitSecondComparer);
             if (compareRes != 0) return compareRes;
         }
         if (Kickers != null)

@@ -5,6 +5,7 @@ using hamsterbyte.DeveloperConsole;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
+using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Common;
@@ -37,7 +38,7 @@ public partial class DebugProxy: Node
         selectRewardCard.Setup(new System.Collections.Generic.Dictionary<string, object>()
         {
             { "rewardCardCount", defs.Count },
-            { "rewardCardDefType", typeof(AbilityCardDef) },
+            { "rewardCardDefType", typeof(InteractCardDef) },
             { "reRollPrice", Configuration.DefaultReRollPrice },
             { "reRollPriceIncrease", Configuration.DefaultReRollPriceIncrease },
             { "skipReward", Configuration.DefaultSkipReward },

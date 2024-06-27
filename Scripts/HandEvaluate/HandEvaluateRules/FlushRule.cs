@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using XCardGame.Scripts.Cards;
 
 using XCardGame.Scripts.Common;

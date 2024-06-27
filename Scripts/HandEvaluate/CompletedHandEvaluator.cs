@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Cards;
@@ -8,7 +7,6 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
-using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.HandEvaluate;
 
@@ -30,11 +28,9 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         IsCompareHandTierOnly = false;
     }
     
-    public CompletedHand EvaluateBestHand(List<BaseCard> communityCards, List<BaseCard> holeCards)
+    public CompletedHand EvaluateBestHand(List<BaseCard> validCommunityCards, List<BaseCard> validHoleCards)
     {
         CalculatedHands.Clear();
-        var validHoleCards = holeCards.Where(x => !x.IsTapped).ToList();
-        var validCommunityCards = communityCards.Where(x => !x.IsTapped).ToList();
         // GD.Print($"valid Community cards: {validCommunityCards.Count}");
         // Profile.StartWatch("evaluate best hand 1");
         foreach (var cards in Utils.GetCombinationsWithXToYFromA(validHoleCards, validCommunityCards, 

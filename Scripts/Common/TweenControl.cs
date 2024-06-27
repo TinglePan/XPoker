@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Common.DataBinding;
 
@@ -22,6 +23,7 @@ public class TweenControl
         public ObservableProperty<Tween> Tween;
         public float Time;
         public ObservableProperty<Action> Callback;
+        public TaskCompletionSource Complete;
         
         public ControlledTween(string tag, Tween tween, float time, Action callback = null)
         {
@@ -53,6 +55,7 @@ public class TweenControl
                 if (Callback.Value != null)
                 {
                     valueChangedEventDetailedArgs.OldValue.Finished -= Callback.Value;
+                    valueChangedEventDetailedArgs.NewValue.Finished -= MarkComplete;
                 }
             }
             if (valueChangedEventDetailedArgs.NewValue != null)
@@ -60,6 +63,7 @@ public class TweenControl
                 if (Callback.Value != null)
                 {
                     valueChangedEventDetailedArgs.NewValue.Finished += Callback.Value;
+                    valueChangedEventDetailedArgs.NewValue.Finished += MarkComplete;
                 }
             }
         }
@@ -77,6 +81,11 @@ public class TweenControl
                     Tween.Value.Finished += valueChangedEventDetailedArgs.NewValue;
                 }
             }
+        }
+
+        protected void MarkComplete()
+        {
+            Complete.TrySetResult();
         }
     }
     
@@ -147,6 +156,11 @@ public class TweenControl
     public ControlledTween GetControlledTween(string tag)
     {
         return TweenMap.GetValueOrDefault(tag);
+    }
+
+    public Task WaitComplete(string tag)
+    {
+        return GetControlledTween(tag)?.Complete.Task;
     }
 
     public Tween GetTween(string tag)

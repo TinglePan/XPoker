@@ -1,4 +1,5 @@
-﻿using XCardGame.Scripts.GameLogic;
+﻿using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.GameLogic;
 
 namespace XCardGame.Scripts.Cards.CardMarkers;
 
@@ -6,11 +7,11 @@ public class BaseCardMarker: ILifeCycleTriggeredInBattle
 {
     public string Description;
     public string TexturePath;
-    public MarkerCard Card;
+    public PokerCard Card;
     
     protected Battle Battle;
 
-    public BaseCardMarker(string description, string texturePath, MarkerCard card)
+    public BaseCardMarker(string description, string texturePath, PokerCard card)
     {
         Description = description;
         TexturePath = texturePath;
@@ -20,9 +21,16 @@ public class BaseCardMarker: ILifeCycleTriggeredInBattle
 
     public virtual void OnStart(Battle battle)
     {
+        
     }
 
     public virtual void OnStop(Battle battle)
     {
+        
+    }
+
+    public virtual void Resolve(Battle battle, Engage engage, Enums.EngageRole role)
+    {
+        
     }
 }

@@ -66,7 +66,7 @@ public partial class GameMgr : Node
 			}
 		});
 		
-		InputMgr.SwitchToInputHandler(new BattleMainInputHandler(this, CurrentBattle));
+		InputMgr.SwitchToInputHandler(new BattleMainInputHandler(this));
 		CurrentBattle.Start();
 	}
 

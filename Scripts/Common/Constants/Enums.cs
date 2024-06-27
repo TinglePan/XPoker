@@ -99,16 +99,9 @@ public static class Enums
 
     public enum FactionId
     {
+        None,
         Player,
         Enemy
-    }
-
-    public enum CardInteractions
-    {
-        None,
-        Use,
-        Activate,
-        Seal
     }
 
     public enum TapDirection
@@ -119,13 +112,37 @@ public static class Enums
 
     public enum EngageRole
     {
+        None,
         Attacker,
         Defender
     }
 
-    public enum SkillType
+    public enum InteractCardType
     {
-        Main,
-        Extra
+        None,
+        Item,
+        Equipment,
+        Rule
+    }
+
+    public enum InteractionType
+    {
+        Use,
+        Seal,
+        Custom
+    }
+
+    public enum RuleNature
+    {
+        Blessing,
+        Neutral,
+        Curse
+    }
+
+    public enum ExhaustBehavior
+    {
+        Tap,
+        Discard,
+        Dispose
     }
 }

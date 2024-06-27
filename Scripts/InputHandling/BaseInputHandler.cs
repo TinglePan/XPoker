@@ -34,6 +34,11 @@ public class BaseInputHandler: IHandleInput
         }
     }
 
+    public void Exit()
+    {
+        GameMgr.InputMgr.QuitCurrentInputHandler();
+    }
+
     public virtual void OnEnter()
     {
         

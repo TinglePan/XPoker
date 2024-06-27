@@ -55,7 +55,8 @@ public class StraightRule: BaseHandEvaluateRule
         {
             if (currPick.Count == CardCount)
             {
-                picks.Add(new List<BaseCard>(currPick));
+                var pick = new List<BaseCard>(currPick);
+                picks.Add(pick);
                 return;
             }
             var currRank = Range[currentRankIndexInRange];

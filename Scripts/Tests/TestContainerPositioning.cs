@@ -6,6 +6,7 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
+using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.Tests;
@@ -38,9 +39,8 @@ public partial class TestContainerPositioning: Node
 
     public void SpawnCardNodeAndAppend()
     {
-        var card = new PokerCard(new BaseCardDef()
+        var card = new PokerCard(new PokerCardDef
         {
-            BasePrice = 0,
             Rank = Enums.CardRank.Ace,
             Suit = Enums.CardSuit.Clubs
         });

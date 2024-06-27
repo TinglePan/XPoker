@@ -1,9 +1,6 @@
 ﻿using System.Collections.Specialized;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.AbilityCards;
-using XCardGame.Scripts.Cards.SkillCards;
-using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
 using XCardGame.Scripts.Nodes;
 using CardNode = XCardGame.Scripts.Nodes.CardNode;
@@ -12,37 +9,37 @@ namespace XCardGame.Scripts.InputHandling;
 
 public class BattleMainInputHandler: BaseInputHandler
 {
+    public Battle Battle;
     public BaseButton ProceedButton;
     public CardContainer FieldCardContainer;
     
-    public BattleMainInputHandler(GameMgr gameMgr, Battle battle) : base(gameMgr)
+    public BattleMainInputHandler(GameMgr gameMgr) : base(gameMgr)
     {
-        FieldCardContainer = battle.FieldCardContainer;
-        ProceedButton = GameMgr.CurrentBattle.ProceedButton;
     }
     
     public override void OnEnter()
     {
         base.OnEnter();
-        ProceedButton.Pressed += GameMgr.CurrentBattle.Proceed;
-        // ProceedButton.Pressed += AddSkillCard;
+        Battle = GameMgr.CurrentBattle;
+        ProceedButton = GameMgr.CurrentBattle.BigButton;
+        
+        ProceedButton.Pressed += Battle.Proceed;
+        if (ProceedButton is Button button)
+        {
+            button.Text = "Proceed...";
+        }
+        
         FieldCardContainer.ContentNodes.CollectionChanged += OnFieldCardNodesCollectionChanged;
         foreach (var cardNode in FieldCardContainer.ContentNodes)
         {
             cardNode.OnPressed += OnCardNodePressed;
         }
     }
-
-    // protected void AddSkillCard()
-    // {
-    //     var playerSkillCardContainer = GameMgr.CurrentBattle.Player.SkillCardContainer;
-    //     playerSkillCardContainer.Contents.Add(new DualWieldSkillCard(Enums.CardSuit.Spades, Enums.CardRank.Two, GameMgr.CurrentBattle.Player));
-    // }
     
     public override void OnExit()
     {
         base.OnExit();
-        ProceedButton.Pressed -= GameMgr.CurrentBattle.Proceed;
+        ProceedButton.Pressed -= Battle.Proceed;
         FieldCardContainer.ContentNodes.CollectionChanged -= OnFieldCardNodesCollectionChanged;
         foreach (var cardNode in FieldCardContainer.ContentNodes)
         {
@@ -50,12 +47,12 @@ public class BattleMainInputHandler: BaseInputHandler
         }
     }
     
-    protected void OnCardNodePressed(CardNode node)
+    protected void OnCardNodePressed(BaseContentNode<BaseCard> node)
     {
-        GD.Print($"ClickCard {node.Content.Value}");
-        if (node.Content.Value is IInteractCard interactCard && interactCard.CanInteract())
+        var cardNode = (CardNode)node;
+        if (node.Content.Value is IInteractCard interactCard && interactCard.CanInteract(cardNode))
         {
-            interactCard.Interact();
+            interactCard.Interact(cardNode);
         }
     }
     

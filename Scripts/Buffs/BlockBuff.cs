@@ -11,8 +11,8 @@ public class BlockBuff: BaseBuff
     {
     }
 
-    public override string GetDescription()
+    public override string Description()
     {
-        return string.Format(Description, Stack.Value);
+        return string.Format(DescriptionTemplate, Stack.Value);
     }
 }

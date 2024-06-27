@@ -4,6 +4,7 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
+using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Nodes;
 
 namespace XCardGame.Scripts.Tests;
@@ -14,9 +15,8 @@ public partial class TestFlipCard: Node
     public override void _Ready()
     {
         base._Ready();
-        var card = new PokerCard(new BaseCardDef()
+        var card = new PokerCard(new PokerCardDef
         {
-            BasePrice = 0,
             Rank = Enums.CardRank.Ace,
             Suit = Enums.CardSuit.Clubs
         });

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.GameLogic;
@@ -10,6 +12,44 @@ namespace XCardGame.Scripts.Common;
 
 public static class Utils
 {
+    public static string _(string text)
+    {
+        return text;
+    }
+    
+    public static string GetPersonalPronoun(BattleEntity who, BattleEntity self, BattleEntity target, bool capitalize = false)
+    {
+        string res = who.Def.Name;
+        if (who == self) res = _("user");
+        if (who == target) res = _("target");
+        if (capitalize) res = res.Capitalize();
+        return res;
+    }
+
+    public static Vector2 AddUpSeparatedMultipliers(List<float> multipliers)
+    {
+        float positiveMultiplier = 1;
+        float negativeMultiplier = 1;
+        foreach (var multiplier in multipliers)
+        {
+            if (multiplier > 1)
+            {
+                positiveMultiplier += multiplier - 1;
+            }
+            else
+            {
+                negativeMultiplier *= multiplier;
+            }
+        }
+        return new Vector2(positiveMultiplier, negativeMultiplier);
+    }
+
+    public static async Task Wait(Node node, float time)
+    {
+        Debug.Assert(GodotObject.IsInstanceValid(node));
+        var timer = node.GetTree().CreateTimer(time);
+        await node.ToSignal(timer, Timer.SignalName.Timeout);
+    }
     
     public static Node InstantiatePrefab(PackedScene prefab, Node parent)
     {
@@ -107,25 +147,54 @@ public static class Utils
         return thresholds.Count - 1;
     }
 
+    public static int RandOnOdds(List<int> odds, Random rand)
+    {
+        return RandOnThresholds(Odds2Thresholds(odds), rand);
+    }
+
+    public static List<int> Odds2Thresholds(List<int> odds)
+    {
+        var res = new List<int>();
+        var sum = 0;
+        foreach (var odd in odds)
+        {
+            sum += odd;
+            res.Add(sum);
+        }
+        return res;
+    }
+
     public static string PrettyPrintCardSuit(Enums.CardSuit suit)
     {
         switch (suit)
         {
             case Enums.CardSuit.Clubs:
-                return "♣";
+                return _("♣");
             case Enums.CardSuit.Diamonds:
-                return "♦";
+                return _("♦");
             case Enums.CardSuit.Hearts:
-                return "♥";
+                return _("♥");
             case Enums.CardSuit.Spades:
-                return "♠";
+                return _("♠");
         }
         return "";
     }
 
     public static string GetPercentageString(float value)
     {
-        return $"{Mathf.RoundToInt(value * 100)}%";
+        return _($"{Mathf.RoundToInt(value * 100)}%");
+    }
+
+    public static Enums.CardColor GetCardSuitColor(Enums.CardSuit suit)
+    {
+        return suit switch
+        {
+            Enums.CardSuit.Spades => Enums.CardColor.Black,
+            Enums.CardSuit.Clubs => Enums.CardColor.Black,
+            Enums.CardSuit.Hearts => Enums.CardColor.Red,
+            Enums.CardSuit.Diamonds => Enums.CardColor.Red,
+            _ => Enums.CardColor.None
+        };
     }
 
     public static int GetCardRankValue(Enums.CardRank rank)
@@ -182,7 +251,7 @@ public static class Utils
     {
         switch (value)
         {
-            case 1:
+            case <= 1:
                 return Enums.CardRank.Ace;
             case 2:
                 return Enums.CardRank.Two;
@@ -206,10 +275,9 @@ public static class Utils
                 return Enums.CardRank.Jack;
             case 12:
                 return Enums.CardRank.Queen;
-            case 13:
+            default:
                 return Enums.CardRank.King;
         }
-        return Enums.CardRank.None;
     }
 
     public static Texture2D GetCardSuitTexture(Enums.CardSuit suit)

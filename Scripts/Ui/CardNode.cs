@@ -6,10 +6,9 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Ui;
+using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Nodes;
+namespace XCardGame.Scripts.Ui;
 
 public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 {
@@ -35,6 +34,8 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
     public ObservableProperty<bool> IsRevealed;
     public ObservableProperty<bool> IsTapped;
     public ObservableProperty<bool> IsBought;
+    
+    protected Vector2 InitPosition;
 
 	public override void _Ready()
 	{
@@ -59,6 +60,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		IsTapped = new ObservableProperty<bool>(nameof(IsTapped), this, false);
 		IsTapped.DetailedValueChanged += OnToggleIsTapped;
 		Container.DetailedValueChanged += OnContainerChanged;
+		InitPosition = Position;
 	}
 
 	public override void Setup(Dictionary<string, object> args)
@@ -142,10 +144,16 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
 	}
 
-	public void AnimateSelectWithOrder(int order)
+	public async Task AnimateSelectWithOrder(int order)
 	{
-		IsSelected = true;
-		// TODO: animate move up, and show number which stands for order.
+		if (!IsSelected)
+		{
+			var newTween = CreateTween();
+			var offset = Configuration.SelectedCardOffset;
+			newTween.TweenProperty(this, "position", Position + offset, Configuration.SelectTweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+			await ToSignal(newTween, Tween.SignalName.Finished);
+			IsSelected = true;
+		}
 	}
 
 	public void OnFlipAnimationToggleCardFace()
@@ -157,8 +165,8 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 	{
 		if (IsTapped.Value == to) return;
 		var newTween = CreateTween();
-		newTween.TweenProperty(this, "rotation_degrees", to ? 90f : 0, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
-		TweenControl.AddTween("tap", newTween, tweenTime);
+		var offset = Configuration.SelectedCardOffset;
+		newTween.TweenProperty(this, "position", to ? InitPosition + offset : InitPosition, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
 		await ToSignal(newTween, Tween.SignalName.Finished);
 		IsTapped.Value = to;
 	}
@@ -243,6 +251,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		MainIcon.ResetIconPath(card.IconPath);
 		StartCard();
 	}
+	
 
 	protected override void OnContentDetached(BaseCard card)
 	{

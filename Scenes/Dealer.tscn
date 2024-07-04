@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://4gturyb6lq6"]
 
-[ext_resource type="Script" path="res://Scripts/GameLogic/Dealer.cs" id="1_wisyj"]
+[ext_resource type="Script" path="res://Scripts/Game/Dealer.cs" id="1_wisyj"]
 [ext_resource type="PackedScene" uid="uid://blf82px0mx4rp" path="res://Scenes/CardPile.tscn" id="2_02rlv"]
 
 [node name="Dealer" type="Node2D"]

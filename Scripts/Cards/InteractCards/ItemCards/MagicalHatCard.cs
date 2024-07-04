@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Godot;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
+﻿using System.Collections.Generic;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
 using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Nodes;
-using CardNode = XCardGame.Scripts.Nodes.CardNode;
+using XCardGame.Scripts.Ui;
+using CardNode = XCardGame.Scripts.Ui.CardNode;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
 public class MagicalHatCard: BaseUseCard
 {

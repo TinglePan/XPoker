@@ -3,7 +3,8 @@ using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Nodes;
+
+using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.Tests;
 
@@ -22,7 +23,8 @@ public partial class TestMouseEventInSubViewport : Control
 		{
 			{ "card", card },
 			{ "faceDirection", Enums.CardFace.Up },
-			{ "container", null }
+			{ "container", null },
+			{ "hasPhysics", true }
 		});
 		GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");
 	}

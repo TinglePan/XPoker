@@ -1,16 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Godot;
-using XCardGame.Scripts.Buffs;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Effects;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.HandEvaluate;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Game;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
 public class TurnTheTablesCard: BaseUseCard
 {
@@ -42,11 +35,17 @@ public class TurnTheTablesCard: BaseUseCard
         foreach (var cardNode in playerHoleCardNodes)
         {
             PlayerHoleCardContainer.ContentNodes.Remove(cardNode);
-            EnemyHoleCardContainer.ContentNodes.Add(cardNode);
         }
         foreach (var cardNode in enemyHoleCardNodes)
         {
             EnemyHoleCardContainer.ContentNodes.Remove(cardNode);
+        }
+        foreach (var cardNode in playerHoleCardNodes)
+        {
+            EnemyHoleCardContainer.ContentNodes.Add(cardNode);
+        }
+        foreach (var cardNode in enemyHoleCardNodes)
+        {
             PlayerHoleCardContainer.ContentNodes.Add(cardNode);
         }
     }

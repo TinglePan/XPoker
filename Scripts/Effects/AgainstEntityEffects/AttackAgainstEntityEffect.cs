@@ -1,17 +1,15 @@
 ﻿using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.HandEvaluate;
+using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Effects.SkillEffects;
+namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
 
 public class AttackAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEffect
 {
     public int RawValue { get; }
     public float PowerScale { get; }
     
-    public AttackAgainstEntityEffect(BaseCard originateCard, int rawValue, float powerScale) : 
-        base("Damage", $"Deal {rawValue} base damage to {{}}, plus {{}} * power", originateCard)
+    public AttackAgainstEntityEffect(BaseCard originateCard, BattleEntity src, BattleEntity dst, int rawValue, float powerScale) : 
+        base("Damage", $"Deal {rawValue} base damage, plus {{}} * power", src, dst, originateCard)
     {
         RawValue = rawValue;
         PowerScale = powerScale;
@@ -23,13 +21,18 @@ public class AttackAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
         int power = 0;
         if (PowerScale > 0)
         {
-            power = Self.GetPower(Engage.Hands[Self].Tier);
+            power = Src.GetPower(Engage.Hands[Src].Tier);
             rawAttackValue = CalculateValue(power);
         }
-        var attack = new Attack(Battle, Self, Opponent, power, rawAttackValue);
+        var attack = new Attack(Battle, Src, Dst, power, rawAttackValue);
         attack.Resolve();
     }
-    
+
+    public override string Description()
+    {
+        return string.Format(DescriptionTemplate, PowerScale);
+    }
+
     public int CalculateValue(int power)
     {
         return RawValue + (int)(power * PowerScale);

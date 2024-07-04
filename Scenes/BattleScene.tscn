@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://nko5a5mn6ufg"]
 
-[ext_resource type="Script" path="res://Scripts/Nodes/BattleScene.cs" id="1_54v76"]
+[ext_resource type="Script" path="res://Scripts/Ui/BattleScene.cs" id="1_54v76"]
 [ext_resource type="PackedScene" uid="uid://cmlbufighcu1t" path="res://Scenes/Battle.tscn" id="2_b2wp5"]
 [ext_resource type="PackedScene" uid="uid://cu8cytigbn45" path="res://Scenes/DialogueBox.tscn" id="2_drmk1"]
 [ext_resource type="Theme" uid="uid://dwpbfhy3isgh5" path="res://Resources/button_theme.tres" id="4_lascm"]

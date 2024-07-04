@@ -1,12 +1,9 @@
 ﻿using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
 
 public class BigShieldCard: BaseUseCard
 {

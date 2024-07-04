@@ -7,7 +7,9 @@ using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Nodes;
+
+using CardContainer = XCardGame.Scripts.Ui.CardContainer;
+using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.Tests;
 
@@ -50,7 +52,8 @@ public partial class TestContainerPositioning: Node
         {
             { "card", card },
             { "faceDirection", Enums.CardFace.Up },
-            { "container", null }
+            { "container", null },
+            { "hasPhysics", true }
         }); 
         CardContainer.ContentNodes.Add(cardNode);
         GD.Print("done");

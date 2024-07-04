@@ -9,10 +9,11 @@ using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
+using XCardGame.Scripts.Defs.Tables;
 using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 
 public partial class Shop: Control, ISetup

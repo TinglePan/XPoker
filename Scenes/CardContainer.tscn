@@ -1,18 +1,25 @@
-[gd_scene load_steps=5 format=3 uid="uid://bmkxps5u10t7k"]
+[gd_scene load_steps=4 format=3 uid="uid://bmkxps5u10t7k"]
 
-[ext_resource type="Script" path="res://Scripts/Nodes/CardContainer.cs" id="1_7d008"]
-[ext_resource type="StyleBox" uid="uid://x5rshmqmi8pu" path="res://Resources/CardContainerStyleBox.tres" id="2_rygq5"]
+[ext_resource type="Script" path="res://Scripts/Ui/CardContainer.cs" id="1_7d008"]
 [ext_resource type="Texture2D" uid="uid://cqdm4vfd3iafs" path="res://Sprites/box.png" id="2_yuu2b"]
 [ext_resource type="LabelSettings" uid="uid://8qnntxqwa647" path="res://Resources/11pxLabelSetting.tres" id="4_snc7q"]
 
 [node name="Cards" type="Node2D" groups=["cardContainer"]]
 script = ExtResource("1_7d008")
-StyleBox = ExtResource("2_rygq5")
 
 [node name="Border" type="NinePatchRect" parent="."]
 texture_filter = 1
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("2_yuu2b")
 region_rect = Rect2(0, 0, 32, 32)
 patch_margin_left = 3
@@ -22,8 +29,17 @@ patch_margin_bottom = 3
 
 [node name="Name" type="Label" parent="."]
 texture_filter = 1
-offset_right = 25.0
-offset_bottom = 12.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -12.5
+offset_top = -6.0
+offset_right = 12.5
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "name"
 label_settings = ExtResource("4_snc7q")
 vertical_alignment = 2

@@ -8,16 +8,16 @@ using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Nodes;
+namespace XCardGame.Scripts.Ui;
 
 public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 {
 	public PackedScene CardPrefab;
 	public Battle Battle;
 
-	public Enums.CardFace DefaultCardFaceDirection;
+	public Enums.CardFace DefaultCardFaceDirection; 
 	public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
 
 	public bool AllowInteract;
@@ -111,7 +111,8 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 				{
 					{ "card", card },
 					{ "container", this },
-					{ "faceDirection", faceDirection }
+					{ "faceDirection", faceDirection },
+					{ "hasPhysics", true }
 				});
 				card.Setup(new Dictionary<string, object>()
 				{

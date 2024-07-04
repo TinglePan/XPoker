@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Godot;
-using XCardGame.Scripts.GameLogic;
+﻿using Godot;
+using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Nodes;
+namespace XCardGame.Scripts.Ui;
 
 public partial class BattleScene: Node
 {

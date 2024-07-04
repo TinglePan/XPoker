@@ -1,0 +1,91 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Threading.Tasks;
+using Godot;
+using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.InputHandling;
+using XCardGame.Scripts.Ui;
+
+namespace XCardGame.Scripts.Game;
+
+public partial class BattleLog: DialogueBox
+{
+    public class BattleLogInputHandler: BaseInputHandler
+    {
+        public BattleLog BattleLog;
+        
+        public BattleLogInputHandler(GameMgr gameMgr, BattleLog battleLog) : base(gameMgr)
+        {
+            BattleLog = battleLog;
+        }
+
+        protected override void OnLeftMouseButtonPressed(Vector2 position)
+        {
+            base.OnLeftMouseButtonPressed(position);
+            BattleLog.Proceed();
+        }
+    }
+    
+    public GameMgr GameMgr;
+    
+    public Action OnLogProceed;
+    public Action OnLogFinished;
+    public TaskCompletionSource LogFinished;
+
+    public ObservableCollection<string> HistoryLogEntries;
+    public List<string> LogEntriesToDisplay;
+
+    protected BattleLogInputHandler InputHandler;
+    protected bool SuppressNotification;
+
+    public override void _Ready()
+    {
+        base._Ready();
+        GameMgr = GetNode<GameMgr>("/root/GameMgr");
+        HistoryLogEntries = new ObservableCollection<string>();
+        HistoryLogEntries.CollectionChanged += OnHistoryLogsChanged;
+        LogEntriesToDisplay = new List<string>();
+        SuppressNotification = false;
+        InputHandler = new BattleLogInputHandler(GameMgr, this);
+        LogFinished = new TaskCompletionSource();
+    }
+    
+    public void Log(List<string> logEntries)
+    {
+        LogEntriesToDisplay.Clear();
+        LogEntriesToDisplay.AddRange(logEntries);
+        GameMgr.InputMgr.SwitchToInputHandler(InputHandler);
+    }
+
+    public void Proceed()
+    {
+        if (LogEntriesToDisplay.Count > 0)
+        {
+            if (HistoryLogEntries.Count >= Configuration.MaxLogEntriesCount)
+            {
+                HistoryLogEntries.RemoveAt(0);
+            }
+            HistoryLogEntries.Add(LogEntriesToDisplay[0]);
+            OnLogProceed?.Invoke();
+        }
+        else
+        {
+            GameMgr.InputMgr.QuitCurrentInputHandler();
+            LogFinished.SetResult();
+            OnLogFinished?.Invoke();
+        }
+    }
+    
+    public async Task LogAndAwait(List<string> logEntries)
+    {
+        Log(logEntries);
+        await LogFinished.Task;
+    }
+    
+    protected void OnHistoryLogsChanged(object sender, NotifyCollectionChangedEventArgs args)
+    {
+        Content.Value = string.Join("\n", HistoryLogEntries);
+    }
+}

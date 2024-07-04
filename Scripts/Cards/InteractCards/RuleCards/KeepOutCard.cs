@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Effects;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Effects.FieldEffects;
+using XCardGame.Scripts.Game;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 
 public class KeepOutCard: BaseTapCard
@@ -124,7 +122,7 @@ public class KeepOutCard: BaseTapCard
             Battle.Player.HoleCardContainer,
             Battle.Enemy.HoleCardContainer
         };
-        Effect = new KeepOutEffect(Def.Name, GetDescription(), this);
+        Effect = new KeepOutEffect(Def.Name, Description(), this);
         Effect.Setup(args);
     }
 

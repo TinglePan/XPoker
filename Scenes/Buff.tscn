@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cfh3qchowgcu0"]
 
-[ext_resource type="Script" path="res://Scripts/Nodes/BuffNode.cs" id="1_qlfvg"]
+[ext_resource type="Script" path="res://Scripts/Ui/BuffNode.cs" id="1_qlfvg"]
 [ext_resource type="Texture2D" uid="uid://clsn66xayhv6j" path="res://Sprites/box_thin.png" id="2_cc0sd"]
 [ext_resource type="Texture2D" uid="uid://fmig87mavmir" path="res://Sprites/BuffIcons/up_arrow_8x8.png" id="3_0uwcq"]
 

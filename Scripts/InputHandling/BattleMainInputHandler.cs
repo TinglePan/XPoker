@@ -1,9 +1,12 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
-using CardNode = XCardGame.Scripts.Nodes.CardNode;
+
+
+using Battle = XCardGame.Scripts.Game.Battle;
+using CardContainer = XCardGame.Scripts.Ui.CardContainer;
+using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.InputHandling;
 
@@ -11,7 +14,7 @@ public class BattleMainInputHandler: BaseInputHandler
 {
     public Battle Battle;
     public BaseButton ProceedButton;
-    public CardContainer FieldCardContainer;
+    public List<CardContainer> InteractCardContainers;
     
     public BattleMainInputHandler(GameMgr gameMgr) : base(gameMgr)
     {
@@ -28,11 +31,21 @@ public class BattleMainInputHandler: BaseInputHandler
         {
             button.Text = "Proceed...";
         }
-        
-        FieldCardContainer.ContentNodes.CollectionChanged += OnFieldCardNodesCollectionChanged;
-        foreach (var cardNode in FieldCardContainer.ContentNodes)
+
+        InteractCardContainers = new List<CardContainer>()
         {
-            cardNode.OnPressed += OnCardNodePressed;
+            Battle.EquipmentCardContainer,
+            Battle.ItemCardContainer,
+            Battle.RuleCardContainer
+        };
+
+        foreach (var cardContainer in InteractCardContainers)
+        {
+            cardContainer.ContentNodes.CollectionChanged += OnInteractCardNodesCollectionChanged;
+            foreach (var cardNode in cardContainer.ContentNodes)
+            {
+                cardNode.OnPressed += OnCardNodePressed;
+            }
         }
     }
     
@@ -40,14 +53,17 @@ public class BattleMainInputHandler: BaseInputHandler
     {
         base.OnExit();
         ProceedButton.Pressed -= Battle.Proceed;
-        FieldCardContainer.ContentNodes.CollectionChanged -= OnFieldCardNodesCollectionChanged;
-        foreach (var cardNode in FieldCardContainer.ContentNodes)
+        foreach (var cardContainer in InteractCardContainers)
         {
-            cardNode.OnPressed -= OnCardNodePressed;
+            cardContainer.ContentNodes.CollectionChanged -= OnInteractCardNodesCollectionChanged;
+            foreach (var cardNode in cardContainer.ContentNodes)
+            {
+                cardNode.OnPressed -= OnCardNodePressed;
+            }
         }
     }
     
-    protected void OnCardNodePressed(BaseContentNode<BaseCard> node)
+    protected void OnCardNodePressed(Ui.BaseContentNode<BaseCard> node)
     {
         var cardNode = (CardNode)node;
         if (node.Content.Value is IInteractCard interactCard && interactCard.CanInteract(cardNode))
@@ -56,7 +72,7 @@ public class BattleMainInputHandler: BaseInputHandler
         }
     }
     
-    protected void OnFieldCardNodesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+    protected void OnInteractCardNodesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
     {
         switch (args.Action)
         {
@@ -79,15 +95,6 @@ public class BattleMainInputHandler: BaseInputHandler
                             cardNode.OnPressed -= OnCardNodePressed;
                         }
                     }
-                break;
-            case NotifyCollectionChangedAction.Reset:
-                foreach (var node in FieldCardContainer.GetChildren())
-                {
-                    if (node is CardNode card)
-                    {
-                        card.OnPressed -= OnCardNodePressed;
-                    }
-                }
                 break;
         }
     }

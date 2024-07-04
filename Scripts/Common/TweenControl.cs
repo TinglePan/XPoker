@@ -34,6 +34,7 @@ public class TweenControl
             Callback = new ObservableProperty<Action>(nameof(Callback), this, callback);
             Callback.DetailedValueChanged += CallbackChanged;
             Tween.FireValueChangeEventsOnInit();
+            Complete = new TaskCompletionSource();
             // Callback.FireValueChangeEventsOnInit();
         }
 
@@ -55,16 +56,16 @@ public class TweenControl
                 if (Callback.Value != null)
                 {
                     valueChangedEventDetailedArgs.OldValue.Finished -= Callback.Value;
-                    valueChangedEventDetailedArgs.NewValue.Finished -= MarkComplete;
                 }
+                valueChangedEventDetailedArgs.OldValue.Finished -= MarkComplete;
             }
             if (valueChangedEventDetailedArgs.NewValue != null)
             {
                 if (Callback.Value != null)
                 {
                     valueChangedEventDetailedArgs.NewValue.Finished += Callback.Value;
-                    valueChangedEventDetailedArgs.NewValue.Finished += MarkComplete;
                 }
+                valueChangedEventDetailedArgs.NewValue.Finished += MarkComplete;
             }
         }
 

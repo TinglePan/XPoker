@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
+﻿using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 public class SocialismCard: BaseTapCard
 {

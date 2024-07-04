@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Defs.Def.Deck;
-using XCardGame.Scripts.GameLogic;
 
-namespace XCardGame.Scripts.Defs.Def;
+namespace XCardGame.Scripts.Defs.Def.BattleEntity;
 
 public class BattleEntityDef
 {

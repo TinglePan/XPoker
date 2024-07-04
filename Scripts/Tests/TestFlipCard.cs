@@ -5,7 +5,8 @@ using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Nodes;
+
+using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.Tests;
 
@@ -24,7 +25,8 @@ public partial class TestFlipCard: Node
         {
             { "card", card },
             { "faceDirection", Enums.CardFace.Up },
-            { "container", null }
+            { "container", null },
+            { "hasPhysics", true }
         });
         CardNode.AnimateFlip(Enums.CardFace.Down);
         GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");

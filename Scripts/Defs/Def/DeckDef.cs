@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using XCardGame.Scripts.Defs.Def.Card;
 
-namespace XCardGame.Scripts.Defs.Def.Deck;
+namespace XCardGame.Scripts.Defs.Def;
 
 public class DeckDef
 {

@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using XCardGame.Scripts.Buffs;
+﻿using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
 
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 public class Attack
 {

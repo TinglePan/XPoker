@@ -1,26 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-// using Godot.Collections;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.AbilityCards;
+using XCardGame.Scripts.Cards.InteractCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.HandEvaluate;
-using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Nodes;
 using XCardGame.Scripts.Ui;
+// using Godot.Collections;
 
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 public partial class Battle: Node2D, ISetup
 {
@@ -39,14 +35,9 @@ public partial class Battle: Node2D, ISetup
     public CardContainer EquipmentCardContainer;
     public CardContainer ItemCardContainer;
     public CardContainer RuleCardContainer;
-    public CardContainer ResolveCardContainer;
-    public CardContainer KickerCardContainer;
     public PlayerBattleEntity Player;
     public BattleEntity Enemy;
     public BattleEntity[] Entities;
-    public RoleMarker PlayerRoleMarker;
-    public RoleMarker EnemyRoleMarker;
-    public System.Collections.Generic.Dictionary<BattleEntity, RoleMarker> RoleMarkers;
 
     public BaseButton BigButton;
     public PackedScene GameOverScene;
@@ -70,8 +61,6 @@ public partial class Battle: Node2D, ISetup
 
     public ObservableCollection<BaseCard> CommunityCards;
     public ObservableCollection<BaseCard> RuleCards;
-    public ObservableCollection<BaseCard> ResolveCards;
-    public ObservableCollection<BaseCard> KickerCards;
     
     public CompletedHandEvaluator HandEvaluator;
     
@@ -81,7 +70,7 @@ public partial class Battle: Node2D, ISetup
     public int RequiredHoleCardCountMax;
     
     public int RoundCount;
-    public System.Collections.Generic.Dictionary<BattleEntity, CompletedHand> RoundHands;
+    public Dictionary<BattleEntity, CompletedHand> RoundHands;
     public Engage RoundEngage;
 
     public ObservableCollection<Enums.HandTier> HandTierOrderAscend;
@@ -99,8 +88,6 @@ public partial class Battle: Node2D, ISetup
         EquipmentCardContainer = GetNode<CardContainer>("EquipmentCards");
         ItemCardContainer = GetNode<CardContainer>("ItemCards");
         RuleCardContainer = GetNode<CardContainer>("RuleCards");
-        ResolveCardContainer = GetNode<CardContainer>("ResolveCards");
-        KickerCardContainer = GetNode<CardContainer>("KickerCards");
         
         Player = GetNode<PlayerBattleEntity>("Player");
         Enemy = GetNode<BattleEntity>("Enemy");
@@ -109,24 +96,15 @@ public partial class Battle: Node2D, ISetup
         SelectRewardCardScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/SelectRewardCard.tscn");
         Entities = new [] { Player, Enemy };
         HasSetup = false;
-        PlayerRoleMarker = GetNode<RoleMarker>("PlayerRoleMarker");
-        EnemyRoleMarker = GetNode<RoleMarker>("EnemyRoleMarker");
-        RoleMarkers = new Dictionary<BattleEntity, RoleMarker>
-        {
-            { Player, PlayerRoleMarker },
-            { Enemy, EnemyRoleMarker }
-        };
         
         RoundHands = new Dictionary<BattleEntity, CompletedHand>();
         CommunityCards = new ObservableCollection<BaseCard>();
         RuleCards = new ObservableCollection<BaseCard>();
-        ResolveCards = new ObservableCollection<BaseCard>();
-        KickerCards = new ObservableCollection<BaseCard>();
         HandTierOrderAscend = new ObservableCollection<Enums.HandTier>();
         Effects = new List<BaseEffect>();
     }
 
-    public virtual void Setup(System.Collections.Generic.Dictionary<string, object> args)
+    public virtual void Setup(Dictionary<string, object> args)
     {
         DealCommunityCardCount = (int)args["dealCommunityCardCount"];
         FaceDownCommunityCardCount = (int)args["faceDownCommunityCardCount"];
@@ -135,60 +113,8 @@ public partial class Battle: Node2D, ISetup
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, 
             RequiredHoleCardCountMin, RequiredHoleCardCountMax);
 
-        var containerSetupArgs = new System.Collections.Generic.Dictionary<string, object>()
-        {
-            { "allowInteract", false },
-            { "contentNodeSize", Configuration.CardSize },
-            { "separation", Configuration.CardContainerSeparation },
-            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-            { "nodesPerRow", 0 },
-            { "hasBorder", true },
-            { "expectedContentNodeCount", 1 },
-            { "hasName", true },
-            { "containerName", "Community cards" },
-            { "margins", Configuration.DefaultContentContainerMargins },
-            { "withCardEffect", true }
-        };
 
-        containerSetupArgs["cards"] = CommunityCards;
-        containerSetupArgs["containerName"] = "Community cards";
-        containerSetupArgs["expectedContentNodeCount"] = Configuration.CommunityCardCount;
-        containerSetupArgs["getCardFaceDirectionFunc"] = (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc;
-        CommunityCardContainer.Setup(containerSetupArgs);
-        
-        containerSetupArgs["defaultCardFaceDirection"] = Enums.CardFace.Up;
-        
-        containerSetupArgs["cards"] = ResolveCards;
-        containerSetupArgs["containerName"] = "Resolve region";
-        containerSetupArgs["expectedContentNodeCount"] = Configuration.CompletedHandCardCount;
-        RuleCardContainer.Setup(containerSetupArgs);
-
-        containerSetupArgs["cards"] = KickerCards;
-        containerSetupArgs["containerName"] = "Kickers";
-        containerSetupArgs["expectedContentNodeCount"] = 0;
-        RuleCardContainer.Setup(containerSetupArgs);
-        
-        containerSetupArgs["allowInteract"] = true;
-        
-        containerSetupArgs["cards"] = Player.Equipments;
-        containerSetupArgs["expectedInteractCardType"] = Enums.InteractCardType.Equipment;
-        containerSetupArgs["containerName"] = "Equipments";
-        containerSetupArgs["expectedContentNodeCount"] = 0;
-        EquipmentCardContainer.Setup(containerSetupArgs);
-        
-        containerSetupArgs["cards"] = Player.Items;
-        containerSetupArgs["expectedInteractCardType"] = Enums.InteractCardType.Item;
-        containerSetupArgs["containerName"] = "Items";
-        containerSetupArgs["expectedContentNodeCount"] = Player.ItemPocketSize;
-        ItemCardContainer.Setup(containerSetupArgs);
-
-        containerSetupArgs["cards"] = RuleCards;
-        containerSetupArgs["expectedInteractCardType"] = Enums.InteractCardType.Rule;
-        containerSetupArgs["containerName"] = "Rules";
-        containerSetupArgs["expectedContentNodeCount"] = 0;
-        RuleCardContainer.Setup(containerSetupArgs);
-        
-        var entitiesSetupArgs = (List<System.Collections.Generic.Dictionary<string, object>>)args["entities"];
+        var entitiesSetupArgs = (List<Dictionary<string, object>>)args["entities"];
         for (int i = 0; i < Entities.Length; i++)
         {
             var entity = Entities[i];
@@ -196,7 +122,49 @@ public partial class Battle: Node2D, ISetup
             entity.OnDefeated += OnEntityDefeated;
         }
         
-        Dealer.Setup(new System.Collections.Generic.Dictionary<string, object>()
+        var containerSetupArgs = new Dictionary<string, object>()
+        {
+            { "allowInteract", false },
+            { "contentNodeSize", Configuration.CardSize },
+            { "separation", Configuration.CardContainerSeparation },
+            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
+            { "nodesPerRow", 0 },
+            { "hasBorder", false },
+            { "hasName", true },
+            { "containerName", "Community cards" },
+            { "margins", Configuration.DefaultContentContainerMargins },
+            { "withCardEffect", true }
+        };
+        
+        containerSetupArgs["cards"] = CommunityCards;
+        containerSetupArgs["containerName"] = "Community cards";
+        containerSetupArgs["expectedContentNodeCount"] = Configuration.CommunityCardCount;
+        containerSetupArgs["getCardFaceDirectionFunc"] = (Func<int, Enums.CardFace>)GetCommunityCardFaceDirectionFunc;
+        CommunityCardContainer.Setup(containerSetupArgs);
+        
+        containerSetupArgs["defaultCardFaceDirection"] = Enums.CardFace.Up;
+        containerSetupArgs["allowInteract"] = true;
+        
+        containerSetupArgs["cards"] = Player.Equipments;
+        containerSetupArgs["expectedInteractCardType"] = Enums.InteractCardType.Equipment;
+        containerSetupArgs["containerName"] = "Equipments";
+        containerSetupArgs["expectedContentNodeCount"] = 1;
+        EquipmentCardContainer.Setup(containerSetupArgs);
+        
+        containerSetupArgs["cards"] = Player.Items;
+        containerSetupArgs["expectedInteractCardType"] = Enums.InteractCardType.Item;
+        containerSetupArgs["containerName"] = "Items";
+        containerSetupArgs["expectedContentNodeCount"] = Player.ItemPocketSize.Value;
+        ItemCardContainer.Setup(containerSetupArgs);
+
+        containerSetupArgs["cards"] = RuleCards;
+        containerSetupArgs["expectedInteractCardType"] = Enums.InteractCardType.Rule;
+        containerSetupArgs["containerName"] = "Rules";
+        containerSetupArgs["expectedContentNodeCount"] = 1;
+        RuleCardContainer.Setup(containerSetupArgs);
+        
+        
+        Dealer.Setup(new Dictionary<string, object>()
         {
             { "sourceDecks" , Entities.Select(e => e.Deck).ToList() },
             { "excludedCards" , null }
@@ -265,7 +233,7 @@ public partial class Battle: Node2D, ISetup
                         await Dealer.AnimateShuffle();
                         var selectRewardCard = GameMgr.OverlayScene(SelectRewardCardScene) as SelectRewardCard;
                         selectRewardCard.OnQuit += AfterSelectRewardCard;
-                        selectRewardCard.Setup(new System.Collections.Generic.Dictionary<string, object>()
+                        selectRewardCard.Setup(new Dictionary<string, object>()
                         {
                             { "rewardCardCount", Configuration.DefaultRewardCardCount },
                             { "rewardCardDefType", typeof(InteractCardDef) },
@@ -323,8 +291,6 @@ public partial class Battle: Node2D, ISetup
             tasks.Add(DiscardCards(entity.HoleCardContainer.ContentNodes.ToList()));
         }
         tasks.Add(DiscardCards(CommunityCardContainer.ContentNodes.ToList()));
-        tasks.Add(DiscardCards(ResolveCardContainer.ContentNodes.ToList()));
-        tasks.Add(DiscardCards(KickerCardContainer.ContentNodes.ToList()));
         RoundCount++;
         OnRoundStart?.Invoke(this);
         RoundHands.Clear();
@@ -384,11 +350,11 @@ public partial class Battle: Node2D, ISetup
         
         // var startTime = Time.GetTicksUsec();
 
-        var validCommunityCards = GetValidCards(CommunityCards);
+        // var validCommunityCards = GetValidCards(CommunityCards);
         foreach (var entity in Entities)
         {
-            var validHoleCards = GetValidCards(entity.HoleCards);
-            var bestHand = HandEvaluator.EvaluateBestHand(validCommunityCards, validHoleCards);
+            // var validHoleCards = GetValidCards(entity.HoleCards);
+            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.ToList(), entity.HoleCards.ToList());
             RoundHands.Add(entity, bestHand);
         }
 
@@ -497,7 +463,14 @@ public partial class Battle: Node2D, ISetup
 
     protected Enums.CardFace GetCommunityCardFaceDirectionFunc(int i)
     {
-        return i < DealCommunityCardCount - FaceDownCommunityCardCount ? Enums.CardFace.Up : Enums.CardFace.Down;
+        if (CurrentState >= State.BeforeResolve)
+        {
+            return Enums.CardFace.Up;
+        }
+        else
+        {
+            return i < DealCommunityCardCount - FaceDownCommunityCardCount ? Enums.CardFace.Up : Enums.CardFace.Down;
+        }
     }
 
     // protected void OnEntityAbilityCardsChanged(object sender, NotifyCollectionChangedEventArgs args)

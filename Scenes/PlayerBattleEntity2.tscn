@@ -1,9 +1,9 @@
 [gd_scene load_steps=12 format=3 uid="uid://b5ckc3msigv6m"]
 
-[ext_resource type="Script" path="res://Scripts/GameLogic/PlayerBattleEntity.cs" id="1_bow21"]
+[ext_resource type="Script" path="res://Scripts/Game/PlayerBattleEntity.cs" id="1_bow21"]
 [ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="2_3nqyy"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="3_4i2i6"]
-[ext_resource type="PackedScene" uid="uid://2yj0yi24lkar" path="res://Scenes/BuffTabUi.tscn" id="4_v7dil"]
+[ext_resource type="PackedScene" uid="uid://2yj0yi24lkar" path="res://Scenes/BuffContainer.tscn" id="4_v7dil"]
 [ext_resource type="PackedScene" uid="uid://cfh3qchowgcu0" path="res://Scenes/Buff.tscn" id="5_jb356"]
 [ext_resource type="LabelSettings" uid="uid://ch1l3y7aj324" path="res://Resources/11pxLabelSettingOutline.tres" id="7_6c07j"]
 [ext_resource type="LabelSettings" uid="uid://8qnntxqwa647" path="res://Resources/11pxLabelSetting.tres" id="7_o4anw"]
@@ -35,14 +35,9 @@ anti_aliasing = false
 script = ExtResource("1_bow21")
 
 [node name="HoleCards" parent="." groups=["markerCardContainer"] instance=ExtResource("2_3nqyy")]
-position = Vector2(0, -104)
+position = Vector2(0, 76)
 
 [node name="Card" parent="HoleCards" instance=ExtResource("3_4i2i6")]
-
-[node name="SkillCards" parent="." groups=["skillCardContainer"] instance=ExtResource("2_3nqyy")]
-position = Vector2(0, -178)
-
-[node name="Card" parent="SkillCards" instance=ExtResource("3_4i2i6")]
 
 [node name="Buffs" parent="." instance=ExtResource("4_v7dil")]
 position = Vector2(0, -28)
@@ -114,6 +109,27 @@ offset_bottom = 7.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "50"
+label_settings = ExtResource("7_o4anw")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Node2D" type="Node2D" parent="."]
+position = Vector2(0, 128)
+
+[node name="Label" type="Label" parent="Node2D"]
+texture_filter = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -67.5
+offset_top = -11.5
+offset_right = 67.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Defend(Two Pairs)"
 label_settings = ExtResource("7_o4anw")
 horizontal_alignment = 1
 vertical_alignment = 1

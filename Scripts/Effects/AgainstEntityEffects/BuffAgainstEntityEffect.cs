@@ -2,21 +2,17 @@
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.HandEvaluate;
+using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Effects.SkillEffects;
+namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
 
 public class BuffAgainstEntityEffect: BaseAgainstEntityEffect
 {
-
-    public bool TargetSelf;
     public BaseBuff Buff;
     
-    public BuffAgainstEntityEffect(BaseCard originateCard, BaseBuff buff, bool targetSelf = false): base("Buff", "Inflict {} on {}", originateCard)
+    public BuffAgainstEntityEffect(BaseCard originateCard, BaseBuff buff, BattleEntity src, BattleEntity dst):
+        base("Buff", "Inflict {} on {}", src, dst, originateCard)
     {
-        TargetSelf = targetSelf;
         Buff = buff;
     }
 
@@ -29,12 +25,11 @@ public class BuffAgainstEntityEffect: BaseAgainstEntityEffect
 
     public override void Resolve()
     {
-        var target = TargetSelf ? Self : Opponent;
-        Battle.InflictBuffOn(Buff, target, Self, OriginateCard);
+        Battle.InflictBuffOn(Buff, Dst, Src, OriginateCard);
     }
 
     public override string Description()
     {
-        return string.Format(DescriptionTemplate, Buff, Utils.GetPersonalPronoun(Self, Self, Opponent));
+        return string.Format(DescriptionTemplate, Buff, Utils.GetPersonalPronoun(Src, Src, Dst));
     }
 }

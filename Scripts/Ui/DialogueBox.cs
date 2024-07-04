@@ -1,7 +1,7 @@
 ﻿using Godot;
 using XCardGame.Scripts.Common.DataBinding;
 
-namespace XCardGame.Scripts.Nodes;
+namespace XCardGame.Scripts.Ui;
 
 public partial class DialogueBox: Container
 {

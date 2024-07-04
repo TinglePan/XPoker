@@ -6,9 +6,9 @@ using System.Linq;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 public partial class CardPile: Node2D, ISetup
 {
@@ -113,8 +113,6 @@ public partial class CardPile: Node2D, ISetup
                 CheckTopCard();
                 break;
         }
-        
-        
     }
 
     protected void CheckTopCard()
@@ -132,7 +130,8 @@ public partial class CardPile: Node2D, ISetup
                 {
                     { "card", Cards[0] },
                     { "container", null },
-                    { "faceDirection", TopCardFaceDirection }
+                    { "faceDirection", TopCardFaceDirection },
+                    { "hasPhysics", true }
                 });
             }
         }

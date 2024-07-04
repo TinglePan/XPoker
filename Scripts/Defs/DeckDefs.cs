@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Defs.Def;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Defs.Def.Deck;
-using XCardGame.Scripts.GameLogic;
+
 
 namespace XCardGame.Scripts.Defs;
 
@@ -33,6 +33,8 @@ public static class DeckDefs
                 cardDefs.Add(new PokerCardDef()
                 {
                     BasePrice = 0,
+                    DescriptionTemplate = "{} of {}",
+                    ConcreteClassPath = "PokerCard",
                     Rank = (Enums.CardRank)rank,
                     Suit = (Enums.CardSuit)suit,
                 });

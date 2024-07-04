@@ -1,4 +1,4 @@
-﻿namespace XCardGame.Scripts.GameLogic;
+﻿namespace XCardGame.Scripts.Game;
 
 public interface ILifeCycleTriggeredInBattle
 {

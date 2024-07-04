@@ -5,9 +5,9 @@ using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Nodes;
+namespace XCardGame.Scripts.Ui;
 
 public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
 {

@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.AbilityCards;
+using XCardGame.Scripts.Cards.InteractCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 public partial class Dealer: Node2D, ISetup
 {
@@ -35,12 +32,12 @@ public partial class Dealer: Node2D, ISetup
         DiscardCardPile = GetNode<CardPile>("DiscardPile");
         CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
         HasSetup = false;
-        Battle = GameMgr.CurrentBattle;
         SourceDecks = new List<Deck>();
     }
 
     public void Setup(Dictionary<string, object> args)
     {
+        Battle = GameMgr.CurrentBattle;
         SourceDecks = (List<Deck>)args["sourceDecks"];
         DealCardPile.Setup(new Dictionary<string, object>()
         {
@@ -240,7 +237,8 @@ public partial class Dealer: Node2D, ISetup
         {
             { "card", card },
             { "container", null },
-            { "faceDirection", pile.TopCardFaceDirection }
+            { "faceDirection", pile.TopCardFaceDirection },
+            { "hasPhysics", true }
         });
         cardNode.Position = pile.TopCard.Position;
         return cardNode;

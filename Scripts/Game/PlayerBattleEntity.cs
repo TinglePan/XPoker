@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Defs.Def;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Defs.Def.BattleEntity;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 public partial class PlayerBattleEntity: BattleEntity
 {
@@ -22,6 +21,9 @@ public partial class PlayerBattleEntity: BattleEntity
     public static Dictionary<string, object> InitArgs(PlayerBattleEntityDef def)
     {
         var res = BattleEntity.InitArgs(def);
+        res["energy"] = def.InitEnergy;
+        res["maxEnergy"] = def.InitEnergy;
+        res["credit"] = def.InitCredit;
         res["itemPocketSize"] = def.InitItemPocketSize;
         return res;
     }

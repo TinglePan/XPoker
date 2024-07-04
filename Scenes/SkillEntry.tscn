@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bbx3a6juyin75"]
 
 [ext_resource type="LabelSettings" uid="uid://dnk1tgnksbjj0" path="res://Resources/12pxLabelSetting.tres" id="1_7i5a7"]
-[ext_resource type="Script" path="res://Scripts/Nodes/CardEntry.cs" id="1_q8v5k"]
+[ext_resource type="Script" path="res://Scripts/Ui/CardEntry.cs" id="1_q8v5k"]
 [ext_resource type="Texture2D" uid="uid://coqodjd1u0uy2" path="res://Sprites/Suits/diamonds.png" id="3_lbtt5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lpb8c"]

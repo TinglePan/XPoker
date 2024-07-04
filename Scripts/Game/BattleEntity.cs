@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.AbilityCards;
-using XCardGame.Scripts.Common;
+using XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Defs.Def;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Defs.Def.BattleEntity;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 public partial class BattleEntity: Node, ISetup
 {
@@ -96,7 +93,6 @@ public partial class BattleEntity: Node, ISetup
             card.OwnerEntity = this;
         }
         DealCardCount = (int)args["dealCardCount"];
-        Speed = (int)args["speed"];
         HandPowers = (Dictionary<Enums.HandTier, int>)args["handPowers"];
         BaseHandPower = (int)args["baseHandPower"];
         MaxHp.Value =(int)args["maxHp"];
@@ -110,7 +106,7 @@ public partial class BattleEntity: Node, ISetup
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
             { "nodesPerRow", 0 },
-            { "hasBorder", true },
+            { "hasBorder", false },
             { "expectedContentNodeCount", Configuration.DefaultHoleCardCount },
             { "hasName", true },
             { "containerName", "Hole cards" },

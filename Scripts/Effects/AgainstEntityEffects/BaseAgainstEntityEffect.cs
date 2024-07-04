@@ -1,22 +1,21 @@
 ﻿using System.Collections.Generic;
-using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
 using XCardGame.Scripts.HandEvaluate;
-using XCardGame.Scripts.Nodes;
 
-namespace XCardGame.Scripts.Effects.SkillEffects;
+namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
 
 public class BaseAgainstEntityEffect: BaseEffect
 {
     public Engage Engage;
-    public BattleEntity Self;
-    public BattleEntity Opponent;
+    public BattleEntity Src;
+    public BattleEntity Dst;
     
-    public BaseAgainstEntityEffect(string name, string descriptionTemplate, BaseCard originateCard) : 
+    public BaseAgainstEntityEffect(string name, string descriptionTemplate, BattleEntity src, BattleEntity dst, BaseCard originateCard) : 
         base(name, descriptionTemplate, originateCard)
     {
+        Src = src;
+        Dst = dst;
     }
 
     public override void Setup(Dictionary<string, object> args)
@@ -26,8 +25,6 @@ public class BaseAgainstEntityEffect: BaseEffect
         {
             Engage = (Engage)engage;
         }
-        Self = OriginateCard.OwnerEntity;
-        Opponent = Battle.GetOpponentOf(Self);
     }
 
     public virtual string GetDescription()

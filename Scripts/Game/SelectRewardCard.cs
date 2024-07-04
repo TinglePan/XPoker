@@ -5,16 +5,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
+using XCardGame.Scripts.Defs.Tables;
 using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 public partial class SelectRewardCard: Control
 {
@@ -28,7 +28,6 @@ public partial class SelectRewardCard: Control
             SelectRewardCard = selectRewardCard;
             SelectRewardCard.ReRollButton.Pressed += SelectRewardCard.ReRoll;
             SelectRewardCard.SkipButton.Pressed += SelectRewardCard.Skip;
-            
         }
         
         public override void OnEnter()
@@ -116,8 +115,8 @@ public partial class SelectRewardCard: Control
             { "separation", Configuration.CardContainerSeparation },
             { "pivotDirection", Enums.Direction2D8Ways.Neutral },
             { "nodesPerRow", 0 },
-            { "hasBorder", true },
-            { "expectedContentNodeCount", rewardCardCount },
+            { "hasBorder", false },
+            { "expectedContentNodeCount", Configuration.DefaultRewardCardCount },
             { "hasName", true },
             { "containerName", "Select a card..."},
             { "defaultCardFaceDirection", Enums.CardFace.Up },

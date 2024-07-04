@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://crs13uri7vyab"]
+
+[ext_resource type="Script" path="res://Scripts/Tests/TestSplitContainerPositioning.cs" id="1_qbm7t"]
+[ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="2_jvw7l"]
+[ext_resource type="Script" path="res://Scripts/Ui/SplitCardContainer.cs" id="2_x3mif"]
+
+[node name="TestSplitContainerPositioning" type="Node2D" node_paths=PackedStringArray("SplitCardContainer")]
+script = ExtResource("1_qbm7t")
+CardPrefab = ExtResource("2_jvw7l")
+SplitCardContainer = NodePath("SplitCardContainer")
+
+[node name="SplitCardContainer" type="Node2D" parent="."]
+position = Vector2(200, 200)
+script = ExtResource("2_x3mif")

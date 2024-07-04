@@ -7,7 +7,9 @@ using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
+
+using Battle = XCardGame.Scripts.Game.Battle;
 
 namespace XCardGame.Scripts.Cards;
 
@@ -57,20 +59,25 @@ public class PokerCard: BaseCard
 		}
 	}
 
-	public override void Resolve(Battle battle, Engage engage, Enums.EngageRole role)
+	public override void Resolve(Battle battle, Engage engage, BattleEntity entity, Enums.EngageRole role)
 	{
-		base.Resolve(battle, engage, role);
+		base.Resolve(battle, engage, entity, role);
 		foreach (var marker in Markers)
 		{
-			marker.Resolve(battle, engage, role);
+			marker.Resolve(battle, engage, entity, role);
 		}
 	}
 	
 	public override string ToString()
 	{
-		return $"{Rank.Value} of {Suit.Value}";
+		return Description();
 	}
 	
+	public override string Description()
+	{
+		return string.Format(Def.DescriptionTemplate, Rank.Value, Suit.Value);
+	}
+
 	protected void OnSuitChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardSuit> args)
 	{
 		IconPath.Value = Utils.GetCardTexturePath(args.NewValue);

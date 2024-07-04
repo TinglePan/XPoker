@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Nodes;
+
+using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.Cards;
 

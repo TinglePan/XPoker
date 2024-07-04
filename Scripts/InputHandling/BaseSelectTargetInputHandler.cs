@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
+
+
 using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.InputHandling;
 
 public abstract class BaseSelectTargetInputHandler<TContentNode, TContent>: BaseInputHandler 
-    where TContentNode: BaseContentNode<TContent>, ISelect
+    where TContentNode: Ui.BaseContentNode<TContent>, ISelect
     where TContent: IContent<TContent>
 {
     public List<TContentNode> SelectedNodes;
@@ -54,7 +54,7 @@ public abstract class BaseSelectTargetInputHandler<TContentNode, TContent>: Base
         SelectedNodes.Remove(node);
     }
     
-    protected void OnTargetPressed(BaseContentNode<TContent> node)
+    protected void OnTargetPressed(Ui.BaseContentNode<TContent> node)
     {
         var contentNode = (TContentNode)node;
         if (contentNode.IsSelected)
@@ -77,6 +77,7 @@ public abstract class BaseSelectTargetInputHandler<TContentNode, TContent>: Base
 
     protected override void OnRightMouseButtonPressed(Vector2 position)
     {
+        base.OnRightMouseButtonPressed(position);
         if (SelectedNodes.Count > 0)
         {
             UnSelectNode(SelectedNodes[^1]);

@@ -1,5 +1,7 @@
 ﻿using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
+
+using Battle = XCardGame.Scripts.Game.Battle;
 
 namespace XCardGame.Scripts.Cards.CardMarkers;
 
@@ -29,7 +31,7 @@ public class BaseCardMarker: ILifeCycleTriggeredInBattle
         
     }
 
-    public virtual void Resolve(Battle battle, Engage engage, Enums.EngageRole role)
+    public virtual void Resolve(Battle battle, Engage engage, BattleEntity entity, Enums.EngageRole role)
     {
         
     }

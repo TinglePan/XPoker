@@ -6,7 +6,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.GameLogic;
+
+using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
 
 namespace XCardGame.Scripts.Common;
 

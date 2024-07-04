@@ -1,4 +1,4 @@
-﻿namespace XCardGame.Scripts.Effects.SkillEffects;
+﻿namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
 
 public interface IPowerScaledEffect
 {

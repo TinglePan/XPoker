@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using Godot;
+﻿using System.Collections.ObjectModel;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Defs.Def;
 
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def.Deck;
-
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 public class Deck
 {

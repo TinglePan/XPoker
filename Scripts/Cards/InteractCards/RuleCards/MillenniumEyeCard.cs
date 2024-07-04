@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Effects;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Game;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 public class MillenniumEyeCard: BaseTapCard
 {

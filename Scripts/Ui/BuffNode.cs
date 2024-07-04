@@ -2,9 +2,8 @@
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.DataBinding;
 
-namespace XCardGame.Scripts.Nodes;
+namespace XCardGame.Scripts.Ui;
 
 public partial class BuffNode: BaseContentNode<BuffNode, BaseBuff>
 {

@@ -1,9 +1,9 @@
 [gd_scene load_steps=12 format=3 uid="uid://dp664b87tm78m"]
 
-[ext_resource type="Script" path="res://Scripts/GameLogic/BattleEntity.cs" id="1_34m83"]
+[ext_resource type="Script" path="res://Scripts/Game/BattleEntity.cs" id="1_34m83"]
 [ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="2_ci3jb"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="3_0wv0m"]
-[ext_resource type="PackedScene" uid="uid://2yj0yi24lkar" path="res://Scenes/BuffTabUi.tscn" id="4_q43le"]
+[ext_resource type="PackedScene" uid="uid://2yj0yi24lkar" path="res://Scenes/BuffContainer.tscn" id="4_q43le"]
 [ext_resource type="PackedScene" uid="uid://cfh3qchowgcu0" path="res://Scenes/Buff.tscn" id="5_tx2ya"]
 [ext_resource type="Texture2D" uid="uid://b3ktwe6xf0o5c" path="res://Sprites/duster_guy.png" id="6_oeeb1"]
 [ext_resource type="LabelSettings" uid="uid://8qnntxqwa647" path="res://Resources/11pxLabelSetting.tres" id="7_mdk1p"]
@@ -38,11 +38,6 @@ script = ExtResource("1_34m83")
 position = Vector2(0, -104)
 
 [node name="Card" parent="HoleCards" instance=ExtResource("3_0wv0m")]
-
-[node name="SkillCards" parent="." groups=["skillCardContainer"] instance=ExtResource("2_ci3jb")]
-position = Vector2(0, -178)
-
-[node name="Card" parent="SkillCards" instance=ExtResource("3_0wv0m")]
 
 [node name="Buffs" parent="." instance=ExtResource("4_q43le")]
 position = Vector2(0, -28)

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace XCardGame.Scripts.Defs;
+namespace XCardGame.Scripts.Defs.Tables;
 
 public static class RarityOddByProgress
 {

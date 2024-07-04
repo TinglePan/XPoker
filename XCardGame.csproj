@@ -5,4 +5,28 @@
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'ios' ">net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="addons\.idea\.idea.Developer Console\.idea\.gitignore" />
+    <Content Include="addons\.idea\.idea.Developer Console\.idea\encodings.xml" />
+    <Content Include="addons\.idea\.idea.Developer Console\.idea\indexLayout.xml" />
+    <Content Include="addons\addons\Developer Console\DeveloperConsole.tscn" />
+    <Content Include="addons\addons\Developer Console\Icons\GuiVisibilityHidden.svg" />
+    <Content Include="addons\addons\Developer Console\Icons\GuiVisibilityHidden.svg.import" />
+    <Content Include="addons\addons\Developer Console\Icons\GuiVisibilityVisible.svg" />
+    <Content Include="addons\addons\Developer Console\Icons\GuiVisibilityVisible.svg.import" />
+    <Content Include="addons\addons\Developer Console\LICENSE.txt" />
+    <Content Include="addons\addons\Developer Console\_demo\circle.png" />
+    <Content Include="addons\addons\Developer Console\_demo\circle.png.import" />
+    <Content Include="addons\addons\Developer Console\_demo\cross.png" />
+    <Content Include="addons\addons\Developer Console\_demo\cross.png.import" />
+    <Content Include="addons\addons\Developer Console\_demo\demo.tscn" />
+    <Content Include="addons\addons\Developer Console\_demo\square.png" />
+    <Content Include="addons\addons\Developer Console\_demo\square.png.import" />
+    <Content Include="addons\addons\Developer Console\_demo\triangle.png" />
+    <Content Include="addons\addons\Developer Console\_demo\triangle.png.import" />
+    <Content Include="addons\Developer Console.csproj" />
+    <Content Include="addons\Developer Console.sln" />
+    <Content Include="addons\raw\icon.png" />
+    <Content Include="addons\raw\icon.png.import" />
+  </ItemGroup>
 </Project>

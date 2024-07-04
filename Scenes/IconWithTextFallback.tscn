@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://vx8l6eyd1n4o"]
 
-[ext_resource type="Script" path="res://Scripts/Nodes/IconWithTextFallback.cs" id="1_vidh8"]
+[ext_resource type="Script" path="res://Scripts/Ui/IconWithTextFallback.cs" id="1_vidh8"]
 [ext_resource type="Texture2D" uid="uid://8nooaaepsol3" path="res://Sprites/Suits/clubs.png" id="2_vuxcb"]
 [ext_resource type="LabelSettings" uid="uid://sh00qgk8hmqa" path="res://Resources/24pxLabelSetting.tres" id="3_dj2oy"]
 

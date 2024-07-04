@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://blf82px0mx4rp"]
 
-[ext_resource type="Script" path="res://Scripts/GameLogic/CardPile.cs" id="1_kikce"]
+[ext_resource type="Script" path="res://Scripts/Game/CardPile.cs" id="1_kikce"]
 [ext_resource type="Texture2D" uid="uid://d3jbkkfnm4hpk" path="res://Sprites/box_filled.png" id="2_2kjlc"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="2_u3vkn"]
 

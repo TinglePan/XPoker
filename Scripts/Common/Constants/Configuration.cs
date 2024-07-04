@@ -6,6 +6,8 @@ namespace XCardGame.Scripts.Common.Constants;
 
 public static class Configuration
 {
+    public static readonly int MaxLogEntriesCount = 100;
+    
     public static readonly int CompletedHandCardCount = 5;
     public static readonly int CommunityCardCount = 5;
     public static readonly int DefaultHoleCardCount = 2;
@@ -20,7 +22,7 @@ public static class Configuration
     public static readonly float NegateTweenTime = 0.5f;
     public static readonly float SwapCardTweenTime = 0.5f;
     public static readonly float InvalidConfirmTweenTime = 0.5f;
-    public static readonly float EmphasizeTweenTime = 0.3f;
+    public static readonly float SelectTweenTime = 0.3f;
     public static readonly Vector2 CardSize = new Vector2(48, 68);
     public static readonly Vector2 CardContainerSeparation = new Vector2(12, 8);
     public static readonly int ShockDecreaseDamageDealtMultiplierPerStack = -10;

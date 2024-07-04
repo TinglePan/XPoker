@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
 using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
 public class BalaTrollHandCard: BaseUseCard
 {

@@ -1,13 +1,14 @@
-﻿using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
+﻿using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
 
-public class TheTieBreakerCard: BaseTapCard
+public class EyePatchCard: BaseTapCard
 {
-    public TheTieBreakerCard(InteractCardDef def): base(def)
+    protected int Count;
+    
+    public EyePatchCard(InteractCardDef def): base(def)
     {
     }
     
@@ -16,17 +17,18 @@ public class TheTieBreakerCard: BaseTapCard
         base.OnStart(battle);
         if (IsFunctioning() && !AlreadyFunctioning)
         {
-            battle.HandEvaluator.IsSuitSecondComparer = true;
+            Count = Utils.GetCardRankValue(Rank.Value);
+            battle.FaceDownCommunityCardCount += Count;
             AlreadyFunctioning = true;
         }
     }
-
+    
     public override void OnStop(Battle battle)
     {
         base.OnStop(battle);
         if (AlreadyFunctioning)
         {
-            battle.HandEvaluator.IsSuitSecondComparer = false;
+            battle.FaceDownCommunityCardCount -= Count;
             AlreadyFunctioning = false;
         }
     }

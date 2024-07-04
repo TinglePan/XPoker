@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Effects.SkillEffects;
 using XCardGame.Scripts.HandEvaluate;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.GameLogic;
+namespace XCardGame.Scripts.Game;
 
 public class Engage
 {
@@ -60,8 +59,6 @@ public class Engage
     {
         var player = Battle.Player;
         var enemy = Battle.Enemy;
-        Battle.RoleMarkers[player].Role.Value = Roles[player];
-        Battle.RoleMarkers[enemy].Role.Value = Roles[enemy];
         if (Roles[player] == Roles[enemy] || Roles[player] == Enums.EngageRole.Defender)
         {
             await ResolveEntity(player);
@@ -92,11 +89,6 @@ public class Engage
         }
         var tasks = new List<Task>();
         hand.Sort();
-        tasks.Add(PrepareCards(hand.PrimaryCards, Battle.ResolveCardContainer));
-        if (hand.Kickers != null)
-        {
-            tasks.Add(PrepareCards(hand.Kickers, Battle.KickerCardContainer));
-        }
 
         await Task.WhenAll(tasks);
 
@@ -107,23 +99,10 @@ public class Engage
         await PrepareEntity(entity, Hands[entity]);
         var timer = Battle.GetTree().CreateTimer(Configuration.DelayBetweenResolveSteps);
         await Battle.ToSignal(timer, Timer.SignalName.Timeout);
-        await Battle.RoleMarkers[entity].TweenEmphasize(true, Configuration.EmphasizeTweenTime);
         var index = 0;
-        foreach (var cardNode in Battle.ResolveCardContainer.ContentNodes)
-        {
-            cardNode.AnimateSelectWithOrder(index);
-            var card = cardNode.Content.Value;
-            card.Resolve(Battle, this, Roles[entity]);
-        }
-        await Battle.RoleMarkers[entity].TweenEmphasize(false, Configuration.EmphasizeTweenTime);
     }
 
     protected async Task ClearResolveArea()
     {
-        foreach (var cardNode in Battle.ResolveCardContainer.ContentNodes)
-        {
-            var sourceContainer = (CardContainer)cardNode.Container.Value;
-            await sourceContainer.MoveCardNodeToContainer(cardNode, CardPositionBeforeResolve[cardNode]);
-        }
     }
 }

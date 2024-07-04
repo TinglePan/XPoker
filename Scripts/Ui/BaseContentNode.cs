@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Godot;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.DataBinding;
 
-namespace XCardGame.Scripts.Nodes;
+namespace XCardGame.Scripts.Ui;
 
 public abstract partial class BaseContentNode<TContent> : Node2D, ISetup
     where TContent: IContent<TContent>

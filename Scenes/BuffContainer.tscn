@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://2yj0yi24lkar"]
 
-[ext_resource type="Script" path="res://Scripts/Nodes/BuffContainer.cs" id="1_1n1y4"]
+[ext_resource type="Script" path="res://Scripts/Ui/BuffContainer.cs" id="1_1n1y4"]
 
 [node name="BuffTab2" type="Node2D" groups=["buffContainer"]]
 script = ExtResource("1_1n1y4")

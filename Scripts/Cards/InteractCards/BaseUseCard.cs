@@ -1,15 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using Godot;
-using XCardGame.Scripts.Common;
+﻿using System.Diagnostics;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.AbilityCards;
+namespace XCardGame.Scripts.Cards.InteractCards;
 
 public class BaseUseCard: BaseInteractCard
 {

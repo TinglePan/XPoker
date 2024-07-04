@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://jttwpoq764fh"]
+
+[ext_resource type="Script" path="res://Scripts/Ui/RoleMarker.cs" id="1_vg0ed"]
+[ext_resource type="Texture2D" uid="uid://8nooaaepsol3" path="res://Sprites/Suits/clubs.png" id="2_6c87t"]
+[ext_resource type="Texture2D" uid="uid://cct87hjq0q0qu" path="res://Sprites/shield.png" id="3_b3hwi"]
+
+[node name="RoleMarker" type="Node2D"]
+script = ExtResource("1_vg0ed")
+
+[node name="Sword" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_6c87t")
+
+[node name="Shield" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("3_b3hwi")

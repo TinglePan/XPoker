@@ -4,7 +4,9 @@ using Godot;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.GameLogic;
+
+using Battle = XCardGame.Scripts.Game.Battle;
+using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
 
 namespace XCardGame.Scripts.Ui;
 
@@ -29,6 +31,7 @@ public partial class RoleMarker: Node2D, ISetup
         ShieldIcon = GetNode<Sprite2D>("Shield");
         Role = new ObservableProperty<Enums.EngageRole>(nameof(Role), this, Enums.EngageRole.None);
         Role.DetailedValueChanged += OnRoleChanged;
+        Role.FireValueChangeEventsOnInit();
         IsEmphasized = new ObservableProperty<bool>(nameof(IsEmphasized), this, false);
         IsEmphasized.DetailedValueChanged += OnIsEmphasizedChanged;
         InitPosition = Position;
@@ -56,6 +59,7 @@ public partial class RoleMarker: Node2D, ISetup
         var offset = Configuration.SelectedCardOffset;
         newTween.TweenProperty(this, "position", to ? InitPosition + offset : InitPosition, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
         await ToSignal(newTween, Tween.SignalName.Finished);
+        IsEmphasized.Value = to;
     }
     
     protected void OnRoleChanged(object sender, ValueChangedEventDetailedArgs<Enums.EngageRole> args)

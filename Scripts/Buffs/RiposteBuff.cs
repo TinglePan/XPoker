@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices.ComTypes;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Effects.SkillEffects;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
+
 using XCardGame.Scripts.HandEvaluate;
 
 namespace XCardGame.Scripts.Buffs;

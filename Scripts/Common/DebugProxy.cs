@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using Godot;
-using Godot.Collections;
 using hamsterbyte.DeveloperConsole;
-using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Common;
 

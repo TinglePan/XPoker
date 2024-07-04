@@ -7,10 +7,12 @@ using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Effects;
-using XCardGame.Scripts.Effects.SkillEffects;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
-using CardNode = XCardGame.Scripts.Nodes.CardNode;
+using XCardGame.Scripts.Effects.AgainstEntityEffects;
+using XCardGame.Scripts.Game;
+using XCardGame.Scripts.Ui;
+using Battle = XCardGame.Scripts.Game.Battle;
+using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
+using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.Cards;
 
@@ -28,7 +30,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     public GameMgr GameMgr;
     public Battle Battle;
     public BattleEntity OwnerEntity;
-    public HashSet<BaseContentNode<BaseCard>> Nodes { get; private set; }
+    public HashSet<Ui.BaseContentNode<BaseCard>> Nodes { get; private set; }
     public bool HasSetup { get; set; }
     public ObservableProperty<string> IconPath;
     public ObservableProperty<Enums.CardSuit> Suit;
@@ -38,7 +40,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     public BaseCard(BaseCardDef def)
     {
         Def = def;
-        Nodes = new HashSet<BaseContentNode<BaseCard>>();
+        Nodes = new HashSet<Ui.BaseContentNode<BaseCard>>();
         IconPath = new ObservableProperty<string>(nameof(IconPath), this, def.IconPath);
         Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, def.Suit);
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, def.Rank);
@@ -46,7 +48,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         IsNegated.DetailedValueChanged += OnToggleIsNegated;
     }
 
-    public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode<TContentNode, BaseCard>
+    public TContentNode Node<TContentNode>() where TContentNode : Ui.BaseContentNode<TContentNode, BaseCard>
     {
         foreach (var node in Nodes)
         {
@@ -90,7 +92,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     
     public override string ToString()
     {
-        return $"{Def.Name}({GetDescription()})";
+        return $"{Def.Name}({Description()})";
     }
 
     public virtual bool IsFunctioning()
@@ -109,7 +111,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         Rank.Value = resultRank;
     }
     
-    public virtual string GetDescription()
+    public virtual string Description()
     {
         return Def.DescriptionTemplate;
     }
@@ -124,22 +126,25 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         
     }
 
-    public virtual void Resolve(Battle battle, Engage engage, Enums.EngageRole role)
+    public virtual void Resolve(Battle battle, Engage engage, BattleEntity entity, Enums.EngageRole role)
     {
         BaseAgainstEntityEffect effect = null;
         if (role == Enums.EngageRole.Attacker)
         {
-            effect = new AttackAgainstEntityEffect(this, Utils.GetCardRankValue(Rank.Value), 1);
+            effect = new AttackAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
+                Utils.GetCardRankValue(Rank.Value), 1);
         }
         else if (role == Enums.EngageRole.Defender)
         {
-            effect = new DefendAgainstEntityEffect(this, Utils.GetCardRankValue(Rank.Value), 1);
+            effect = new DefendAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
+                Utils.GetCardRankValue(Rank.Value), 1);
         }
         effect?.Setup(new Dictionary<string, object>()
         {
             { "battle", battle },
             { "engage", engage }
         });
+        GD.Print($"Resolve of {this}, effect {effect}");
         effect?.Resolve();
     }
 

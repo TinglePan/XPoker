@@ -1,8 +1,7 @@
 ﻿using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
+using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Effects;
+namespace XCardGame.Scripts.Effects.FieldEffects;
 
 public class BaseSingleTurnFieldEffect: BaseFieldEffect
 {

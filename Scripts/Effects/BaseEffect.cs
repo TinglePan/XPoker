@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
+
 using XCardGame.Scripts.HandEvaluate;
-using XCardGame.Scripts.Nodes;
-using BuffNode = XCardGame.Scripts.Nodes.BuffNode;
+
+using Battle = XCardGame.Scripts.Game.Battle;
+using BuffNode = XCardGame.Scripts.Ui.BuffNode;
 
 namespace XCardGame.Scripts.Effects;
 

@@ -4,10 +4,14 @@ using System.Collections.ObjectModel;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Game;
+
 using XCardGame.Scripts.HandEvaluate;
-using XCardGame.Scripts.Nodes;
-using BuffNode = XCardGame.Scripts.Nodes.BuffNode;
+
+using XCardGame.Scripts.Ui;
+using Battle = XCardGame.Scripts.Game.Battle;
+using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
+using BuffNode = XCardGame.Scripts.Ui.BuffNode;
 
 namespace XCardGame.Scripts.Buffs;
 
@@ -28,7 +32,7 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
 
     public bool IsTemporary;
     
-    public HashSet<BaseContentNode<BaseBuff>> Nodes { get; private set; }
+    public HashSet<Ui.BaseContentNode<BaseBuff>> Nodes { get; private set; }
 
     public GameMgr GameMgr;
     public Battle Battle;
@@ -36,7 +40,7 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
 
     public BaseBuff(string name, string descriptionTemplate, string iconPath, bool isStackable = false, bool stackOnRepeat = true, int stack = 0, int maxStack = 0, bool isTemporary = false)
     {
-        Nodes = new HashSet<BaseContentNode<BaseBuff>>();
+        Nodes = new HashSet<Ui.BaseContentNode<BaseBuff>>();
         Name = name;
         DescriptionTemplate = descriptionTemplate;
         IconPath = iconPath;
@@ -48,7 +52,7 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
         HasSetup = false;
     }
     
-    public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode<TContentNode, BaseBuff>
+    public TContentNode Node<TContentNode>() where TContentNode : Ui.BaseContentNode<TContentNode, BaseBuff>
     {
         foreach (var node in Nodes)
         {

@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def;
+using XCardGame.Scripts.Defs.Def.BattleEntity;
 using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.GameLogic;
+using XCardGame.Scripts.Defs.Tables;
+
 
 namespace XCardGame.Scripts.Defs;
 
@@ -16,6 +18,7 @@ public static class BattleEntityDefs
         FactionId = Enums.FactionId.Player,
         InitDeckDef = DeckDefs.PlayerInitDeckDef,
         InitBaseHandPower = 0,
+        InitItemPocketSize = 3,
         InitHandPowers = HandPowerTables.DefaultPlayerHandPowerTable,
         InitHp = 10,
         InitLevel = 1,

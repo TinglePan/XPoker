@@ -4,14 +4,17 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.AbilityCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.GameLogic;
+
 using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Nodes;
+
+using Battle = XCardGame.Scripts.Game.Battle;
+using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
+using BattleScene = XCardGame.Scripts.Ui.BattleScene;
+using PlayerBattleEntity = XCardGame.Scripts.Game.PlayerBattleEntity;
 
 namespace XCardGame.Scripts;
 

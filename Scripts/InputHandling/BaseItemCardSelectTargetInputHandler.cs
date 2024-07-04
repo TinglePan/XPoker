@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Godot;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.AbilityCards;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
+
+
+using Battle = XCardGame.Scripts.Game.Battle;
+using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.InputHandling;
 
@@ -47,7 +48,7 @@ public abstract class BaseItemCardSelectTargetInputHandler<TOriginateCard>: Base
         Exit();
     }
 
-    protected void OnOriginateCardPressed(BaseContentNode<BaseCard> node)
+    protected void OnOriginateCardPressed(Ui.BaseContentNode<BaseCard> node)
     {
         Exit();
     }

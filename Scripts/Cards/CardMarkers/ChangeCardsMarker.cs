@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.GameLogic;
-using XCardGame.Scripts.Nodes;
+
+
+using Battle = XCardGame.Scripts.Game.Battle;
+using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.Cards.CardMarkers;
 

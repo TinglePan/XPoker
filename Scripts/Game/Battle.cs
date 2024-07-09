@@ -32,6 +32,7 @@ public partial class Battle: Node2D, ISetup
     public GameMgr GameMgr;
     public Dealer Dealer;
     public CardContainer CommunityCardContainer;
+    public SplitCardContainer ResolveCardContainer;
     public CardContainer EquipmentCardContainer;
     public CardContainer ItemCardContainer;
     public CardContainer RuleCardContainer;
@@ -60,6 +61,8 @@ public partial class Battle: Node2D, ISetup
     public Action<Battle> OnBattleFinished;
 
     public ObservableCollection<BaseCard> CommunityCards;
+    public ObservableCollection<BaseCard> PrimaryCards;
+    public ObservableCollection<BaseCard> KickerCards;
     public ObservableCollection<BaseCard> RuleCards;
     
     public CompletedHandEvaluator HandEvaluator;
@@ -77,7 +80,6 @@ public partial class Battle: Node2D, ISetup
     
     public List<BaseEffect> Effects;
     public State CurrentState;
-
     
     public override void _Ready()
     {
@@ -85,6 +87,7 @@ public partial class Battle: Node2D, ISetup
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
         Dealer = GetNode<Dealer>("Dealer");
         CommunityCardContainer = GetNode<CardContainer>("CommunityCards");
+        ResolveCardContainer = GetNode<SplitCardContainer>("ResolveCards");
         EquipmentCardContainer = GetNode<CardContainer>("EquipmentCards");
         ItemCardContainer = GetNode<CardContainer>("ItemCards");
         RuleCardContainer = GetNode<CardContainer>("RuleCards");
@@ -99,6 +102,8 @@ public partial class Battle: Node2D, ISetup
         
         RoundHands = new Dictionary<BattleEntity, CompletedHand>();
         CommunityCards = new ObservableCollection<BaseCard>();
+        PrimaryCards = new ObservableCollection<BaseCard>();
+        KickerCards = new ObservableCollection<BaseCard>();
         RuleCards = new ObservableCollection<BaseCard>();
         HandTierOrderAscend = new ObservableCollection<Enums.HandTier>();
         Effects = new List<BaseEffect>();
@@ -112,8 +117,7 @@ public partial class Battle: Node2D, ISetup
         RequiredHoleCardCountMax = (int)args["requiredHoleCardCountMax"];
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, 
             RequiredHoleCardCountMin, RequiredHoleCardCountMax);
-
-
+        
         var entitiesSetupArgs = (List<Dictionary<string, object>>)args["entities"];
         for (int i = 0; i < Entities.Length; i++)
         {
@@ -135,6 +139,31 @@ public partial class Battle: Node2D, ISetup
             { "margins", Configuration.DefaultContentContainerMargins },
             { "withCardEffect", true }
         };
+
+        var primaryCardContainerSetupArgs = new Dictionary<string, object>(containerSetupArgs)
+        {
+            ["cards"] = PrimaryCards,
+            ["hasName"] = false,
+            ["defaultCardFaceDirection"] = Enums.CardFace.Up
+        };
+
+        var kickerCardContainerSetupArgs = new Dictionary<string, object>(primaryCardContainerSetupArgs)
+        {
+            ["cards"] = KickerCards,
+        };
+        
+        var resolveCardContainerSetupArgs = new Dictionary<string, object>()
+        {
+            { "cardContainersSetupArgs", new List<Dictionary<string, object>>()
+            {
+                primaryCardContainerSetupArgs,
+                kickerCardContainerSetupArgs,
+            }},
+            { "separation", Configuration.SplitCardContainerSeparation },
+            { "pivotDirection", Enums.Direction2D8Ways.Neutral }
+        };
+        
+        ResolveCardContainer.Setup(resolveCardContainerSetupArgs);
         
         containerSetupArgs["cards"] = CommunityCards;
         containerSetupArgs["containerName"] = "Community cards";
@@ -191,8 +220,8 @@ public partial class Battle: Node2D, ISetup
     {
         Reset();
         Dealer.Shuffle();
-        await Dealer.DealEquipmentCards();
-        await NewRound();
+        await GameMgr.AwaitAndDisableProceed(Dealer.DealEquipmentCards());
+        await GameMgr.AwaitAndDisableProceed(NewRound());
         CurrentState = State.BeforeDealCards;
     }
 
@@ -201,22 +230,22 @@ public partial class Battle: Node2D, ISetup
         switch (CurrentState)
         {
             case State.BeforeDealCards:
-                DealCards();
+                await GameMgr.AwaitAndDisableProceed(DealCards());
                 CurrentState = State.BeforeShowDown;
                 break;
             case State.BeforeShowDown:
-                ShowDown();
+                await GameMgr.AwaitAndDisableProceed(ShowDown());
                 CurrentState = State.BeforeResolve;
                 break;
             case State.BeforeResolve:
-                RoundEngage.Resolve();
+                await GameMgr.AwaitAndDisableProceed(RoundEngage.Resolve());
                 CurrentState = State.AfterResolve;
                 break;
             case State.AfterResolve:
                 OnRoundEnd?.Invoke(this);
                 var isPlayerDefeated = Player.IsDefeated();
                 var isEnemyDefeated = Enemy.IsDefeated();
-                await NewRound();
+                await GameMgr.AwaitAndDisableProceed(NewRound());
                 if (isPlayerDefeated)
                 {
                     GameOver();
@@ -230,7 +259,7 @@ public partial class Battle: Node2D, ISetup
                     }
                     else
                     {
-                        await Dealer.AnimateShuffle();
+                        await GameMgr.AwaitAndDisableProceed(Dealer.AnimateShuffle());
                         var selectRewardCard = GameMgr.OverlayScene(SelectRewardCardScene) as SelectRewardCard;
                         selectRewardCard.OnQuit += AfterSelectRewardCard;
                         selectRewardCard.Setup(new Dictionary<string, object>()
@@ -291,6 +320,10 @@ public partial class Battle: Node2D, ISetup
             tasks.Add(DiscardCards(entity.HoleCardContainer.ContentNodes.ToList()));
         }
         tasks.Add(DiscardCards(CommunityCardContainer.ContentNodes.ToList()));
+        foreach (var cardContainer in ResolveCardContainer.CardContainers)
+        {
+            tasks.Add(DiscardCards(cardContainer.ContentNodes.ToList()));
+        }
         RoundCount++;
         OnRoundStart?.Invoke(this);
         RoundHands.Clear();
@@ -321,10 +354,11 @@ public partial class Battle: Node2D, ISetup
         tasks.Add(DiscardCards(EquipmentCardContainer.ContentNodes.ToList()));
         tasks.Add(DiscardCards(ItemCardContainer.ContentNodes.ToList()));
         tasks.Add(DiscardCards(RuleCardContainer.ContentNodes.ToList()));
+        Task.WhenAll(tasks);
         Dealer.Reset();
     }
 
-    public async void DealCards()
+    public async Task DealCards()
     {
         var tasks = new List<Task>();
         foreach (var entity in Entities)
@@ -344,7 +378,7 @@ public partial class Battle: Node2D, ISetup
         AfterDealCards?.Invoke(this);
     }
     
-    public void ShowDown()
+    public async Task ShowDown()
     {
         BeforeShowDown?.Invoke(this);
         
@@ -355,16 +389,18 @@ public partial class Battle: Node2D, ISetup
         {
             // var validHoleCards = GetValidCards(entity.HoleCards);
             var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.ToList(), entity.HoleCards.ToList());
+            entity.RoundHandTier.Value = bestHand.Tier;
             RoundHands.Add(entity, bestHand);
         }
 
+        var tasks = new List<Task>();
         foreach (var entity in Entities)
         {
             foreach (var cardNode in entity.HoleCardContainer.ContentNodes)
             {
                 if (cardNode.FaceDirection.Value == Enums.CardFace.Down)
                 {
-                    cardNode.AnimateFlip(Enums.CardFace.Up);
+                    tasks.Add(cardNode.AnimateFlip(Enums.CardFace.Up));
                 }
             }
         }
@@ -372,15 +408,17 @@ public partial class Battle: Node2D, ISetup
         {
             if (cardNode.FaceDirection.Value == Enums.CardFace.Down)
             {
-                cardNode.AnimateFlip(Enums.CardFace.Up);
+                tasks.Add(cardNode.AnimateFlip(Enums.CardFace.Up));
             }
         }
-        
-
         var playerHand = RoundHands[Player];
         var enemyHand = RoundHands[Enemy];
         RoundEngage = new Engage(GameMgr, playerHand, enemyHand);
+        tasks.Add(GameMgr.BattleLog.LogAndWait(
+            Utils._($"Showdown: {Player}({playerHand.Tier}) vs {Enemy}({enemyHand.Tier}). {Player} is {Player.RoundRole.Value}. {Enemy} is {Enemy.RoundRole.Value}"),
+            Configuration.LogInterval));
         BeforeEngage?.Invoke(this, RoundEngage);
+        await Task.WhenAll(tasks);
         // RoundEngage.PrepareRoundSkills();
         // GameMgr.InputMgr.SwitchToInputHandler(new PrepareRoundSkillInputHandler(GameMgr));
         // var endTime = Time.GetTicksUsec();

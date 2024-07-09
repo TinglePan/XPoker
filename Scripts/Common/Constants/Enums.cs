@@ -138,11 +138,18 @@ public static class Enums
         Neutral,
         Curse
     }
-
-    public enum ExhaustBehavior
+    
+    public enum UseUpOperation
     {
         Tap,
         Discard,
-        Dispose
+        Exhaus
+    }
+
+    public enum TerminateBehavior
+    {
+        Tap,
+        Discard,
+        Exhaust
     }
 }

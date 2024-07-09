@@ -59,12 +59,12 @@ public class PokerCard: BaseCard
 		}
 	}
 
-	public override void Resolve(Battle battle, Engage engage, BattleEntity entity, Enums.EngageRole role)
+	public override void Resolve(Battle battle, Engage engage, BattleEntity entity)
 	{
-		base.Resolve(battle, engage, entity, role);
+		base.Resolve(battle, engage, entity);
 		foreach (var marker in Markers)
 		{
-			marker.Resolve(battle, engage, entity, role);
+			marker.Resolve(battle, engage, entity);
 		}
 	}
 	

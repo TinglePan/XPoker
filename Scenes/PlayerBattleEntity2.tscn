@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://b5ckc3msigv6m"]
+[gd_scene load_steps=12 format=3 uid="uid://d7nce7hnes6p"]
 
 [ext_resource type="Script" path="res://Scripts/Game/PlayerBattleEntity.cs" id="1_bow21"]
 [ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="2_3nqyy"]
@@ -113,10 +113,10 @@ label_settings = ExtResource("7_o4anw")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Node2D" type="Node2D" parent="."]
+[node name="RoundHand" type="Node2D" parent="."]
 position = Vector2(0, 128)
 
-[node name="Label" type="Label" parent="Node2D"]
+[node name="Label" type="Label" parent="RoundHand"]
 texture_filter = 1
 anchors_preset = 8
 anchor_left = 0.5

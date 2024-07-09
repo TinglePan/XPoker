@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using XCardGame.Scripts.Cards.CardInputHandlers;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Game;
 using XCardGame.Scripts.InputHandling;
@@ -11,7 +12,7 @@ public class MagicalHatCard: BaseUseCard
 {
     public class MagicalHatCardInputHandler : BaseItemCardSelectTargetInputHandler<MagicalHatCard>
     {
-        public MagicalHatCardInputHandler(GameMgr gameMgr, CardNode node) : base(gameMgr, node)
+        public MagicalHatCardInputHandler(GameMgr gameMgr, CardNode node) : base(gameMgr, node, 2)
         {
         }
 

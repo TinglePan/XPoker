@@ -1,4 +1,5 @@
 ﻿using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
@@ -21,9 +22,11 @@ public class AttackAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
         int power = 0;
         if (PowerScale > 0)
         {
-            power = Src.GetPower(Engage.Hands[Src].Tier);
+            power = Src.GetPower(Battle.RoundHands[Src].Tier);
             rawAttackValue = CalculateValue(power);
         }
+        
+        Battle.GameMgr.BattleLog.Log(Utils._($"{Src} attacks! Power:{power}. Value:{rawAttackValue}"));
         var attack = new Attack(Battle, Src, Dst, power, rawAttackValue);
         attack.Resolve();
     }

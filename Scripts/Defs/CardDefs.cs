@@ -19,6 +19,7 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Six,
         
+        InteractionType = Enums.InteractionType.Use,
         UseCost = 1,
         RankChangePerUse = -2,
     };
@@ -33,6 +34,7 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Three,
         
+        InteractionType = Enums.InteractionType.Use,
         UseCost = 1,
         RankChangePerUse = -1,
     };
@@ -47,6 +49,7 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Three,
         
+        InteractionType = Enums.InteractionType.Use,
         UseCost = 1,
         RankChangePerUse = -1,
     };
@@ -60,6 +63,7 @@ public static class CardDefs
         BasePrice = 5,
         Rarity = 1,
         
+        InteractionType = Enums.InteractionType.Use,
         UseCost = 1,
         RankChangePerUse = -99,
     };
@@ -72,6 +76,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/eye_patch.png",
         BasePrice = 5,
         Rarity = 1,
+        InteractionType = Enums.InteractionType.Seal
     };
     
     public static InteractCardDef BigShield = new ()
@@ -83,6 +88,7 @@ public static class CardDefs
         BasePrice = 5,
         Rarity = 1,
         
+        InteractionType = Enums.InteractionType.Use,
         UseCost = 1,
         RankChangePerUse = -99,
     };
@@ -96,6 +102,7 @@ public static class CardDefs
         BasePrice = 5,
         Rarity = 1,
         
+        InteractionType = Enums.InteractionType.Seal,
         UnSealCost = 1,
     };
     
@@ -107,6 +114,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/capitalism.png",
         Rarity = 1,
         
+        InteractionType = Enums.InteractionType.Seal,
         RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
         SealedRankChangePerTurn = 99
@@ -120,6 +128,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/socialism.png",
         Rarity = 1,
         
+        InteractionType = Enums.InteractionType.Seal,
         RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
         SealedRankChangePerTurn = 99
@@ -133,6 +142,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/keep_out.png",
         Rarity = 1,
         
+        InteractionType = Enums.InteractionType.Seal,
         RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
         SealedRankChangePerTurn = 99
@@ -146,6 +156,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/the_tie_breaker.png",
         Rarity = 1,
         
+        InteractionType = Enums.InteractionType.Seal,
         RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
         SealedRankChangePerTurn = 99
@@ -161,6 +172,7 @@ public static class CardDefs
         Rank = Enums.CardRank.Joker,
         Suit = Enums.CardSuit.Joker,
         
+        InteractionType = Enums.InteractionType.Seal,
         RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
         SealedRankChangePerTurn = 99
@@ -174,6 +186,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/hand_shake.png",
         Rarity = 1,
         
+        InteractionType = Enums.InteractionType.Seal,
         RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
         SealedRankChangePerTurn = 99

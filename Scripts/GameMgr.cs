@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs;
-
+using XCardGame.Scripts.Game;
 using XCardGame.Scripts.InputHandling;
-
+using XCardGame.Scripts.Ui;
 using Battle = XCardGame.Scripts.Game.Battle;
 using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
 using BattleScene = XCardGame.Scripts.Ui.BattleScene;
@@ -20,13 +22,14 @@ namespace XCardGame.Scripts;
 
 public partial class GameMgr : Node
 {
-	public PackedScene IntroScene;
-	public PackedScene BattleScene;
+	public PackedScene IntroScenePrefab;
+	public PackedScene BattleScenePrefab;
 	
 	public InputMgr InputMgr;
 	
 	public Node CurrentScene => SceneStack[^1];
 	public Battle CurrentBattle;
+	public BattleLog BattleLog;
 
 	public ObservableProperty<int> ProgressCounter;
 
@@ -38,8 +41,8 @@ public partial class GameMgr : Node
 	public override void _Ready()
 	{
 		base._Ready();
-		IntroScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Intro.tscn");
-		BattleScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/BattleScene.tscn");
+		IntroScenePrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Intro.tscn");
+		BattleScenePrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/BattleScene.tscn");
 		InputMgr = GetNode<InputMgr>("/root/InputMgr");
 		ProgressCounter = new ObservableProperty<int>(nameof(ProgressCounter), this, 0);
 		Rand = new Random();
@@ -53,7 +56,10 @@ public partial class GameMgr : Node
 
 	public void StartBattle()
 	{
-		CurrentBattle = ((BattleScene)CurrentScene).Battle;
+		ChangeScene(BattleScenePrefab);
+		var battleScene = (BattleScene)CurrentScene;
+		BattleLog = battleScene.GetNode<BattleLog>("LogBox");
+		CurrentBattle = battleScene.Battle;
 		CurrentBattle.Setup(new Dictionary<string, object>
 		{
 			{ "dealCommunityCardCount", 5 },
@@ -116,5 +122,19 @@ public partial class GameMgr : Node
 	public void GameEnd()
 	{
 		
+	}
+
+	public async Task AwaitAndDisableProceed(Task task)
+	{
+		if (CurrentScene is BattleScene battleScene)
+		{
+			battleScene.ProceedButton.Disabled = true;
+			await task;
+			battleScene.ProceedButton.Disabled = false;
+		}
+		else
+		{
+			await task;
+		}
 	}
 }

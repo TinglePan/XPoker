@@ -50,17 +50,31 @@ public class BaseInteractCard: BaseCard, IInteractCard
         }
     }
 
-    public override void ChangeRank(int delta)
+    public override async void ChangeRank(int delta)
     {
         var cardNode = Node<CardNode>();
         var interactCardDef = (InteractCardDef)Def;
         var resultRankValue = Utils.GetCardRankValue(Rank.Value) + delta;
-        if (resultRankValue < interactCardDef.SealWhenLessThan && !cardNode.IsTapped.Value)
+        switch (interactCardDef.TerminateBehavior)
         {
-            cardNode.TweenTap(true, Configuration.TapTweenTime);
-        } else if (resultRankValue > interactCardDef.UnSealWhenGreaterThan && cardNode.IsTapped.Value)
-        {
-            cardNode.TweenTap(false, Configuration.TapTweenTime);
+            case Enums.TerminateBehavior.Tap:
+                if (resultRankValue < interactCardDef.SealWhenLessThan && !cardNode.IsTapped.Value)
+                {
+                    cardNode.TweenTap(true, Configuration.TapTweenTime);
+                } else if (resultRankValue > interactCardDef.UnSealWhenGreaterThan && cardNode.IsTapped.Value)
+                {
+                    cardNode.TweenTap(false, Configuration.TapTweenTime);
+                }
+                break;
+            case Enums.TerminateBehavior.Discard:
+                if (resultRankValue < interactCardDef.SealWhenLessThan)
+                {
+                    await Battle.Dealer.AnimateDiscard(cardNode);
+                }
+                break;
+            case Enums.TerminateBehavior.Exhaust:
+                // TODO: Exhaust card
+                break;
         }
         resultRankValue = Mathf.Clamp(resultRankValue, interactCardDef.NaturalRankChangeRange.X,
             interactCardDef.NaturalRankChangeRange.Y);

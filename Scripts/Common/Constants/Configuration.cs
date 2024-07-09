@@ -25,11 +25,13 @@ public static class Configuration
     public static readonly float SelectTweenTime = 0.3f;
     public static readonly Vector2 CardSize = new Vector2(48, 68);
     public static readonly Vector2 CardContainerSeparation = new Vector2(12, 8);
+    public static readonly int SplitCardContainerSeparation = 24;
     public static readonly int ShockDecreaseDamageDealtMultiplierPerStack = -10;
     public static readonly int ShockIncreaseDamageReceivedMultiplierPerStack = 10;
     public static readonly float AnimateCardTransformInterval = 0.1f;
     public static readonly float ContentContainerAdjustTweenTime = 0.2f;
     public static readonly float DelayBetweenResolveSteps = 0.5f;
+    public static readonly float LogInterval = 0.5f;
     public static readonly int ShuffleAnimateCards = 3;
     // public static readonly int FieldCardCountPerRow = 4;
     // public static readonly int SkillCardCountPerRow = 6;

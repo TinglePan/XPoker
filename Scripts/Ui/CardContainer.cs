@@ -71,11 +71,18 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		await Task.WhenAll(tasks);
 	}
 	
-	public async Task MoveCardNodeToContainer(CardNode cardNode, CardContainer targetContainer)
+	public async Task MoveCardNodeToContainer(CardNode cardNode, CardContainer targetContainer, int index = -1)
 	{
 		var sourceContainer = cardNode.Container.Value;
 		sourceContainer.ContentNodes.Remove(cardNode);
-		targetContainer.ContentNodes.Add(cardNode);
+		if (index < 0)
+		{
+			targetContainer.ContentNodes.Add(cardNode);
+		}
+		else
+		{
+			targetContainer.ContentNodes.Insert(index, cardNode);
+		}
 		await cardNode.TweenControl.WaitComplete("transform");
 	}
 

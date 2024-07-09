@@ -35,7 +35,7 @@ anti_aliasing = false
 script = ExtResource("1_34m83")
 
 [node name="HoleCards" parent="." groups=["markerCardContainer"] instance=ExtResource("2_ci3jb")]
-position = Vector2(0, -104)
+position = Vector2(0, 76)
 
 [node name="Card" parent="HoleCards" instance=ExtResource("3_0wv0m")]
 
@@ -109,6 +109,27 @@ offset_bottom = 7.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "50"
+label_settings = ExtResource("7_mdk1p")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RoundHand" type="Node2D" parent="."]
+position = Vector2(0, 128)
+
+[node name="Label" type="Label" parent="RoundHand"]
+texture_filter = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -67.5
+offset_top = -11.5
+offset_right = 67.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Defend(Two Pairs)"
 label_settings = ExtResource("7_mdk1p")
 horizontal_alignment = 1
 vertical_alignment = 1

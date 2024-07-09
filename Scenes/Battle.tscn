@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://cmlbufighcu1t"]
+[gd_scene load_steps=8 format=3 uid="uid://cmlbufighcu1t"]
 
 [ext_resource type="Script" path="res://Scripts/Game/Battle.cs" id="1_xec1t"]
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="3_0wwqy"]
-[ext_resource type="PackedScene" uid="uid://dp664b87tm78m" path="res://Scenes/BattleEntity2.tscn" id="5_yc2t5"]
-[ext_resource type="PackedScene" uid="uid://b5ckc3msigv6m" path="res://Scenes/PlayerBattleEntity2.tscn" id="6_ce6tx"]
+[ext_resource type="PackedScene" uid="uid://cnnx1hhh5asi6" path="res://Scenes/ResolveCardContainer.tscn" id="4_i02sy"]
+[ext_resource type="PackedScene" uid="uid://dp664b87tm78m" path="res://Scenes/BattleEntity.tscn" id="5_yc2t5"]
+[ext_resource type="PackedScene" uid="uid://d7nce7hnes6p" path="res://Scenes/PlayerBattleEntity2.tscn" id="6_ce6tx"]
 [ext_resource type="PackedScene" uid="uid://4gturyb6lq6" path="res://Scenes/Dealer.tscn" id="7_ppf5v"]
 [ext_resource type="PackedScene" uid="uid://bmkxps5u10t7k" path="res://Scenes/CardContainer.tscn" id="7_xlxsy"]
 
@@ -11,14 +12,18 @@
 script = ExtResource("1_xec1t")
 
 [node name="CommunityCards" parent="." groups=["markerCardContainer"] instance=ExtResource("7_xlxsy")]
+position = Vector2(0, -64)
 
 [node name="Card" parent="CommunityCards" instance=ExtResource("3_0wwqy")]
 
+[node name="ResolveCards" parent="." instance=ExtResource("4_i02sy")]
+position = Vector2(0, 64)
+
 [node name="Enemy" parent="." instance=ExtResource("5_yc2t5")]
-position = Vector2(256, 0)
+position = Vector2(320, 0)
 
 [node name="Player" parent="." instance=ExtResource("6_ce6tx")]
-position = Vector2(-256, 0)
+position = Vector2(-320, 0)
 
 [node name="EquipmentCards" parent="." instance=ExtResource("7_xlxsy")]
 position = Vector2(-256, 256)
@@ -36,4 +41,4 @@ position = Vector2(256, 256)
 [node name="Card" parent="RuleCards" instance=ExtResource("3_0wwqy")]
 
 [node name="Dealer" parent="." instance=ExtResource("7_ppf5v")]
-position = Vector2(592, 224)
+position = Vector2(0, -256)

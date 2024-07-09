@@ -2,7 +2,7 @@
 
 namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
-public class XomCard: BaseTapCard
+public class XomCard: BaseSealCard
 {
     public XomCard(InteractCardDef def): base(def)
     {

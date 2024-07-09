@@ -126,15 +126,15 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         
     }
 
-    public virtual void Resolve(Battle battle, Engage engage, BattleEntity entity, Enums.EngageRole role)
+    public virtual void Resolve(Battle battle, Engage engage, BattleEntity entity)
     {
         BaseAgainstEntityEffect effect = null;
-        if (role == Enums.EngageRole.Attacker)
+        if (entity.RoundRole.Value == Enums.EngageRole.Attacker)
         {
             effect = new AttackAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
                 Utils.GetCardRankValue(Rank.Value), 1);
         }
-        else if (role == Enums.EngageRole.Defender)
+        else if (entity.RoundRole.Value == Enums.EngageRole.Defender)
         {
             effect = new DefendAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
                 Utils.GetCardRankValue(Rank.Value), 1);
@@ -144,7 +144,8 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
             { "battle", battle },
             { "engage", engage }
         });
-        GD.Print($"Resolve of {this}, effect {effect}");
+        Battle.GameMgr.BattleLog.Log($"Resolving {this}");
+        // GD.Print($"Resolve of {this}, effect {effect}");
         effect?.Resolve();
     }
 

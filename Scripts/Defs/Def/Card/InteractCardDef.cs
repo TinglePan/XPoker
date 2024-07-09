@@ -9,7 +9,7 @@ public class InteractCardDef: BaseCardDef
 {
     public Enums.InteractCardType Type;
     public Enums.InteractionType InteractionType;
-    public Enums.ExhaustBehavior ExhaustBehavior;
+    public Enums.TerminateBehavior TerminateBehavior;
     
     // Use
     public int UseCost;

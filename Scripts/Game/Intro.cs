@@ -29,7 +29,6 @@ public partial class Intro: Node
 
     protected void Start()
     {
-        GameMgr.ChangeScene(BattleScene);
         GameMgr.StartBattle();
     }
     

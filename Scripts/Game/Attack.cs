@@ -71,6 +71,8 @@ public class Attack
         var separatedDefenderDamageMultipliers = Utils.AddUpSeparatedMultipliers(defenderDamageMultipliers);
         var roundedDamageValue = (int)(damageValue * separatedDefenderDamageMultipliers.X * separatedDefenderDamageMultipliers.Y);
         
+        Battle.GameMgr.BattleLog.Log(Utils._($"{roundedDamageValue} damage to {Defender}"));
+        
         Defender.TakeDamage(roundedDamageValue);
     }
 }

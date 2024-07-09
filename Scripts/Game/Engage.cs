@@ -18,8 +18,6 @@ public class Engage
     
     public Enums.EngageRole TieRole;
 
-    public Dictionary<BattleEntity, CompletedHand> Hands;
-    public Dictionary<BattleEntity, Enums.EngageRole> Roles;
     public Dictionary<CardNode, CardContainer> CardPositionBeforeResolve;
     
     public Engage(GameMgr gameMgr, CompletedHand playerHand, CompletedHand enemyHand, Enums.EngageRole tieRole = Enums.EngageRole.Attacker)
@@ -27,39 +25,35 @@ public class Engage
         GameMgr = gameMgr;
         Battle = gameMgr.CurrentBattle;
         HandEvaluator = Battle.HandEvaluator;
-        Hands = new Dictionary<BattleEntity, CompletedHand>();
         var player = Battle.Player;
         var enemy = Battle.Enemy;
-        Hands[player] = playerHand;
-        Hands[enemy] = enemyHand;
         TieRole = tieRole;
         var compareRes = HandEvaluator.Compare(playerHand, enemyHand);
-        Roles = new Dictionary<BattleEntity, Enums.EngageRole>();
 
         switch (compareRes)
         {
             case > 0:
-                Roles[player] = Enums.EngageRole.Attacker;
-                Roles[enemy] = Enums.EngageRole.Defender;
+                player.RoundRole.Value = Enums.EngageRole.Attacker;
+                enemy.RoundRole.Value = Enums.EngageRole.Defender;
                 break;
             case < 0:
-                Roles[player] = Enums.EngageRole.Defender;
-                Roles[enemy] = Enums.EngageRole.Attacker;
+                player.RoundRole.Value = Enums.EngageRole.Defender;
+                enemy.RoundRole.Value = Enums.EngageRole.Attacker;
                 break;
             default:
-                Roles[player] = TieRole;
-                Roles[enemy] = TieRole;
+                player.RoundRole.Value = Enums.EngageRole.Attacker;
+                enemy.RoundRole.Value = Enums.EngageRole.Attacker;
                 break;
         }
 
         CardPositionBeforeResolve = new Dictionary<CardNode, CardContainer>();
     }
     
-    public async void Resolve()
+    public async Task Resolve()
     {
         var player = Battle.Player;
         var enemy = Battle.Enemy;
-        if (Roles[player] == Roles[enemy] || Roles[player] == Enums.EngageRole.Defender)
+        if (player.RoundRole.Value == enemy.RoundRole.Value || player.RoundRole.Value == Enums.EngageRole.Defender)
         {
             await ResolveEntity(player);
             await ClearResolveArea();
@@ -83,26 +77,58 @@ public class Engage
                 var sourceContainer = (CardContainer)cardNode.Container.Value;
                 CardPositionBeforeResolve[cardNode] = sourceContainer;
                 tasks.Add(sourceContainer.MoveCardNodeToContainer(cardNode, targetContainer));
-                await Utils.Wait(Battle, Configuration.AnimateCardTransformInterval);
+                // await Utils.Wait(Battle, Configuration.AnimateCardTransformInterval);
             }
             await Task.WhenAll(tasks);
         }
         var tasks = new List<Task>();
         hand.Sort();
-
+        
+        tasks.Add(PrepareCards(hand.PrimaryCards, Battle.ResolveCardContainer.CardContainers[0]));
+        if (hand.Kickers != null)
+        {
+            tasks.Add(PrepareCards(hand.Kickers, Battle.ResolveCardContainer.CardContainers[1]));
+        }
         await Task.WhenAll(tasks);
-
     }
 
     protected async Task ResolveEntity(BattleEntity entity)
     {
-        await PrepareEntity(entity, Hands[entity]);
+        await PrepareEntity(entity, Battle.RoundHands[entity]);
         var timer = Battle.GetTree().CreateTimer(Configuration.DelayBetweenResolveSteps);
         await Battle.ToSignal(timer, Timer.SignalName.Timeout);
-        var index = 0;
+        var resolveCardContainer = Battle.ResolveCardContainer.CardContainers[0];
+        foreach (var cardNode in resolveCardContainer.ContentNodes)
+        {
+            await cardNode.TweenSelect(true, Configuration.SelectTweenTime);
+            var card = cardNode.Content.Value;
+            card.Resolve(Battle, this, entity);
+            await GameMgr.BattleLog.HandleLogEntries();
+        }
+        // await Battle.RoleMarkers[entity].TweenEmphasize(false, Configuration.EmphasizeTweenTime);
+
     }
 
     protected async Task ClearResolveArea()
     {
+        async Task ClearCardContainer(CardContainer targetContainer)
+        {
+            var tasks = new List<Task>();
+            foreach (var cardNode in targetContainer.ContentNodes.ToList())
+            {
+                tasks.Add(targetContainer.MoveCardNodeToContainer(cardNode, CardPositionBeforeResolve[cardNode]));
+                cardNode.IsSelected = false;
+                // await Utils.Wait(Battle, Configuration.AnimateCardTransformInterval);
+            }
+            await Task.WhenAll(tasks);
+        }
+        
+        var tasks = new List<Task>();
+        
+        foreach (var cardContainer in Battle.ResolveCardContainer.CardContainers)
+        {
+            tasks.Add(ClearCardContainer(cardContainer));
+        }
+        await Task.WhenAll(tasks);
     }
 }

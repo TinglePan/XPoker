@@ -41,14 +41,14 @@ public abstract class BaseSelectTargetInputHandler<TContentNode, TContent>: Base
 
     protected abstract IEnumerable<TContentNode> GetValidSelectTargets();
 
-    protected void SelectNode(TContentNode node)
+    protected virtual void SelectNode(TContentNode node)
     {
         node.IsSelected = true;
         node.OnSelected?.Invoke();
         SelectedNodes.Add(node);
     }
 
-    protected void UnSelectNode(TContentNode node)
+    protected virtual void UnSelectNode(TContentNode node)
     {
         node.IsSelected = false;
         SelectedNodes.Remove(node);

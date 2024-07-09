@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://std0bcv2y0bf"]
+
+[ext_resource type="PackedScene" uid="uid://cu8cytigbn45" path="res://Scenes/DialogueBox.tscn" id="1_xceg3"]
+[ext_resource type="Script" path="res://Scripts/Game/BattleLog.cs" id="2_jqay5"]
+
+[node name="DialogueBox" instance=ExtResource("1_xceg3")]
+script = ExtResource("2_jqay5")

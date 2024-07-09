@@ -29,7 +29,6 @@ public partial class GameOver: Node
     
     protected void Restart()
     {
-        GameMgr.ChangeScene(BattleScene);
         GameMgr.StartBattle();
     }
 

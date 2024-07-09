@@ -4,7 +4,7 @@ using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
 
-public class EyePatchCard: BaseTapCard
+public class EyePatchCard: BaseSealCard
 {
     protected int Count;
     

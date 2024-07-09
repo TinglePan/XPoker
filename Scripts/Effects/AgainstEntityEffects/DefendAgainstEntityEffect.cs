@@ -19,15 +19,18 @@ public class DefendAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
     public override void Resolve()
     {
         float defenceValue = RawValue;
+        int power = 0;
         if (PowerScale > 0)
         {
-            var power = Src.GetPower(Engage.Hands[Src].Tier);
+            power = Src.GetPower(Battle.RoundHands[Src].Tier);
             defenceValue = CalculateValue(power);
         }
         defenceValue += Src.GetDefenceModifier();
         var separatedMultipliers = Utils.AddUpSeparatedMultipliers(Src.GetDefenceMultipliers());
         var roundedDefenceValue = (int)(defenceValue * separatedMultipliers.X * separatedMultipliers.Y);
         Src.ChangeDefence(roundedDefenceValue);
+        Battle.GameMgr.BattleLog.Log(Utils._($"{Src} defends! Power:{power}. Value:{defenceValue}"));
+        Battle.GameMgr.BattleLog.Log(Utils._($"Gained {roundedDefenceValue} defence"));
     }
     
     public override string Description()

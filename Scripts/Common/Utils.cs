@@ -181,6 +181,34 @@ public static class Utils
         return "";
     }
 
+    public static string PrettyPrintHandTier(Enums.HandTier tier)
+    {
+        switch (tier)
+        {
+            case Enums.HandTier.HighCard:
+                return "High Card";
+            case Enums.HandTier.Pair:
+                return "Pair";
+            case Enums.HandTier.TwoPairs:
+                return "Two Pairs";
+            case Enums.HandTier.ThreeOfAKind:
+                return "Three of a Kind";
+            case Enums.HandTier.Straight:
+                return "Straight";
+            case Enums.HandTier.Flush:
+                return "Flush";
+            case Enums.HandTier.FullHouse:
+                return "Full House";
+            case Enums.HandTier.Quads:
+                return "Quads";
+            case Enums.HandTier.StraightFlush:
+                return "Straight Flush"; 
+            case Enums.HandTier.RoyalFlush:
+                return "Royal Flush";
+        }
+        return "Unknown";
+    }
+
     public static string GetPercentageString(float value)
     {
         return _($"{Mathf.RoundToInt(value * 100)}%");

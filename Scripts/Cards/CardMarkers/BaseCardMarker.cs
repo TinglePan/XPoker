@@ -31,7 +31,7 @@ public class BaseCardMarker: ILifeCycleTriggeredInBattle
         
     }
 
-    public virtual void Resolve(Battle battle, Engage engage, BattleEntity entity, Enums.EngageRole role)
+    public virtual void Resolve(Battle battle, Engage engage, BattleEntity entity)
     {
         
     }

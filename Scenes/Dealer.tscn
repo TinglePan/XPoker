@@ -7,7 +7,7 @@
 script = ExtResource("1_wisyj")
 
 [node name="DealPile" parent="." instance=ExtResource("2_02rlv")]
-position = Vector2(0, 42)
+position = Vector2(-128, 0)
 
 [node name="DiscardPile" parent="." instance=ExtResource("2_02rlv")]
-position = Vector2(0, -42)
+position = Vector2(128, 0)

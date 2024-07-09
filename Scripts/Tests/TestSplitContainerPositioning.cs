@@ -88,7 +88,6 @@ public partial class TestSplitContainerPositioning: Node
         }
         for (int i = 0; i < 2; i++)
         {
-            
             var card = new PokerCard(new PokerCardDef
             {
                 Rank = Enums.CardRank.Ace,

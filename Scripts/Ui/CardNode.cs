@@ -24,7 +24,6 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
     public Node2D PriceNode;
     public Label PriceLabel;
     public AnimationPlayer AnimationPlayer;
-
     
     public Enums.CardFace OriginalFaceDirection;
     public ObservableProperty<Enums.CardFace> FaceDirection;
@@ -129,7 +128,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		IsRevealed.Value = to;
 	}
 
-	public async void AnimateFlip(Enums.CardFace toFaceDir)
+	public async Task AnimateFlip(Enums.CardFace toFaceDir)
 	{
 		if (FaceDirection.Value == toFaceDir) return;
 		AnimationPlayer.Play("flip");
@@ -144,15 +143,16 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
 	}
 
-	public async Task AnimateSelectWithOrder(int order)
+	public async Task TweenSelect(bool to, float tweenTime)
 	{
-		if (!IsSelected)
+		if (IsSelected != to)
 		{
 			var newTween = CreateTween();
 			var offset = Configuration.SelectedCardOffset;
-			newTween.TweenProperty(this, "position", Position + offset, Configuration.SelectTweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+			newTween.TweenProperty(this, "position", to ? InitPosition + offset : InitPosition, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+			TweenControl.AddTween("select", newTween, tweenTime);
 			await ToSignal(newTween, Tween.SignalName.Finished);
-			IsSelected = true;
+			IsSelected = to;
 		}
 	}
 
@@ -165,8 +165,8 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 	{
 		if (IsTapped.Value == to) return;
 		var newTween = CreateTween();
-		var offset = Configuration.SelectedCardOffset;
-		newTween.TweenProperty(this, "position", to ? InitPosition + offset : InitPosition, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+		newTween.TweenProperty(this, "rotation_degrees", to ? 90f : 0, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+		TweenControl.AddTween("tap", newTween, tweenTime);
 		await ToSignal(newTween, Tween.SignalName.Finished);
 		IsTapped.Value = to;
 	}

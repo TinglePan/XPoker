@@ -210,7 +210,8 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
                 {
                     AddChild(contentNode);
                 }
-                MoveChild(contentNode, index); 
+                MoveChild(contentNode, index);
+                contentNode.PreviousContainer = contentNode.Container.Value;
                 contentNode.Container.Value = this;
                 // GD.Print($"{contentNode.Content.Value}({contentNode}) container added {this}");
             }
@@ -237,6 +238,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
                 // }
                 if (contentNode.Container.Value == this)
                 {
+                    contentNode.PreviousContainer = contentNode.Container.Value;
                     contentNode.Container.Value = null;
                 }
                 // GD.Print($"{contentNode.Content.Value}({contentNode}) container removed {this}");
@@ -258,9 +260,11 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
             {
                 Contents[oldNodesStartingIndex + i] = newNode.Content.Value;
                 RemoveChild(oldNode);
+                oldNode.PreviousContainer = oldNode.Container.Value;
                 oldNode.Container.Value = null;
                 newNode.Reparent(newNode);
                 MoveChild(newNode, oldNodesStartingIndex + i);
+                newNode.PreviousContainer = newNode.Container.Value;
                 newNode.Container.Value = this;
             }
         }

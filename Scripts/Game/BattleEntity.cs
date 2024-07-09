@@ -5,6 +5,7 @@ using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs.Def.BattleEntity;
@@ -23,6 +24,7 @@ public partial class BattleEntity: Node, ISetup
     public Label DefenceLabel;
     public ProgressBar HpBar;
     public Label HpLabel;
+    public Label RoundHandLabel;
     
     public Action<BattleEntity, int> OnHpChanged;
     public Action<BattleEntity> OnDefeated;
@@ -42,6 +44,8 @@ public partial class BattleEntity: Node, ISetup
     public bool IsHoleCardDealtVisible;
     public ObservableCollection<BaseCard> HoleCards;
     public ObservableCollection<BaseBuff> Buffs;
+    public ObservableProperty<Enums.HandTier> RoundHandTier;
+    public ObservableProperty<Enums.EngageRole> RoundRole;
 
     public static Dictionary<string, object> InitArgs(BattleEntityDef def)
     {
@@ -69,15 +73,20 @@ public partial class BattleEntity: Node, ISetup
         HpBar.MinValue = 0;
         HpBar.Step = 1;
         HpLabel = GetNode<Label>("HpBar/Hp");
+        RoundHandLabel = GetNode<Label>("RoundHand/Label");
         
-        MaxHp = new ObservableProperty<int>(nameof(MaxHp), this, 0);
         Hp = new ObservableProperty<int>(nameof(Hp), this, 0);
+        MaxHp = new ObservableProperty<int>(nameof(MaxHp), this, 0);
+        Hp.ValueChanged += HpChanged;
+        MaxHp.ValueChanged += HpChanged;
         // Level = new ObservableProperty<int>(nameof(Level), this, 0);
         Defence = new ObservableProperty<int>(nameof(Defence), this, 0);
         Defence.DetailedValueChanged += DefenceChanged;
         Defence.FireValueChangeEventsOnInit();
-        Hp.ValueChanged += HpChanged;
-        MaxHp.ValueChanged += HpChanged;
+        RoundRole = new ObservableProperty<Enums.EngageRole>(nameof(RoundRole), this, Enums.EngageRole.None);
+        RoundHandTier = new ObservableProperty<Enums.HandTier>(nameof(RoundHandTier), this, Enums.HandTier.HighCard);
+        RoundRole.ValueChanged += UpdateRoundHandLabel;
+        RoundHandTier.ValueChanged += UpdateRoundHandLabel;
         HoleCards = new ObservableCollection<BaseCard>();
         Buffs = new ObservableCollection<BaseBuff>();
         HasSetup = false;
@@ -335,5 +344,10 @@ public partial class BattleEntity: Node, ISetup
             DefenceIcon.Show();
             DefenceLabel.Text = args.NewValue.ToString();
         }
+    }
+    
+    protected void UpdateRoundHandLabel(object sender, ValueChangedEventArgs args)
+    {
+        RoundHandLabel.Text = $"{Utils.PrettyPrintHandTier(RoundHandTier.Value)}({RoundRole.Value.ToString()})";
     }
 }

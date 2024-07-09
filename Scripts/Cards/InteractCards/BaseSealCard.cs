@@ -5,11 +5,11 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards;
 
-public class BaseTapCard: BaseInteractCard
+public class BaseSealCard: BaseInteractCard
 {
-    public BaseTapCard(InteractCardDef def) : base(def)
+    public BaseSealCard(InteractCardDef def) : base(def)
     {
-        Debug.Assert(def.InteractionType == Enums.InteractionType.Seal);
+        Debug.Assert(def.InteractionType == Enums.InteractionType.Seal, def.ToString());
     }
     
     public override bool CanInteract(CardNode node)

@@ -28,7 +28,6 @@ public partial class GameWin: Node
     
     protected void Restart()
     {
-        GameMgr.ChangeScene(BattleScene);
         GameMgr.StartBattle();
     }
 

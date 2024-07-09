@@ -117,6 +117,7 @@ public abstract partial class BaseContentNode<TContentNode, TContent> : BaseCont
     where TContent: IContent<TContent>
 {
     public ObservableProperty<ContentContainer<TContentNode, TContent>> Container;
+    public ContentContainer<TContentNode, TContent> PreviousContainer;
 
     public override void _Ready()
     {
@@ -128,5 +129,6 @@ public abstract partial class BaseContentNode<TContentNode, TContent> : BaseCont
     {
         base.Setup(args);
         Container.Value = (ContentContainer<TContentNode, TContent>)args["container"];
+        PreviousContainer = Container.Value;
     }
 }

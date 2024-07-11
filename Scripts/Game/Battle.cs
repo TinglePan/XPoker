@@ -33,7 +33,6 @@ public partial class Battle: Node2D, ISetup
     public Dealer Dealer;
     public CardContainer CommunityCardContainer;
     public SplitCardContainer ResolveCardContainer;
-    public CardContainer EquipmentCardContainer;
     public CardContainer ItemCardContainer;
     public CardContainer RuleCardContainer;
     public PlayerBattleEntity Player;
@@ -88,7 +87,6 @@ public partial class Battle: Node2D, ISetup
         Dealer = GetNode<Dealer>("Dealer");
         CommunityCardContainer = GetNode<CardContainer>("CommunityCards");
         ResolveCardContainer = GetNode<SplitCardContainer>("ResolveCards");
-        EquipmentCardContainer = GetNode<CardContainer>("EquipmentCards");
         ItemCardContainer = GetNode<CardContainer>("ItemCards");
         RuleCardContainer = GetNode<CardContainer>("RuleCards");
         
@@ -174,20 +172,14 @@ public partial class Battle: Node2D, ISetup
         containerSetupArgs["defaultCardFaceDirection"] = Enums.CardFace.Up;
         containerSetupArgs["allowInteract"] = true;
         
-        containerSetupArgs["cards"] = Player.Equipments;
-        containerSetupArgs["expectedInteractCardType"] = Enums.InteractCardType.Equipment;
-        containerSetupArgs["containerName"] = "Equipments";
-        containerSetupArgs["expectedContentNodeCount"] = 1;
-        EquipmentCardContainer.Setup(containerSetupArgs);
-        
         containerSetupArgs["cards"] = Player.Items;
-        containerSetupArgs["expectedInteractCardType"] = Enums.InteractCardType.Item;
+        containerSetupArgs["expectedInteractCardDefType"] = typeof(ItemCardDef);
         containerSetupArgs["containerName"] = "Items";
         containerSetupArgs["expectedContentNodeCount"] = Player.ItemPocketSize.Value;
         ItemCardContainer.Setup(containerSetupArgs);
 
         containerSetupArgs["cards"] = RuleCards;
-        containerSetupArgs["expectedInteractCardType"] = Enums.InteractCardType.Rule;
+        containerSetupArgs["expectedInteractCardDefType"] = typeof(RuleCardDef);
         containerSetupArgs["containerName"] = "Rules";
         containerSetupArgs["expectedContentNodeCount"] = 1;
         RuleCardContainer.Setup(containerSetupArgs);
@@ -220,7 +212,7 @@ public partial class Battle: Node2D, ISetup
     {
         Reset();
         Dealer.Shuffle();
-        await GameMgr.AwaitAndDisableProceed(Dealer.DealEquipmentCards());
+        await GameMgr.AwaitAndDisableProceed(Dealer.DealInnateCards());
         await GameMgr.AwaitAndDisableProceed(NewRound());
         CurrentState = State.BeforeDealCards;
     }
@@ -265,7 +257,7 @@ public partial class Battle: Node2D, ISetup
                         selectRewardCard.Setup(new Dictionary<string, object>()
                         {
                             { "rewardCardCount", Configuration.DefaultRewardCardCount },
-                            { "rewardCardDefType", typeof(InteractCardDef) },
+                            { "rewardCardDefType", typeof(ItemCardDef) },
                             { "reRollPrice", Configuration.DefaultReRollPrice },
                             { "reRollPriceIncrease", Configuration.DefaultReRollPriceIncrease },
                             { "skipReward", Configuration.DefaultSkipReward }
@@ -285,31 +277,7 @@ public partial class Battle: Node2D, ISetup
             var tasks = new List<Task>();
             foreach (var cardNode in cardNodes)
             {
-                var card = cardNode.Content.Value;
-                if (card is BaseInteractCard interactCard)
-                {
-                    var sourceContainer = (CardContainer)cardNode.Container.Value;
-                    switch (interactCard.InteractCardDef.Type)
-                    {
-                        case Enums.InteractCardType.Equipment:
-                            tasks.Add(sourceContainer.MoveCardNodeToContainer(cardNode, EquipmentCardContainer));
-                            break;
-                        case Enums.InteractCardType.Item:
-                            if (ItemCardContainer.ContentNodes.Count >= Player.ItemPocketSize.Value)
-                            {
-                                tasks.Add(Dealer.AnimateDiscard(ItemCardContainer.ContentNodes[0]));
-                            }
-                            tasks.Add(sourceContainer.MoveCardNodeToContainer(cardNode, ItemCardContainer));
-                            break;
-                        case Enums.InteractCardType.Rule:
-                            tasks.Add(sourceContainer.MoveCardNodeToContainer(cardNode, RuleCardContainer));
-                            break;
-                    }
-                }
-                else
-                {
-                    tasks.Add(Dealer.AnimateDiscard(cardNode));
-                }
+                tasks.Add(Dealer.AnimateDiscard(cardNode));
                 await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
             }
             await Task.WhenAll(tasks);
@@ -317,7 +285,7 @@ public partial class Battle: Node2D, ISetup
         var tasks = new List<Task>();
         foreach (var entity in Entities)
         {
-            tasks.Add(DiscardCards(entity.HoleCardContainer.ContentNodes.ToList()));
+            tasks.Add(entity.RoundReset());
         }
         tasks.Add(DiscardCards(CommunityCardContainer.ContentNodes.ToList()));
         foreach (var cardContainer in ResolveCardContainer.CardContainers)
@@ -351,7 +319,6 @@ public partial class Battle: Node2D, ISetup
             entity.Reset();
         }
 
-        tasks.Add(DiscardCards(EquipmentCardContainer.ContentNodes.ToList()));
         tasks.Add(DiscardCards(ItemCardContainer.ContentNodes.ToList()));
         tasks.Add(DiscardCards(RuleCardContainer.ContentNodes.ToList()));
         Task.WhenAll(tasks);

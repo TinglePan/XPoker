@@ -4,11 +4,11 @@ using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
 
-public class EyePatchCard: BaseRuleCard
+public class DarknessCard: BaseRuleCard
 {
     protected int Count;
     
-    public EyePatchCard(InteractCardDef def): base(def)
+    public DarknessCard(RuleCardDef def): base(def)
     {
     }
     

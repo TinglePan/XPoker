@@ -5,7 +5,7 @@ namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 public class TheTieBreakerCard: BaseRuleCard
 {
-    public TheTieBreakerCard(InteractCardDef def): base(def)
+    public TheTieBreakerCard(RuleCardDef def): base(def)
     {
     }
     

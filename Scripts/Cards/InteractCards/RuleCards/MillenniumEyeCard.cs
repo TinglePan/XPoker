@@ -12,7 +12,7 @@ public class MillenniumEyeCard: BaseRuleCard
     public List<CardContainer> CardContainers;
     public List<CardNode> RevealedCardNodes;
     
-    public MillenniumEyeCard(InteractCardDef def): base(def)
+    public MillenniumEyeCard(RuleCardDef def): base(def)
     {
         RevealedCardNodes = new List<CardNode>();
     }

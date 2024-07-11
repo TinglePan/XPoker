@@ -8,7 +8,7 @@ public class CapitalismCard: BaseRuleCard
 {
     protected int Count;
     
-    public CapitalismCard(InteractCardDef def): base(def)
+    public CapitalismCard(RuleCardDef def): base(def)
     {
         
     }

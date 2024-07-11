@@ -8,7 +8,7 @@ public class SocialismCard: BaseRuleCard
 {
     private int _count;
     
-    public SocialismCard(InteractCardDef def): base(def)
+    public SocialismCard(RuleCardDef def): base(def)
     {
     }
 

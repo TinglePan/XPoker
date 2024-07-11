@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs.Def.BattleEntity;
@@ -60,8 +61,9 @@ public partial class PlayerBattleEntity: BattleEntity
         }
     }
 
-    public override void RoundReset()
+    public override async Task RoundReset()
     {
+        await base.RoundReset();
         Energy.Value = MaxEnergy.Value;
     }
 

@@ -16,7 +16,7 @@ public class BigShieldCard: BaseItemCard
         }
     }
 
-    public BigShieldCard(InteractCardDef def) : base(def)
+    public BigShieldCard(ItemCardDef def) : base(def)
     {
         
     }

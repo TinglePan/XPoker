@@ -34,7 +34,6 @@ public class BattleMainInputHandler: BaseInputHandler
 
         InteractCardContainers = new List<CardContainer>()
         {
-            Battle.EquipmentCardContainer,
             Battle.ItemCardContainer,
             Battle.RuleCardContainer
         };

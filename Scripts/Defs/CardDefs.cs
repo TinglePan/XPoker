@@ -9,7 +9,7 @@ namespace XCardGame.Scripts.Defs;
 
 public static class CardDefs
 {
-    public static InteractCardDef D6 = new ()
+    public static ItemCardDef D6 = new ()
     {
         Name = Utils._("D6"),
         ConcreteClassPath = "InteractCards.ItemCards.D6Card",
@@ -19,12 +19,11 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Six,
         
-        InteractionType = Enums.InteractionType.Use,
-        UseCost = 1,
+        Cost = 1,
         RankChangePerUse = -2,
     };
     
-    public static InteractCardDef MagicalHat = new ()
+    public static ItemCardDef MagicalHat = new ()
     {
         Name = Utils._("Magical hat"),
         ConcreteClassPath = "InteractCards.ItemCards.MagicalHatCard",
@@ -34,12 +33,11 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Three,
         
-        InteractionType = Enums.InteractionType.Use,
-        UseCost = 1,
+        Cost = 1,
         RankChangePerUse = -1,
     };
     
-    public static InteractCardDef BalaTrollHand = new ()
+    public static ItemCardDef BalaTrollHand = new ()
     {
         Name = Utils._("BalaTroll Hand"),
         ConcreteClassPath = "InteractCards.ItemCards.BalaTrollHandCard",
@@ -49,12 +47,11 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Three,
         
-        InteractionType = Enums.InteractionType.Use,
-        UseCost = 1,
+        Cost = 1,
         RankChangePerUse = -1,
     };
     
-    public static InteractCardDef TurnTheTables = new ()
+    public static ItemCardDef TurnTheTables = new ()
     {
         Name = Utils._("Turn the tables"),
         ConcreteClassPath = "InteractCards.ItemCards.TurnTheTablesCard",
@@ -63,50 +60,49 @@ public static class CardDefs
         BasePrice = 5,
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Use,
-        UseCost = 1,
+        Cost = 1,
         RankChangePerUse = -99,
     };
     
-    public static InteractCardDef EyePatch = new ()
-    {
-        Name = Utils._("Eye patch"),
-        ConcreteClassPath = "InteractCards.EquipmentCards.EyePatchCard",
-        DescriptionTemplate = Utils._("Add face-down community cards."),
-        IconPath = "res://Sprites/Cards/eye_patch.png",
-        BasePrice = 5,
-        Rarity = 1,
-        InteractionType = Enums.InteractionType.Seal
-    };
-    
-    public static InteractCardDef BigShield = new ()
+    public static ItemCardDef BigShield = new ()
     {
         Name = Utils._("Big shield"),
-        ConcreteClassPath = "InteractCards.EquipmentCards.BigShieldCard",
+        ConcreteClassPath = "InteractCards.ItemCards.BigShieldCard",
         DescriptionTemplate = Utils._("Increase defend value while decrease attack value"),
         IconPath = "res://Sprites/Cards/big_shield.png",
         BasePrice = 5,
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Use,
-        UseCost = 1,
+        Cost = 1,
         RankChangePerUse = -99,
     };
     
-    public static InteractCardDef MillenniumEye = new ()
+    public static ItemCardDef MillenniumEye = new ()
     {
         Name = Utils._("Millennium eye"),
-        ConcreteClassPath = "InteractCards.EquipmentCards.MillenniumEyeCard",
+        ConcreteClassPath = "InteractCards.ItemCards.MillenniumEyeCard",
         DescriptionTemplate = Utils._("I can see forever."),
         IconPath = "res://Sprites/Cards/millennium_eye.png",
         BasePrice = 5,
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        UnSealCost = 1,
+        Cost = 2,
+        RankChangePerUse = -99,
     };
     
-    public static InteractCardDef Capitalism = new ()
+    public static RuleCardDef Darkness = new ()
+    {
+        Name = Utils._("Darkness"),
+        ConcreteClassPath = "InteractCards.RuleCards.DarknessCard",
+        DescriptionTemplate = Utils._("Add face-down community cards."),
+        IconPath = "res://Sprites/Cards/darkness.png",
+        Rarity = 1,
+        
+        SealCost = 1,
+        AutoUnSeal = true,
+    };
+    
+    public static RuleCardDef Capitalism = new ()
     {
         Name = Utils._("Capitalism"),
         ConcreteClassPath = "InteractCards.RuleCards.CapitalismCard",
@@ -114,13 +110,11 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/capitalism.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef Socialism = new ()
+    public static RuleCardDef Socialism = new ()
     {
         Name = Utils._("Socialism"),
         ConcreteClassPath = "InteractCards.RuleCards.SocialismCard",
@@ -128,13 +122,11 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/socialism.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef KeepOut = new ()
+    public static RuleCardDef KeepOut = new ()
     {
         Name = Utils._("Keep out"),
         ConcreteClassPath = "InteractCards.RuleCards.KeepOutCard",
@@ -142,13 +134,11 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/keep_out.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef TheTieBreaker = new ()
+    public static RuleCardDef TheTieBreaker = new ()
     {
         Name = Utils._("The tie breaker"),
         ConcreteClassPath = "InteractCards.RuleCards.TheTieBreakerCard",
@@ -156,13 +146,11 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/the_tie_breaker.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef Xom = new ()
+    public static RuleCardDef Xom = new ()
     {
         Name = Utils._("Xom"),
         ConcreteClassPath = "InteractCards.RuleCards.XomCard",
@@ -172,13 +160,11 @@ public static class CardDefs
         Rank = Enums.CardRank.Joker,
         Suit = Enums.CardSuit.Joker,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef Separation = new ()
+    public static RuleCardDef Separation = new ()
     {
         Name = Utils._("Separation"),
         ConcreteClassPath = "InteractCards.RuleCards.SeparationCard",
@@ -186,13 +172,10 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/hand_shake.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
-        SealCost = 1,
-        SealedRankChangePerTurn = 99
+        SealCost = 0,
     };
     
-    public static InteractCardDef SpadesRule = new ()
+    public static RuleCardDef SpadesRule = new ()
     {
         Name = Utils._("Spades rule"),
         ConcreteClassPath = "InteractCards.RuleCards.SpadesRuleCard",
@@ -200,13 +183,11 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/spades_rule.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef HeartsRule = new ()
+    public static RuleCardDef HeartsRule = new ()
     {
         Name = Utils._("Hearts rule"),
         ConcreteClassPath = "InteractCards.RuleCards.HeartsRuleCard",
@@ -214,13 +195,11 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/hearts_rule.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef ClubsRule = new ()
+    public static RuleCardDef ClubsRule = new ()
     {
         Name = Utils._("Clubs rule"),
         ConcreteClassPath = "InteractCards.RuleCards.ClubsRuleCard",
@@ -228,13 +207,11 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/clubs_rule.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef DiamondsRule = new ()
+    public static RuleCardDef DiamondsRule = new ()
     {
         Name = Utils._("Diamonds rule"),
         ConcreteClassPath = "InteractCards.RuleCards.DiamondsRuleCard",
@@ -242,13 +219,11 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/diamonds_rule.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef NerfFlush = new InteractCardDef()
+    public static RuleCardDef NerfFlush = new ()
     {
         Name = Utils._("Nerf flush"),
         ConcreteClassPath = "InteractCards.RuleCards.NerfFlushCard",
@@ -256,13 +231,11 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/nerf_flush.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
-    public static InteractCardDef ShortDeckRule = new InteractCardDef()
+    public static RuleCardDef ShortDeckRule = new ()
     {
         Name = Utils._("Short deck rule"),
         ConcreteClassPath = "InteractCards.RuleCards.ShortDeckRuleCard",
@@ -270,10 +243,8 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/short_deck_rule.png",
         Rarity = 1,
         
-        InteractionType = Enums.InteractionType.Seal,
-        RuleNature = Enums.RuleNature.Neutral,
         SealCost = 1,
-        SealedRankChangePerTurn = 99
+        AutoUnSeal = true,
     };
     
     public static List<BaseCardDef> All()

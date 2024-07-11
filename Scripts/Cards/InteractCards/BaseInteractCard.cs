@@ -9,11 +9,9 @@ namespace XCardGame.Scripts.Cards.InteractCards;
 
 public class BaseInteractCard: BaseCard, IInteractCard
 {
-    public InteractCardDef InteractCardDef => (InteractCardDef)Def;
-    
     protected bool AlreadyFunctioning;
     
-    public BaseInteractCard(InteractCardDef def): base(def)
+    public BaseInteractCard(BaseCardDef def): base(def)
     {
         AlreadyFunctioning = false;
     }
@@ -32,20 +30,16 @@ public class BaseInteractCard: BaseCard, IInteractCard
     
     public override void OnStart(Battle battle)
     {
-        base.OnStart(battle);
         if (IsFunctioning() && !AlreadyFunctioning)
         {
-            Battle.OnRoundStart += OnRoundStart;
             AlreadyFunctioning = true;
         }
     }
 
     public override void OnStop(Battle battle)
     {
-        base.OnStop(battle);
         if (AlreadyFunctioning)
         {
-            Battle.OnRoundStart -= OnRoundStart;
             AlreadyFunctioning = false;
         }
     }
@@ -53,39 +47,18 @@ public class BaseInteractCard: BaseCard, IInteractCard
     public override async void ChangeRank(int delta)
     {
         var cardNode = Node<CardNode>();
-        var interactCardDef = (InteractCardDef)Def;
-        var resultRankValue = Utils.GetCardRankValue(Rank.Value) + delta;
-        switch (interactCardDef.TerminateBehavior)
+        var currentRankValue = Utils.GetCardRankValue(Rank.Value);
+        if (currentRankValue == 1 && delta < 0)
         {
-            case Enums.TerminateBehavior.Tap:
-                if (resultRankValue < interactCardDef.SealWhenLessThan && !cardNode.IsTapped.Value)
-                {
-                    cardNode.TweenTap(true, Configuration.TapTweenTime);
-                } else if (resultRankValue > interactCardDef.UnSealWhenGreaterThan && cardNode.IsTapped.Value)
-                {
-                    cardNode.TweenTap(false, Configuration.TapTweenTime);
-                }
-                break;
-            case Enums.TerminateBehavior.Discard:
-                if (resultRankValue < interactCardDef.SealWhenLessThan)
-                {
-                    await Battle.Dealer.AnimateDiscard(cardNode);
-                }
-                break;
-            case Enums.TerminateBehavior.Exhaust:
-                // TODO: Exhaust card
-                break;
+            await GameMgr.AwaitAndDisableProceed(Battle.Dealer.AnimateDiscard(cardNode));
         }
-        resultRankValue = Mathf.Clamp(resultRankValue, interactCardDef.NaturalRankChangeRange.X,
-            interactCardDef.NaturalRankChangeRange.Y);
-        var resultRank = Utils.GetCardRank(resultRankValue);
-        Rank.Value = resultRank;
-    }
-    
-    protected void OnRoundStart(Battle battle)
-    {
-        var interactCardDef = (InteractCardDef)Def;
-        var cardNode = Node<CardNode>();
-        ChangeRank(cardNode.IsTapped.Value ? interactCardDef.SealedRankChangePerTurn : interactCardDef.RankChangePerTurn);
+        else
+        {
+            var resultRankValue = Utils.GetCardRankValue(Rank.Value) + delta;
+            resultRankValue = Mathf.Clamp(resultRankValue, 1,
+                Utils.GetCardRankValue(Enums.CardRank.King));
+            var resultRank = Utils.GetCardRank(resultRankValue);
+            Rank.Value = resultRank;
+        }
     }
 }

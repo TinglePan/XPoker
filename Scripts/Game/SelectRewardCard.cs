@@ -70,7 +70,7 @@ public partial class SelectRewardCard: Control
     public List<BaseCardDef> AllRewardCardDefs;
     public Dictionary<int, List<BaseCardDef>> RewardCardDefPool;
     
-    public Enums.InteractCardType RewardCardType;
+    public Type RewardCardDefType;
     public ObservableProperty<int> ReRollPrice;
     public int ReRollPriceIncrease;
     public ObservableProperty<int> SkipReward;
@@ -103,9 +103,9 @@ public partial class SelectRewardCard: Control
     {
         Battle = GameMgr.CurrentBattle;
         var rewardCardCount = (int)args["rewardCardCount"];
-        if (args.TryGetValue("rewardCardType", out var arg))
+        if (args.TryGetValue("rewardCardDefType", out var arg))
         {
-            RewardCardType = (Enums.InteractCardType)arg;
+            RewardCardDefType = (Type)arg;
         }
         CardContainer.Setup(new Dictionary<string, object>()
         {
@@ -126,9 +126,9 @@ public partial class SelectRewardCard: Control
         });
         AllRewardCardDefs = FilterCardDefs(CardDefs.All(), x => x.GetType().IsAssignableTo(typeof(InteractCardDef)));
         
-        if (RewardCardType != Enums.InteractCardType.None)
+        if (RewardCardDefType != null)
         {
-            AllRewardCardDefs = FilterCardDefs(AllRewardCardDefs, x => ((InteractCardDef)x).Type == RewardCardType);
+            AllRewardCardDefs = FilterCardDefs(AllRewardCardDefs, x => x.GetType() == RewardCardDefType);
         }
         
         RewardCardDefPool = new Dictionary<int, List<BaseCardDef>>();

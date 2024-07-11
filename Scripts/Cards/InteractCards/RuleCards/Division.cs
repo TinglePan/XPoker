@@ -4,7 +4,7 @@ namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 public class Division: BaseRuleCard
 {
-    public Division(InteractCardDef def): base(def)
+    public Division(RuleCardDef def): base(def)
     {
     }
     

@@ -133,17 +133,18 @@ public partial class Dealer: Node2D, ISetup
         }
     }
 
-    public async Task DealEquipmentCards()
+    public async Task DealInnateCards()
     {
         var tasks = new List<Task>();
         foreach (var card in DealCardPile.Cards)
         {
-            if (card is BaseInteractCard interactCard && ((InteractCardDef)interactCard.Def).Type == Enums.InteractCardType.Equipment)
+            if (card is BaseInteractCard interactCard && ((InteractCardDef)interactCard.Def).IsInnate)
             {
                 var cardNode = CreateCardNodeOnPile(card, DealCardPile);
                 Battle.OnDealCard?.Invoke(Battle, cardNode);
-                Battle.EquipmentCardContainer.ContentNodes.Add(cardNode);
+                Battle.ItemCardContainer.ContentNodes.Add(cardNode);
                 tasks.Add(cardNode.TweenControl.WaitComplete("transform"));
+                if (Battle.ItemCardContainer.ContentNodes.Count >= Battle.Player.ItemPocketSize.Value) break;
             }
         }
         await Task.WhenAll(tasks);

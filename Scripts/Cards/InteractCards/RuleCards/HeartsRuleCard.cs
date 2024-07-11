@@ -4,7 +4,7 @@ namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 public class HeartsRuleCard: BaseRuleCard
 {
-    public HeartsRuleCard(InteractCardDef def) : base(def)
+    public HeartsRuleCard(RuleCardDef def) : base(def)
     {
     }
 }

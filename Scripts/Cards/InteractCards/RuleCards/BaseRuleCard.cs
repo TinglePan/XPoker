@@ -1,48 +1,67 @@
 ﻿using System.Diagnostics;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def.Card;
+using XCardGame.Scripts.Game;
 using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards;
 
 public class BaseRuleCard: BaseInteractCard
 {
-    public BaseRuleCard(InteractCardDef def) : base(def)
+    
+    public BaseRuleCard(RuleCardDef def) : base(def)
     {
-        Debug.Assert(def.InteractionType == Enums.InteractionType.Seal, def.ToString());
     }
     
     public override bool CanInteract(CardNode node)
     {
         if (!base.CanInteract(node)) return false;
-        var interactCardDef = (InteractCardDef)Def;
-        if (node.Container.Value is CardContainer cardContainer && cardContainer.ExpectedInteractCardType != interactCardDef.Type) return false;
-        if (node.IsTapped.Value)
-        {
-            // UnSeal
-            if (Battle.Player.MaxEnergy.Value + interactCardDef.SealCost < interactCardDef.UnSealCost) return false;
-        }
-        else
+        var ruleCardDef = (RuleCardDef)Def;
+        if (node.Container.Value is CardContainer cardContainer && cardContainer.ExpectedInteractCardDefType != typeof(RuleCardDef)) return false;
+        if (!node.IsTapped.Value)
         {
             // Seal
-            if (Battle.Player.MaxEnergy.Value + interactCardDef.UnSealCost < interactCardDef.SealCost) return false;
+            if (Battle.Player.Energy.Value < ruleCardDef.SealCost) return false;
         }
         return true;
     }
 
     public override void Interact(CardNode node)
     {
-        var interactCardDef = (InteractCardDef)Def;
-        if (node.IsTapped.Value)
-        {
-            // UnSeal
-            Battle.Player.MaxEnergy.Value = Battle.Player.MaxEnergy.Value - interactCardDef.UnSealCost + interactCardDef.SealCost;
-        }
-        else
+        var ruleCardDef = (RuleCardDef)Def;
+        if (!node.IsTapped.Value)
         {
             // Seal
-            Battle.Player.MaxEnergy.Value = Battle.Player.MaxEnergy.Value + interactCardDef.UnSealCost - interactCardDef.SealCost;
+            Battle.Player.Energy.Value -=  ruleCardDef.SealCost;
         }
         node.TweenTap(!node.IsTapped.Value, Configuration.TapTweenTime);
+    }
+    
+    public override void OnStart(Battle battle)
+    {
+        if (IsFunctioning() && !AlreadyFunctioning)
+        {
+            battle.OnRoundEnd += OnRoundEnd;
+            AlreadyFunctioning = true;
+        }
+    }
+    
+    public override void OnStop(Battle battle)
+    {
+        base.OnStop(battle);
+        if (AlreadyFunctioning)
+        {
+            battle.OnRoundEnd -= OnRoundEnd;
+            AlreadyFunctioning = false;
+        }
+    }
+
+    protected void OnRoundEnd(Battle battle)
+    {
+        var ruleCardDef = (RuleCardDef)Def;
+        if (IsFunctioning())
+        {
+            ChangeRank(ruleCardDef.RankChangePerTurn);
+        }
     }
 }

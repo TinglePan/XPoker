@@ -11,7 +11,7 @@ namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 public class D6Card: BaseItemCard
 {
     public List<CardContainer> CardContainers;
-    public D6Card(InteractCardDef def): base(def)
+    public D6Card(ItemCardDef def): base(def)
     {
     }
 

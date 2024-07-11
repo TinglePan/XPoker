@@ -7,18 +7,17 @@ namespace XCardGame.Scripts.Cards.InteractCards;
 
 public class BaseItemCard: BaseInteractCard
 {
-    public BaseItemCard(InteractCardDef def): base(def)
+    public BaseItemCard(ItemCardDef def): base(def)
     {
-        Debug.Assert(def.InteractionType == Enums.InteractionType.Use, $"Incorrect card type for this interaction type {def.InteractionType}");
     }
 
     public override bool CanInteract(CardNode node)
     {
         if (!base.CanInteract(node)) return false;
         if (node.IsTapped.Value) return false;
-        var interactCardDef = (InteractCardDef)Def;
-        if (node.Container.Value is CardContainer cardContainer && cardContainer.ExpectedInteractCardType != interactCardDef.Type) return false;
-        if (Battle.Player.Energy.Value < interactCardDef.UseCost) return false;
+        var itemCardDef = (ItemCardDef)Def;
+        if (node.Container.Value is CardContainer cardContainer && cardContainer.ExpectedInteractCardDefType != typeof(ItemCardDef)) return false;
+        if (Battle.Player.Energy.Value < itemCardDef.Cost) return false;
         return true;
     }
 
@@ -34,8 +33,8 @@ public class BaseItemCard: BaseInteractCard
 
     public virtual void Use(CardNode node)
     {
-        var interactCardDef = (InteractCardDef)Def;
+        var interactCardDef = (ItemCardDef)Def;
         ChangeRank(interactCardDef.RankChangePerUse);
-        Battle.Player.Energy.Value -= interactCardDef.UseCost;
+        Battle.Player.Energy.Value -= interactCardDef.Cost;
     }
 }

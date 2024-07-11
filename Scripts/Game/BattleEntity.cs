@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
@@ -154,9 +156,19 @@ public partial class BattleEntity: Node, ISetup
         BuffContainer.ContentNodes.Clear();
     }
     
-    public virtual void RoundReset()
+    public virtual async Task RoundReset()
     {
-        // HoleCardContainer.ContentNodes.Clear();
+        async Task DiscardCards(List<CardNode> cardNodes)
+        {
+            var tasks = new List<Task>();
+            foreach (var cardNode in cardNodes)
+            {
+                tasks.Add(Battle.Dealer.AnimateDiscard(cardNode));
+                await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
+            }
+            await Task.WhenAll(tasks);
+        }
+        await DiscardCards(HoleCardContainer.ContentNodes.ToList());
     }
 
     public int GetPower(Enums.HandTier handTier, bool useCharge = true)

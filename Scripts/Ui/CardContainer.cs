@@ -21,7 +21,7 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 	public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
 
 	public bool AllowInteract;
-	public Enums.InteractCardType ExpectedInteractCardType;
+	public Type ExpectedInteractCardDefType;
 	public bool WithCardEffect;
 	
 	public override void _Ready()
@@ -37,7 +37,7 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		AllowInteract = (bool)args["allowInteract"];
 		if (AllowInteract)
 		{
-			ExpectedInteractCardType = (Enums.InteractCardType)args["expectedInteractCardType"];
+			ExpectedInteractCardDefType = (Type)args["expectedInteractCardDefType"];
 		}
 		WithCardEffect = (bool)args["withCardEffect"];
 		if (args["cards"] is ObservableCollection<BaseCard> cards && cards != Contents)

@@ -53,7 +53,7 @@ public class MagicalHatCard: BaseItemCard
     
     public List<CardContainer> CardContainers;
 
-    public MagicalHatCard(InteractCardDef def) : base(def)
+    public MagicalHatCard(ItemCardDef def) : base(def)
     {
     }
     

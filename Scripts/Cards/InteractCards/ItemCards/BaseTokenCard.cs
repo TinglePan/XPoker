@@ -63,7 +63,7 @@ public abstract class BaseTokenCard<TCard, TInputHandler>: BaseItemCard where TI
     
     public List<CardContainer> ValidTargetContainers;
     
-    public BaseTokenCard(InteractCardDef def) : base(def)
+    public BaseTokenCard(ItemCardDef def) : base(def)
     {
         Debug.Assert(def.RankChangePerUse == 0);
     }

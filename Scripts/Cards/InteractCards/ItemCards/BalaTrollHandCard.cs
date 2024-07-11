@@ -51,7 +51,7 @@ public class BalaTrollHandCard: BaseItemCard
     
     public CardContainer PlayerCardContainer; 
     
-    public BalaTrollHandCard(InteractCardDef def): base(def)
+    public BalaTrollHandCard(ItemCardDef def): base(def)
     {
     }
 

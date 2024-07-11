@@ -4,7 +4,7 @@ namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 public class XomCard: BaseRuleCard
 {
-    public XomCard(InteractCardDef def): base(def)
+    public XomCard(RuleCardDef def): base(def)
     {
     }
     

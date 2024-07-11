@@ -10,7 +10,7 @@ public class NerfFlushCard: BaseRuleCard
     protected List<Enums.HandTier> NerfHandRanksInDescendingOrder;
     
 
-    public NerfFlushCard(InteractCardDef def) : base(def)
+    public NerfFlushCard(RuleCardDef def) : base(def)
     {
     }
     

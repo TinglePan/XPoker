@@ -108,7 +108,7 @@ public class KeepOutCard: BaseRuleCard
     public List<CardContainer> CardContainers;
     public KeepOutEffect Effect;
     
-    public KeepOutCard(InteractCardDef def): base(def)
+    public KeepOutCard(RuleCardDef def): base(def)
     {
         Rule = null;
     }

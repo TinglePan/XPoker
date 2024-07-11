@@ -33,6 +33,8 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
     public ObservableProperty<bool> IsRevealed;
     public ObservableProperty<bool> IsTapped;
     public ObservableProperty<bool> IsBought;
+
+    public bool HasTappedThisRound;
     
     protected Vector2 InitPosition;
 
@@ -58,6 +60,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		IsRevealed.DetailedValueChanged += OnToggleIsRevealed;
 		IsTapped = new ObservableProperty<bool>(nameof(IsTapped), this, false);
 		IsTapped.DetailedValueChanged += OnToggleIsTapped;
+		HasTappedThisRound = false;
 		Container.DetailedValueChanged += OnContainerChanged;
 		InitPosition = Position;
 	}

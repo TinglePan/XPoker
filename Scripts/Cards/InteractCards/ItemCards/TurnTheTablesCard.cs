@@ -10,7 +10,7 @@ public class TurnTheTablesCard: BaseItemCard
     public CardContainer PlayerHoleCardContainer;
     public CardContainer EnemyHoleCardContainer;
     
-    public TurnTheTablesCard(InteractCardDef def) : base(def)
+    public TurnTheTablesCard(ItemCardDef def) : base(def)
     {
     }
 

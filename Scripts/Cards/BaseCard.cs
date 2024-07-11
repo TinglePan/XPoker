@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Godot;
+using XCardGame.Scripts.Cards.InteractCards.RuleCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
@@ -129,15 +130,36 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     public virtual void Resolve(Battle battle, Engage engage, BattleEntity entity)
     {
         BaseAgainstEntityEffect effect = null;
+        bool applyHeartsRule = false;
         if (entity.RoundRole.Value == Enums.EngageRole.Attacker)
         {
             effect = new AttackAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
                 Utils.GetCardRankValue(Rank.Value), 1);
+            foreach (var ruleCard in battle.RuleCards)
+            {
+                if (ruleCard is SpadesRuleCard)
+                {
+                    ((AttackAgainstEntityEffect)effect).Leech = 0.5f;
+                } else if (ruleCard is ClubsRuleCard)
+                {
+                    ((AttackAgainstEntityEffect)effect).RawValue *= 2;
+                }
+            }
         }
         else if (entity.RoundRole.Value == Enums.EngageRole.Defender)
         {
             effect = new DefendAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
                 Utils.GetCardRankValue(Rank.Value), 1);
+            foreach (var ruleCard in battle.RuleCards)
+            {
+                if (ruleCard is HeartsRuleCard)
+                {
+                    applyHeartsRule = true;
+                } else if (ruleCard is DiamondsRuleCard)
+                {
+                    ((DefendAgainstEntityEffect)effect).RawValue *= 2;
+                }
+            }
         }
         effect?.Setup(new Dictionary<string, object>()
         {
@@ -147,6 +169,18 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         Battle.GameMgr.BattleLog.Log($"Resolving {this}");
         // GD.Print($"Resolve of {this}, effect {effect}");
         effect?.Resolve();
+
+        if (applyHeartsRule)
+        {
+            effect = new HealEffect(this, entity, entity,
+                Utils.GetCardRankValue(Rank.Value) / 2, 0);
+            effect.Setup(new Dictionary<string, object>()
+            {
+                { "battle", battle },
+                { "engage", engage }
+            });
+            effect?.Resolve();
+        }
     }
 
     protected void OnToggleIsNegated(object sender, ValueChangedEventDetailedArgs<bool> args)

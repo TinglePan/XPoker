@@ -9,7 +9,49 @@ public class StraightGraph
     public class StraightGraphNode
     {
         public Enums.CardRank Rank;
+        public bool IsTerminal;
         public List<StraightGraphNode> ValidNextNodes;
+    }
+
+    public static StraightGraph StandardStraightGraph(bool allowWrap = false, bool allowShort = false)
+    {
+        var res = new StraightGraph();
+        var aceNode = res.GetNodeOrNew(Enums.CardRank.Ace);
+        if (!allowWrap)
+        {
+            aceNode.IsTerminal = true;
+        }
+        res.GetNodeOrNew(Enums.CardRank.Two);
+        res.GetNodeOrNew(Enums.CardRank.Three);
+        res.GetNodeOrNew(Enums.CardRank.Four);
+        res.GetNodeOrNew(Enums.CardRank.Five);
+        res.GetNodeOrNew(Enums.CardRank.Six);
+        res.GetNodeOrNew(Enums.CardRank.Seven);
+        res.GetNodeOrNew(Enums.CardRank.Eight);
+        res.GetNodeOrNew(Enums.CardRank.Nine);
+        res.GetNodeOrNew(Enums.CardRank.Ten);
+        res.GetNodeOrNew(Enums.CardRank.Jack);
+        res.GetNodeOrNew(Enums.CardRank.Queen);
+        res.GetNodeOrNew(Enums.CardRank.King);
+        
+        res.AddEdge(Enums.CardRank.Ace, Enums.CardRank.Two);
+        res.AddEdge(Enums.CardRank.Two, Enums.CardRank.Three);
+        res.AddEdge(Enums.CardRank.Three, Enums.CardRank.Four);
+        res.AddEdge(Enums.CardRank.Four, Enums.CardRank.Five);
+        res.AddEdge(Enums.CardRank.Five, Enums.CardRank.Six);
+        res.AddEdge(Enums.CardRank.Six, Enums.CardRank.Seven);
+        res.AddEdge(Enums.CardRank.Seven, Enums.CardRank.Eight);
+        res.AddEdge(Enums.CardRank.Eight, Enums.CardRank.Nine);
+        res.AddEdge(Enums.CardRank.Nine, Enums.CardRank.Ten);
+        res.AddEdge(Enums.CardRank.Ten, Enums.CardRank.Jack);
+        res.AddEdge(Enums.CardRank.Jack, Enums.CardRank.Queen);
+        res.AddEdge(Enums.CardRank.Queen, Enums.CardRank.King);
+        
+        if (allowShort)
+        {
+            res.AddEdge(Enums.CardRank.Ace, Enums.CardRank.Six);
+        }
+        return res;
     }
 
     public Dictionary<Enums.CardRank, StraightGraphNode> NodeIndex;
@@ -18,8 +60,8 @@ public class StraightGraph
     {
         NodeIndex = new Dictionary<Enums.CardRank, StraightGraphNode>();
     }
-    
-    public void AddNode(Enums.CardRank rank, params Enums.CardRank[] validNextRanks)
+
+    public void AddEdge(Enums.CardRank rank, params Enums.CardRank[] validNextRanks)
     {
         var node = GetNodeOrNew(rank);
         foreach (var nextRank in validNextRanks)
@@ -36,7 +78,13 @@ public class StraightGraph
         return currentNode.ValidNextNodes.Any(node => node.Rank == nextRank);
     }
     
-    public List<List<Enums.CardRank>> AllPossibleStraightRanges(Enums.CardRank startRank, int steps)
+    public List<Enums.CardRank> AllPossibleStraightNext(Enums.CardRank startRank)
+    {
+        if (!NodeIndex.TryGetValue(startRank, out var startNode)) return null;
+        return startNode.ValidNextNodes.Select(node => node.Rank).ToList();
+    }
+    
+    public List<List<Enums.CardRank>> AllPossibleStraightSequences(Enums.CardRank startRank, int steps)
     {
         if (!NodeIndex.TryGetValue(startRank, out var startNode)) return null;
         var res = new List<List<Enums.CardRank>>(); 
@@ -66,7 +114,7 @@ public class StraightGraph
         {
             var node = new StraightGraphNode
             {
-                Rank = rank, ValidNextNodes = new List<StraightGraphNode>()
+                Rank = rank, IsTerminal = false, ValidNextNodes = new List<StraightGraphNode>()
             };
             NodeIndex[rank] = node;
         }

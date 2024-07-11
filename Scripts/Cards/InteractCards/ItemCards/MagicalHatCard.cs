@@ -8,7 +8,7 @@ using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
-public class MagicalHatCard: BaseUseCard
+public class MagicalHatCard: BaseItemCard
 {
     public class MagicalHatCardInputHandler : BaseItemCardSelectTargetInputHandler<MagicalHatCard>
     {

@@ -5,7 +5,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
-public class TurnTheTablesCard: BaseUseCard
+public class TurnTheTablesCard: BaseItemCard
 {
     public CardContainer PlayerHoleCardContainer;
     public CardContainer EnemyHoleCardContainer;

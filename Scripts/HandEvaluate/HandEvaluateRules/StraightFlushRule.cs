@@ -10,7 +10,7 @@ public class StraightFlushRule: StraightRule
 {
     public override Enums.HandTier Tier => Enums.HandTier.StraightFlush;
     
-    public StraightFlushRule(int cardCount, bool canWrap, bool allowAceLowStraight) : base(cardCount, canWrap, allowAceLowStraight)
+    public StraightFlushRule(int cardCount, bool allowWrap, bool allowShort) : base(cardCount, allowWrap, allowShort)
     {
     }
     

@@ -11,7 +11,7 @@ public class BaseAgainstEntityEffect: BaseEffect
     public BattleEntity Src;
     public BattleEntity Dst;
     
-    public BaseAgainstEntityEffect(string name, string descriptionTemplate, BattleEntity src, BattleEntity dst, BaseCard originateCard) : 
+    public BaseAgainstEntityEffect(string name, string descriptionTemplate, BaseCard originateCard, BattleEntity src, BattleEntity dst) : 
         base(name, descriptionTemplate, originateCard)
     {
         Src = src;

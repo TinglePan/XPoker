@@ -4,7 +4,7 @@ using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
-public class SocialismCard: BaseSealCard
+public class SocialismCard: BaseRuleCard
 {
     private int _count;
     

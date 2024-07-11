@@ -5,9 +5,9 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards;
 
-public class BaseUseCard: BaseInteractCard
+public class BaseItemCard: BaseInteractCard
 {
-    public BaseUseCard(InteractCardDef def): base(def)
+    public BaseItemCard(InteractCardDef def): base(def)
     {
         Debug.Assert(def.InteractionType == Enums.InteractionType.Use, $"Incorrect card type for this interaction type {def.InteractionType}");
     }

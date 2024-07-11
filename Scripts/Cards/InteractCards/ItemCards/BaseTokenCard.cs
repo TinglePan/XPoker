@@ -8,7 +8,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards;
 
-public abstract class BaseTokenCard<TCard, TInputHandler>: BaseUseCard where TInputHandler: BaseItemCardSelectTargetInputHandler<TCard> where TCard: BaseTokenCard<TCard, TInputHandler>
+public abstract class BaseTokenCard<TCard, TInputHandler>: BaseItemCard where TInputHandler: BaseItemCardSelectTargetInputHandler<TCard> where TCard: BaseTokenCard<TCard, TInputHandler>
 {
     public class BaseTokenCardInputHandler : BaseItemCardSelectTargetInputHandler<TCard>
     {

@@ -7,7 +7,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
-public class MillenniumEyeCard: BaseSealCard
+public class MillenniumEyeCard: BaseRuleCard
 {
     public List<CardContainer> CardContainers;
     public List<CardNode> RevealedCardNodes;

@@ -10,7 +10,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
-public class BalaTrollHandCard: BaseUseCard
+public class BalaTrollHandCard: BaseItemCard
 {
     public class BalaTrollHandCardInputHandler : BaseItemCardSelectTargetInputHandler<BalaTrollHandCard>
     {

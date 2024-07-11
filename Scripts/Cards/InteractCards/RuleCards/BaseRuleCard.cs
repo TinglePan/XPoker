@@ -5,9 +5,9 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards;
 
-public class BaseSealCard: BaseInteractCard
+public class BaseRuleCard: BaseInteractCard
 {
-    public BaseSealCard(InteractCardDef def) : base(def)
+    public BaseRuleCard(InteractCardDef def) : base(def)
     {
         Debug.Assert(def.InteractionType == Enums.InteractionType.Seal, def.ToString());
     }

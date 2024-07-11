@@ -8,7 +8,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
-public class D6Card: BaseUseCard
+public class D6Card: BaseItemCard
 {
     public List<CardContainer> CardContainers;
     public D6Card(InteractCardDef def): base(def)

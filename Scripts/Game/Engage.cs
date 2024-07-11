@@ -28,7 +28,7 @@ public class Engage
         var player = Battle.Player;
         var enemy = Battle.Enemy;
         TieRole = tieRole;
-        var compareRes = HandEvaluator.Compare(playerHand, enemyHand);
+        var compareRes = HandEvaluator.Compare(playerHand, enemyHand, Battle.HandTierOrderDescend.ToList());
 
         switch (compareRes)
         {

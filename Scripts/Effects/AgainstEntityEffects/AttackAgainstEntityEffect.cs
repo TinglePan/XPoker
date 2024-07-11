@@ -6,14 +6,17 @@ namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
 
 public class AttackAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEffect
 {
-    public int RawValue { get; }
+    public int RawValue { get; set; }
     public float PowerScale { get; }
     
-    public AttackAgainstEntityEffect(BaseCard originateCard, BattleEntity src, BattleEntity dst, int rawValue, float powerScale) : 
-        base("Damage", $"Deal {rawValue} base damage, plus {{}} * power", src, dst, originateCard)
+    public float Leech { get; set; }
+    
+    public AttackAgainstEntityEffect(BaseCard originateCard, BattleEntity src, BattleEntity dst, int rawValue, float powerScale, float leech = 0f) : 
+        base(Utils._("Attack"), Utils._($"Deal {rawValue} base damage, plus {{}} * power"), originateCard, src, dst)
     {
         RawValue = rawValue;
         PowerScale = powerScale;
+        Leech = leech;
     }
 
     public override void Resolve()
@@ -28,7 +31,13 @@ public class AttackAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
         
         Battle.GameMgr.BattleLog.Log(Utils._($"{Src} attacks! Power:{power}. Value:{rawAttackValue}"));
         var attack = new Attack(Battle, Src, Dst, power, rawAttackValue);
-        attack.Resolve();
+        var damage = attack.Resolve();
+        if (Leech > 0)
+        {
+            var leechValue = (int)(damage * Leech);
+            Src.ChangeHp(leechValue);
+            Battle.GameMgr.BattleLog.Log(Utils._($"{Src} leeches {leechValue} HP!"));
+        }
     }
 
     public override string Description()

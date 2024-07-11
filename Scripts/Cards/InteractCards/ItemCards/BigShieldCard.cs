@@ -5,7 +5,7 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
 
-public class BigShieldCard: BaseUseCard
+public class BigShieldCard: BaseItemCard
 {
     
     public class BigShieldBuff: BaseBuff

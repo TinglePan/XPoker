@@ -9,7 +9,7 @@ using XCardGame.Scripts.Ui;
 namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 
-public class KeepOutCard: BaseSealCard
+public class KeepOutCard: BaseRuleCard
 {
     
     public abstract class BaseKeepOutCardRule

@@ -6,11 +6,11 @@ namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
 
 public class DefendAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEffect
 {
-    public int RawValue { get; }
+    public int RawValue { get; set; }
     public float PowerScale { get; }
     
     public DefendAgainstEntityEffect(BaseCard originateCard, BattleEntity src, BattleEntity dst, int rawValue, float powerScale) : 
-        base("Grant defence", $"Gain {rawValue} defence, plus {{}} * power", src, dst, originateCard)
+        base(Utils._("Defend"), Utils._($"Gain {rawValue} defence, plus {{}} * power"), originateCard, src, dst)
     {
         RawValue = rawValue;
         PowerScale = powerScale;

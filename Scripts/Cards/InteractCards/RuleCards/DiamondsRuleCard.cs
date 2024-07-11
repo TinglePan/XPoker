@@ -2,11 +2,9 @@
 
 namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
-public class XomCard: BaseRuleCard
+public class DiamondsRuleCard: BaseRuleCard
 {
-    public XomCard(InteractCardDef def): base(def)
+    public DiamondsRuleCard(InteractCardDef def) : base(def)
     {
     }
-    
-    // NYI
 }

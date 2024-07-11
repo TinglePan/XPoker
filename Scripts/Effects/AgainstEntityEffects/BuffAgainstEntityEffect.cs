@@ -11,7 +11,7 @@ public class BuffAgainstEntityEffect: BaseAgainstEntityEffect
     public BaseBuff Buff;
     
     public BuffAgainstEntityEffect(BaseCard originateCard, BaseBuff buff, BattleEntity src, BattleEntity dst):
-        base("Buff", "Inflict {} on {}", src, dst, originateCard)
+        base(Utils._("Buff"), Utils._("Inflict {} on {}"), originateCard, src, dst)
     {
         Buff = buff;
     }

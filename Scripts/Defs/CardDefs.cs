@@ -192,6 +192,90 @@ public static class CardDefs
         SealedRankChangePerTurn = 99
     };
     
+    public static InteractCardDef SpadesRule = new ()
+    {
+        Name = Utils._("Spades rule"),
+        ConcreteClassPath = "InteractCards.RuleCards.SpadesRuleCard",
+        DescriptionTemplate = Utils._("When attack, spades resolve with 50% life leech."),
+        IconPath = "res://Sprites/Cards/spades_rule.png",
+        Rarity = 1,
+        
+        InteractionType = Enums.InteractionType.Seal,
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef HeartsRule = new ()
+    {
+        Name = Utils._("Hearts rule"),
+        ConcreteClassPath = "InteractCards.RuleCards.HeartsRuleCard",
+        DescriptionTemplate = Utils._("When defend, hearts resolve with life recovery of 50% card rank value."),
+        IconPath = "res://Sprites/Cards/hearts_rule.png",
+        Rarity = 1,
+        
+        InteractionType = Enums.InteractionType.Seal,
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef ClubsRule = new ()
+    {
+        Name = Utils._("Clubs rule"),
+        ConcreteClassPath = "InteractCards.RuleCards.ClubsRuleCard",
+        DescriptionTemplate = Utils._("When attack, clubs resolve with double card rank value."),
+        IconPath = "res://Sprites/Cards/clubs_rule.png",
+        Rarity = 1,
+        
+        InteractionType = Enums.InteractionType.Seal,
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef DiamondsRule = new ()
+    {
+        Name = Utils._("Diamonds rule"),
+        ConcreteClassPath = "InteractCards.RuleCards.DiamondsRuleCard",
+        DescriptionTemplate = Utils._("When defend, diamonds are the only suit that matters."),
+        IconPath = "res://Sprites/Cards/diamonds_rule.png",
+        Rarity = 1,
+        
+        InteractionType = Enums.InteractionType.Seal,
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef NerfFlush = new InteractCardDef()
+    {
+        Name = Utils._("Nerf flush"),
+        ConcreteClassPath = "InteractCards.RuleCards.NerfFlushCard",
+        DescriptionTemplate = Utils._("Reduce Flush's hand tier by 1."),
+        IconPath = "res://Sprites/Cards/nerf_flush.png",
+        Rarity = 1,
+        
+        InteractionType = Enums.InteractionType.Seal,
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
+    public static InteractCardDef ShortDeckRule = new InteractCardDef()
+    {
+        Name = Utils._("Short deck rule"),
+        ConcreteClassPath = "InteractCards.RuleCards.ShortDeckRuleCard",
+        DescriptionTemplate = Utils._("Straight connects Ace and 6 "),
+        IconPath = "res://Sprites/Cards/short_deck_rule.png",
+        Rarity = 1,
+        
+        InteractionType = Enums.InteractionType.Seal,
+        RuleNature = Enums.RuleNature.Neutral,
+        SealCost = 1,
+        SealedRankChangePerTurn = 99
+    };
+    
     public static List<BaseCardDef> All()
     {
         Type cards = typeof(CardDefs);

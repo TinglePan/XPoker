@@ -28,7 +28,7 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         IsCompareHandTierOnly = false;
     }
     
-    public CompletedHand EvaluateBestHand(List<BaseCard> validCommunityCards, List<BaseCard> validHoleCards)
+    public CompletedHand EvaluateBestHand(List<BaseCard> validCommunityCards, List<BaseCard> validHoleCards, List<Enums.HandTier> handRanksInDescendingOrder)
     {
         CalculatedHands.Clear();
         // GD.Print($"valid Community cards: {validCommunityCards.Count}");
@@ -53,8 +53,6 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         }
         // Profile.EndWatch("evaluate best hand 1", true, 1);
 
-        var handRanksInDescendingOrder = ((Enums.HandTier[])Enum.GetValues(typeof(Enums.HandTier))).
-            OrderByDescending(x => x);
         foreach (var handRank in handRanksInDescendingOrder)
         {
             if (CalculatedHands.TryGetValue(handRank, out var hands) && hands.Count > 0)
@@ -75,8 +73,8 @@ public class CompletedHandEvaluator: BaseHandEvaluator
     //     return (bestHandWithFaceDownCard, bestHandWithoutFaceDownCard);
     // }
 
-    public int Compare(CompletedHand a, CompletedHand b)
+    public int Compare(CompletedHand a, CompletedHand b, List<Enums.HandTier> handRanksInDescendingOrder)
     {
-        return a.CompareTo(b, IsCompareHandTierOnly, IsSuitSecondComparer);
+        return a.CompareTo(b, IsCompareHandTierOnly, IsSuitSecondComparer, handRanksInDescendingOrder);
     }
 }

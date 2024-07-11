@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using XCardGame.Scripts.Cards;
 
 using XCardGame.Scripts.Common.Constants;
@@ -9,35 +10,14 @@ namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
 public class StraightRule: BaseHandEvaluateRule
 {
     protected int CardCount;
-    protected bool CanWrap;
-    protected bool AllowAceLowStraight;
-    protected List<Enums.CardRank> Range;
+    protected StraightGraph Graph;
     
     public override Enums.HandTier Tier => Enums.HandTier.Straight;
     
-    public static List<Enums.CardRank> DefaultRange = new()
-    {
-        Enums.CardRank.Two,
-        Enums.CardRank.Three,
-        Enums.CardRank.Four,
-        Enums.CardRank.Five,
-        Enums.CardRank.Six,
-        Enums.CardRank.Seven,
-        Enums.CardRank.Eight,
-        Enums.CardRank.Nine,
-        Enums.CardRank.Ten,
-        Enums.CardRank.Jack,
-        Enums.CardRank.Queen,
-        Enums.CardRank.King,
-        Enums.CardRank.Ace,
-    };
-    
-    public StraightRule(int cardCount, bool canWrap, bool allowAceLowStraight)
+    public StraightRule(int cardCount, bool allowWrap, bool allowShort)
     {
         CardCount = cardCount;
-        CanWrap = canWrap;
-        Range = new List<Enums.CardRank>(DefaultRange);
-        AllowAceLowStraight = canWrap || allowAceLowStraight;
+        Graph = StraightGraph.StandardStraightGraph(allowWrap, allowShort);
     }
     
     protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
@@ -51,7 +31,7 @@ public class StraightRule: BaseHandEvaluateRule
             cardsByRank[card.Rank.Value].Add(card);
         }
         
-        void Helper(int currentRankIndexInRange)
+        void Helper(Enums.CardRank rank)
         {
             if (currPick.Count == CardCount)
             {
@@ -59,38 +39,22 @@ public class StraightRule: BaseHandEvaluateRule
                 picks.Add(pick);
                 return;
             }
-            var currRank = Range[currentRankIndexInRange];
-            var nextRankIndex = (currentRankIndexInRange + 1) % Range.Count;
-            var cardsOfRank = cardsByRank[currRank];
-            foreach (var card in cardsOfRank)
+            if (!Graph.NodeIndex.TryGetValue(rank, out var value)) return;
+            foreach (var nextNode in value.ValidNextNodes)
             {
-                currPick.Add(card);
-                Helper(nextRankIndex);
-                currPick.Remove(card);
+                if (!cardsByRank.TryGetValue(nextNode.Rank, out var cardsOfRank)) continue;
+                foreach (var card in cardsOfRank)
+                {
+                    currPick.Add(card);
+                    Helper(nextNode.Rank);
+                    currPick.Remove(card);
+                }
             }
         }
 
-        for (int i = 0; i < Range.Count; i++)
+        foreach (var rank in Graph.NodeIndex.Keys)
         {
-            if (i + CardCount > Range.Count && !CanWrap && !(AllowAceLowStraight && Range[i] == Enums.CardRank.Ace))
-            {
-                continue;
-            }
-
-            var haveStraightAtRank = true;
-            for (int j = 0; j < CardCount; j++)
-            {
-                var searchRank = Range[(i + j) % Range.Count];
-                if (!cardsByRank.ContainsKey(searchRank))
-                {
-                    haveStraightAtRank = false;
-                    break;
-                }
-            }
-            if (haveStraightAtRank)
-            {
-                Helper(i);
-            }
+            Helper(rank);
         }
 
         return picks;
@@ -98,26 +62,42 @@ public class StraightRule: BaseHandEvaluateRule
 
     protected override List<BaseCard> GetPrimaryComparerCards(List<BaseCard> pick, List<BaseCard> cards)
     {
-        if (!AllowAceLowStraight && !CanWrap) return base.GetPrimaryComparerCards(pick, cards);
         var pickCardByRank = pick.ToDictionary(card => card.Rank.Value);
-        BaseCard endAtBaseCard = null;
-        for (int i = 0; i < Range.Count; i++)
+        var successorRankHashSet = new HashSet<Enums.CardRank>();
+        foreach (var card in pick)
         {
-            bool found = true;
-            for (int j = 0; j < CardCount; j++)
+            var rank = card.Rank.Value;
+            foreach (var nextRank in Graph.AllPossibleStraightNext(rank))
             {
-                var searchRank = Range[(i + j) % Range.Count];
-                if (!pickCardByRank.ContainsKey(searchRank))
+                if (pickCardByRank.ContainsKey(nextRank))
                 {
-                    found = false;
-                    break;
+                    successorRankHashSet.Add(nextRank);
                 }
             }
-            if (found)
-            {
-                endAtBaseCard = pickCardByRank[Range[(i + CardCount - 1) % Range.Count]];
-            } 
         }
-        return new List<BaseCard>() { endAtBaseCard };
+
+        BaseCard startCard = null;
+        foreach (var card in pick)
+        {
+            if (successorRankHashSet.Contains(card.Rank.Value)) continue;
+            startCard = card;
+            break;
+        }
+
+        if (startCard == null)
+        {
+            GD.PrintErr("No primary comparer card found. Not supposed to happen.");
+            return null;
+        }
+
+        // Get second card in straight as primary comparer.
+        foreach (var nextRank in Graph.AllPossibleStraightNext(startCard.Rank.Value))
+        {
+            if (pickCardByRank.TryGetValue(nextRank, out var value))
+            {
+                return new List<BaseCard> { value };
+            }
+        }
+        return null;
     }
 }

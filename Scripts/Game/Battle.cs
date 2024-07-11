@@ -76,7 +76,7 @@ public partial class Battle: Node2D, ISetup
     public Dictionary<BattleEntity, CompletedHand> RoundHands;
     public Engage RoundEngage;
 
-    public ObservableCollection<Enums.HandTier> HandTierOrderAscend;
+    public ObservableCollection<Enums.HandTier> HandTierOrderDescend;
     
     public List<BaseEffect> Effects;
     public State CurrentState;
@@ -105,7 +105,7 @@ public partial class Battle: Node2D, ISetup
         PrimaryCards = new ObservableCollection<BaseCard>();
         KickerCards = new ObservableCollection<BaseCard>();
         RuleCards = new ObservableCollection<BaseCard>();
-        HandTierOrderAscend = new ObservableCollection<Enums.HandTier>();
+        HandTierOrderDescend = new ObservableCollection<Enums.HandTier>();
         Effects = new List<BaseEffect>();
     }
 
@@ -201,7 +201,7 @@ public partial class Battle: Node2D, ISetup
 
         foreach (var handTierValue in Enum.GetValues(typeof(Enums.HandTier)))
         {
-            HandTierOrderAscend.Add((Enums.HandTier)handTierValue);
+            HandTierOrderDescend.Add((Enums.HandTier)handTierValue);
         }
         Reset();
 
@@ -388,7 +388,7 @@ public partial class Battle: Node2D, ISetup
         foreach (var entity in Entities)
         {
             // var validHoleCards = GetValidCards(entity.HoleCards);
-            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.ToList(), entity.HoleCards.ToList());
+            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCards.ToList(), entity.HoleCards.ToList(), HandTierOrderDescend.ToList());
             entity.RoundHandTier.Value = bestHand.Tier;
             RoundHands.Add(entity, bestHand);
         }
@@ -485,18 +485,6 @@ public partial class Battle: Node2D, ISetup
         {
             buff.InflictOn(target, source, sourceCard);
         }
-    }
-
-    public int GetHandTierValue(Enums.HandTier handTier)
-    {
-        return HandTierOrderAscend.IndexOf(handTier);
-    }
-    
-    protected List<BaseCard> GetValidCards(IEnumerable<BaseCard> cards)
-    {
-        var res = new List<BaseCard>();
-        
-        return res;
     }
 
     protected Enums.CardFace GetCommunityCardFaceDirectionFunc(int i)

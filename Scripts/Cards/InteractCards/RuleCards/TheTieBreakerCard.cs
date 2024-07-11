@@ -3,7 +3,7 @@ using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
-public class TheTieBreakerCard: BaseSealCard
+public class TheTieBreakerCard: BaseRuleCard
 {
     public TheTieBreakerCard(InteractCardDef def): base(def)
     {

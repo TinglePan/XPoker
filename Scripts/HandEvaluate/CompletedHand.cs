@@ -53,10 +53,20 @@ public class CompletedHand: IComparable<CompletedHand>
         return CompareTo(other, false, false);
     }
 
-    public int CompareTo(CompletedHand other, bool isCompareTierOnly, bool isSuitSecondComparer)
+    public int CompareTo(CompletedHand other, bool isCompareTierOnly, bool isSuitSecondComparer, List<Enums.HandTier> order = null)
     {
-        if (Tier > other.Tier) return 1;
-        if (Tier < other.Tier) return -1;
+        if (order != null)
+        {
+            var thisIndex = order.IndexOf(Tier);
+            var otherIndex = order.IndexOf(other.Tier);
+            if (thisIndex > otherIndex) return -1;
+            if (thisIndex < otherIndex) return 1;
+        }
+        else
+        {
+            if (Tier > other.Tier) return 1;
+            if (Tier < other.Tier) return -1;
+        }
         if (isCompareTierOnly) return 0;
         for (var i = 0; i < PrimaryComparerCards.Count; i++)
         {

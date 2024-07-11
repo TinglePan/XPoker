@@ -22,7 +22,7 @@ public class Attack
         RawAttackValue = rawAttackValue;
     }
     
-    public void Resolve()
+    public int Resolve()
     {
         var attackerDamageModifier = Attacker.GetAttackerDamageModifier();
         var attackerDamageMultipliers = Attacker.GetAttackerDamageMultipliers();
@@ -45,21 +45,21 @@ public class Attack
                     var riposteCounterAttack = riposteBuff.CounterAttack();
                     riposteBuff.Consume();
                     riposteCounterAttack.Resolve();
-                    return;
+                    return 0;
                 }
             } else if (buff is InvincibleBuff)
             {
-                return;
+                return 0;
             } else if (buff is BlockBuff blockBuff)
             {
                 if (Power <= blockBuff.Stack.Value)
                 {
-                    return;
+                    return 0;
                 }
             } else if (buff is EvadeBuff evadeBuff)
             {
                 evadeBuff.Consume();
-                return;
+                return 0;
             }
         }
         
@@ -74,5 +74,6 @@ public class Attack
         Battle.GameMgr.BattleLog.Log(Utils._($"{roundedDamageValue} damage to {Defender}"));
         
         Defender.TakeDamage(roundedDamageValue);
+        return roundedDamageValue;
     }
 }

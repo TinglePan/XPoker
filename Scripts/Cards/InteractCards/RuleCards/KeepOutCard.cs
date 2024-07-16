@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def.Card;
+using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.Effects.FieldEffects;
 using XCardGame.Scripts.Game;
 using XCardGame.Scripts.Ui;
@@ -62,41 +64,45 @@ public class KeepOutCard: BaseRuleCard
             NegatedCardNodes = new List<CardNode>();
         }
 
-        public override void OnStart(Battle battle)
+        public override async void OnStart(Battle battle)
         {
             base.OnStart(battle);
+            var tasks = new List<Task>();
             var keepOutCard = (KeepOutCard)OriginateCard;
             foreach (var container in keepOutCard.CardContainers)
             {
-                foreach (var cardNode in container.ContentNodes)
+                foreach (var cardNode in container.CardNodes)
                 {
-                    if (keepOutCard.Rule.Filter(cardNode.Content.Value))
+                    if (keepOutCard.Rule.Filter(cardNode.Card))
                     {
-                        cardNode.TweenNegate(true, Configuration.NegateTweenTime);
+                        tasks.Add(cardNode.AnimateNegate(true, Configuration.NegateTweenTime));
                         NegatedCardNodes.Add(cardNode);
                     }
                 }
             }
             battle.OnDealCard += OnDealCard;
+            await Task.WhenAll(tasks);
         }
         
-        public override void OnStop(Battle battle)
+        public override async void OnStop(Battle battle)
         {
+            var tasks = new List<Task>();
             foreach (var cardNode in NegatedCardNodes)
             {
                 if (GodotObject.IsInstanceValid(cardNode))
                 {
-                    cardNode.TweenNegate(false, Configuration.NegateTweenTime);
+                    tasks.Add(cardNode.AnimateNegate(false, Configuration.NegateTweenTime));
                 }
             }
             NegatedCardNodes.Clear();
             battle.OnDealCard -= OnDealCard;
+            await Task.WhenAll(tasks);
         }
 
         protected void OnDealCard(Battle battle, CardNode node)
         {
             var keepOutCard = (KeepOutCard)OriginateCard;
-            var targetCard = node.Content.Value;
+            var targetCard = node.Card;
             if (keepOutCard.Rule.Filter(targetCard))
             {
                 targetCard.IsNegated.Value = true;
@@ -113,7 +119,7 @@ public class KeepOutCard: BaseRuleCard
         Rule = null;
     }
     
-    public override void Setup(Dictionary<string, object> args)
+    public override void Setup(SetupArgs args)
     {
         base.Setup(args);
         CardContainers = new List<CardContainer>
@@ -123,7 +129,11 @@ public class KeepOutCard: BaseRuleCard
             Battle.Enemy.HoleCardContainer
         };
         Effect = new KeepOutEffect(Def.Name, Description(), this);
-        Effect.Setup(args);
+        Effect.Setup(new BaseEffect.SetupArgs
+        {
+            GameMgr = args.GameMgr,
+            Battle = args.Battle
+        });
     }
 
     public override void OnStart(Battle battle)

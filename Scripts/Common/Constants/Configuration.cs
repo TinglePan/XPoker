@@ -10,6 +10,7 @@ public static class Configuration
     
     public static readonly int CompletedHandCardCount = 5;
     public static readonly int CommunityCardCount = 5;
+    public static readonly int DefaultFaceDownCommunityCardCount = 1;
     public static readonly int DefaultHoleCardCount = 2;
     public static readonly int RoundSkillsCount = 1;
 

@@ -36,7 +36,7 @@ public partial class SelectRewardCard: Control
             Battle = GameMgr.CurrentBattle;
             foreach (var cardNode in SelectRewardCard.CardContainer.ContentNodes)
             {
-                cardNode.OnPressed += OnCardNodePressed;
+                cardNode.OnMousePressed += OnCardNodePressed;
             }
         }
         
@@ -45,15 +45,18 @@ public partial class SelectRewardCard: Control
             base.OnExit();
             foreach (var cardNode in SelectRewardCard.CardContainer.ContentNodes)
             {
-                cardNode.OnPressed -= OnCardNodePressed;
+                cardNode.OnMousePressed -= OnCardNodePressed;
             }
         }
 
-        public async void OnCardNodePressed(BaseContentNode<BaseCard> node)
+        public async void OnCardNodePressed(BaseContentNode node, MouseButton mouseButton)
         {
-            var cardNode = (CardNode)node;
-            await SelectRewardCard.Select(cardNode);
-            SelectRewardCard.Quit();
+            if (mouseButton == MouseButton.Left)
+            {
+                var cardNode = (CardNode)node;
+                await SelectRewardCard.Select(cardNode);
+                SelectRewardCard.Quit();
+            }
         }
     }
     
@@ -74,7 +77,6 @@ public partial class SelectRewardCard: Control
     public ObservableProperty<int> ReRollPrice;
     public int ReRollPriceIncrease;
     public ObservableProperty<int> SkipReward;
-    public ObservableCollection<BaseCard> RewardCards;
     public Action OnQuit;
     
     public bool HasSetup { get; set; }
@@ -95,7 +97,6 @@ public partial class SelectRewardCard: Control
         ReRollPrice.DetailedValueChanged += OnReRollPriceChanged;
         SkipReward = new ObservableProperty<int>(nameof(SkipReward), this, 0);
         SkipReward.DetailedValueChanged += OnSkipRewardChanged;
-        RewardCards = new ObservableCollection<BaseCard>();
         RewardCardDefPool = new Dictionary<int, List<BaseCardDef>>();
     }
 
@@ -107,22 +108,16 @@ public partial class SelectRewardCard: Control
         {
             RewardCardDefType = (Type)arg;
         }
-        CardContainer.Setup(new Dictionary<string, object>()
+        CardContainer.Setup(new CardContainer.SetupArgs
         {
-            { "allowInteract", false },
-            { "cards", RewardCards },
-            { "contentNodeSize", Configuration.CardSize },
-            { "separation", Configuration.CardContainerSeparation },
-            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-            { "nodesPerRow", 0 },
-            { "hasBorder", false },
-            { "expectedContentNodeCount", Configuration.DefaultRewardCardCount },
-            { "hasName", true },
-            { "containerName", "Select a card..."},
-            { "defaultCardFaceDirection", Enums.CardFace.Up },
-            { "getCardFaceDirectionFunc", null },
-            { "margins", Configuration.DefaultContentContainerMargins },
-            { "withCardEffect", false }
+            ContentNodeSize = Configuration.CardSize,
+            Separation = Configuration.CardContainerSeparation,
+            PivotDirection = Enums.Direction2D8Ways.Neutral,
+            HasName = true,
+            ContainerName = Utils._("Select a card..."),
+            DefaultCardFaceDirection = Enums.CardFace.Up,
+            Margins = Configuration.DefaultContentContainerMargins,
+            OnlyDisplay = true,
         });
         AllRewardCardDefs = FilterCardDefs(CardDefs.All(), x => x.GetType().IsAssignableTo(typeof(InteractCardDef)));
         
@@ -146,13 +141,13 @@ public partial class SelectRewardCard: Control
             foreach (var cardDef in (List<BaseCardDef>)value)
             {
                 var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
-                if (index < RewardCards.Count)
+                if (index < CardContainer.Contents.Count)
                 {
-                    RewardCards[index] = card;
+                    CardContainer.Contents[index] = card;
                 }
                 else
                 {
-                    RewardCards.Add(card);
+                    CardContainer.Contents.Add(card);
                 }
                 index++;
             }
@@ -192,7 +187,7 @@ public partial class SelectRewardCard: Control
     {
         // cardNode.AnimateFlip(Enums.CardFace.Down);
         // cardNode.IsBought.Value = true;
-        var card = cardNode.Content.Value;
+        var card = cardNode.Card;
         card.OwnerEntity = Battle.Player;
         // AnimationPlayer.Play("close");
         // await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
@@ -223,13 +218,13 @@ public partial class SelectRewardCard: Control
                 foreach (var cardDef in Utils.RandMFrom(value, count, GameMgr.Rand))
                 {
                     var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
-                    if (index < RewardCards.Count)
+                    if (index < CardContainer.Contents.Count)
                     {
-                        RewardCards[index] = card;
+                        CardContainer.Contents[index] = card;
                     }
                     else
                     {
-                        RewardCards.Add(card);
+                        CardContainer.Contents.Add(card);
                     }
                     index++;
                 }
@@ -238,13 +233,13 @@ public partial class SelectRewardCard: Control
         foreach (var cardDef in Utils.RandMFrom(AllRewardCardDefs, Configuration.DefaultRewardCardCount - index, GameMgr.Rand))
         {
             var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
-            if (index < RewardCards.Count)
+            if (index < CardContainer.Contents.Count)
             {
-                RewardCards[index] = card;
+                CardContainer.Contents[index] = card;
             }
             else
             {
-                RewardCards.Add(card);
+                CardContainer.Contents.Add(card);
             }
 
             index++;

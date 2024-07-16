@@ -2,8 +2,7 @@
 using System.Collections.Specialized;
 using Godot;
 using XCardGame.Scripts.Cards;
-
-
+using XCardGame.Scripts.Ui;
 using Battle = XCardGame.Scripts.Game.Battle;
 using CardContainer = XCardGame.Scripts.Ui.CardContainer;
 using CardNode = XCardGame.Scripts.Ui.CardNode;
@@ -43,7 +42,7 @@ public class BattleMainInputHandler: BaseInputHandler
             cardContainer.ContentNodes.CollectionChanged += OnInteractCardNodesCollectionChanged;
             foreach (var cardNode in cardContainer.ContentNodes)
             {
-                cardNode.OnPressed += OnCardNodePressed;
+                cardNode.OnMousePressed += OnCardNodePressed;
             }
         }
     }
@@ -57,17 +56,20 @@ public class BattleMainInputHandler: BaseInputHandler
             cardContainer.ContentNodes.CollectionChanged -= OnInteractCardNodesCollectionChanged;
             foreach (var cardNode in cardContainer.ContentNodes)
             {
-                cardNode.OnPressed -= OnCardNodePressed;
+                cardNode.OnMousePressed -= OnCardNodePressed;
             }
         }
     }
     
-    protected void OnCardNodePressed(Ui.BaseContentNode<BaseCard> node)
+    protected void OnCardNodePressed(BaseContentNode node, MouseButton mouseButton)
     {
-        var cardNode = (CardNode)node;
-        if (node.Content.Value is IInteractCard interactCard && interactCard.CanInteract(cardNode))
+        if (mouseButton == MouseButton.Left)
         {
-            interactCard.Interact(cardNode);
+            var cardNode = (CardNode)node;
+            if (node.Content.Value is IInteractCard interactCard && interactCard.CanInteract(cardNode))
+            {
+                interactCard.Interact(cardNode);
+            }
         }
     }
     
@@ -81,7 +83,7 @@ public class BattleMainInputHandler: BaseInputHandler
                     {
                         if (t is CardNode cardNode)
                         {
-                            cardNode.OnPressed += OnCardNodePressed;
+                            cardNode.OnMousePressed += OnCardNodePressed;
                         }
                     }
                 break;
@@ -91,7 +93,7 @@ public class BattleMainInputHandler: BaseInputHandler
                     {
                         if (t is CardNode cardNode)
                         {
-                            cardNode.OnPressed -= OnCardNodePressed;
+                            cardNode.OnMousePressed -= OnCardNodePressed;
                         }
                     }
                 break;

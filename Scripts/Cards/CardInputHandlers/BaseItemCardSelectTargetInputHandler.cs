@@ -2,12 +2,13 @@
 using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.InputHandling;
+using XCardGame.Scripts.Ui;
 using Battle = XCardGame.Scripts.Game.Battle;
 using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.Cards.CardInputHandlers;
 
-public abstract class BaseItemCardSelectTargetInputHandler<TOriginateCard>: BaseSelectTargetInputHandler<CardNode, BaseCard> where TOriginateCard: BaseCard
+public abstract class BaseItemCardSelectTargetInputHandler<TOriginateCard>: BaseSelectTargetInputHandler<CardNode> where TOriginateCard: BaseCard
 {
     public Battle Battle;
     public BaseButton ProceedButton;
@@ -34,15 +35,15 @@ public abstract class BaseItemCardSelectTargetInputHandler<TOriginateCard>: Base
         }
         ProceedButton.Pressed += Confirm;
 
-        OriginateCardNode.OnPressed += OnOriginateCardPressed;
+        OriginateCardNode.OnMousePressed += OnOriginateCardPressed;
     }
 
-    public override void OnExit()
+    public override async void OnExit()
     {
         base.OnExit();
-        OriginateCardNode.TweenSelect(false, Configuration.SelectTweenTime);
+        await OriginateCardNode.AnimateSelect(false, Configuration.SelectTweenTime);
         ProceedButton.Pressed -= Confirm;
-        OriginateCardNode.OnPressed -= OnOriginateCardPressed;
+        OriginateCardNode.OnMousePressed -= OnOriginateCardPressed;
     }
 
     protected override void SelectNode(CardNode node)
@@ -54,12 +55,12 @@ public abstract class BaseItemCardSelectTargetInputHandler<TOriginateCard>: Base
         base.SelectNode(node);
     }
 
-    protected virtual async void Confirm()
+    protected virtual void Confirm()
     {
         Exit();
     }
 
-    protected async void OnOriginateCardPressed(Ui.BaseContentNode<BaseCard> node)
+    protected void OnOriginateCardPressed(BaseContentNode node, MouseButton mouseButton)
     {
         Exit();
     }

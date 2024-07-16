@@ -7,7 +7,7 @@ namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
 
 public class BaseAgainstEntityEffect: BaseEffect
 {
-    public Engage Engage;
+    public Engage Engage => Battle.RoundEngage;
     public BattleEntity Src;
     public BattleEntity Dst;
     
@@ -16,15 +16,6 @@ public class BaseAgainstEntityEffect: BaseEffect
     {
         Src = src;
         Dst = dst;
-    }
-
-    public override void Setup(Dictionary<string, object> args)
-    {
-        base.Setup(args);
-        if (args.TryGetValue("engage", out var engage))
-        {
-            Engage = (Engage)engage;
-        }
     }
 
     public virtual string GetDescription()

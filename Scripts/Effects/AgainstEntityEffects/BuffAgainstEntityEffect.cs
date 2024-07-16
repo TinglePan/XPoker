@@ -8,6 +8,11 @@ namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
 
 public class BuffAgainstEntityEffect: BaseAgainstEntityEffect
 {
+    public new class SetupArgs: BaseAgainstEntityEffect.SetupArgs
+    {
+        public BaseBuff.SetupArgs BuffSetupArgs;
+    }
+    
     public BaseBuff Buff;
     
     public BuffAgainstEntityEffect(BaseCard originateCard, BaseBuff buff, BattleEntity src, BattleEntity dst):
@@ -16,10 +21,10 @@ public class BuffAgainstEntityEffect: BaseAgainstEntityEffect
         Buff = buff;
     }
 
-    public override void Setup(Dictionary<string, object> args)
+    public void Setup(SetupArgs args)
     {
         base.Setup(args);
-        Buff.Setup(args);
+        Buff.Setup(args.BuffSetupArgs);
     }
 
 

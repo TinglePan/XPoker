@@ -74,7 +74,7 @@ public class Engage
             foreach (var card in cards)
             {
                 var cardNode = card.Node<CardNode>();
-                var sourceContainer = (CardContainer)cardNode.Container.Value;
+                var sourceContainer = (CardContainer)cardNode.CurrentContainer.Value;
                 CardPositionBeforeResolve[cardNode] = sourceContainer;
                 tasks.Add(sourceContainer.MoveCardNodeToContainer(cardNode, targetContainer));
                 // await Utils.Wait(Battle, Configuration.AnimateCardTransformInterval);
@@ -98,10 +98,11 @@ public class Engage
         var timer = Battle.GetTree().CreateTimer(Configuration.DelayBetweenResolveSteps);
         await Battle.ToSignal(timer, Timer.SignalName.Timeout);
         var resolveCardContainer = Battle.ResolveCardContainer.CardContainers[0];
-        foreach (var cardNode in resolveCardContainer.ContentNodes)
+        foreach (var node in resolveCardContainer.ContentNodes)
         {
-            await cardNode.TweenSelect(true, Configuration.SelectTweenTime);
-            var card = cardNode.Content.Value;
+            var cardNode = (CardNode)node;
+            await cardNode.AnimateLift(true, Configuration.SelectTweenTime);
+            var card = cardNode.Card;
             card.Resolve(Battle, this, entity);
             await GameMgr.BattleLog.HandleLogEntries();
         }
@@ -114,8 +115,9 @@ public class Engage
         async Task ClearCardContainer(CardContainer targetContainer)
         {
             var tasks = new List<Task>();
-            foreach (var cardNode in targetContainer.ContentNodes.ToList())
+            foreach (var node in targetContainer.ContentNodes.ToList())
             {
+                var cardNode = (CardNode)node;
                 tasks.Add(targetContainer.MoveCardNodeToContainer(cardNode, CardPositionBeforeResolve[cardNode]));
                 cardNode.IsSelected = false;
                 // await Utils.Wait(Battle, Configuration.AnimateCardTransformInterval);

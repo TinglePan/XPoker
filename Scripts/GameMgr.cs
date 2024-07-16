@@ -10,6 +10,7 @@ using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs;
+using XCardGame.Scripts.Defs.Def.BattleEntity;
 using XCardGame.Scripts.Game;
 using XCardGame.Scripts.InputHandling;
 using XCardGame.Scripts.Ui;
@@ -60,18 +61,16 @@ public partial class GameMgr : Node
 		var battleScene = (BattleScene)CurrentScene;
 		BattleLog = battleScene.GetNode<BattleLog>("LogBox");
 		CurrentBattle = battleScene.Battle;
-		CurrentBattle.Setup(new Dictionary<string, object>
+		CurrentBattle.Setup(new Battle.SetupArgs
 		{
-			{ "dealCommunityCardCount", 5 },
-			{ "faceDownCommunityCardCount", 1 },
-			{ "requiredHoleCardCountMin", 0 },
-			{ "requiredHoleCardCountMax", 2 },
+			DealCommunityCardCount = Configuration.CommunityCardCount,
+			FaceDownCommunityCardCount = Configuration.DefaultFaceDownCommunityCardCount,
+			RequiredHoleCardCountMin = 0,
+			RequiredHoleCardCountMax = 2,
+			EntitySetupArgs = new List<BattleEntity.SetupArgs>()
 			{
-				"entities", new List<Dictionary<string, object>>
-				{
-					PlayerBattleEntity.InitArgs(BattleEntityDefs.DefaultPlayerBattleEntityDef),
-					BattleEntity.InitArgs(BattleEntityDefs.DefaultEnemyBattleEntityDef)
-				}
+				PlayerBattleEntity.InitArgs(BattleEntityDefs.DefaultPlayerBattleEntityDef),
+				BattleEntity.InitArgs(BattleEntityDefs.DefaultEnemyBattleEntityDef)
 			}
 		});
 		

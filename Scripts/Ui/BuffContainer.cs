@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Common;
@@ -8,9 +9,11 @@ using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Ui;
 
-public partial class BuffContainer: ContentContainer<BuffNode, BaseBuff>
+public partial class BuffContainer: BaseContentContainer
 { 
     public PackedScene BuffPrefab;
+
+    public List<BaseBuff> Buffs => Contents.Cast<BaseBuff>().ToList();
 
     protected Battle Battle;
 
@@ -20,20 +23,14 @@ public partial class BuffContainer: ContentContainer<BuffNode, BaseBuff>
         BuffPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Buff.tscn");
     }
 
-    public override void Setup(Dictionary<string, object> args)
+    public override void Setup(SetupArgs args)
     {
         base.Setup(args);
         Battle = GameMgr.CurrentBattle;
-        if (args["buffs"] is ObservableCollection<BaseBuff> buffs && buffs != Contents)
-        {
-            Contents = buffs;
-            Contents.CollectionChanged += OnContentsChanged;
-        }
     }
 
     protected override void OnM2VAddContents(int startingIndex, IList contents)
     {
-        EnsureSetup();
         SuppressNotifications = true;
         var index = startingIndex;
         foreach (var content in contents)
@@ -42,18 +39,18 @@ public partial class BuffContainer: ContentContainer<BuffNode, BaseBuff>
             {
                 var buffNode = BuffPrefab.Instantiate<BuffNode>();
                 AddChild(buffNode);
-                buffNode.Setup(new Dictionary<string, object>()
+                buffNode.Setup(new BaseContentNode.SetupArgs()
                 {
-                    { "buff", buff },
-                    { "container", this }
+                    Content = buff,
+                    Container = this,
                 });
-                buff.Setup(new Dictionary<string, object>()
+                buff.Setup(new BaseBuff.SetupArgs
                 {
-                    { "gameMgr", GameMgr },
-                    { "node", buffNode }
+                    GameMgr = GameMgr,
+                    Node = buffNode,
                 });
-                OnAddContentNode?.Invoke(buffNode);
                 ContentNodes.Insert(index, buffNode);
+                OnAddContentNode?.Invoke(buffNode);
             }
             index++;
         }

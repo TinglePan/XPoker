@@ -19,12 +19,11 @@ public partial class TestMouseEventInSubViewport : Control
 			Rank = Enums.CardRank.Ace,
 			Suit = Enums.CardSuit.Clubs
 		});
-		CardNode.Setup(new Dictionary<string, object>()
+		CardNode.Setup(new CardNode.SetupArgs()
 		{
-			{ "card", card },
-			{ "faceDirection", Enums.CardFace.Up },
-			{ "container", null },
-			{ "hasPhysics", true }
+			Content = card,
+			FaceDirection = Enums.CardFace.Up,
+			HasPhysics = true,
 		});
 		GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");
 	}

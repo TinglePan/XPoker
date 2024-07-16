@@ -2,8 +2,8 @@
 
 namespace XCardGame.Scripts.Ui;
 
-public interface IContent<TContent> where TContent: IContent<TContent>
+public interface IContent
 {
-    public HashSet<BaseContentNode<TContent>> Nodes { get; }
-    public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode<TContentNode, TContent>;
+    public HashSet<BaseContentNode> Nodes { get; }
+    public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode;
 }

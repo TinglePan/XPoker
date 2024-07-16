@@ -21,12 +21,11 @@ public partial class TestFlipCard: Node
             Rank = Enums.CardRank.Ace,
             Suit = Enums.CardSuit.Clubs
         });
-        CardNode.Setup(new Dictionary<string, object>()
+        CardNode.Setup(new CardNode.SetupArgs()
         {
-            { "card", card },
-            { "faceDirection", Enums.CardFace.Up },
-            { "container", null },
-            { "hasPhysics", true }
+            Content = card,
+            FaceDirection = Enums.CardFace.Up,
+            HasPhysics = true,
         });
         CardNode.AnimateFlip(Enums.CardFace.Down);
         GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");

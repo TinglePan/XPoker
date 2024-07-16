@@ -25,17 +25,17 @@ public class ChangeCardsMarker: BaseCardMarker
     public static IEnumerable<PokerCard> SelectLeftNeighbour(Battle battle, PokerCard card)
     {
         var cardNode = card.Node<CardNode>();
-        var neighbourIndex = cardNode.Container.Value.Contents.IndexOf(card) - 1;
+        var neighbourIndex = cardNode.CurrentContainer.Value.Contents.IndexOf(card) - 1;
         if (neighbourIndex >= 0)
         {
-            yield return cardNode.Container.Value.Contents[neighbourIndex] as PokerCard;
+            yield return cardNode.CurrentContainer.Value.Contents[neighbourIndex] as PokerCard;
         }
     }
     
     public static IEnumerable<PokerCard> SelectRightNeighbour(Battle battle, PokerCard card)
     {
         var cardNode = card.Node<CardNode>();
-        var container = cardNode.Container.Value;
+        var container = cardNode.CurrentContainer.Value;
         var neighbourIndex = container.Contents.IndexOf(card) + 1;
         if (neighbourIndex < container.Contents.Count)
         {
@@ -46,7 +46,7 @@ public class ChangeCardsMarker: BaseCardMarker
     public static IEnumerable<PokerCard> SelectBothNeighbours(Battle battle, PokerCard card)
     {
         var cardNode = card.Node<CardNode>();
-        var container = cardNode.Container.Value;
+        var container = cardNode.CurrentContainer.Value;
         var index = container.Contents.IndexOf(card);
         var leftIndex = index - 1;
         var rightIndex = index + 1;
@@ -64,7 +64,7 @@ public class ChangeCardsMarker: BaseCardMarker
     {
         var suitCount = new Dictionary<Enums.CardSuit, int>();
         var cardNode = card.Node<CardNode>();
-        var container = cardNode.Container.Value;
+        var container = cardNode.CurrentContainer.Value;
         foreach (var cardInContainer in container.Contents)
         {
             if (cardInContainer is PokerCard pokerCard)

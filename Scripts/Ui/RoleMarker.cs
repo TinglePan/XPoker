@@ -10,14 +10,19 @@ using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
 
 namespace XCardGame.Scripts.Ui;
 
-public partial class RoleMarker: Node2D, ISetup
+public partial class RoleMarker: Node2D
 {
+
+    public class SetupArgs
+    {
+        public Battle Battle;
+        public BattleEntity Entity;
+    }
+    
     public Sprite2D SwordIcon;
     public Sprite2D ShieldIcon;
     public Battle Battle;
     public BattleEntity Entity;
-    
-    public bool HasSetup { get; set; }
 
     public ObservableProperty<Enums.EngageRole> Role;
     public ObservableProperty<bool> IsEmphasized;
@@ -26,7 +31,6 @@ public partial class RoleMarker: Node2D, ISetup
 
     public override void _Ready()
     {
-        base._Ready();
         SwordIcon = GetNode<Sprite2D>("Sword");
         ShieldIcon = GetNode<Sprite2D>("Shield");
         Role = new ObservableProperty<Enums.EngageRole>(nameof(Role), this, Enums.EngageRole.None);
@@ -37,22 +41,13 @@ public partial class RoleMarker: Node2D, ISetup
         InitPosition = Position;
     }
 
-    public void Setup(Dictionary<string, object> args)
+    public void Setup(SetupArgs args)
     {
-        Battle = (Battle)args["battle"];
-        Entity = (BattleEntity)args["entity"];
-        HasSetup = true;
+        Battle = args.Battle;
+        Entity = args.Entity;
     }
     
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
-        {
-            GD.PrintErr($"{this} not setup yet");
-        }
-    }
-
-    public async Task TweenEmphasize(bool to, float tweenTime)
+    public async Task AnimateLift(bool to, float tweenTime)
     {
         if (IsEmphasized.Value == to) return;
         var newTween = CreateTween();

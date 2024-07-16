@@ -10,17 +10,47 @@ using Vector4 = Godot.Vector4;
 
 namespace XCardGame.Scripts.Ui;
 
-public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, ISetup
-    where TContentNode: BaseContentNode<TContentNode, TContent>
-    where TContent: IContent<TContent>
+public abstract partial class BaseContentContainer: Node2D
 {
+    public class SetupArgs
+    {
+        public Vector2 ContentNodeSize;
+        public Vector2 Separation;
+        public Enums.Direction2D8Ways PivotDirection; 
+        public int NodesPerRow;
+        
+        public bool HasBorder;
+        public Vector4 Margins;
+        public int MinContentNodeCountForBorder;
+        
+        public bool HasName;
+        public string ContainerName;
+
+        public SetupArgs()
+        {
+            
+        }
+        
+        public SetupArgs(SetupArgs other)
+        {
+            ContentNodeSize = other.ContentNodeSize;
+            Separation = other.Separation;
+            PivotDirection = other.PivotDirection;
+            NodesPerRow = other.NodesPerRow;
+            HasBorder = other.HasBorder;
+            Margins = other.Margins;
+            MinContentNodeCountForBorder = other.MinContentNodeCountForBorder;
+            HasName = other.HasName;
+            ContainerName = other.ContainerName;
+        }
+    }
+    
     public GameMgr GameMgr;
     public NinePatchRect Border;
     public Label ContainerNameLabel;
     
-    public bool HasSetup { get; set; }
-    public Action<TContentNode> OnAddContentNode;
-    public Action<TContentNode> OnRemoveContentNode;
+    public Action<BaseContentNode> OnAddContentNode;
+    public Action<BaseContentNode> OnRemoveContentNode;
     public Action OnAdjustLayout;
     
     public Vector2 ContentNodeSize;
@@ -29,15 +59,15 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
     public int NodesPerRow;
 
     public bool HasBorder;
-    public int ExpectedContentNodeCount;
+    public int MinContentNodeCountForBorder;
 
     public bool HasName;
     public string ContainerName;
 
     public Vector4 Margins;
     
-    public ObservableCollection<TContent> Contents;
-    public ObservableCollection<TContentNode> ContentNodes;
+    public ObservableCollection<IContent> Contents;
+    public ObservableCollection<BaseContentNode> ContentNodes;
     protected bool SuppressNotifications;
     
     public override void _Ready()
@@ -46,62 +76,48 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         ClearChildren();
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
 
-        Contents = new ObservableCollection<TContent>();
+        Contents = new ObservableCollection<IContent>();
         Contents.CollectionChanged += OnContentsChanged;
-        ContentNodes = new ObservableCollection<TContentNode>();
+        ContentNodes = new ObservableCollection<BaseContentNode>();
         ContentNodes.CollectionChanged += OnContentNodesChanged;
         HasBorder = false;
+        HasName = false;
         SuppressNotifications = false;
-        HasSetup = false;
     }
 
-    public virtual void Setup(Dictionary<string, object> args)
+    public virtual void Setup(SetupArgs args)
     {
-        ContentNodeSize = (Vector2)args["contentNodeSize"];
-        Separation = (Vector2)args["separation"];
-        PivotDirection = (Enums.Direction2D8Ways)args["pivotDirection"]; 
-        NodesPerRow = (int)args["nodesPerRow"];
-        Margins = (Vector4)args["margins"];
-        
-        HasBorder = (bool)args["hasBorder"];
-        Border = GetNodeOrNull<NinePatchRect>("Border");
+        ContentNodeSize = args.ContentNodeSize;
+        Separation = args.Separation;
+        PivotDirection = args.PivotDirection;
+        NodesPerRow = args.NodesPerRow;
+        Margins = args.Margins;
+
+        HasBorder = args.HasBorder;
         if (HasBorder)
         {
-            ExpectedContentNodeCount = (int)args["expectedContentNodeCount"];
+            Border = GetNode<NinePatchRect>("Border");
+            MinContentNodeCountForBorder = args.MinContentNodeCountForBorder;
         }
-        else if (args.TryGetValue("expectedContentNodeCount", out var value))
-        {
-            ExpectedContentNodeCount = (int)value;
-        }
-        
-        HasName = (bool)args["hasName"];
-        ContainerNameLabel = GetNodeOrNull<Label>("Name");
+
+        HasName = args.HasName;
         if (HasName)
         {
-            ContainerName = (string)args["containerName"];
+            ContainerNameLabel = GetNode<Label>("Name");
+            ContainerName = args.ContainerName;
             ContainerNameLabel.Text = ContainerName;
         }
         AdjustLayout();
-
-        HasSetup = true;
-    }
-    
-    public void EnsureSetup()
-    {
-        if (!(HasSetup && Contents != null))
-        {
-            GD.PrintErr($"{this} not setup yet");
-        }
     }
     
     public Vector2 Size()
     {
-        var actualNodeCount = ActualNodeCount();
-        if (actualNodeCount == 0) return new Vector2(0, ContentNodeSize.Y);
-        var actualNodesPerRow = NodesPerRow == 0 ? actualNodeCount : Mathf.Min(actualNodeCount, NodesPerRow);
-        var actualRowCount = actualNodesPerRow == 0 ? 0 : (actualNodeCount - 1) / actualNodesPerRow + 1;
-        return new Vector2(ContentNodeSize.X * actualNodesPerRow + Separation.X * (actualNodesPerRow - 1),
-            ContentNodeSize.Y * actualRowCount + Separation.Y * (actualRowCount - 1));
+        var effectiveNodeCount = EffectiveNodeCount();
+        if (effectiveNodeCount == 0) return new Vector2(0, ContentNodeSize.Y);
+        var effectiveNodesPerRow = NodesPerRow == 0 ? effectiveNodeCount : Mathf.Min(effectiveNodeCount, NodesPerRow);
+        var effectiveRowCount = effectiveNodesPerRow == 0 ? 0 : (effectiveNodeCount - 1) / effectiveNodesPerRow + 1;
+        return new Vector2(ContentNodeSize.X * effectiveNodesPerRow + Separation.X * (effectiveNodesPerRow - 1),
+            ContentNodeSize.Y * effectiveRowCount + Separation.Y * (effectiveRowCount - 1));
     }
     
     public Vector2 CalculateContentNodePosition(int index, bool globalPosition = false)
@@ -162,12 +178,20 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         }
         return pivotOffsetFromBottomLeft;
     }
+
+    protected int EffectiveNodeCount()
+    {
+        if (HasBorder && MinContentNodeCountForBorder > 0)
+        {
+            return Mathf.Max(MinContentNodeCountForBorder, ContentNodes.Count);
+        }
+        return ContentNodes.Count;
+    }
     
     protected abstract void OnM2VAddContents(int startingIndex, IList contents);
 
     protected void OnM2VRemoveContents(int startingIndex, IList contents)
     {
-        EnsureSetup();
         SuppressNotifications = true;
         for (int i = 0; i < contents.Count; i++)
         {
@@ -180,10 +204,9 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
 
     protected void OnM2VReplaceContents(int oldContentsStartingIndex, IList oldContents, IList newContents)
     {
-        EnsureSetup();
         for (int i = 0; i < oldContents.Count; i++)
         {
-            if (oldContents[i] is TContent oldContent && newContents[i] is TContent newContent)
+            if (oldContents[i] is IContent oldContent && newContents[i] is IContent newContent)
             {
                 var oldContentNode = ContentNodes[oldContentsStartingIndex + i];
                 oldContentNode.Content.Value = newContent;
@@ -193,14 +216,12 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
 
     protected virtual void OnV2MAddNodes(int startingIndex, IList nodes)
     {
-        EnsureSetup();
         SuppressNotifications = true;
         var index = startingIndex;
         foreach (var node in nodes)
         {
-            if (node is TContentNode contentNode)
+            if (node is BaseContentNode contentNode)
             {
-                OnAddContentNode?.Invoke(contentNode);
                 Contents.Insert(index, contentNode.Content.Value);
                 if (contentNode.GetParent() != null)
                 {
@@ -211,8 +232,9 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
                     AddChild(contentNode);
                 }
                 MoveChild(contentNode, index);
-                contentNode.PreviousContainer = contentNode.Container.Value;
-                contentNode.Container.Value = this;
+                contentNode.PreviousContainer = contentNode.CurrentContainer.Value;
+                contentNode.CurrentContainer.Value = this;
+                OnAddContentNode?.Invoke(contentNode);
                 // GD.Print($"{contentNode.Content.Value}({contentNode}) container added {this}");
             }
             index++;
@@ -223,12 +245,11 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
 
     protected virtual void OnV2MRemoveNodes(int startingIndex, IList nodes)
     {
-        EnsureSetup();
         SuppressNotifications = true;
         var index = startingIndex;
         foreach (var node in nodes)
         {
-            if (node is TContentNode contentNode)
+            if (node is BaseContentNode contentNode)
             {
                 OnRemoveContentNode?.Invoke(contentNode);
                 Contents.RemoveAt(index);
@@ -236,10 +257,10 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
                 // {
                 //     RemoveChild(contentNode);
                 // }
-                if (contentNode.Container.Value == this)
+                if (contentNode.CurrentContainer.Value == this)
                 {
-                    contentNode.PreviousContainer = contentNode.Container.Value;
-                    contentNode.Container.Value = null;
+                    contentNode.PreviousContainer = contentNode.CurrentContainer.Value;
+                    contentNode.CurrentContainer.Value = null;
                 }
                 // GD.Print($"{contentNode.Content.Value}({contentNode}) container removed {this}");
             }
@@ -252,20 +273,19 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
 
     protected virtual void OnV2MReplaceNodes(int oldNodesStartingIndex, IList oldNodes, IList newNodes)
     {
-        EnsureSetup();
         SuppressNotifications = true;
         for (int i = 0; i < oldNodes.Count; i++)
         {
-            if (oldNodes[i] is TContentNode oldNode && newNodes[i] is TContentNode newNode)
+            if (oldNodes[i] is BaseContentNode oldNode && newNodes[i] is BaseContentNode newNode)
             {
                 Contents[oldNodesStartingIndex + i] = newNode.Content.Value;
                 RemoveChild(oldNode);
-                oldNode.PreviousContainer = oldNode.Container.Value;
-                oldNode.Container.Value = null;
+                oldNode.PreviousContainer = oldNode.CurrentContainer.Value;
+                oldNode.CurrentContainer.Value = null;
                 newNode.Reparent(newNode);
                 MoveChild(newNode, oldNodesStartingIndex + i);
-                newNode.PreviousContainer = newNode.Container.Value;
-                newNode.Container.Value = this;
+                newNode.PreviousContainer = newNode.CurrentContainer.Value;
+                newNode.CurrentContainer.Value = this;
             }
         }
         for (int i = 0; i < ContentNodes.Count; i++)
@@ -277,29 +297,18 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
 
     protected virtual void OnV2MClearNodes()
     {
-        EnsureSetup();
         SuppressNotifications = true;
         ClearChildren();
         Contents.Clear();
         SuppressNotifications = false;
         AdjustLayout();
     }
-
-
-    protected virtual int ActualNodeCount()
-    {
-        if (HasBorder)
-        {
-            return Mathf.Max(ExpectedContentNodeCount, ContentNodes.Count);
-        }
-        return ContentNodes.Count;
-    }
     
     protected void ClearChildren()
     {
         foreach (var child in GetChildren())
         {
-            if (child is TContentNode)
+            if (child is BaseContentNode)
             {
                 child.QueueFree();
             }
@@ -373,7 +382,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
         OnAdjustLayout?.Invoke();
     }
 
-    protected void AdjustContentNode(int index, bool useTween)
+    protected async void AdjustContentNode(int index, bool useTween)
     {
         var node = ContentNodes[index];
         var position = CalculateContentNodePosition(index, true);
@@ -390,7 +399,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
             {
                 tweenTime = Configuration.ContentContainerAdjustTweenTime;
             }
-            node.TweenTransform(position, rotation, tweenTime);
+            await node.AnimateTransform(position, rotation, tweenTime);
         }
         else
         {
@@ -401,7 +410,7 @@ public abstract partial class ContentContainer<TContentNode, TContent>: Node2D, 
 
     protected virtual void AdjustBorder()
     {
-        if (!HasBorder || ActualNodeCount() == 0)
+        if (!HasBorder || EffectiveNodeCount() == 0)
         {
             // GD.Print($"hide {Border}");
             if (Border != null)

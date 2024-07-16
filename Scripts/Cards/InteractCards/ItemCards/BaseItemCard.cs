@@ -16,7 +16,7 @@ public class BaseItemCard: BaseInteractCard
         if (!base.CanInteract(node)) return false;
         if (node.IsTapped.Value) return false;
         var itemCardDef = (ItemCardDef)Def;
-        if (node.Container.Value is CardContainer cardContainer && cardContainer.ExpectedInteractCardDefType != typeof(ItemCardDef)) return false;
+        if (node.CurrentContainer.Value is CardContainer cardContainer && cardContainer.ExpectedInteractCardDefType != typeof(ItemCardDef)) return false;
         if (Battle.Player.Energy.Value < itemCardDef.Cost) return false;
         return true;
     }

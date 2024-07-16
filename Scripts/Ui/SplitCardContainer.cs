@@ -5,8 +5,15 @@ using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.Ui;
 
-public partial class SplitCardContainer: Node2D, ISetup
+public partial class SplitCardContainer: Node2D
 {
+    public class SetupArgs
+    {
+        public List<CardContainer.SetupArgs> CardContainersSetupArgs;
+        public int Separation;
+        public Enums.Direction2D8Ways PivotDirection;
+    } 
+    
     public GameMgr GameMgr;
     
     public PackedScene CardContainerPrefab;
@@ -16,37 +23,25 @@ public partial class SplitCardContainer: Node2D, ISetup
     public Enums.Direction2D8Ways PivotDirection;
     public int Separation;
 
-    public bool HasSetup { get; set; }
 
     public override void _Ready()
     {
-        base._Ready();
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
         CardContainerPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/CardContainer.tscn");
         CardContainers = new List<CardContainer>();
-        HasSetup = false;
     }
 
-    public void Setup(Dictionary<string, object> args)
+    public void Setup(SetupArgs args)
     {
-        var cardContainersSetupArgs = (List<Dictionary<string, object>>)args["cardContainersSetupArgs"];
-        Separation = (int)args["separation"];
-        PivotDirection = (Enums.Direction2D8Ways)args["pivotDirection"];
+        var cardContainersSetupArgs = args.CardContainersSetupArgs;
+        Separation = args.Separation;
+        PivotDirection = args.PivotDirection;
         foreach (var cardContainersSetupArg in cardContainersSetupArgs)
         {
             var cardContainer = (CardContainer)Utils.InstantiatePrefab(CardContainerPrefab, this);
             cardContainer.Setup(cardContainersSetupArg);
             CardContainers.Add(cardContainer);
             cardContainer.OnAdjustLayout += AdjustContainers;
-        }
-        HasSetup = true;
-    }
-
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
-        {
-            GD.PrintErr($"{this} not setup yet");
         }
     }
 

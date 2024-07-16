@@ -5,11 +5,16 @@ using Godot;
 
 namespace XCardGame.Scripts.Ui;
 
-public partial class NumberLineEdit: LineEdit, ISetup
+public partial class NumberLineEdit: LineEdit
 {
-    public bool HasSetup { get; set; }
     
     public Action<int, int> ValueChanged;
+
+    public class SetupArgs
+    {
+        public int Min;
+        public int Max;
+    }
     
     private Regex _regex;
     private string _oldText;
@@ -42,20 +47,12 @@ public partial class NumberLineEdit: LineEdit, ISetup
         TextSubmitted += OnTextSubmitted;
     }
 
-    void ISetup.Setup(Dictionary<string, object> args)
+    public void Setup(SetupArgs args)
     {
-        _min = (int)args["min"];
-        _max = (int)args["max"];
+        _min = args.Min;
+        _max = args.Max;
     }
-
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
-        {
-            GD.PrintErr($"{this} not setup yet");
-        }
-    }
-
+    
     private void OnTextChanged(string newText)
     {
         if (_regex.IsMatch(newText))

@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Common;
+using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs.Def.BattleEntity;
 using XCardGame.Scripts.Ui;
@@ -10,55 +13,61 @@ namespace XCardGame.Scripts.Game;
 
 public partial class PlayerBattleEntity: BattleEntity
 {
+
+    public new class SetupArgs : BattleEntity.SetupArgs
+    {
+        public int Energy;
+        public int MaxEnergy;
+        public int Credit;
+        public int ItemPocketSize;
+    }
+    
+    public Label EnergyLabel;
+    
     public ObservableProperty<int> Energy;
     public ObservableProperty<int> MaxEnergy;
     public ObservableProperty<int> Credit;
 
-    public ObservableCollection<BaseCard> Equipments;
     public ObservableProperty<int> ItemPocketSize;
-    public ObservableCollection<BaseCard> Items;
     // public Dictionary<int, LevelUpInfo> LevelUpTable;
 
-    public static Dictionary<string, object> InitArgs(PlayerBattleEntityDef def)
+    public static SetupArgs InitArgs(PlayerBattleEntityDef def)
     {
-        var res = BattleEntity.InitArgs(def);
-        res["energy"] = def.InitEnergy;
-        res["maxEnergy"] = def.InitEnergy;
-        res["credit"] = def.InitCredit;
-        res["itemPocketSize"] = def.InitItemPocketSize;
-        return res;
+        return new SetupArgs
+        {
+            Def = def,
+            Deck = new Deck(def.InitDeckDef),
+            DealCardCount = Configuration.DefaultHoleCardCount,
+            BaseHandPower = def.InitBaseHandPower,
+            HandPowers = def.InitHandPowers,
+            MaxHp = def.InitHp,
+            IsHoleCardDealtVisible = true,
+            Energy = def.InitEnergy,
+            MaxEnergy = def.InitEnergy,
+            Credit = def.InitCredit,
+            ItemPocketSize = def.InitItemPocketSize,
+        };
     }
     
-    // public override void _Ready()
-    // {
-    //     base._Ready();
-    //     Level.DetailedValueChanged += LevelChanged;
-    // }
+    public override void _Ready()
+    {
+        base._Ready();
+        EnergyLabel = GetNode<Label>("Energy/Label");
+    }
 
-    public override void Setup(Dictionary<string, object> args)
+    public void Setup(SetupArgs args)
     {
         // LevelUpTable = (Dictionary<int, LevelUpInfo>)args["levelUpTable"];
         base.Setup(args);
-        Energy = new ObservableProperty<int>(nameof(Energy), this, (int)args["energy"]);
-        MaxEnergy = new ObservableProperty<int>(nameof(MaxEnergy), this, (int)args["maxEnergy"]);
+        Energy = new ObservableProperty<int>(nameof(Energy), this, args.Energy);
+        MaxEnergy = new ObservableProperty<int>(nameof(MaxEnergy), this, args.MaxEnergy);
+        Energy.ValueChanged += UpdateEnergyLabel;
+        MaxEnergy.ValueChanged += UpdateEnergyLabel;
+        Energy.FireValueChangeEventsOnInit();
         Credit = new ObservableProperty<int>(nameof(Credit), this, 0);
-        Equipments = new ObservableCollection<BaseCard>();
-        if (args.TryGetValue("equipments", out var equipments))
-        {
-            foreach (var equipmentCard in (List<BaseCard>)equipments)
-            {
-                Equipments.Add(equipmentCard);
-            }
-        }
-        ItemPocketSize = new ObservableProperty<int>(nameof(ItemPocketSize), this, (int)args["itemPocketSize"]);
-        Items = new ObservableCollection<BaseCard>();
-        if (args.TryGetValue("items", out var items))
-        {
-            foreach (var itemCard in (List<BaseCard>)items)
-            {
-                Items.Add(itemCard);
-            }            
-        }
+        Credit.FireValueChangeEventsOnInit();
+        ItemPocketSize = new ObservableProperty<int>(nameof(ItemPocketSize), this, args.ItemPocketSize);
+        ItemPocketSize.FireValueChangeEventsOnInit();
     }
 
     public override async Task RoundReset()
@@ -69,7 +78,17 @@ public partial class PlayerBattleEntity: BattleEntity
 
     public bool CanBuy(CardNode cardNode)
     {
-        return Credit.Value >= cardNode.Content.Value.Def.BasePrice;
+        return Credit.Value >= cardNode.Card.Def.BasePrice;
+    }
+    
+    protected void UpdateEnergyLabel(object sender, ValueChangedEventArgs args)
+    {
+        EnergyLabel.Text = GetEnergyText();
+    }
+
+    protected string GetEnergyText()
+    {
+        return Utils._($"En: {Energy.Value} / {MaxEnergy.Value}");
     }
 
     // protected void LevelChanged(object obj, ValueChangedEventDetailedArgs<int> args)

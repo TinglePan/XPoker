@@ -15,8 +15,19 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Game;
 
-public partial class BattleEntity: Node, ISetup
+public partial class BattleEntity: Node
 {
+    public class SetupArgs
+    {
+        public BattleEntityDef Def;
+        public Deck Deck;
+        public int DealCardCount;
+        public int BaseHandPower;
+        public Dictionary<Enums.HandTier, int> HandPowers;
+        public int MaxHp;
+        public bool IsHoleCardDealtVisible;
+    }
+    
     public GameMgr GameMgr;
     public Battle Battle;
     public CardContainer HoleCardContainer;
@@ -30,8 +41,6 @@ public partial class BattleEntity: Node, ISetup
     
     public Action<BattleEntity, int> OnHpChanged;
     public Action<BattleEntity> OnDefeated;
-    
-    public bool HasSetup { get; set; }
 
     public BattleEntityDef Def;
     public Deck Deck;
@@ -44,22 +53,23 @@ public partial class BattleEntity: Node, ISetup
     public ObservableProperty<int> MaxHp;
     // public ObservableProperty<int> Level;
     public bool IsHoleCardDealtVisible;
-    public ObservableCollection<BaseCard> HoleCards;
-    public ObservableCollection<BaseBuff> Buffs;
+    // public ObservableCollection<BaseCard> HoleCards;
+    // public ObservableCollection<BaseBuff> Buffs;
     public ObservableProperty<Enums.HandTier> RoundHandTier;
     public ObservableProperty<Enums.EngageRole> RoundRole;
 
-    public static Dictionary<string, object> InitArgs(BattleEntityDef def)
+    public static SetupArgs InitArgs(BattleEntityDef def)
     {
-        var res = new Dictionary<string, object>();
-        res["def"] = def;
-        res["deck"] = new Deck(def.InitDeckDef);
-        res["dealCardCount"] = Configuration.DefaultHoleCardCount;
-        res["handPowers"] = def.InitHandPowers;
-        res["maxHp"] = def.InitHp;
-        res["baseHandPower"] = def.InitBaseHandPower;
-        res["isHoleCardDealtVisible"] = def is PlayerBattleEntityDef;
-        return res;
+        return new SetupArgs()
+        {
+            Def = def,
+            Deck = new Deck(def.InitDeckDef),
+            DealCardCount = Configuration.DefaultHoleCardCount,
+            BaseHandPower = def.InitBaseHandPower,
+            HandPowers = def.InitHandPowers,
+            MaxHp = def.InitHp,
+            IsHoleCardDealtVisible = def is PlayerBattleEntityDef
+        };
     }
 
     public override void _Ready()
@@ -89,64 +99,42 @@ public partial class BattleEntity: Node, ISetup
         RoundHandTier = new ObservableProperty<Enums.HandTier>(nameof(RoundHandTier), this, Enums.HandTier.HighCard);
         RoundRole.ValueChanged += UpdateRoundHandLabel;
         RoundHandTier.ValueChanged += UpdateRoundHandLabel;
-        HoleCards = new ObservableCollection<BaseCard>();
-        Buffs = new ObservableCollection<BaseBuff>();
-        HasSetup = false;
+        // HoleCards = new ObservableCollection<BaseCard>();
+        // Buffs = new ObservableCollection<BaseBuff>();
     }
 
-    public virtual void Setup(Dictionary<string, object> args)
+    public void Setup(SetupArgs args)
     {
         Battle = GameMgr.CurrentBattle;
-        Def = (BattleEntityDef)args["def"];
-        Deck = (Deck)args["deck"];
+        Def = args.Def;
+        Deck = args.Deck;
         foreach (var card in Deck.CardList)
         {
             card.OwnerEntity = this;
         }
-        DealCardCount = (int)args["dealCardCount"];
-        HandPowers = (Dictionary<Enums.HandTier, int>)args["handPowers"];
-        BaseHandPower = (int)args["baseHandPower"];
-        MaxHp.Value =(int)args["maxHp"];
-        Hp.Value = MaxHp.Value;
-        IsHoleCardDealtVisible = (bool)args["isHoleCardDealtVisible"];
-        HoleCardContainer.Setup(new Dictionary<string, object>()
-        {
-            { "allowInteract", false },
-            { "cards", HoleCards },
-            { "contentNodeSize", Configuration.CardSize },
-            { "separation", Configuration.CardContainerSeparation },
-            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-            { "nodesPerRow", 0 },
-            { "hasBorder", false },
-            { "expectedContentNodeCount", Configuration.DefaultHoleCardCount },
-            { "hasName", true },
-            { "containerName", "Hole cards" },
-            { "defaultCardFaceDirection", IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down },
-            { "margins", Configuration.DefaultContentContainerMargins },
-            { "withCardEffect", true }
-        });
-        BuffContainer.Setup(new Dictionary<string, object>()
-        {
-            { "allowInteract", false },
-            { "buffs", Buffs },
-            { "contentNodeSize", Configuration.CardSize },
-            { "separation", Configuration.CardContainerSeparation },
-            { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-            { "nodesPerRow", Configuration.BuffCountPerRow },
-            { "hasBorder", false },
-            { "hasName", false },
-            { "margins", Configuration.DefaultContentContainerMargins }
-        });
-        
-        HasSetup = true;
-    }
 
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
+        DealCardCount = args.DealCardCount;
+        HandPowers = args.HandPowers;
+        BaseHandPower = args.BaseHandPower;
+        MaxHp.Value = args.MaxHp;
+        Hp.Value = MaxHp.Value;
+        IsHoleCardDealtVisible = args.IsHoleCardDealtVisible;
+        HoleCardContainer.Setup(new CardContainer.SetupArgs
         {
-            GD.PrintErr($"{this} not setup yet");
-        }
+            ContentNodeSize = Configuration.CardSize,
+            Separation = Configuration.CardContainerSeparation,
+            PivotDirection = Enums.Direction2D8Ways.Neutral,
+            DefaultCardFaceDirection = IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down,
+            Margins = Configuration.DefaultContentContainerMargins,
+        });
+        BuffContainer.Setup(new BaseContentContainer.SetupArgs
+        {
+            ContentNodeSize = Configuration.CardSize,
+            Separation = Configuration.CardContainerSeparation,
+            PivotDirection = Enums.Direction2D8Ways.Neutral,
+            Margins = Configuration.DefaultContentContainerMargins,
+            NodesPerRow = Configuration.BuffCountPerRow,
+        });
     }
 
     public virtual void Reset()
@@ -158,12 +146,12 @@ public partial class BattleEntity: Node, ISetup
     
     public virtual async Task RoundReset()
     {
-        async Task DiscardCards(List<CardNode> cardNodes)
+        async Task DiscardCards(List<BaseContentNode> nodes)
         {
             var tasks = new List<Task>();
-            foreach (var cardNode in cardNodes)
+            foreach (var node in nodes)
             {
-                tasks.Add(Battle.Dealer.AnimateDiscard(cardNode));
+                tasks.Add(Battle.Dealer.AnimateDiscard((CardNode)node));
                 await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
             }
             await Task.WhenAll(tasks);
@@ -174,7 +162,7 @@ public partial class BattleEntity: Node, ISetup
     public int GetPower(Enums.HandTier handTier, bool useCharge = true)
     {
         var power = BaseHandPower + HandPowers[handTier];
-        foreach (var buff in Buffs)
+        foreach (var buff in BuffContainer.Contents)
         {
             if (buff is ChargeBuff chargePowerBuff)
             {
@@ -213,12 +201,12 @@ public partial class BattleEntity: Node, ISetup
     public List<float> GetAttackerDamageMultipliers()
     {
         List<float> res = new();
-        foreach (var buff in Buffs)
+        foreach (var buff in BuffContainer.Contents)
         {
-            if (buff is WeakenDeBuff)
+            if (buff is WeakenDeBuff weakenDeBuff)
             {
                 res.Add(1 - (float)Configuration.WeakenMultiplier / 100);
-                buff.Consume();
+                weakenDeBuff.Consume();
             } else if (buff is BigShieldCard.BigShieldBuff)
             {
                 res.Add(0);
@@ -230,11 +218,11 @@ public partial class BattleEntity: Node, ISetup
     public int GetDefenderDamageModifier()
     {
         var res = 0;
-        foreach (var buff in Buffs)
+        foreach (var buff in BuffContainer.Contents)
         {
-            if (buff is ResistBuff)
+            if (buff is ResistBuff resistBuff)
             {
-                res -= buff.Stack.Value;
+                res -= resistBuff.Stack.Value;
             }
         }
         return res;
@@ -243,12 +231,12 @@ public partial class BattleEntity: Node, ISetup
     public List<float> GetDefenderDamageMultipliers()
     {
         List<float> res = new();
-        foreach (var buff in Buffs)
+        foreach (var buff in BuffContainer.Contents)
         {
-            if (buff is VulnerableDeBuff)
+            if (buff is VulnerableDeBuff vulnerableDeBuff)
             {
                 res.Add(1 + (float)Configuration.VulnerableMultiplier / 100);
-                buff.Consume();
+                vulnerableDeBuff.Consume();
             }
             else if (buff is BigShieldCard.BigShieldBuff)
             {
@@ -270,7 +258,7 @@ public partial class BattleEntity: Node, ISetup
     public List<float> GetDefenceMultipliers()
     {
         List<float> res = new();
-        foreach (var buff in Buffs)
+        foreach (var buff in BuffContainer.Contents)
         {
             if (buff is FragileDeBuff)
             {
@@ -360,6 +348,11 @@ public partial class BattleEntity: Node, ISetup
     
     protected void UpdateRoundHandLabel(object sender, ValueChangedEventArgs args)
     {
-        RoundHandLabel.Text = $"{Utils.PrettyPrintHandTier(RoundHandTier.Value)}({RoundRole.Value.ToString()})";
+        RoundHandLabel.Text = GetRoundHandText();
+    }
+
+    protected string GetRoundHandText()
+    {
+        return Utils._($"Round hand: {Utils.PrettyPrintHandTier(RoundHandTier.Value)}({RoundRole.Value.ToString()})");
     }
 }

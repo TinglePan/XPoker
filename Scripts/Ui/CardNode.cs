@@ -10,8 +10,14 @@ using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Ui;
 
-public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
+public partial class CardNode: BaseContentNode, ISelect
 {
+	public new class SetupArgs: BaseContentNode.SetupArgs
+	{
+		public Enums.CardFace FaceDirection;
+		public bool OnlyDisplay;
+	}
+	
 	public GameMgr GameMgr;
 	public Battle Battle;
 	public Node2D Front;
@@ -21,20 +27,18 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
     public Label RankLabel;
     public Sprite2D JokerMark;
     public Label CostLabel;
-    public Node2D PriceNode;
-    public Label PriceLabel;
     public AnimationPlayer AnimationPlayer;
     
+    public BaseCard Card => (BaseCard)Content.Value;
     public Enums.CardFace OriginalFaceDirection;
     public ObservableProperty<Enums.CardFace> FaceDirection;
-    public bool WithCardEffect;
-    public bool IsSelected { get; set; }
-    public Action OnSelected { get; }
+    public bool OnlyDisplay;
     public ObservableProperty<bool> IsRevealed;
     public ObservableProperty<bool> IsTapped;
-    public ObservableProperty<bool> IsBought;
 
-    public bool HasTappedThisRound;
+    private ObservableProperty<bool> _isSelected;
+    public bool IsSelected { get; set; }
+    public Action OnSelected { get; }
     
     protected Vector2 InitPosition;
 
@@ -54,42 +58,33 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		FaceDirection = new ObservableProperty<Enums.CardFace>(nameof(FaceDirection), this, Enums.CardFace.Down);
 		FaceDirection.DetailedValueChanged += OnCardFaceChanged;
 		FaceDirection.FireValueChangeEventsOnInit();
-		WithCardEffect = false;
+		OnlyDisplay = false;
 		IsSelected = false;
 		IsRevealed = new ObservableProperty<bool>(nameof(IsTapped), this, false);
 		IsRevealed.DetailedValueChanged += OnToggleIsRevealed;
 		IsTapped = new ObservableProperty<bool>(nameof(IsTapped), this, false);
 		IsTapped.DetailedValueChanged += OnToggleIsTapped;
-		HasTappedThisRound = false;
-		Container.DetailedValueChanged += OnContainerChanged;
 		InitPosition = Position;
 	}
 
-	public override void Setup(Dictionary<string, object> args)
+	public void Setup(SetupArgs args)
     {
 	    base.Setup(args);
 	    Battle = GameMgr.CurrentBattle;
-	    Content.Value = (BaseCard)args["card"];
-	    MainIcon.Setup(new Dictionary<string, object>()
+	    MainIcon.Setup(new IconWithTextFallback.SetupArgs
 	    {
-		    { "iconPath", Content.Value.IconPath },
-		    { "displayName", Content.Value.Def.Name }
+		    IconPath = Card.IconPath,
+		    DisplayName =  Card.Def.Name,
 	    });
-	    OriginalFaceDirection = (Enums.CardFace)args["faceDirection"];
+	    OriginalFaceDirection = args.FaceDirection;
 	    FaceDirection.Value = OriginalFaceDirection;
-
-	    if (args.ContainsKey("DisplayPrice"))
-	    {
-		    PriceNode = GetNode<Node2D>("Price");
-		    PriceNode.Show();
-		    PriceLabel = GetNode<Label>("Price/Value");
-		    IsBought = new ObservableProperty<bool>(nameof(IsBought), this, false);
-		    IsBought.DetailedValueChanged += OnIsBoughtChanged;
-		    IsBought.FireValueChangeEventsOnInit();
-	    }
+	    OnlyDisplay = args.OnlyDisplay;
+	    
+	    CurrentContainer.DetailedValueChanged += OnContainerChanged;
+	    CurrentContainer.FireValueChangeEventsOnInit();
     }
 	
-	public virtual bool CanSelect()
+	public bool CanSelect()
 	{
 		return true;
 	}
@@ -99,29 +94,32 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		IsSelected = to;
 	}
 
-	public void Reset(bool useTween = true)
+	public async void Reset(bool useTween = true)
 	{
-		Content.Value.Suit.Value = Content.Value.Def.Suit;
-		Content.Value.Rank.Value = Content.Value.Def.Rank;
+		Card.Suit.Value = Card.Def.Suit;
+		Card.Rank.Value = Card.Def.Rank;
 		IsSelected = false;
 		if (useTween)
 		{
-			TweenReveal(false, Configuration.RevealTweenTime);
-			// TweenFlip(OriginalFaceDirection, Configuration.FlipTweenTime);
-			AnimateFlip(OriginalFaceDirection);
-			TweenTap(false, Configuration.TapTweenTime);
-			TweenNegate(false, Configuration.NegateTweenTime);
+			var tasks = new List<Task>
+			{
+				AnimateReveal(false, Configuration.RevealTweenTime),
+				AnimateFlip(OriginalFaceDirection),
+				AnimateTap(false, Configuration.TapTweenTime),
+				AnimateNegate(false, Configuration.NegateTweenTime)
+			};
+			await Task.WhenAll(tasks);
 		}
 		else
 		{
 			IsRevealed.Value = false;
 			FaceDirection.Value = OriginalFaceDirection;
 			IsTapped.Value = false;
-			Content.Value.IsNegated.Value = false;
+			Card.IsNegated.Value = false;
 		}
 	}
 
-	public async void TweenReveal(bool to, float tweenTime)
+	public async Task AnimateReveal(bool to, float tweenTime)
 	{
 		if (IsRevealed.Value == to) return;
 		var newTween = CreateTween();
@@ -146,16 +144,24 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
 	}
 
-	public async Task TweenSelect(bool to, float tweenTime)
+	public async Task AnimateSelect(bool to, float time)
 	{
 		if (IsSelected != to)
 		{
+			await AnimateLift(to, time);
+			IsSelected = to;
+		}
+	}
+
+	public async Task AnimateLift(bool to, float time)
+	{
+		if (Position == InitPosition ^ to)
+		{
 			var newTween = CreateTween();
 			var offset = Configuration.SelectedCardOffset;
-			newTween.TweenProperty(this, "position", to ? InitPosition + offset : InitPosition, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
-			TweenControl.AddTween("select", newTween, tweenTime);
+			newTween.TweenProperty(this, "position", to ? InitPosition + offset : InitPosition, time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+			TweenControl.AddTween("transform", newTween, time);
 			await ToSignal(newTween, Tween.SignalName.Finished);
-			IsSelected = to;
 		}
 	}
 
@@ -164,7 +170,7 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		FaceDirection.Value = FaceDirection.Value == Enums.CardFace.Down ? Enums.CardFace.Up : Enums.CardFace.Down;
 	}
 
-	public async void TweenTap(bool to, float tweenTime)
+	public async Task AnimateTap(bool to, float tweenTime)
 	{
 		if (IsTapped.Value == to) return;
 		var newTween = CreateTween();
@@ -174,14 +180,14 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		IsTapped.Value = to;
 	}
 
-	public async void TweenNegate(bool toState, float tweenTime)
+	public async Task AnimateNegate(bool toState, float tweenTime)
 	{
-		if (Content.Value.IsNegated.Value == toState) return;
+		if (Card.IsNegated.Value == toState) return;
 		var newTween = CreateTween();
 		newTween.TweenProperty(this, "modulate", toState ? Colors.DimGray : Colors.White, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
 		TweenControl.AddTween("negate", newTween, tweenTime);
 		await ToSignal(newTween, Tween.SignalName.Finished);
-		Content.Value.IsNegated.Value = toState;
+		Card.IsNegated.Value = toState;
 	}
 
 	protected void OnCardFaceChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardFace> args)
@@ -234,17 +240,17 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 	    }
     }
 
-	protected override void OnContentAttached(BaseCard card)
+	protected override void OnContentAttached(IContent content)
 	{
-		base.OnContentAttached(card);
+		base.OnContentAttached(content);
+		var card = (BaseCard)content;
 		// GD.Print($"On card attached {card}");
-		card.Setup(new Dictionary<string, object>()
+		card.Setup(new BaseCard.SetupArgs
 		{
-			{ "gameMgr", GameMgr },
-			{ "battle", Battle },
-			{ "node", this }
+			GameMgr = GameMgr,
+			Battle = Battle,
+			Node = this,
 		});
-		card.Nodes.Add(this);
 		card.Rank.DetailedValueChanged += OnCardRankChanged;
 		card.Rank.FireValueChangeEventsOnInit();
 		card.Suit.DetailedValueChanged += OnCardSuitChanged;
@@ -252,47 +258,41 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 		card.IsNegated.DetailedValueChanged += OnToggleIsNegated;
 		card.IsNegated.FireValueChangeEventsOnInit();
 		MainIcon.ResetIconPath(card.IconPath);
-		StartCard();
+		if (!OnlyDisplay)
+		{
+			StartCard();
+		}
 	}
 	
-
-	protected override void OnContentDetached(BaseCard card)
+	protected override void OnContentDetached(IContent content)
 	{
+		base.OnContentDetached(content);
+		var card = (BaseCard)content;
 		// GD.Print($"On card detached {card}");
-		card.Nodes.Remove(this);
 		card.Rank.DetailedValueChanged -= OnCardRankChanged;
 		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
 		card.IsNegated.DetailedValueChanged -= OnToggleIsNegated;
 		MainIcon.ResetIconPath(null);
-		StopCard();
-	}
-
-	protected void OnIsBoughtChanged(object sender, ValueChangedEventDetailedArgs<bool> args)
-	{
-		if (args.NewValue)
+		if (!OnlyDisplay)
 		{
-			PriceLabel.Text = "Bought";
-		}
-		else
-		{
-			PriceLabel.Text = Content.Value.Def.BasePrice.ToString();
+			card.OnStop(card.Battle);
 		}
 	}
 
 	protected void OnContainerChanged(object sender,
-		ValueChangedEventDetailedArgs<ContentContainer<CardNode, BaseCard>> args)
+		ValueChangedEventDetailedArgs<BaseContentContainer> args)
 	{
 		var oldValue = (CardContainer)args.OldValue;
 		var newValue = (CardContainer)args.NewValue;
-		if (oldValue is { WithCardEffect: true } && newValue is not { WithCardEffect: true })
+		if (oldValue is { OnlyDisplay: true } && newValue is not { OnlyDisplay: true })
 		{
-			WithCardEffect = false;
+			OnlyDisplay = false;
 			StopCard();
 		}
 
-		if (oldValue is not { WithCardEffect: true } && newValue is { WithCardEffect: true })
+		if (oldValue is not { OnlyDisplay: true } && newValue is { OnlyDisplay: true })
 		{
-			WithCardEffect = newValue.WithCardEffect;
+			OnlyDisplay = true;
 			StartCard();
 		}
 	}
@@ -339,17 +339,11 @@ public partial class CardNode: BaseContentNode<CardNode, BaseCard>, ISelect
 
 	protected void StartCard()
 	{
-		if (Content.Value is {} card)
-		{
-			card.OnStart(card.Battle);
-		}
+		Card?.OnStart(Card.Battle);
 	}
 
 	protected void StopCard()
 	{
-		if (Content.Value is {} card)
-		{
-			card.OnStop(card.Battle);
-		}
+		Card?.OnStop(Card.Battle);
 	}
 }

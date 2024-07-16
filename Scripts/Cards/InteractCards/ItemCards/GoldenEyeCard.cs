@@ -1,31 +1,35 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Godot;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Game;
 using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
+namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
-public class D6Card: BaseItemCard
+public class GoldenEyeCard: BaseItemCard
 {
     public List<CardContainer> CardContainers;
-    public D6Card(ItemCardDef def): base(def)
+    // public List<CardNode> RevealedCardNodes;
+    
+    public GoldenEyeCard(ItemCardDef def): base(def)
     {
+        // RevealedCardNodes = new List<CardNode>();
     }
-
+    
     public override void Setup(SetupArgs args)
     {
         base.Setup(args);
         CardContainers = new List<CardContainer>
         {
             Battle.CommunityCardContainer,
-            Battle.Player.HoleCardContainer,
             Battle.Enemy.HoleCardContainer
         };
     }
-
+    
+    
     public override bool CanInteract(CardNode node)
     {
         return base.CanInteract(node) && Battle.CurrentState == Battle.State.BeforeShowDown;
@@ -39,8 +43,8 @@ public class D6Card: BaseItemCard
         {
             foreach (var cardNode in cardContainer.CardNodes)
             {
-                if (cardNode.FaceDirection.Value != Enums.CardFace.Up) continue;
-                tasks.Add(Battle.Dealer.DealCardAndReplace(cardNode));
+                if (cardNode.FaceDirection.Value == Enums.CardFace.Up) continue;
+                tasks.Add(GameMgr.AwaitAndDisableProceed(cardNode.AnimateReveal(true, Configuration.RevealTweenTime)));
                 await Utils.Wait(node, Configuration.AnimateCardTransformInterval);
             }
         }

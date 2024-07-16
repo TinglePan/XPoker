@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
@@ -12,17 +13,42 @@ using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Ui;
 
-public partial class CardContainer: ContentContainer<CardNode, BaseCard>
+public partial class CardContainer: BaseContentContainer
 {
+	public new class SetupArgs: BaseContentContainer.SetupArgs
+	{
+		public bool AllowInteract;
+		public Type ExpectedInteractCardDefType;
+		public Enums.CardFace DefaultCardFaceDirection;
+		public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
+		public bool OnlyDisplay;
+
+		public SetupArgs()
+		{
+		}
+		
+		public SetupArgs(SetupArgs other): base(other)
+		{
+			AllowInteract = other.AllowInteract;
+			ExpectedInteractCardDefType = other.ExpectedInteractCardDefType;
+			DefaultCardFaceDirection = other.DefaultCardFaceDirection;
+			GetCardFaceDirectionFunc = other.GetCardFaceDirectionFunc;
+			OnlyDisplay = other.OnlyDisplay;
+		}
+	}
+	
 	public PackedScene CardPrefab;
 	public Battle Battle;
 
+	public List<BaseCard> Cards => Contents.Cast<BaseCard>().ToList();
+	public List<CardNode> CardNodes => ContentNodes.Cast<CardNode>().ToList();
+	
 	public Enums.CardFace DefaultCardFaceDirection; 
 	public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
 
 	public bool AllowInteract;
 	public Type ExpectedInteractCardDefType;
-	public bool WithCardEffect;
+	public bool OnlyDisplay;
 	
 	public override void _Ready()
 	{
@@ -30,39 +56,27 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
 	}
 
-	public override void Setup(Dictionary<string, object> args)
+	public void Setup(SetupArgs args)
 	{
 		base.Setup(args);
 		Battle = GameMgr.CurrentBattle;
-		AllowInteract = (bool)args["allowInteract"];
+		AllowInteract = args.AllowInteract;
+		OnlyDisplay = args.OnlyDisplay;
+		DefaultCardFaceDirection = args.DefaultCardFaceDirection;
+		GetCardFaceDirectionFunc = args.GetCardFaceDirectionFunc;
 		if (AllowInteract)
 		{
-			ExpectedInteractCardDefType = (Type)args["expectedInteractCardDefType"];
-		}
-		WithCardEffect = (bool)args["withCardEffect"];
-		if (args["cards"] is ObservableCollection<BaseCard> cards && cards != Contents)
-		{
-			Contents = cards;
-			Contents.CollectionChanged += OnContentsChanged;
-		}
-		Debug.Assert(args.ContainsKey("defaultCardFaceDirection") || args.ContainsKey("getCardFaceDirectionFunc"));
-		if (args.TryGetValue("defaultCardFaceDirection", out var arg))
-		{
-			DefaultCardFaceDirection = (Enums.CardFace)arg;
-		}
-		if (args.TryGetValue("getCardFaceDirectionFunc", out arg))
-		{
-			GetCardFaceDirectionFunc = (Func<int, Enums.CardFace>)arg;
+			ExpectedInteractCardDefType = args.ExpectedInteractCardDefType;
 		}
 	}
 
 	public async void MoveCardNodesToContainer(CardContainer targetContainer, float delay = 0f)
 	{
 		var tasks = new List<Task>();
-		var cardNodes = new List<CardNode>(ContentNodes);
-		foreach (var cardNode in cardNodes)
+		var contentNodes = new List<BaseContentNode>(ContentNodes);
+		foreach (var contentNode in contentNodes)
 		{
-			tasks.Add(MoveCardNodeToContainer(cardNode, targetContainer));
+			tasks.Add(MoveCardNodeToContainer((CardNode)contentNode, targetContainer));
 			if (delay > 0)
 			{
 				await Utils.Wait(this, delay);
@@ -73,7 +87,7 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 	
 	public async Task MoveCardNodeToContainer(CardNode cardNode, CardContainer targetContainer, int index = -1)
 	{
-		var sourceContainer = cardNode.Container.Value;
+		var sourceContainer = cardNode.CurrentContainer.Value;
 		sourceContainer.ContentNodes.Remove(cardNode);
 		if (index < 0)
 		{
@@ -94,7 +108,6 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 		{
 			if (node is CardNode cardNode)
 			{
-				OnAddContentNode?.Invoke(cardNode);
 				cardNode.OriginalFaceDirection = GetCardFaceDirection(index);
 				cardNode.FaceDirection.Value = cardNode.OriginalFaceDirection;
 			}
@@ -104,7 +117,6 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 
 	protected override void OnM2VAddContents(int startingIndex, IList contents)
 	{
-		EnsureSetup();
 		SuppressNotifications = true;
 		var index = startingIndex;
 		foreach (var content in contents)
@@ -114,21 +126,21 @@ public partial class CardContainer: ContentContainer<CardNode, BaseCard>
 				var cardNode = CardPrefab.Instantiate<CardNode>();
 				AddChild(cardNode);
 				var faceDirection = GetCardFaceDirection(index);
-				cardNode.Setup(new Dictionary<string, object>()
+				cardNode.Setup(new CardNode.SetupArgs
 				{
-					{ "card", card },
-					{ "container", this },
-					{ "faceDirection", faceDirection },
-					{ "hasPhysics", true }
+					Content = card,
+					Container = this,
+					FaceDirection = faceDirection,
+					HasPhysics = true
 				});
-				card.Setup(new Dictionary<string, object>()
+				card.Setup(new BaseCard.SetupArgs
 				{
-					{ "gameMgr", GameMgr },
-					{ "battle", Battle },
-					{ "node", cardNode }
+					GameMgr = GameMgr,
+					Battle = Battle,
+					Node = cardNode
 				});
-				OnAddContentNode?.Invoke(cardNode);
 				ContentNodes.Insert(index, cardNode);
+				OnAddContentNode?.Invoke(cardNode);
 			}
 			index++;
 		}

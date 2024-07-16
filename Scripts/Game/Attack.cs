@@ -36,7 +36,7 @@ public class Attack
         var roundedAttackValue = (int)(attackValue * separatedAttackerDamageMultipliers.X * separatedAttackerDamageMultipliers.Y);
 
         // Blockers
-        foreach (var buff in Defender.Buffs)
+        foreach (var buff in Defender.BuffContainer.Buffs)
         {
             if (buff is RiposteBuff riposteBuff)
             {

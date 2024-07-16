@@ -10,8 +10,15 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.Game;
 
-public partial class CardPile: Node2D, ISetup
+public partial class CardPile: Node2D
 {
+
+    public class SetupArgs
+    {
+        public List<BaseCard> Cards;
+        public Enums.CardFace TopCardFaceDirection;
+    }
+    
     public CardNode TopCard;
     public NinePatchRect PileImage;
     public ObservableCollection<BaseCard> Cards;
@@ -28,13 +35,16 @@ public partial class CardPile: Node2D, ISetup
         Cards.CollectionChanged += OnCardsChanged;
     }
 
-    public void Setup(Dictionary<string, object> args)
+    public void Setup(SetupArgs args)
     {
-        foreach (var card in (List<BaseCard>)args["cards"])
+        if (args.Cards != null)
         {
-            Cards.Add(card);
+            foreach (var card in args.Cards)
+            {
+                Cards.Add(card);
+            }
         }
-        TopCardFaceDirection = (Enums.CardFace)args["topCardFaceDirection"];
+        TopCardFaceDirection = args.TopCardFaceDirection;
     }
 
     public void EnsureSetup()
@@ -120,20 +130,12 @@ public partial class CardPile: Node2D, ISetup
         if (Cards.Count > 0)
         {
             TopCard.Show();
-            if (TopCard.HasSetup)
+            TopCard.Setup(new CardNode.SetupArgs
             {
-                TopCard.Content.Value = Cards[0];
-            }
-            else
-            {
-                TopCard.Setup(new Dictionary<string, object>()
-                {
-                    { "card", Cards[0] },
-                    { "container", null },
-                    { "faceDirection", TopCardFaceDirection },
-                    { "hasPhysics", true }
-                });
-            }
+                Content = Cards[0],
+                FaceDirection = TopCardFaceDirection,
+                HasPhysics = true,
+            });
         }
         else
         {

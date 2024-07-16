@@ -20,7 +20,7 @@ public class BalaTrollHandCard: BaseItemCard
 
         protected override IEnumerable<CardNode> GetValidSelectTargets()
         {
-            foreach (var node in OriginateCard.PlayerCardContainer.ContentNodes)
+            foreach (var node in OriginateCard.PlayerCardContainer.CardNodes)
             {
                 yield return node;
             }
@@ -55,7 +55,7 @@ public class BalaTrollHandCard: BaseItemCard
     {
     }
 
-    public override void Setup(Dictionary<string, object> args)
+    public override void Setup(SetupArgs args)
     {
         base.Setup(args);
         PlayerCardContainer = Battle.Player.HoleCardContainer;

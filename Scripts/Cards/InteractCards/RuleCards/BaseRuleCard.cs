@@ -17,7 +17,7 @@ public class BaseRuleCard: BaseInteractCard
     {
         if (!base.CanInteract(node)) return false;
         var ruleCardDef = (RuleCardDef)Def;
-        if (node.Container.Value is CardContainer cardContainer && cardContainer.ExpectedInteractCardDefType != typeof(RuleCardDef)) return false;
+        if (node.CurrentContainer.Value is CardContainer cardContainer && cardContainer.ExpectedInteractCardDefType != typeof(RuleCardDef)) return false;
         if (!node.IsTapped.Value)
         {
             // Seal
@@ -34,13 +34,14 @@ public class BaseRuleCard: BaseInteractCard
             // Seal
             Battle.Player.Energy.Value -=  ruleCardDef.SealCost;
         }
-        node.TweenTap(!node.IsTapped.Value, Configuration.TapTweenTime);
+        node.AnimateTap(!node.IsTapped.Value, Configuration.TapTweenTime);
     }
     
     public override void OnStart(Battle battle)
     {
         if (IsFunctioning() && !AlreadyFunctioning)
         {
+            battle.OnRoundStart += OnRoundStart;
             battle.OnRoundEnd += OnRoundEnd;
             AlreadyFunctioning = true;
         }
@@ -51,8 +52,19 @@ public class BaseRuleCard: BaseInteractCard
         base.OnStop(battle);
         if (AlreadyFunctioning)
         {
+            battle.OnRoundStart -= OnRoundStart;
             battle.OnRoundEnd -= OnRoundEnd;
             AlreadyFunctioning = false;
+        }
+    }
+
+    protected void OnRoundStart(Battle battle)
+    {
+        var ruleCardDef = (RuleCardDef)Def;
+        var cardNode = Node<CardNode>();
+        if (ruleCardDef.AutoUnSeal && cardNode.IsTapped.Value)
+        {
+            cardNode.AnimateTap(false, Configuration.TapTweenTime);
         }
     }
 

@@ -163,12 +163,6 @@ public class TweenControl
     {
         return GetControlledTween(tag)?.Complete.Task;
     }
-
-    public Tween GetTween(string tag)
-    {
-        var controlledTween = GetControlledTween(tag);
-        return controlledTween?.Tween.Value;
-    }
     
     public bool IsRunning(string tag)
     {

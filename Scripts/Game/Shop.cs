@@ -16,7 +16,7 @@ using XCardGame.Scripts.Ui;
 namespace XCardGame.Scripts.Game;
 
 
-public partial class Shop: Control, ISetup
+public partial class Shop: Control
 {
 
     public class ShopInputHandler : BaseInputHandler
@@ -41,7 +41,7 @@ public partial class Shop: Control, ISetup
             {
                 foreach (var cardNode in cardContainer.ContentNodes)
                 {
-                    cardNode.OnPressed += OnCardNodePressed;
+                    cardNode.OnMousePressed += OnCardNodePressed;
                 }
             }
         }
@@ -53,19 +53,22 @@ public partial class Shop: Control, ISetup
             {
                 foreach (var cardNode in cardContainer.ContentNodes)
                 {
-                    cardNode.OnPressed -= OnCardNodePressed;
+                    cardNode.OnMousePressed -= OnCardNodePressed;
                 }
             }
         }
 
-        public void OnCardNodePressed(BaseContentNode<BaseCard> node)
+        public void OnCardNodePressed(BaseContentNode node, MouseButton mouseButton)
         {
-            var cardNode = (CardNode)node;
-            if (Player.CanBuy(cardNode))
+            if (mouseButton == MouseButton.Left)
             {
-                var card = node.Content.Value;
-                Player.Credit.Value -= card.Def.BasePrice;
-                Shop.AnimateBought(cardNode);
+                var cardNode = (CardNode)node;
+                if (Player.CanBuy(cardNode))
+                {
+                    var card = cardNode.Card;
+                    Player.Credit.Value -= card.Def.BasePrice;
+                    Shop.AnimateBought(cardNode);
+                }
             }
         }
     }
@@ -82,10 +85,10 @@ public partial class Shop: Control, ISetup
     public CardContainer SkillCardContainer;
     public CardContainer AbilityCardContainer;
     
-    public ObservableCollection<BaseCard> PokerCards;
-    public ObservableCollection<BaseCard> SkillCards;
-    public ObservableCollection<BaseCard> AbilityCards;
-    public ObservableCollection<BaseCardMarker> Markers;
+    // public ObservableCollection<BaseCard> PokerCards;
+    // public ObservableCollection<BaseCard> SkillCards;
+    // public ObservableCollection<BaseCard> AbilityCards;
+    // public ObservableCollection<BaseCardMarker> Markers;
 
     public List<BaseCardDef> AllCardDefs; 
     
@@ -104,63 +107,11 @@ public partial class Shop: Control, ISetup
         SkillCardContainer = GetNode<CardContainer>("Panel/SkillCardContainer");
         AbilityCardContainer = GetNode<CardContainer>("Panel/AbilityCardContainer");
         CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
-        PokerCards = new ObservableCollection<BaseCard>();
-        SkillCards = new ObservableCollection<BaseCard>();
-        AbilityCards = new ObservableCollection<BaseCard>();
-        Markers = new ObservableCollection<BaseCardMarker>();
     }
 
     public void Setup(Dictionary<string, object> args)
     {
         Battle = GameMgr.CurrentBattle;
-        PokerCardContainer.Setup(new Dictionary<string, object>()
-        {
-            { "allowInteract", false },
-            { "cards", PokerCards },
-            { "contentNodeSize", Configuration.CardSize },
-            { "separation", Configuration.CardContainerSeparation },
-            { "pivotDirection", Enums.Direction2D8Ways.Left },
-            { "nodesPerRow", Configuration.ShopPokerCardCount },
-            { "hasBorder", true },
-            { "expectedContentNodeCount", Configuration.ShopPokerCardCount },
-            { "hasName", true },
-            { "containerName", "Community cards"},
-            { "defaultCardFaceDirection", Enums.CardFace.Up },
-            { "getCardFaceDirectionFunc", null },
-            { "withCardEffect", false }
-        });
-        SkillCardContainer.Setup(new Dictionary<string, object>()
-        {
-            { "allowInteract", false },
-            { "cards", SkillCards },
-            { "contentNodeSize", Configuration.CardSize },
-            { "separation", Configuration.CardContainerSeparation },
-            { "pivotDirection", Enums.Direction2D8Ways.Left },
-            { "nodesPerRow", Configuration.ShopSkillCardCount },
-            { "hasBorder", true },
-            { "expectedContentNodeCount", Configuration.ShopSkillCardCount },
-            { "hasName", true },
-            { "containerName", "Skill cards"},
-            { "defaultCardFaceDirection", Enums.CardFace.Up },
-            { "getCardFaceDirectionFunc", null },
-            { "withCardEffect", false }
-        });
-        AbilityCardContainer.Setup(new Dictionary<string, object>()
-        {
-            { "allowInteract", false },
-            { "cards", AbilityCards },
-            { "contentNodeSize", Configuration.CardSize },
-            { "separation", Configuration.CardContainerSeparation },
-            { "pivotDirection", Enums.Direction2D8Ways.Left },
-            { "nodesPerRow", Configuration.ShopAbilityCardCount },
-            { "hasBorder", true },
-            { "expectedContentNodeCount", Configuration.ShopAbilityCardCount },
-            { "hasName", true },
-            { "containerName", "Ability cards"},
-            { "defaultCardFaceDirection", Enums.CardFace.Up },
-            { "getCardFaceDirectionFunc", null },
-            { "withCardEffect", false }
-        });
         AllCardDefs = CardDefs.All();
     }
 
@@ -194,8 +145,8 @@ public partial class Shop: Control, ISetup
     public void AnimateBought(CardNode cardNode)
     {
         // cardNode.AnimateFlip(Enums.CardFace.Down);
-        cardNode.IsBought.Value = true;
-        var card = cardNode.Content.Value;
+        // cardNode.IsBought.Value = true;
+        // var card = cardNode.Content.Value;
         // if (cardNode.Container.Value == AbilityCardContainer)
         // {
         //     Battle.Player.AbilityCards.Add(card);
@@ -203,8 +154,6 @@ public partial class Shop: Control, ISetup
         // {
         //     Battle.Player.SkillCards.Add(card);
         // }
-        
-        // TODO: poker cards, markers unhandled.
     }
 
     protected int RandRarity()

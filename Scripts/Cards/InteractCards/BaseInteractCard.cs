@@ -19,7 +19,7 @@ public class BaseInteractCard: BaseCard, IInteractCard
     public virtual bool CanInteract(CardNode node)
     {
         if (!IsFunctioning()) return false;
-        if (node.Container.Value is CardContainer { AllowInteract: false }) return false;
+        if (node.CurrentContainer.Value is CardContainer { AllowInteract: false }) return false;
         return true;
     }
 

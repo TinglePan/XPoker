@@ -9,8 +9,14 @@ using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Ui;
 
-public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
+public partial class CardEntry: BaseContentNode, ISelect
 {
+
+	public new class SetupArgs: BaseContentNode.SetupArgs
+	{
+		public bool OnlyDisplay;
+	}
+	
     public GameMgr GameMgr;
     public Battle Battle;
     public Sprite2D SuitIcon;
@@ -18,13 +24,14 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
     public Label JokerLabel;
     public Label NameLabel;
     public Line2D NegateLine;
-    
+
+    public BaseCard Card => (BaseCard)Content.Value;
     public Action<CardEntry> OnPressed;
 
-    public bool WithCardEffect;
-    public bool IsNegated;
-    public bool IsSelected;
+    public bool OnlyDisplay;
     
+    public Action OnSelected { get; }
+    public bool IsSelected { get; set; }
     
     public override void _Ready()
     {
@@ -36,8 +43,7 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
         NameLabel = GetNode<Label>("Name");
         NegateLine = GetNode<Line2D>("NegateLine");
         Area.InputEvent += InputEventHandler;
-        WithCardEffect = false;
-        IsNegated = false;
+        OnlyDisplay = true;
         IsSelected = false;
     }
     
@@ -49,12 +55,24 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
         }
     }
 
-    public override void Setup(Dictionary<string, object> args)
+    public void Setup(SetupArgs args)
     {
         base.Setup(args);
         Battle = GameMgr.CurrentBattle;
-        Content.Value = (BaseCard)args["card"];
-        WithCardEffect = (bool)args["withCardEffect"];
+        OnlyDisplay = args.OnlyDisplay;
+        
+        CurrentContainer.DetailedValueChanged += OnContainerChanged;
+        CurrentContainer.FireValueChangeEventsOnInit();
+    }
+    
+    public bool CanSelect()
+    {
+	    return true;
+    }
+
+    public void ToggleSelect(bool to)
+    {
+	    IsSelected = to;
     }
     
     protected void InputEventHandler(Node viewport, InputEvent @event, long shapeIdx)
@@ -103,37 +121,80 @@ public partial class CardEntry: BaseContentNode<CardEntry, BaseCard>
 	    }
     }
 
-	protected override void OnContentAttached(BaseCard card)
+	protected override void OnContentAttached(IContent content)
 	{
-		base.OnContentAttached(card);
+		base.OnContentAttached(content);
+		var card = (BaseCard)content;
 		// GD.Print($"On card attached {card}");
-		card.Setup(new Dictionary<string, object>()
+		card.Setup(new BaseCard.SetupArgs
 		{
-			{ "gameMgr", GameMgr },
-			{ "battle", Battle },
-			{ "node", this }
+			GameMgr = GameMgr,
+			Battle = Battle,
+			Node = this,
 		});
 		card.Nodes.Add(this);
 		card.Rank.DetailedValueChanged += OnCardRankChanged;
 		card.Rank.FireValueChangeEventsOnInit();
 		card.Suit.DetailedValueChanged += OnCardSuitChanged;
 		card.Suit.FireValueChangeEventsOnInit();
-		if (WithCardEffect)
+		if (!OnlyDisplay)
 		{
-			card.OnStart(card.Battle);
+			StartCard();
 		}
 	}
 
-	protected override void OnContentDetached(BaseCard card)
+	protected override void OnContentDetached(IContent content)
 	{
+		base.OnContentDetached(content);
+		var card = (BaseCard)content;
 		// GD.Print($"On card detached {card}");
-		card.Nodes.Remove(this);
 		card.Rank.DetailedValueChanged -= OnCardRankChanged;
 		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
-		if (WithCardEffect)
+		if (!OnlyDisplay)
 		{
-			card.OnStop(card.Battle);
+			StopCard();
 		}
 	}
-    
+	
+	protected void OnContainerChanged(object sender,
+		ValueChangedEventDetailedArgs<BaseContentContainer> args)
+	{
+		var oldValue = (CardContainer)args.OldValue;
+		var newValue = (CardContainer)args.NewValue;
+		if (oldValue is { OnlyDisplay: true } && newValue is not { OnlyDisplay: true })
+		{
+			OnlyDisplay = false;
+			StopCard();
+		}
+
+		if (oldValue is not { OnlyDisplay: true } && newValue is { OnlyDisplay: true })
+		{
+			OnlyDisplay = true;
+			StartCard();
+		}
+	}
+	
+	protected void OnToggleIsNegated(object sender, ValueChangedEventDetailedArgs<bool> args)
+	{
+		if (args.NewValue)
+		{
+			Modulate = Colors.DimGray;
+			StartCard();
+		}
+		else
+		{
+			Modulate = Colors.White;
+			StopCard();
+		}
+	}
+	
+	protected void StartCard()
+	{
+		Card?.OnStart(Card.Battle);
+	}
+
+	protected void StopCard()
+	{
+		Card?.OnStop(Card.Battle);
+	}
 }

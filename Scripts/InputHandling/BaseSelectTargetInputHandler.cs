@@ -8,15 +8,14 @@ using XCardGame.Scripts.Ui;
 
 namespace XCardGame.Scripts.InputHandling;
 
-public abstract class BaseSelectTargetInputHandler<TContentNode, TContent>: BaseInputHandler 
-    where TContentNode: Ui.BaseContentNode<TContent>, ISelect
-    where TContent: IContent<TContent>
+public abstract class BaseSelectTargetInputHandler<TTargetNode>: BaseInputHandler 
+    where TTargetNode: BaseContentNode, ISelect
 {
-    public List<TContentNode> SelectedNodes;
+    public List<TTargetNode> SelectedNodes;
     
     public BaseSelectTargetInputHandler(GameMgr gameMgr) : base(gameMgr)
     {
-        SelectedNodes = new List<TContentNode>();
+        SelectedNodes = new List<TTargetNode>();
     }
     
     public override void OnEnter()
@@ -24,7 +23,7 @@ public abstract class BaseSelectTargetInputHandler<TContentNode, TContent>: Base
         base.OnEnter();
         foreach (var selectTarget in GetValidSelectTargets())
         {
-            selectTarget.OnPressed += OnTargetPressed;
+            selectTarget.OnMousePressed += OnTargetPressed;
             selectTarget.IsSelected = false;
         }
     }
@@ -34,36 +33,39 @@ public abstract class BaseSelectTargetInputHandler<TContentNode, TContent>: Base
         base.OnExit();
         foreach (var selectTarget in GetValidSelectTargets())
         {
-            selectTarget.OnPressed -= OnTargetPressed;
+            selectTarget.OnMousePressed -= OnTargetPressed;
             selectTarget.IsSelected = false;
         }
     }
 
-    protected abstract IEnumerable<TContentNode> GetValidSelectTargets();
+    protected abstract IEnumerable<TTargetNode> GetValidSelectTargets();
 
-    protected virtual void SelectNode(TContentNode node)
+    protected virtual void SelectNode(TTargetNode node)
     {
         node.IsSelected = true;
         node.OnSelected?.Invoke();
         SelectedNodes.Add(node);
     }
 
-    protected virtual void UnSelectNode(TContentNode node)
+    protected virtual void UnSelectNode(TTargetNode node)
     {
         node.IsSelected = false;
         SelectedNodes.Remove(node);
     }
     
-    protected void OnTargetPressed(Ui.BaseContentNode<TContent> node)
+    protected void OnTargetPressed(BaseContentNode node, MouseButton mouseButton)
     {
-        var contentNode = (TContentNode)node;
-        if (contentNode.IsSelected)
+        if (mouseButton == MouseButton.Left)
         {
-            UnSelectNode(contentNode);
-        }
-        else
-        {
-            SelectNode(contentNode);
+            var contentNode = (TTargetNode)node;
+            if (contentNode.IsSelected)
+            {
+                UnSelectNode(contentNode);
+            }
+            else
+            {
+                SelectNode(contentNode);
+            }
         }
     }
     

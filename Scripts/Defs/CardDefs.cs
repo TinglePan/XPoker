@@ -77,16 +77,43 @@ public static class CardDefs
         RankChangePerUse = -99,
     };
     
-    public static ItemCardDef MillenniumEye = new ()
+    public static ItemCardDef GoldenEye = new ()
     {
-        Name = Utils._("Millennium eye"),
-        ConcreteClassPath = "InteractCards.ItemCards.MillenniumEyeCard",
-        DescriptionTemplate = Utils._("I can see forever."),
-        IconPath = "res://Sprites/Cards/millennium_eye.png",
+        Name = Utils._("Golden eye"),
+        ConcreteClassPath = "InteractCards.ItemCards.GoldenEyeCard",
+        DescriptionTemplate = Utils._("This trinket reveals the face-down cards."),
+        IconPath = "res://Sprites/Cards/golden_eye.png",
         BasePrice = 5,
         Rarity = 1,
         
         Cost = 2,
+        RankChangePerUse = -99,
+    };
+
+    public static ItemCardDef CopyPaste = new()
+    {
+        Name = Utils._("Copy & paste"),
+        ConcreteClassPath = "InteractCards.ItemCards.CopyPasteCard",
+        DescriptionTemplate =
+            Utils._("Create a copy of a selected card."),
+        IconPath = "res://Sprites/Cards/copy_paste.png",
+        BasePrice = 5,
+        Rarity = 1,
+
+        Cost = 1,
+        RankChangePerUse = -99,
+    };
+
+    public static ItemCardDef Copy = new()
+    {
+        Name = Utils._("Copy"),
+        ConcreteClassPath = "InteractCards.ItemCards.CopyCard",
+        DescriptionTemplate =
+            Utils._("A copy. You can replace a card with it when needed"),
+        IconPath = "res://Sprites/Cards/copy.png",
+        Rarity = 1,
+
+        Cost = 0,
         RankChangePerUse = -99,
     };
     
@@ -96,30 +123,6 @@ public static class CardDefs
         ConcreteClassPath = "InteractCards.RuleCards.DarknessCard",
         DescriptionTemplate = Utils._("Add face-down community cards."),
         IconPath = "res://Sprites/Cards/darkness.png",
-        Rarity = 1,
-        
-        SealCost = 1,
-        AutoUnSeal = true,
-    };
-    
-    public static RuleCardDef Capitalism = new ()
-    {
-        Name = Utils._("Capitalism"),
-        ConcreteClassPath = "InteractCards.RuleCards.CapitalismCard",
-        DescriptionTemplate = Utils._("Add hole cards dealt each round."),
-        IconPath = "res://Sprites/Cards/capitalism.png",
-        Rarity = 1,
-        
-        SealCost = 1,
-        AutoUnSeal = true,
-    };
-    
-    public static RuleCardDef Socialism = new ()
-    {
-        Name = Utils._("Socialism"),
-        ConcreteClassPath = "InteractCards.RuleCards.SocialismCard",
-        DescriptionTemplate = Utils._("Add community cards dealt each round."),
-        IconPath = "res://Sprites/Cards/socialism.png",
         Rarity = 1,
         
         SealCost = 1,

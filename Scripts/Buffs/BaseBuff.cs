@@ -15,8 +15,16 @@ using BuffNode = XCardGame.Scripts.Ui.BuffNode;
 
 namespace XCardGame.Scripts.Buffs;
 
-public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, IEquatable<BaseBuff>
+public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff>
 {
+
+    public class SetupArgs
+    {
+        public GameMgr GameMgr;
+        public Battle Battle;
+        public BaseContentNode Node;
+    }
+    
     public string Name;
     public string DescriptionTemplate;
     public string IconPath;
@@ -32,15 +40,14 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
 
     public bool IsTemporary;
     
-    public HashSet<Ui.BaseContentNode<BaseBuff>> Nodes { get; private set; }
+    public HashSet<BaseContentNode> Nodes { get; private set; }
 
     public GameMgr GameMgr;
     public Battle Battle;
-    public bool HasSetup { get; set; }
 
     public BaseBuff(string name, string descriptionTemplate, string iconPath, bool isStackable = false, bool stackOnRepeat = true, int stack = 0, int maxStack = 0, bool isTemporary = false)
     {
-        Nodes = new HashSet<Ui.BaseContentNode<BaseBuff>>();
+        Nodes = new HashSet<BaseContentNode>();
         Name = name;
         DescriptionTemplate = descriptionTemplate;
         IconPath = iconPath;
@@ -49,10 +56,9 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
         Stack = new ObservableProperty<int>(nameof(Stack), this, stack);
         MaxStack = maxStack;
         IsTemporary = isTemporary;
-        HasSetup = false;
     }
     
-    public TContentNode Node<TContentNode>() where TContentNode : Ui.BaseContentNode<TContentNode, BaseBuff>
+    public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode
     {
         foreach (var node in Nodes)
         {
@@ -64,20 +70,11 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
         return null;
     }
 
-    public void Setup(Dictionary<string, object> args)
+    public void Setup(SetupArgs args)
     {
-        Nodes.Add((BuffNode)args["node"]);
-        GameMgr = (GameMgr)args["gameMgr"];
-        Battle = GameMgr.CurrentBattle;
-        HasSetup = true;
-    }
-
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
-        {
-            GD.PrintErr($"{this} not setup yet");
-        }
+        Nodes.Add(args.Node);
+        GameMgr = args.GameMgr;
+        Battle = args.Battle;
     }
 
     public override string ToString()
@@ -87,33 +84,29 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
 
     public void InflictOn(BattleEntity target, BattleEntity source, BaseCard sourceCard)
     {
-        EnsureSetup();
         Entity = target;
         InflictedBy = source;
         InflictedByCard = sourceCard;
-        Entity.Buffs.Add(this);
+        Entity.BuffContainer.Buffs.Add(this);
     }
 
     public virtual void OnStart(Battle battle)
     {
-        EnsureSetup();
         Battle.OnRoundEnd += OnRoundEnd;
     }
 
     public virtual void OnStop(Battle battle)
     {
-        EnsureSetup();
         Battle.OnRoundEnd -= OnRoundEnd;
     }
 
     public virtual void Repeat(Battle battle, BattleEntity entity, BattleEntity inflictedBy, BaseCard inflictedByCard)
     {
-        EnsureSetup();
         InflictedBy = inflictedBy;
         InflictedByCard = inflictedByCard;
         if (IsStackable)
         {
-            foreach (var buff in entity.Buffs)
+            foreach (var buff in entity.BuffContainer.Buffs)
             {
                 if (buff.Equals(this))
                 {
@@ -134,16 +127,14 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
 
     public virtual void Consume()
     {
-        EnsureSetup();
-        Entity.Buffs.Remove(this);
+        Entity.BuffContainer.Buffs.Remove(this);
     }
 
     public virtual void OnRoundEnd(Battle battle)
     {
-        EnsureSetup();
         if (IsTemporary)
         {
-            Entity.Buffs.Remove(this);
+            Entity.BuffContainer.Buffs.Remove(this);
             return;
         }
         if (IsStackable)
@@ -179,7 +170,7 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, ISetup, IContent<BaseBuff>, I
         }
         if (Stack.Value <= 0)
         {
-            Entity.Buffs.Remove(this);
+            Entity.BuffContainer.Buffs.Remove(this);
         }
     }
 }

@@ -17,22 +17,27 @@ using CardNode = XCardGame.Scripts.Ui.CardNode;
 
 namespace XCardGame.Scripts.Cards;
 
-public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, IComparable<BaseCard>
+public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCard>
 {
+    public class SetupArgs
+    {
+        public GameMgr GameMgr;
+        public Battle Battle;
+        public BaseContentNode Node;
+    }
     // public string Name;
     // public string Description;
     // public string OriginalIconPath;
     // public Enums.CardSuit OriginalSuit;
     // public Enums.CardRank OriginalRank;
     // public int BasePrice;
-
-    public BaseCardDef Def;
     
     public GameMgr GameMgr;
     public Battle Battle;
     public BattleEntity OwnerEntity;
-    public HashSet<Ui.BaseContentNode<BaseCard>> Nodes { get; private set; }
-    public bool HasSetup { get; set; }
+    
+    public BaseCardDef Def;
+    public HashSet<BaseContentNode> Nodes { get; private set; }
     public ObservableProperty<string> IconPath;
     public ObservableProperty<Enums.CardSuit> Suit;
     public ObservableProperty<Enums.CardRank> Rank;
@@ -41,7 +46,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
     public BaseCard(BaseCardDef def)
     {
         Def = def;
-        Nodes = new HashSet<Ui.BaseContentNode<BaseCard>>();
+        Nodes = new HashSet<BaseContentNode>();
         IconPath = new ObservableProperty<string>(nameof(IconPath), this, def.IconPath);
         Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, def.Suit);
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, def.Rank);
@@ -49,7 +54,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         IsNegated.DetailedValueChanged += OnToggleIsNegated;
     }
 
-    public TContentNode Node<TContentNode>() where TContentNode : Ui.BaseContentNode<TContentNode, BaseCard>
+    public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode
     {
         foreach (var node in Nodes)
         {
@@ -61,19 +66,11 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         return null;
     }
 
-    public virtual void Setup(Dictionary<string, object> args)
+    public virtual void Setup(SetupArgs args)
     {
-        GameMgr = (GameMgr)args["gameMgr"];
-        Battle = (Battle)args["battle"];
-        Nodes.Add((CardNode)args["node"]);
-    }
-
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
-        {
-            GD.PrintErr($"{this} not setup yet");
-        }
+        GameMgr = args.GameMgr;
+        Battle = args.Battle;
+        Nodes.Add(args.Node);
     }
     
     public int CompareTo(BaseCard other)
@@ -101,7 +98,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         var node = Node<CardNode>();
         if (IsNegated.Value) return false;
         if (node.FaceDirection.Value == Enums.CardFace.Down) return false;
-        if (!node.WithCardEffect) return false;
+        if (node.OnlyDisplay) return false;
         return true;
     }
 
@@ -135,7 +132,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         {
             effect = new AttackAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
                 Utils.GetCardRankValue(Rank.Value), 1);
-            foreach (var ruleCard in battle.RuleCards)
+            foreach (var ruleCard in battle.RuleCardContainer.Cards)
             {
                 if (ruleCard is SpadesRuleCard)
                 {
@@ -150,7 +147,7 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         {
             effect = new DefendAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
                 Utils.GetCardRankValue(Rank.Value), 1);
-            foreach (var ruleCard in battle.RuleCards)
+            foreach (var ruleCard in battle.RuleCardContainer.Cards)
             {
                 if (ruleCard is HeartsRuleCard)
                 {
@@ -161,10 +158,10 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
                 }
             }
         }
-        effect?.Setup(new Dictionary<string, object>()
+        effect?.Setup(new BaseEffect.SetupArgs
         {
-            { "battle", battle },
-            { "engage", engage }
+            GameMgr = GameMgr,
+            Battle = battle,
         });
         Battle.GameMgr.BattleLog.Log($"Resolving {this}");
         // GD.Print($"Resolve of {this}, effect {effect}");
@@ -174,10 +171,10 @@ public class BaseCard: ISetup, ILifeCycleTriggeredInBattle, IContent<BaseCard>, 
         {
             effect = new HealEffect(this, entity, entity,
                 Utils.GetCardRankValue(Rank.Value) / 2, 0);
-            effect.Setup(new Dictionary<string, object>()
+            effect.Setup(new BaseEffect.SetupArgs
             {
-                { "battle", battle },
-                { "engage", engage }
+                GameMgr = GameMgr,
+                Battle = battle,
             });
             effect?.Resolve();
         }

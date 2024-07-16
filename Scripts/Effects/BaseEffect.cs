@@ -12,12 +12,18 @@ using BuffNode = XCardGame.Scripts.Ui.BuffNode;
 
 namespace XCardGame.Scripts.Effects;
 
-public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>, ISetup
+public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
 {
+
+    public class SetupArgs
+    {
+        public GameMgr GameMgr;
+        public Battle Battle;
+    }
+    
+    public GameMgr GameMgr;
     public Battle Battle;
     public BaseCard OriginateCard;
-
-    public bool HasSetup { get; set; }
     
     public string Name;
     public string DescriptionTemplate;
@@ -29,17 +35,10 @@ public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>, IS
         OriginateCard = originateCard;
     }
     
-    public virtual void Setup(Dictionary<string, object> args)
+    public virtual void Setup(SetupArgs args)
     {
-        Battle = (Battle)args["battle"];
-    }
-    
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
-        {
-            GD.PrintErr($"{this} not setup yet");
-        }
+        GameMgr = args.GameMgr;
+        Battle = args.Battle;
     }
     
     public bool Equals(BaseEffect other)

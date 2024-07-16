@@ -22,16 +22,13 @@ public partial class TestContainerPositioning: Node
     public override void _Ready()
     {
         base._Ready();
-        CardContainer.Setup(new Dictionary<string, object>()
+        CardContainer.Setup(new CardContainer.SetupArgs
         {
-            { "cards", new ObservableCollection<CardNode>() },
-            { "contentNodeSize", new Vector2(48, 68) },
-            { "separation", 12 },
-            { "defaultCardFaceDirection", Enums.CardFace.Up },
-            { "hasBorder", false },
-            { "hasName", false },
-            { "margins", Configuration.DefaultContentContainerMargins },
-            { "withCardEffect", true }
+            ContentNodeSize = new Vector2(48, 68),
+            Separation = new Vector2(12, 12),
+            PivotDirection = Enums.Direction2D8Ways.Neutral,
+            DefaultCardFaceDirection = Enums.CardFace.Up,
+            Margins = Configuration.DefaultContentContainerMargins,
         });
         SpawnCardNodeAndAppend();
         GD.Print("task start");
@@ -48,12 +45,11 @@ public partial class TestContainerPositioning: Node
         });
         var cardNode = CardPrefab.Instantiate<CardNode>();
         AddChild(cardNode);
-        cardNode.Setup(new Dictionary<string, object>()
+        cardNode.Setup(new CardNode.SetupArgs
         {
-            { "card", card },
-            { "faceDirection", Enums.CardFace.Up },
-            { "container", null },
-            { "hasPhysics", true }
+            Content = card,
+            FaceDirection = Enums.CardFace.Up,
+            HasPhysics = true,
         }); 
         CardContainer.ContentNodes.Add(cardNode);
         GD.Print("done");

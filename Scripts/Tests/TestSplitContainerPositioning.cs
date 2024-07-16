@@ -19,45 +19,29 @@ public partial class TestSplitContainerPositioning: Node
     {
         base._Ready();
         
-        SplitCardContainer.Setup(new Dictionary<string, object>()
+        SplitCardContainer.Setup(new SplitCardContainer.SetupArgs()
         {
-            { "cardContainersSetupArgs", new List<Dictionary<string, object>>()
+            CardContainersSetupArgs = new List<CardContainer.SetupArgs>
             {
                 new ()
                 {
-                    { "allowInteract", false },
-                    { "cards", new ObservableCollection<BaseCard>() },
-                    { "contentNodeSize", Configuration.CardSize },
-                    { "separation", Configuration.CardContainerSeparation },
-                    { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-                    { "nodesPerRow", 0 },
-                    { "hasBorder", false },
-                    { "expectedContentNodeCount", Configuration.DefaultHoleCardCount },
-                    { "hasName", true },
-                    { "containerName", "Primary cards" },
-                    { "defaultCardFaceDirection", Enums.CardFace.Up },
-                    { "margins", Configuration.DefaultContentContainerMargins },
-                    { "withCardEffect", true }
+                    ContentNodeSize = Configuration.CardSize,
+                    Separation = Configuration.CardContainerSeparation,
+                    PivotDirection = Enums.Direction2D8Ways.Neutral,
+                    DefaultCardFaceDirection = Enums.CardFace.Up,
+                    Margins = Configuration.DefaultContentContainerMargins,
                 },
                 new ()
                 {
-                    { "allowInteract", false },
-                    { "cards", new ObservableCollection<BaseCard>() },
-                    { "contentNodeSize", Configuration.CardSize },
-                    { "separation", Configuration.CardContainerSeparation },
-                    { "pivotDirection", Enums.Direction2D8Ways.Neutral },
-                    { "nodesPerRow", 0 },
-                    { "hasBorder", false },
-                    { "expectedContentNodeCount", Configuration.DefaultHoleCardCount },
-                    { "hasName", true },
-                    { "containerName", "Kickers" },
-                    { "defaultCardFaceDirection", Enums.CardFace.Up },
-                    { "margins", Configuration.DefaultContentContainerMargins },
-                    { "withCardEffect", true }
-                }
-            } },
-            { "separation", 24 },
-            { "pivotDirection", Enums.Direction2D8Ways.Neutral }
+                    ContentNodeSize = Configuration.CardSize,
+                    Separation = Configuration.CardContainerSeparation,
+                    PivotDirection = Enums.Direction2D8Ways.Neutral,
+                    DefaultCardFaceDirection = Enums.CardFace.Up,
+                    Margins = Configuration.DefaultContentContainerMargins,
+                },
+            },
+            Separation = Configuration.SplitCardContainerSeparation,
+            PivotDirection = Enums.Direction2D8Ways.Neutral,
         });
         
         SpawnCardNodeAndAppend();
@@ -77,13 +61,13 @@ public partial class TestSplitContainerPositioning: Node
             });
             var cardNode = Utils.InstantiatePrefab(CardPrefab, SplitCardContainer.CardContainers[0]) as CardNode;
             AddChild(cardNode);
-            cardNode?.Setup(new Dictionary<string, object>
+            cardNode?.Setup(new CardNode.SetupArgs()
             {
-                { "card", card },
-                { "faceDirection", Enums.CardFace.Up },
-                { "container", SplitCardContainer.CardContainers[0] },
-                { "hasPhysics", true }
-            }); 
+                Content = card,
+                FaceDirection = Enums.CardFace.Up,
+                Container = SplitCardContainer.CardContainers[0],
+                HasPhysics = true,
+            });
             SplitCardContainer.CardContainers[0].ContentNodes.Add(cardNode);
         }
         for (int i = 0; i < 2; i++)
@@ -95,13 +79,13 @@ public partial class TestSplitContainerPositioning: Node
             });
             var cardNode = Utils.InstantiatePrefab(CardPrefab, SplitCardContainer.CardContainers[0]) as CardNode;
             AddChild(cardNode);
-            cardNode?.Setup(new Dictionary<string, object>
+            cardNode?.Setup(new CardNode.SetupArgs()
             {
-                { "card", card },
-                { "faceDirection", Enums.CardFace.Up },
-                { "container", SplitCardContainer.CardContainers[1] },
-                { "hasPhysics", true }
-            }); 
+                Content = card,
+                FaceDirection = Enums.CardFace.Up,
+                Container = SplitCardContainer.CardContainers[1],
+                HasPhysics = true,
+            });
             SplitCardContainer.CardContainers[1].ContentNodes.Add(cardNode);
         }
         GD.Print("done");

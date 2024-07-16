@@ -18,9 +18,9 @@ public class MagicalHatCard: BaseItemCard
 
         protected override IEnumerable<CardNode> GetValidSelectTargets()
         {
-            foreach (var cardContainer in OriginateCard.CardContainers)
+            foreach (var cardContainer in OriginateCard.ValidTargetContainers)
             {
-                foreach (var node in cardContainer.ContentNodes)
+                foreach (var node in cardContainer.CardNodes)
                 {
                     yield return node;
                 }
@@ -33,8 +33,8 @@ public class MagicalHatCard: BaseItemCard
             {
                 var fromNode = SelectedNodes[0];
                 var toNode = SelectedNodes[1];
-                var fromContainer = fromNode.Container.Value;
-                var toContainer = toNode.Container.Value;
+                var fromContainer = fromNode.CurrentContainer.Value;
+                var toContainer = toNode.CurrentContainer.Value;
                 var fromIndex = fromContainer.ContentNodes.IndexOf(fromNode);
                 var toIndex = toContainer.ContentNodes.IndexOf(toNode);
                 (toContainer.ContentNodes[toIndex], fromContainer.ContentNodes[fromIndex]) = (fromContainer.ContentNodes[fromIndex], toContainer.ContentNodes[toIndex]);
@@ -51,16 +51,16 @@ public class MagicalHatCard: BaseItemCard
         }
     }
     
-    public List<CardContainer> CardContainers;
+    public List<CardContainer> ValidTargetContainers;
 
     public MagicalHatCard(ItemCardDef def) : base(def)
     {
     }
     
-    public override void Setup(Dictionary<string, object> args)
+    public override void Setup(SetupArgs args)
     {
         base.Setup(args);
-        CardContainers = new List<CardContainer>
+        ValidTargetContainers = new List<CardContainer>
         {
             Battle.CommunityCardContainer,
             Battle.Player.HoleCardContainer,

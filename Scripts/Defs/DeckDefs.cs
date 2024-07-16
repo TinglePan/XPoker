@@ -50,7 +50,7 @@ public static class DeckDefs
         Enums.CardRank.King,
     };
 
-    public static DeckDef StandardDeck(List<Enums.CardSuit> suits, List<Enums.CardRank> ranks)
+    public static List<BaseCardDef> StandardDeck(List<Enums.CardSuit> suits, List<Enums.CardRank> ranks)
     {
         
         var cardDefs = new List<BaseCardDef>();
@@ -68,52 +68,48 @@ public static class DeckDefs
                 });
             }
         }
-        return new DeckDef
-        {
-            CardDefs = cardDefs
-        };
+
+        return cardDefs;
     }
     
-    public static DeckDef Standard52Deck()
+    public static List<BaseCardDef> Standard52Deck()
     {
         var res = StandardDeck(_standardSuits, _standardRanks);
-        res.CardDefs.Add(CardDefs.SpadesRule);
-        res.CardDefs.Add(CardDefs.HeartsRule);
-        res.CardDefs.Add(CardDefs.ClubsRule);
-        res.CardDefs.Add(CardDefs.DiamondsRule);
+        res.Add(CardDefs.SpadesRule);
+        res.Add(CardDefs.HeartsRule);
+        res.Add(CardDefs.ClubsRule);
+        res.Add(CardDefs.DiamondsRule);
         return res;
     }
 
-    public static DeckDef Short52Deck()
+    public static List<BaseCardDef> Short52Deck()
     {
         var res = StandardDeck(_standardSuits, _shortRanks);
-        res.CardDefs.Add(CardDefs.SpadesRule);
-        res.CardDefs.Add(CardDefs.HeartsRule);
-        res.CardDefs.Add(CardDefs.ClubsRule);
-        res.CardDefs.Add(CardDefs.DiamondsRule);
-        res.CardDefs.Add(CardDefs.ShortDeckRule);
+        res.Add(CardDefs.SpadesRule);
+        res.Add(CardDefs.HeartsRule);
+        res.Add(CardDefs.ClubsRule);
+        res.Add(CardDefs.DiamondsRule);
+        res.Add(CardDefs.ShortDeckRule);
         return res;
     }
     
-    public static DeckDef EnhancedBlackDeck()
+    public static List<BaseCardDef> EnhancedBlackDeck()
     {
         var res = StandardDeck(new List<Enums.CardSuit> { Enums.CardSuit.Spades, Enums.CardSuit.Clubs }, _standardRanks);
-        res.CardDefs.Add(CardDefs.SpadesRule);
-        res.CardDefs.Add(CardDefs.ClubsRule);
-        res.CardDefs.Add(CardDefs.NerfFlush);
+        res.Add(CardDefs.SpadesRule);
+        res.Add(CardDefs.ClubsRule);
+        res.Add(CardDefs.NerfFlush);
         return res;
     }
     
-    public static DeckDef EnhancedRedDeck()
+    public static List<BaseCardDef> EnhancedRedDeck()
     {
         var res = StandardDeck(new List<Enums.CardSuit> { Enums.CardSuit.Hearts, Enums.CardSuit.Diamonds }, _standardRanks);
-        res.CardDefs.Add(CardDefs.HeartsRule);
-        res.CardDefs.Add(CardDefs.DiamondsRule);
-        res.CardDefs.Add(CardDefs.NerfFlush);
+        res.Add(CardDefs.HeartsRule);
+        res.Add(CardDefs.DiamondsRule);
+        res.Add(CardDefs.NerfFlush);
         return res;
     }
     
-    public static DeckDef PlayerInitDeckDef = Standard52Deck();
-    public static DeckDef EnemyInitDeckDef = Standard52Deck();
-    
+    public static List<BaseCardDef> PlayerInitDeckDef = Standard52Deck();
 }

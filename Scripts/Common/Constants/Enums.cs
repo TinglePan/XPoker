@@ -97,13 +97,6 @@ public static class Enums
         Raise
     }
 
-    public enum FactionId
-    {
-        None,
-        Player,
-        Enemy
-    }
-
     public enum TapDirection
     {
         Tapped,

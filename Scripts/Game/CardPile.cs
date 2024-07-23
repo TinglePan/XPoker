@@ -35,8 +35,9 @@ public partial class CardPile: Node2D
         Cards.CollectionChanged += OnCardsChanged;
     }
 
-    public void Setup(SetupArgs args)
+    public virtual void Setup(object o)
     {
+        var args = (SetupArgs)o;
         if (args.Cards != null)
         {
             foreach (var card in args.Cards)
@@ -45,6 +46,11 @@ public partial class CardPile: Node2D
             }
         }
         TopCardFaceDirection = args.TopCardFaceDirection;
+        TopCard.Setup(new CardNode.SetupArgs
+        {
+            FaceDirection = TopCardFaceDirection,
+            HasPhysics = true,
+        });
     }
 
     public void EnsureSetup()
@@ -130,12 +136,7 @@ public partial class CardPile: Node2D
         if (Cards.Count > 0)
         {
             TopCard.Show();
-            TopCard.Setup(new CardNode.SetupArgs
-            {
-                Content = Cards[0],
-                FaceDirection = TopCardFaceDirection,
-                HasPhysics = true,
-            });
+            TopCard.Content.Value = Cards[0];
         }
         else
         {

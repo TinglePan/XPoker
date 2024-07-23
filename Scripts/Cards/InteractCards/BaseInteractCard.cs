@@ -1,6 +1,7 @@
 ﻿using Godot;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
+using XCardGame.Scripts.Common.DataBinding;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Game;
 using XCardGame.Scripts.Ui;
@@ -9,17 +10,21 @@ namespace XCardGame.Scripts.Cards.InteractCards;
 
 public class BaseInteractCard: BaseCard, IInteractCard
 {
+    public ObservableProperty<int> Cost;
+    
     protected bool AlreadyFunctioning;
     
-    public BaseInteractCard(BaseCardDef def): base(def)
+    public BaseInteractCard(InteractCardDef def): base(def)
     {
         AlreadyFunctioning = false;
+        Cost = new ObservableProperty<int>(nameof(Cost), this, def.Cost);
     }
 
     public virtual bool CanInteract(CardNode node)
     {
         if (!IsFunctioning()) return false;
         if (node.CurrentContainer.Value is CardContainer { AllowInteract: false }) return false;
+        if (Cost.Value > Battle.Player.Energy.Value) return false;
         return true;
     }
 
@@ -48,17 +53,13 @@ public class BaseInteractCard: BaseCard, IInteractCard
     {
         var cardNode = Node<CardNode>();
         var currentRankValue = Utils.GetCardRankValue(Rank.Value);
-        if (currentRankValue == 1 && delta < 0)
+        var resultRankValue = currentRankValue + delta;
+        var resultRank = Utils.GetCardRank(Mathf.Clamp(resultRankValue, 1,
+            Utils.GetCardRankValue(Enums.CardRank.King)));
+        Rank.Value = resultRank;
+        if (resultRankValue <= 0)
         {
-            await GameMgr.AwaitAndDisableProceed(Battle.Dealer.AnimateDiscard(cardNode));
-        }
-        else
-        {
-            var resultRankValue = Utils.GetCardRankValue(Rank.Value) + delta;
-            resultRankValue = Mathf.Clamp(resultRankValue, 1,
-                Utils.GetCardRankValue(Enums.CardRank.King));
-            var resultRank = Utils.GetCardRank(resultRankValue);
-            Rank.Value = resultRank;
+            await GameMgr.AwaitAndDisableInput(Battle.Dealer.AnimateDiscard(cardNode));
         }
     }
 }

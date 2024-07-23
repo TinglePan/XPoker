@@ -109,7 +109,7 @@ public partial class Shop: Control
         CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
     }
 
-    public void Setup(Dictionary<string, object> args)
+    public void Setup(object o)
     {
         Battle = GameMgr.CurrentBattle;
         AllCardDefs = CardDefs.All();

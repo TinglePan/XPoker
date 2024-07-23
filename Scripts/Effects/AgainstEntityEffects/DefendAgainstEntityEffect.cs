@@ -1,5 +1,6 @@
 ﻿using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
+using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
@@ -22,15 +23,15 @@ public class DefendAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
         int power = 0;
         if (PowerScale > 0)
         {
-            power = Src.GetPower(Battle.RoundHands[Src].Tier);
+            power = Src.GetPower(Battle.RoundHands[Src].Tier, Enums.EngageRole.Defender);
             defenceValue = CalculateValue(power);
         }
         defenceValue += Src.GetDefenceModifier();
         var separatedMultipliers = Utils.AddUpSeparatedMultipliers(Src.GetDefenceMultipliers());
         var roundedDefenceValue = (int)(defenceValue * separatedMultipliers.X * separatedMultipliers.Y);
         Src.ChangeDefence(roundedDefenceValue);
-        Battle.GameMgr.BattleLog.Log(Utils._($"{Src} defends! Power:{power}. Value:{defenceValue}"));
-        Battle.GameMgr.BattleLog.Log(Utils._($"Gained {roundedDefenceValue} defence"));
+        Battle.GameMgr.BattleLog.Log(Utils._($"{Src} defends! Def:{power}. Base:{defenceValue}"));
+        Battle.GameMgr.BattleLog.Log(Utils._($"Gained {roundedDefenceValue} guard"));
     }
     
     public override string Description()

@@ -38,7 +38,7 @@ public partial class TestContainerPositioning: Node
 
     public void SpawnCardNodeAndAppend()
     {
-        var card = new PokerCard(new PokerCardDef
+        var card = new PokerCard(new BaseCardDef
         {
             Rank = Enums.CardRank.Ace,
             Suit = Enums.CardSuit.Clubs

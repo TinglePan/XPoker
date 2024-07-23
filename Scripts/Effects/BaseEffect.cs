@@ -35,8 +35,9 @@ public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
         OriginateCard = originateCard;
     }
     
-    public virtual void Setup(SetupArgs args)
+    public virtual void Setup(object o)
     {
+        var args = (SetupArgs)o;
         GameMgr = args.GameMgr;
         Battle = args.Battle;
     }

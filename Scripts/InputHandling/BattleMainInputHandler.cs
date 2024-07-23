@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Ui;
@@ -18,7 +19,18 @@ public class BattleMainInputHandler: BaseInputHandler
     public BattleMainInputHandler(GameMgr gameMgr) : base(gameMgr)
     {
     }
-    
+
+    public override async Task AwaitAndDisableInput(Task task)
+    {
+        // GD.Print("await and disable input 1");
+        ReceiveInput = false;
+        ProceedButton.Disabled = true;
+        await task;
+        ProceedButton.Disabled = false;
+        ReceiveInput = true;
+        // GD.Print("await and disable input 2");
+    }
+
     public override void OnEnter()
     {
         base.OnEnter();
@@ -63,12 +75,16 @@ public class BattleMainInputHandler: BaseInputHandler
     
     protected void OnCardNodePressed(BaseContentNode node, MouseButton mouseButton)
     {
-        if (mouseButton == MouseButton.Left)
+        GD.Print($"on card node {node} pressed: {ReceiveInput}.");
+        if (ReceiveInput)
         {
-            var cardNode = (CardNode)node;
-            if (node.Content.Value is IInteractCard interactCard && interactCard.CanInteract(cardNode))
+            if (mouseButton == MouseButton.Left)
             {
-                interactCard.Interact(cardNode);
+                var cardNode = (CardNode)node;
+                if (node.Content.Value is IInteractCard interactCard && interactCard.CanInteract(cardNode))
+                {
+                    interactCard.Interact(cardNode);
+                }
             }
         }
     }

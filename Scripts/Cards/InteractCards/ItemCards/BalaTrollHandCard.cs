@@ -33,13 +33,12 @@ public class BalaTrollHandCard: BaseItemCard
             {
                 foreach (var selectedNode in SelectedNodes)
                 {
-                    selectedNode.IsSelected = false;
                     tasks.Add(Battle.Dealer.DealCardAndReplace(selectedNode));
                     await Utils.Wait(OriginateCardNode, Configuration.AnimateCardTransformInterval);
                 }
-                SelectedNodes.Clear();
                 OriginateCard.Use(OriginateCardNode);
                 GameMgr.InputMgr.QuitCurrentInputHandler();
+                SelectedNodes.Clear();
                 await Task.WhenAll(tasks);
             }
             else
@@ -55,9 +54,9 @@ public class BalaTrollHandCard: BaseItemCard
     {
     }
 
-    public override void Setup(SetupArgs args)
+    public override void Setup(object o)
     {
-        base.Setup(args);
+        base.Setup(o);
         PlayerCardContainer = Battle.Player.HoleCardContainer;
     }
     

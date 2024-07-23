@@ -31,7 +31,7 @@ public abstract partial class BaseContentNode : Node2D
         Content = new ObservableProperty<IContent>(nameof(Content), this, default);
         Content.DetailedValueChanged += OnContentChanged;
         CurrentContainer = new ObservableProperty<BaseContentContainer>(nameof(CurrentContainer), this, null);
-        TweenControl = new TweenControl();
+        TweenControl = new TweenControl(this);
     }
     
     public override void _Notification(int what)
@@ -42,8 +42,9 @@ public abstract partial class BaseContentNode : Node2D
         }
     }
 
-    public virtual void Setup(SetupArgs args)
+    public virtual void Setup(object o)
     {
+        var args = (SetupArgs)o;
         if (args.HasPhysics)
         {
             Area = GetNode<Area2D>("Area");
@@ -56,15 +57,36 @@ public abstract partial class BaseContentNode : Node2D
         Content.Value = args.Content;
     }
 
-    public async Task AnimateTransform(Vector2 position, float rotationDegrees, float animationTime,
-        Action callback = null,
+    public virtual async Task AnimateTransform(Vector2 position, float rotationDegrees, float animationTime,
+        int priority = 0, Action callback = null,
         TweenControl.ConflictTweenAction conflictTweenAction = TweenControl.ConflictTweenAction.Interrupt)
     {
-        var newTween = CreateTween().SetParallel();
-        newTween.TweenProperty(this, "position", position, animationTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
-        newTween.TweenProperty(this, "rotation_degrees", rotationDegrees, animationTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
-        TweenControl.AddTween("transform", newTween, animationTime, callback, conflictTweenAction);
-        await TweenControl.WaitComplete("transform");
+        var tasks = new List<Task>();
+        if (position != Position || TweenControl.IsRunning("position"))
+        {
+            var controlledTween = TweenControl.CreateTween("position", animationTime, priority, callback, conflictTweenAction);
+            if (controlledTween != null)
+            {
+                var tween = controlledTween.Tween.Value;
+                // tween.SetParallel();
+                tween.TweenProperty(this, "position", position, controlledTween.Time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+                // tween.TweenProperty(this, "rotation_degrees", rotationDegrees, animationTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+                tasks.Add(TweenControl.WaitComplete("position"));
+                callback = null;
+                GD.Print($"animate transform {this} done {position}/{Position}");
+            }
+        }
+        if (Math.Abs(RotationDegrees - rotationDegrees) > 0.1f || TweenControl.IsRunning("rotation"))
+        {
+            var controlledTween = TweenControl.CreateTween("rotation", animationTime, priority, callback, conflictTweenAction);
+            if (controlledTween != null)
+            {
+                var tween = controlledTween.Tween.Value;
+                tween.TweenProperty(this, "rotation_degrees", rotationDegrees, controlledTween.Time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+                tasks.Add(TweenControl.WaitComplete("rotation"));
+            }
+        }
+        await Task.WhenAll(tasks);
     }
 
     protected void OnMouseEnter()

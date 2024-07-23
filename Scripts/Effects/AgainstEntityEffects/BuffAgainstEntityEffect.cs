@@ -21,9 +21,10 @@ public class BuffAgainstEntityEffect: BaseAgainstEntityEffect
         Buff = buff;
     }
 
-    public void Setup(SetupArgs args)
+    public override void Setup(object o)
     {
-        base.Setup(args);
+        base.Setup(o);
+        var args = (SetupArgs)o;
         Buff.Setup(args.BuffSetupArgs);
     }
 

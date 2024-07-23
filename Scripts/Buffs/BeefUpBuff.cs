@@ -1,13 +1,14 @@
 ﻿using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 
 
 namespace XCardGame.Scripts.Buffs;
 
-public class EmpowerBuff: BaseBuff
+public class BeefUpBuff: BaseBuff
 {
-    public EmpowerBuff(int stack) :
-        base("Empower", $"Grants 1 extra power per stack.", "res://Sprites/BuffIcons/permanent_power.png",
+    public BeefUpBuff(int stack) :
+        base(Utils._("BeefUp"), Utils._("Add attack value by 1 per stack."), "res://Sprites/BuffIcons/beef_up.png",
             true, stack:stack, maxStack:Configuration.CommonBuffMaxStack, isTemporary:true)
     {
     }

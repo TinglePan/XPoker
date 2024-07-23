@@ -38,16 +38,7 @@ public class Attack
         // Blockers
         foreach (var buff in Defender.BuffContainer.Buffs)
         {
-            if (buff is RiposteBuff riposteBuff)
-            {
-                if (Power <= riposteBuff.Stack.Value)
-                {
-                    var riposteCounterAttack = riposteBuff.CounterAttack();
-                    riposteBuff.Consume();
-                    riposteCounterAttack.Resolve();
-                    return 0;
-                }
-            } else if (buff is InvincibleBuff)
+            if (buff is InvincibleBuff)
             {
                 return 0;
             } else if (buff is BlockBuff blockBuff)

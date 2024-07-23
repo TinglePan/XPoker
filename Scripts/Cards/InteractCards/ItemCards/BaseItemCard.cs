@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def.Card;
+﻿using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards;
+namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
 public class BaseItemCard: BaseInteractCard
 {

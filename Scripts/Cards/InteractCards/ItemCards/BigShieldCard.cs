@@ -3,7 +3,7 @@ using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
+namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
 public class BigShieldCard: BaseItemCard
 {

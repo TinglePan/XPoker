@@ -33,14 +33,14 @@ public partial class DebugProxy: Node
             }
         }
         var selectRewardCard = GameMgr.OverlayScene(SelectRewardCardScene) as SelectRewardCard;
-        selectRewardCard.Setup(new System.Collections.Generic.Dictionary<string, object>()
+        selectRewardCard.Setup(new SelectRewardCard.SetupArgs
         {
-            { "rewardCardCount", defs.Count },
-            { "rewardCardDefType", typeof(InteractCardDef) },
-            { "reRollPrice", Configuration.DefaultReRollPrice },
-            { "reRollPriceIncrease", Configuration.DefaultReRollPriceIncrease },
-            { "skipReward", Configuration.DefaultSkipReward },
-            { "defs", defs }
+            RewardCardCount = defs.Count,
+            RewardCardDefType = typeof(InteractCardDef),
+            InitReRollPrice = Configuration.DefaultReRollPrice,
+            ReRollPriceIncrease = Configuration.DefaultReRollPriceIncrease,
+            SkipReward = Configuration.DefaultSkipReward,
+            PassInDefs = defs
         });
     }
 }

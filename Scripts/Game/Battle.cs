@@ -10,6 +10,7 @@ using XCardGame.Scripts.Cards.InteractCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs;
+using XCardGame.Scripts.Defs.Def;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Effects;
 using XCardGame.Scripts.HandEvaluate;
@@ -87,6 +88,8 @@ public partial class Battle: Node2D
     
     public List<BaseEffect> Effects;
     public State CurrentState;
+
+    protected List<EnemyRandBoxDef> AllEnemyRandBoxDefs;
     
     public override void _Ready()
     {
@@ -114,8 +117,9 @@ public partial class Battle: Node2D
         Effects = new List<BaseEffect>();
     }
 
-    public virtual void Setup(SetupArgs args)
+    public virtual void Setup(object o)
     {
+        var args = (SetupArgs)o;
         DealCommunityCardCount = args.DealCommunityCardCount;
         FaceDownCommunityCardCount = args.FaceDownCommunityCardCount;
         RequiredHoleCardCountMin = args.RequiredHoleCardCountMin;
@@ -154,8 +158,10 @@ public partial class Battle: Node2D
         ResolveCardContainer.Setup(resolveCardContainerSetupArgs);
         
         containerSetupArgs.GetCardFaceDirectionFunc = GetCommunityCardFaceDirectionFunc;
+        containerSetupArgs.ShouldCollectDealtItemAndRuleCards = true;
         CommunityCardContainer.Setup(containerSetupArgs);
         containerSetupArgs.GetCardFaceDirectionFunc = null;
+        containerSetupArgs.ShouldCollectDealtItemAndRuleCards = false;
         
         containerSetupArgs.AllowInteract = true;
         containerSetupArgs.ExpectedInteractCardDefType = typeof(ItemCardDef);
@@ -172,10 +178,13 @@ public partial class Battle: Node2D
             SourceDecks = Entities.Select(e => e.Deck).ToList(),
         });
 
-        foreach (var handTierValue in Enum.GetValues(typeof(Enums.HandTier)))
+        foreach (var handTierValue in ((Enums.HandTier[])Enum.GetValues(typeof(Enums.HandTier))).Reverse())
         {
-            HandTierOrderDescend.Add((Enums.HandTier)handTierValue);
+            HandTierOrderDescend.Add(handTierValue);
         }
+
+        AllEnemyRandBoxDefs = EnemyRandBoxDefs.All();
+        
         Reset();
     }
 
@@ -183,8 +192,8 @@ public partial class Battle: Node2D
     {
         Reset();
         Dealer.Shuffle();
-        await GameMgr.AwaitAndDisableProceed(Dealer.DealInnateCards());
-        await GameMgr.AwaitAndDisableProceed(NewRound());
+        await GameMgr.AwaitAndDisableInput(Dealer.DealInnateCards());
+        await GameMgr.AwaitAndDisableInput(NewRound());
         CurrentState = State.BeforeDealCards;
     }
 
@@ -193,22 +202,22 @@ public partial class Battle: Node2D
         switch (CurrentState)
         {
             case State.BeforeDealCards:
-                await GameMgr.AwaitAndDisableProceed(DealCards());
+                await GameMgr.AwaitAndDisableInput(DealCards());
                 CurrentState = State.BeforeShowDown;
                 break;
             case State.BeforeShowDown:
-                await GameMgr.AwaitAndDisableProceed(ShowDown());
+                await GameMgr.AwaitAndDisableInput(ShowDown());
                 CurrentState = State.BeforeResolve;
                 break;
             case State.BeforeResolve:
-                await GameMgr.AwaitAndDisableProceed(RoundEngage.Resolve());
+                await GameMgr.AwaitAndDisableInput(RoundEngage.Resolve());
                 CurrentState = State.AfterResolve;
                 break;
             case State.AfterResolve:
                 OnRoundEnd?.Invoke(this);
                 var isPlayerDefeated = Player.IsDefeated();
                 var isEnemyDefeated = Enemy.IsDefeated();
-                await GameMgr.AwaitAndDisableProceed(NewRound());
+                await GameMgr.AwaitAndDisableInput(NewRound());
                 if (isPlayerDefeated)
                 {
                     GameOver();
@@ -222,16 +231,16 @@ public partial class Battle: Node2D
                     }
                     else
                     {
-                        await GameMgr.AwaitAndDisableProceed(Dealer.AnimateShuffle());
+                        await GameMgr.AwaitAndDisableInput(Dealer.AnimateShuffle());
                         var selectRewardCard = GameMgr.OverlayScene(SelectRewardCardScene) as SelectRewardCard;
                         selectRewardCard.OnQuit += AfterSelectRewardCard;
-                        selectRewardCard.Setup(new Dictionary<string, object>()
+                        selectRewardCard.Setup(new SelectRewardCard.SetupArgs
                         {
-                            { "rewardCardCount", Configuration.DefaultRewardCardCount },
-                            { "rewardCardDefType", typeof(ItemCardDef) },
-                            { "reRollPrice", Configuration.DefaultReRollPrice },
-                            { "reRollPriceIncrease", Configuration.DefaultReRollPriceIncrease },
-                            { "skipReward", Configuration.DefaultSkipReward }
+                            RewardCardCount = Configuration.DefaultRewardCardCount,
+                            RewardCardDefType = typeof(ItemCardDef),
+                            InitReRollPrice = Configuration.DefaultReRollPrice,
+                            ReRollPriceIncrease = Configuration.DefaultReRollPriceIncrease,
+                            SkipReward = Configuration.DefaultSkipReward
                         });
                     }
                 }
@@ -250,24 +259,23 @@ public partial class Battle: Node2D
             {
                 tasks.Add(Dealer.AnimateDiscard(cardNode));
                 await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
+                GD.Print($"time: {Time.GetTicksMsec()}");
             }
             await Task.WhenAll(tasks);
         }
-        var tasks = new List<Task>();
         foreach (var entity in Entities)
         {
-            tasks.Add(entity.RoundReset());
+            await entity.RoundReset();
         }
-        tasks.Add(DiscardCards(CommunityCardContainer.CardNodes));
+        await DiscardCards(CommunityCardContainer.CardNodes);
         foreach (var cardContainer in ResolveCardContainer.CardContainers)
         {
-            tasks.Add(DiscardCards(cardContainer.CardNodes));
+            await DiscardCards(cardContainer.CardNodes);
         }
         RoundCount++;
         OnRoundStart?.Invoke(this);
         RoundHands.Clear();
         RoundEngage = null;
-        await Task.WhenAll(tasks);
     }
     
     public void Reset()
@@ -289,11 +297,10 @@ public partial class Battle: Node2D
         {
             entity.Reset();
         }
-
+        Dealer.Reset();
         tasks.Add(DiscardCards(ItemCardContainer.CardNodes));
         tasks.Add(DiscardCards(RuleCardContainer.CardNodes));
         Task.WhenAll(tasks);
-        Dealer.Reset();
     }
 
     public async Task DealCards()
@@ -500,7 +507,14 @@ public partial class Battle: Node2D
 
     protected void NewChallenger()
     {
-        Enemy.Setup(BattleEntity.InitArgs(BattleEntityDefs.DefaultEnemyBattleEntityDef));
+        var boxes = AllEnemyRandBoxDefs
+            .Where(def => def.ProgressRange.X <= GameMgr.ProgressCounter.Value
+                          && GameMgr.ProgressCounter.Value < def.ProgressRange.Y).ToList();
+        var i = Utils.RandOnWeight(boxes.Select(x => x.RandBox.RandBoxWeight).ToList(), GameMgr.Rand);
+        var boxDef = boxes[i];
+        var box = boxDef.RandBox;
+        var entityDef = box.Rand(GameMgr.Rand);
+        Enemy.Setup(BattleEntity.InitArgs(entityDef));
         OnNewEnemy?.Invoke(this, Enemy);
     }
 
@@ -514,7 +528,7 @@ public partial class Battle: Node2D
     {
         if (ItemCardContainer.ContentNodes.Count > Player.ItemPocketSize.Value)
         {
-            await GameMgr.AwaitAndDisableProceed(Dealer.AnimateDiscard((CardNode)ItemCardContainer.ContentNodes[0]));
+            await GameMgr.AwaitAndDisableInput(Dealer.AnimateDiscard((CardNode)ItemCardContainer.ContentNodes[0]));
         }
     }
 }

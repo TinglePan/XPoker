@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
-using XCardGame.Scripts.Common.Constants;
+﻿using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Game;
 using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards;
+namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 public class BaseRuleCard: BaseInteractCard
 {
@@ -21,7 +20,7 @@ public class BaseRuleCard: BaseInteractCard
         if (!node.IsTapped.Value)
         {
             // Seal
-            if (Battle.Player.Energy.Value < ruleCardDef.SealCost) return false;
+            if (Battle.Player.Energy.Value < ruleCardDef.Cost) return false;
         }
         return true;
     }
@@ -32,7 +31,7 @@ public class BaseRuleCard: BaseInteractCard
         if (!node.IsTapped.Value)
         {
             // Seal
-            Battle.Player.Energy.Value -=  ruleCardDef.SealCost;
+            Battle.Player.Energy.Value -=  ruleCardDef.Cost;
         }
         node.AnimateTap(!node.IsTapped.Value, Configuration.TapTweenTime);
     }

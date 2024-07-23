@@ -31,8 +31,9 @@ public partial class SplitCardContainer: Node2D
         CardContainers = new List<CardContainer>();
     }
 
-    public void Setup(SetupArgs args)
+    public void Setup(object o)
     {
+        var args = (SetupArgs)o;
         var cardContainersSetupArgs = args.CardContainersSetupArgs;
         Separation = args.Separation;
         PivotDirection = args.PivotDirection;

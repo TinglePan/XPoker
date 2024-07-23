@@ -55,9 +55,10 @@ public partial class CardEntry: BaseContentNode, ISelect
         }
     }
 
-    public void Setup(SetupArgs args)
+    public override void Setup(object o)
     {
-        base.Setup(args);
+        base.Setup(o);
+        var args = (SetupArgs)o;
         Battle = GameMgr.CurrentBattle;
         OnlyDisplay = args.OnlyDisplay;
         

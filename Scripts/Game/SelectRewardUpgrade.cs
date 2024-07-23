@@ -77,7 +77,7 @@ public partial class SelectRewardUpgrade: Control
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
     }
 
-    public void Setup(SetupArgs args)
+    public void Setup(object o)
     {
         Battle = GameMgr.CurrentBattle;
         Container.Setup(new BaseContentContainer.SetupArgs

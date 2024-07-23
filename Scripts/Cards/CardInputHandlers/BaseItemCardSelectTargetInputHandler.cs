@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.InputHandling;
@@ -22,37 +23,59 @@ public abstract class BaseItemCardSelectTargetInputHandler<TOriginateCard>: Base
         OriginateCard = (TOriginateCard)originate.Content.Value;
         SelectTargetCountLimit = selectTargetCountLimit;
     }
-    
-    public override void OnEnter()
+
+    public override async Task AwaitAndDisableInput(Task task)
+    {
+        ReceiveInput = false;
+        ProceedButton.Disabled = true;
+        await task;
+        ReceiveInput = true;
+        ProceedButton.Disabled = false;
+    }
+
+    public override async void OnEnter()
     {
         base.OnEnter();
         Battle = GameMgr.CurrentBattle;
         ProceedButton = GameMgr.CurrentBattle.BigButton;
-        
+
+        await OriginateCardNode.AnimateSelect(true, Configuration.SelectTweenTime);
         if (ProceedButton is Button button)
         {
             button.Text = "Confirm";
         }
         ProceedButton.Pressed += Confirm;
-
         OriginateCardNode.OnMousePressed += OnOriginateCardPressed;
     }
 
     public override async void OnExit()
     {
         base.OnExit();
-        await OriginateCardNode.AnimateSelect(false, Configuration.SelectTweenTime);
+        var tasks = new List<Task>();
+        tasks.Add(OriginateCardNode.AnimateSelect(false, Configuration.SelectTweenTime));
+        foreach (var cardNode in SelectedNodes)
+        {
+            tasks.Add(cardNode.AnimateSelect(false, Configuration.SelectTweenTime));
+        }
+        await Task.WhenAll(tasks);
         ProceedButton.Pressed -= Confirm;
         OriginateCardNode.OnMousePressed -= OnOriginateCardPressed;
     }
 
-    protected override void SelectNode(CardNode node)
+    protected override async void SelectNode(CardNode node)
     {
-        if (SelectedNodes.Count >= SelectTargetCountLimit)
+        if (SelectTargetCountLimit > 0 && SelectedNodes.Count >= SelectTargetCountLimit)
         {
             UnSelectNode(SelectedNodes[0]);
         }
-        base.SelectNode(node);
+        SelectedNodes.Add(node);
+        await node.AnimateSelect(true, Configuration.SelectTweenTime);
+    }
+
+    protected override async void UnSelectNode(CardNode node)
+    {
+        SelectedNodes.Remove(node);
+        await node.AnimateSelect(false, Configuration.SelectTweenTime);
     }
 
     protected virtual void Confirm()
@@ -62,6 +85,9 @@ public abstract class BaseItemCardSelectTargetInputHandler<TOriginateCard>: Base
 
     protected void OnOriginateCardPressed(BaseContentNode node, MouseButton mouseButton)
     {
-        Exit();
+        if (ReceiveInput)
+        {
+            Exit();
+        }
     }
 }

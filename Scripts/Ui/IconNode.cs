@@ -2,7 +2,7 @@
 
 namespace XCardGame.Scripts.Ui;
 
-public class IconNode: BaseContentNode
+public partial class IconNode: BaseContentNode
 {
     public Sprite2D Icon;
 

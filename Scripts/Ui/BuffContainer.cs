@@ -23,9 +23,9 @@ public partial class BuffContainer: BaseContentContainer
         BuffPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Buff.tscn");
     }
 
-    public override void Setup(SetupArgs args)
+    public override void Setup(object o)
     {
-        base.Setup(args);
+        base.Setup(o);
         Battle = GameMgr.CurrentBattle;
     }
 

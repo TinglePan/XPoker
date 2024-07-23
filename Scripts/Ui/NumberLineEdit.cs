@@ -47,8 +47,9 @@ public partial class NumberLineEdit: LineEdit
         TextSubmitted += OnTextSubmitted;
     }
 
-    public void Setup(SetupArgs args)
+    public void Setup(object o)
     {
+        var args = (SetupArgs)o;
         _min = args.Min;
         _max = args.Max;
     }

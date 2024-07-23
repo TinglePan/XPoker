@@ -36,10 +36,7 @@ public partial class IconContainer: BaseContentContainer
             }
             index++;
         }
-        for (int i = 0; i < ContentNodes.Count; i++)
-        {
-            AdjustContentNode(i, true);
-        }
+        AdjustLayout();
         SuppressNotifications = false;
     }
 }

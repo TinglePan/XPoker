@@ -19,8 +19,23 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Six,
         
+        IsInnate = true,
         Cost = 1,
         RankChangePerUse = -2,
+    };
+
+    public static ItemCardDef LesserD6 = new()
+    {
+        Name = Utils._("Lesser d6"),
+        ConcreteClassPath = "InteractCards.ItemCards.D6Card",
+        DescriptionTemplate = Utils._("Randomized destiny."),
+        IconPath = "res://Sprites/Cards/d6.png",
+        BasePrice = 0,
+        Rarity = 1,
+        Rank = Enums.CardRank.Ace,
+
+        Cost = 1,
+        RankChangePerUse = -99,
     };
     
     public static ItemCardDef MagicalHat = new ()
@@ -33,8 +48,23 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Three,
         
+        IsInnate = true,
         Cost = 1,
         RankChangePerUse = -1,
+    };
+    
+    public static ItemCardDef LesserMagicalHat = new ()
+    {
+        Name = Utils._("Lesser magical hat"),
+        ConcreteClassPath = "InteractCards.ItemCards.MagicalHatCard",
+        DescriptionTemplate = Utils._("Swap two cards."),
+        IconPath = "res://Sprites/Cards/magical_hat.png",
+        BasePrice = 0,
+        Rarity = 1,
+        Rank = Enums.CardRank.Ace,
+        
+        Cost = 1,
+        RankChangePerUse = -99,
     };
     
     public static ItemCardDef BalaTrollHand = new ()
@@ -47,8 +77,68 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Three,
         
+        IsInnate = true,
         Cost = 1,
         RankChangePerUse = -1,
+    };
+
+    public static ItemCardDef LesserBalaTrollHand = new()
+    {
+        Name = Utils._("Lesser balaTroll Hand"),
+        ConcreteClassPath = "InteractCards.ItemCards.BalaTrollHandCard",
+        DescriptionTemplate = Utils._("Discard and redraw, like what you would do in balatro."),
+        IconPath = "res://Sprites/Cards/balatroll_hand.png",
+        BasePrice = 0,
+        Rarity = 1,
+        Rank = Enums.CardRank.Ace,
+
+        Cost = 1,
+        RankChangePerUse = -99,
+    };
+
+    public static ItemCardDef CopyPaste = new()
+    {
+        Name = Utils._("Copy & paste"),
+        ConcreteClassPath = "InteractCards.ItemCards.CopyPasteCard",
+        DescriptionTemplate =
+            Utils._("Create a copy of a selected card."),
+        IconPath = "res://Sprites/Cards/copy_paste.png",
+        BasePrice = 5,
+        Rarity = 1,
+
+        Rank = Enums.CardRank.Three,
+        IsInnate = true,
+        Cost = 1,
+        RankChangePerUse = -1,
+    };
+
+    public static ItemCardDef LesserCopyPaste = new()
+    {
+
+        Name = Utils._("Lesser copy & paste"),
+        ConcreteClassPath = "InteractCards.ItemCards.CopyPasteCard",
+        DescriptionTemplate =
+            Utils._("Create a copy of a selected card."),
+        IconPath = "res://Sprites/Cards/copy_paste.png",
+        BasePrice = 0,
+        Rarity = 1,
+
+        Rank = Enums.CardRank.Ace,
+        Cost = 1,
+        RankChangePerUse = -99,
+    };
+
+    public static ItemCardDef Copy = new()
+    {
+        Name = Utils._("Copy"),
+        ConcreteClassPath = "InteractCards.ItemCards.CopyCard",
+        DescriptionTemplate =
+            Utils._("A copy. You can replace a card with it when needed"),
+        IconPath = "res://Sprites/Cards/copy.png",
+        Rarity = 1,
+
+        Cost = 1,
+        RankChangePerUse = 0,
     };
     
     public static ItemCardDef TurnTheTables = new ()
@@ -89,33 +179,6 @@ public static class CardDefs
         Cost = 2,
         RankChangePerUse = -99,
     };
-
-    public static ItemCardDef CopyPaste = new()
-    {
-        Name = Utils._("Copy & paste"),
-        ConcreteClassPath = "InteractCards.ItemCards.CopyPasteCard",
-        DescriptionTemplate =
-            Utils._("Create a copy of a selected card."),
-        IconPath = "res://Sprites/Cards/copy_paste.png",
-        BasePrice = 5,
-        Rarity = 1,
-
-        Cost = 1,
-        RankChangePerUse = -99,
-    };
-
-    public static ItemCardDef Copy = new()
-    {
-        Name = Utils._("Copy"),
-        ConcreteClassPath = "InteractCards.ItemCards.CopyCard",
-        DescriptionTemplate =
-            Utils._("A copy. You can replace a card with it when needed"),
-        IconPath = "res://Sprites/Cards/copy.png",
-        Rarity = 1,
-
-        Cost = 0,
-        RankChangePerUse = -99,
-    };
     
     public static RuleCardDef Darkness = new ()
     {
@@ -125,7 +188,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/darkness.png",
         Rarity = 1,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     
@@ -137,7 +200,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/keep_out.png",
         Rarity = 1,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     
@@ -149,7 +212,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/the_tie_breaker.png",
         Rarity = 1,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     
@@ -163,7 +226,7 @@ public static class CardDefs
         Rank = Enums.CardRank.Joker,
         Suit = Enums.CardSuit.Joker,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     
@@ -175,7 +238,6 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/hand_shake.png",
         Rarity = 1,
         
-        SealCost = 0,
     };
     
     public static RuleCardDef SpadesRule = new ()
@@ -186,7 +248,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/spades_rule.png",
         Rarity = 1,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     
@@ -198,7 +260,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/hearts_rule.png",
         Rarity = 1,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     
@@ -210,7 +272,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/clubs_rule.png",
         Rarity = 1,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     
@@ -222,7 +284,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/diamonds_rule.png",
         Rarity = 1,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     
@@ -234,7 +296,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/nerf_flush.png",
         Rarity = 1,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     
@@ -246,7 +308,7 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/short_deck_rule.png",
         Rarity = 1,
         
-        SealCost = 1,
+        Cost = 1,
         AutoUnSeal = true,
     };
     

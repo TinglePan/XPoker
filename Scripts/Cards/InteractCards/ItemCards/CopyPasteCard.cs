@@ -12,37 +12,6 @@ namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
 public class CopyPasteCard: BaseItemCard
 {
-    public class CopyCard : BaseTokenCard<CopyCard, BaseTokenCardInputHandler<CopyCard>>
-    {
-        protected static ItemCardDef CreateDefFromCopiedCard(ItemCardDef def, BaseCard card)
-        {
-            var res = new ItemCardDef()
-            {
-                Name = def.Name,
-                DescriptionTemplate = def.DescriptionTemplate,
-                ConcreteClassPath = def.ConcreteClassPath,
-                Rarity = def.Rarity,
-                IconPath = def.IconPath,
-                Cost = def.Cost,
-                RankChangePerUse = def.RankChangePerUse,
-            };
-            def.Rank = card.Def.Rank;
-            def.Suit = card.Def.Suit;
-            return res;
-        }
-        
-        public CopyCard(ItemCardDef def, BaseCard target) : base(CreateDefFromCopiedCard(def, target))
-        {
-            
-        }
-
-        protected override BaseTokenCardInputHandler<CopyCard> GetInputHandler()
-        {
-            var cardNode = Node<CardNode>();
-            return new BaseTokenCardInputHandler<CopyCard>(GameMgr, cardNode);
-        }
-    }
-    
     public class CopyPasteCardInputHandler : BaseItemCardSelectTargetInputHandler<CopyPasteCard>
     {
         public CopyPasteCardInputHandler(GameMgr gameMgr, CardNode node) : base(gameMgr, node, 1)
@@ -66,13 +35,13 @@ public class CopyPasteCard: BaseItemCard
             if (SelectedNodes.Count == 1)
             {
                 var selectedNode = SelectedNodes[0];
-                selectedNode.IsSelected = false;
                 var copiedCard = new CopyCard(CardDefs.Copy, selectedNode.Card);
-                tasks.Add(GameMgr.AwaitAndDisableProceed(Battle.Dealer.CreateCardAndPutInto(copiedCard, selectedNode, Enums.CardFace.Up, Battle.CommunityCardContainer)));
-                SelectedNodes.Clear();
+                tasks.Add(GameMgr.AwaitAndDisableInput(Battle.Dealer.CreateCardAndPutInto(copiedCard, selectedNode, Enums.CardFace.Up, Battle.ItemCardContainer)));
                 OriginateCard.Use(OriginateCardNode);
                 GameMgr.InputMgr.QuitCurrentInputHandler();
+                SelectedNodes.Clear();
                 await Task.WhenAll(tasks);
+
             }
             else
             {
@@ -87,9 +56,9 @@ public class CopyPasteCard: BaseItemCard
     {
     }
 
-    public override void Setup(SetupArgs args)
+    public override void Setup(object o)
     {
-        base.Setup(args);
+        base.Setup(o);
         ValidTargetContainers = new List<CardContainer>
         {
             Battle.CommunityCardContainer,
@@ -105,7 +74,7 @@ public class CopyPasteCard: BaseItemCard
 
     public override void ChooseTargets(CardNode node)
     {
-        var inputHandler = new BalaTrollHandCard.BalaTrollHandCardInputHandler(GameMgr, node);
+        var inputHandler = new CopyPasteCardInputHandler(GameMgr, node);
         GameMgr.InputMgr.SwitchToInputHandler(inputHandler);
     }
 }

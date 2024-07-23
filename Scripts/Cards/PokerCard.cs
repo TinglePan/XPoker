@@ -20,14 +20,11 @@ public class PokerCard: BaseCard
 	{
 		return $"{rank} of {suit}";
 	}
-	
-	public ObservableCollection<BaseCardMarker> Markers;
 
 	protected bool AlreadyFunctioning;
 	
-	public PokerCard(PokerCardDef def): base(def)
+	public PokerCard(BaseCardDef def): base(def)
 	{
-		Markers = new ObservableCollection<BaseCardMarker>();
 		def.Name = GetCardName(def.Suit, def.Rank);
 		def.DescriptionTemplate = def.Name;
 		Suit.DetailedValueChanged += OnSuitChanged;
@@ -36,13 +33,8 @@ public class PokerCard: BaseCard
 	public override void OnStart(Battle battle)
 	{
 		base.OnStart(battle);
-		if (IsFunctioning() && !AlreadyFunctioning && Markers != null)
+		if (IsFunctioning() && !AlreadyFunctioning)
 		{
-			foreach (var marker in Markers)
-			{
-				marker.OnStart(battle);
-			}
-
 			AlreadyFunctioning = true;
 		}
 	}
@@ -50,21 +42,9 @@ public class PokerCard: BaseCard
 	public override void OnStop(Battle battle)
 	{
 		base.OnStop(battle);
-		if (AlreadyFunctioning && Markers != null)
+		if (AlreadyFunctioning)
 		{
-			foreach (var marker in Markers)
-			{
-				marker.OnStop(battle);
-			}
-		}
-	}
-
-	public override void Resolve(Battle battle, Engage engage, BattleEntity entity)
-	{
-		base.Resolve(battle, engage, entity);
-		foreach (var marker in Markers)
-		{
-			marker.Resolve(battle, engage, entity);
+			AlreadyFunctioning = false;
 		}
 	}
 	

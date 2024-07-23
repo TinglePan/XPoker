@@ -112,6 +112,21 @@ public static class Utils
         return res;
     }
 
+    public static int RandOnWeight(List<int> weights, Random rand)
+    {
+        var totalWeight = weights.Sum();
+        var randValue = rand.Next(0, totalWeight);
+        for (int i = 0; i < weights.Count; i++)
+        {
+            if (randValue < weights[i])
+            {
+                return i;
+            }
+            randValue -= weights[i];
+        }
+        return -1;
+    }
+
     public static List<T> RandMFrom<T>(List<T> source, int m, Random rand)
     {
         if (m < source.Count)

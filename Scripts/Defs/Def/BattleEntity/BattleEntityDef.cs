@@ -10,7 +10,8 @@ public class BattleEntityDef
     public string PortraitPath;
     public string SpritePath;
     public List<BaseCardDef> InitDeckDef;
-    public int InitBaseHandPower;
+    public int InitAttack;
+    public int InitDefence;
     public Dictionary<Enums.HandTier, int> InitHandPowers;
     public int InitHp;
     public int InitLevel;

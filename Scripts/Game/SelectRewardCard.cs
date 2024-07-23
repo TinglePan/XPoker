@@ -18,6 +18,15 @@ namespace XCardGame.Scripts.Game;
 
 public partial class SelectRewardCard: Control
 {
+    public class SetupArgs
+    {
+        public int RewardCardCount;
+        public Type RewardCardDefType;
+        public int InitReRollPrice;
+        public int ReRollPriceIncrease;
+        public int SkipReward;
+        public List<BaseCardDef> PassInDefs;
+    }
     public class SelectRewardCardInputHandler : BaseInputHandler
     {
         protected Battle Battle;
@@ -26,13 +35,13 @@ public partial class SelectRewardCard: Control
         public SelectRewardCardInputHandler(GameMgr gameMgr, SelectRewardCard selectRewardCard) : base(gameMgr)
         {
             SelectRewardCard = selectRewardCard;
-            SelectRewardCard.ReRollButton.Pressed += SelectRewardCard.ReRoll;
-            SelectRewardCard.SkipButton.Pressed += SelectRewardCard.Skip;
         }
         
         public override void OnEnter()
         {
             base.OnEnter();
+            SelectRewardCard.ReRollButton.Pressed += SelectRewardCard.ReRoll;
+            SelectRewardCard.SkipButton.Pressed += SelectRewardCard.Skip;
             Battle = GameMgr.CurrentBattle;
             foreach (var cardNode in SelectRewardCard.CardContainer.ContentNodes)
             {
@@ -43,6 +52,8 @@ public partial class SelectRewardCard: Control
         public override void OnExit()
         {
             base.OnExit();
+            SelectRewardCard.ReRollButton.Pressed -= SelectRewardCard.ReRoll;
+            SelectRewardCard.SkipButton.Pressed -= SelectRewardCard.Skip;
             foreach (var cardNode in SelectRewardCard.CardContainer.ContentNodes)
             {
                 cardNode.OnMousePressed -= OnCardNodePressed;
@@ -51,11 +62,14 @@ public partial class SelectRewardCard: Control
 
         public async void OnCardNodePressed(BaseContentNode node, MouseButton mouseButton)
         {
-            if (mouseButton == MouseButton.Left)
+            if (ReceiveInput)
             {
-                var cardNode = (CardNode)node;
-                await SelectRewardCard.Select(cardNode);
-                SelectRewardCard.Quit();
+                if (mouseButton == MouseButton.Left)
+                {
+                    var cardNode = (CardNode)node;
+                    await SelectRewardCard.Select(cardNode);
+                    SelectRewardCard.Quit();
+                }
             }
         }
     }
@@ -100,14 +114,12 @@ public partial class SelectRewardCard: Control
         RewardCardDefPool = new Dictionary<int, List<BaseCardDef>>();
     }
 
-    public void Setup(Dictionary<string, object> args)
+    public virtual void Setup(object o)
     {
         Battle = GameMgr.CurrentBattle;
-        var rewardCardCount = (int)args["rewardCardCount"];
-        if (args.TryGetValue("rewardCardDefType", out var arg))
-        {
-            RewardCardDefType = (Type)arg;
-        }
+        var args = (SetupArgs)o;
+        var rewardCardCount = args.RewardCardCount;
+        RewardCardDefType = args.RewardCardDefType;
         CardContainer.Setup(new CardContainer.SetupArgs
         {
             ContentNodeSize = Configuration.CardSize,
@@ -132,13 +144,13 @@ public partial class SelectRewardCard: Control
             RewardCardDefPool.TryAdd(cardDef.Rarity, new List<BaseCardDef>());
             RewardCardDefPool[cardDef.Rarity].Add(cardDef);
         }
-        ReRollPrice.Value = (int)args["reRollPrice"];
-        ReRollPriceIncrease = (int)args["reRollPriceIncrease"];
-        SkipReward.Value = (int)args["skipReward"];
-        if (args.TryGetValue("defs", out var value))
+        ReRollPrice.Value = args.InitReRollPrice;
+        ReRollPriceIncrease = args.ReRollPriceIncrease;
+        SkipReward.Value = args.SkipReward;
+        if (args.PassInDefs != null)
         {
             int index = 0;
-            foreach (var cardDef in (List<BaseCardDef>)value)
+            foreach (var cardDef in args.PassInDefs)
             {
                 var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
                 if (index < CardContainer.Contents.Count)

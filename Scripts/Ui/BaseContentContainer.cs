@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Godot;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using Vector2 = Godot.Vector2;
 using Vector4 = Godot.Vector4;
@@ -85,8 +86,9 @@ public abstract partial class BaseContentContainer: Node2D
         SuppressNotifications = false;
     }
 
-    public virtual void Setup(SetupArgs args)
+    public virtual void Setup(object o)
     {
+        var args = (SetupArgs)o;
         ContentNodeSize = args.ContentNodeSize;
         Separation = args.Separation;
         PivotDirection = args.PivotDirection;
@@ -94,16 +96,17 @@ public abstract partial class BaseContentContainer: Node2D
         Margins = args.Margins;
 
         HasBorder = args.HasBorder;
+        Border = GetNodeOrNull<NinePatchRect>("Border");
         if (HasBorder)
         {
-            Border = GetNode<NinePatchRect>("Border");
             MinContentNodeCountForBorder = args.MinContentNodeCountForBorder;
         }
 
         HasName = args.HasName;
+        
+        ContainerNameLabel = GetNodeOrNull<Label>("Name");
         if (HasName)
         {
-            ContainerNameLabel = GetNode<Label>("Name");
             ContainerName = args.ContainerName;
             ContainerNameLabel.Text = ContainerName;
         }
@@ -216,6 +219,7 @@ public abstract partial class BaseContentContainer: Node2D
 
     protected virtual void OnV2MAddNodes(int startingIndex, IList nodes)
     {
+        GD.Print($"On V2M Add Nodes {this}");
         SuppressNotifications = true;
         var index = startingIndex;
         foreach (var node in nodes)
@@ -245,6 +249,7 @@ public abstract partial class BaseContentContainer: Node2D
 
     protected virtual void OnV2MRemoveNodes(int startingIndex, IList nodes)
     {
+        GD.Print($"On V2M Remove Nodes {this}");
         SuppressNotifications = true;
         var index = startingIndex;
         foreach (var node in nodes)
@@ -267,33 +272,48 @@ public abstract partial class BaseContentContainer: Node2D
             index++;
         }
         AdjustLayout();
-        
         SuppressNotifications = false;
     }
-
-    protected virtual void OnV2MReplaceNodes(int oldNodesStartingIndex, IList oldNodes, IList newNodes)
-    {
-        SuppressNotifications = true;
-        for (int i = 0; i < oldNodes.Count; i++)
-        {
-            if (oldNodes[i] is BaseContentNode oldNode && newNodes[i] is BaseContentNode newNode)
-            {
-                Contents[oldNodesStartingIndex + i] = newNode.Content.Value;
-                RemoveChild(oldNode);
-                oldNode.PreviousContainer = oldNode.CurrentContainer.Value;
-                oldNode.CurrentContainer.Value = null;
-                newNode.Reparent(newNode);
-                MoveChild(newNode, oldNodesStartingIndex + i);
-                newNode.PreviousContainer = newNode.CurrentContainer.Value;
-                newNode.CurrentContainer.Value = this;
-            }
-        }
-        for (int i = 0; i < ContentNodes.Count; i++)
-        {
-            AdjustContentNode(i, true);
-        }
-        SuppressNotifications = false;
-    }
+    
+    // NOTE: replace nodes causes problems and can be workaround by using add nodes and remove nodes.
+    // protected virtual void OnV2MReplaceNodes(int oldNodesStartingIndex, IList oldNodes, IList newNodes)
+    // {
+    //     SuppressNotifications = true;
+    //     for (int i = 0; i < oldNodes.Count; i++)
+    //     {
+    //         if (oldNodes[i] is BaseContentNode oldNode && newNodes[i] is BaseContentNode newNode)
+    //         {
+    //             GD.Print($"replace node {oldNode}/{newNode}");
+    //             Contents[oldNodesStartingIndex + i] = newNode.Content.Value;
+    //             if (oldNode.GetParent() == this)
+    //             {
+    //                 RemoveChild(oldNode);
+    //                 oldNode.PreviousContainer = oldNode.CurrentContainer.Value;
+    //                 oldNode.CurrentContainer.Value = null;
+    //             }
+    //
+    //             var newNodeParent = newNode.GetParent();
+    //             if (newNodeParent != this)
+    //             {
+    //                 if (newNodeParent == null)
+    //                 {
+    //                     AddChild(newNode);
+    //                 }
+    //                 else
+    //                 {
+    //                     newNode.Reparent(this);
+    //                 }
+    //                 MoveChild(newNode, oldNodesStartingIndex + i);
+    //                 GD.Print($"{newNode}'s parent set to {this}");
+    //                 GD.Print($"{newNode}'s parent confirmed: {newNode.GetParent()}");
+    //                 newNode.PreviousContainer = newNode.CurrentContainer.Value;
+    //                 newNode.CurrentContainer.Value = this;
+    //             }
+    //         }
+    //     }
+    //     AdjustLayout();
+    //     SuppressNotifications = false;
+    // }
 
     protected virtual void OnV2MClearNodes()
     {
@@ -360,10 +380,11 @@ public abstract partial class BaseContentContainer: Node2D
                 }
                 break;
             case NotifyCollectionChangedAction.Replace:
-                if (args.OldItems != null && args.NewItems != null && args.OldItems.Count == args.NewItems.Count)
-                {
-                    OnV2MReplaceNodes(args.OldStartingIndex, args.OldItems, args.NewItems);
-                }
+                // if (args.OldItems != null && args.NewItems != null && args.OldItems.Count == args.NewItems.Count)
+                // {
+                //     OnV2MReplaceNodes(args.OldStartingIndex, args.OldItems, args.NewItems);
+                // }
+                GD.PrintErr("Replacing nodes is deprecated");
                 break;
             case NotifyCollectionChangedAction.Reset:
                 ClearChildren();
@@ -373,6 +394,7 @@ public abstract partial class BaseContentContainer: Node2D
 
     protected void AdjustLayout()
     {
+        GD.Print("Adjust layout");
         for (int i = 0; i < ContentNodes.Count; i++)
         {
             AdjustContentNode(i, true);
@@ -385,24 +407,20 @@ public abstract partial class BaseContentContainer: Node2D
     protected async void AdjustContentNode(int index, bool useTween)
     {
         var node = ContentNodes[index];
+        GD.Print($"Adjust content node {index} {node}");
         var position = CalculateContentNodePosition(index, true);
         var rotation = CalculateContentNodeRotation(index);
         if (useTween)
         {
-            float tweenTime;
-            if (node.TweenControl.IsRunning("transform"))
-            {
-                var controlledTween = node.TweenControl.GetControlledTween("transform");
-                tweenTime = controlledTween.Time - (float)controlledTween.Tween.Value.GetTotalElapsedTime();
-            }
-            else
-            {
-                tweenTime = Configuration.ContentContainerAdjustTweenTime;
-            }
-            await node.AnimateTransform(position, rotation, tweenTime);
+            await node.AnimateTransform(position, rotation, Configuration.ContentContainerAdjustTweenTime,
+                Configuration.CardMoveTweenPriority,
+                conflictTweenAction: TweenControl.ConflictTweenAction.InterruptContinue);
+            // GD.Print($"adjust node {node} to {position}");
+            // GD.Print($"adjust node {node}, parent is {node.GetParent()}");
         }
         else
         {
+            // GD.Print($"adjust node 2 {node} to {position}");
             node.Position = position;
             node.Rotation = rotation;
         }

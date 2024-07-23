@@ -41,8 +41,9 @@ public partial class RoleMarker: Node2D
         InitPosition = Position;
     }
 
-    public void Setup(SetupArgs args)
+    public void Setup(object o)
     {
+        var args = (SetupArgs)o;
         Battle = args.Battle;
         Entity = args.Entity;
     }

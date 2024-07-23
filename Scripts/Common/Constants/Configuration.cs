@@ -29,7 +29,7 @@ public static class Configuration
     public static readonly int SplitCardContainerSeparation = 24;
     public static readonly int ShockDecreaseDamageDealtMultiplierPerStack = -10;
     public static readonly int ShockIncreaseDamageReceivedMultiplierPerStack = 10;
-    public static readonly float AnimateCardTransformInterval = 0.1f;
+    public static readonly float AnimateCardTransformInterval = .1f;
     public static readonly float ContentContainerAdjustTweenTime = 0.2f;
     public static readonly float DelayBetweenResolveSteps = 0.5f;
     public static readonly float LogInterval = 0.5f;
@@ -60,4 +60,8 @@ public static class Configuration
     public static readonly int FragileMultiplier = 50;
 
     public static readonly Vector4 DefaultContentContainerMargins = new Vector4(8, 4, 8, 4);
+
+    public static readonly int CardLiftTweenPriority = 1;
+    public static readonly int CardTapTweenPriority = 2;
+    public static readonly int CardMoveTweenPriority = 3;
 }

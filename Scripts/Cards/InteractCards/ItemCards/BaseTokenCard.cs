@@ -15,13 +15,7 @@ public class BaseTokenCardInputHandler<TCard> : BaseItemCardSelectTargetInputHan
 
     protected override IEnumerable<CardNode> GetValidSelectTargets()
     {
-        foreach (var cardContainer in OriginateCard.ValidTargetContainers)
-        {
-            foreach (var node in cardContainer.CardNodes)
-            {
-                yield return node;
-            }
-        }
+        return OriginateCard.GetValidTargetSelectTargets();
     }
     
     protected override async void Confirm()
@@ -39,16 +33,15 @@ public class BaseTokenCardInputHandler<TCard> : BaseItemCardSelectTargetInputHan
             {
                 tasks.Add(Battle.Dealer.AnimateDiscard(toNode));
             }
-            else
-            {
-                tasks.Add(toContainer.MoveCardNodeToContainer(toNode, (CardContainer)toNode.PreviousContainer));
-            }
-            toNode.IsSelected = false;
+            // else
+            // {
+            //     tasks.Add(toContainer.MoveCardNodeToContainer(toNode, (CardContainer)toNode.PreviousContainer));
+            // }
             tasks.Add(fromContainer.MoveCardNodeToContainer(fromNode, toContainer, toIndex));
             fromNode.IsSelected = false;
-            SelectedNodes.Clear();
             OriginateCard.Use(OriginateCardNode);
             GameMgr.InputMgr.QuitCurrentInputHandler();
+            SelectedNodes.Clear();
             await Task.WhenAll(tasks);
         }
         else
@@ -61,26 +54,41 @@ public class BaseTokenCardInputHandler<TCard> : BaseItemCardSelectTargetInputHan
 public abstract class BaseTokenCard<TCard, TInputHandler>: BaseItemCard where TInputHandler: BaseItemCardSelectTargetInputHandler<TCard> where TCard: BaseTokenCard<TCard, TInputHandler>
 {
     
-    public List<CardContainer> ValidTargetContainers;
-    
     public BaseTokenCard(ItemCardDef def) : base(def)
     {
         Debug.Assert(def.RankChangePerUse == 0);
-    }
-    
-    public override void Setup(SetupArgs args)
-    {
-        base.Setup(args);
-        ValidTargetContainers = new List<CardContainer>
-        {
-            Battle.CommunityCardContainer,
-        };
     }
 
     public override void ChooseTargets(CardNode node)
     {
         var inputHandler = GetInputHandler();
         GameMgr.InputMgr.SwitchToInputHandler(inputHandler);
+    }
+    
+    public IEnumerable<CardNode> GetValidTargetSelectTargets()
+    {
+        foreach (var cardContainer in GetValidTargetContainers())
+        {
+            foreach (var node in cardContainer.CardNodes)
+            {
+                if (FilterValidCardNodes(node))
+                {
+                    yield return node;
+                }
+            }
+        }
+    }
+
+    protected virtual IEnumerable<CardContainer> GetValidTargetContainers()
+    {
+        yield return Battle.CommunityCardContainer;
+        yield return Battle.Player.HoleCardContainer;
+        yield return Battle.Enemy.HoleCardContainer;
+    }
+
+    protected virtual bool FilterValidCardNodes(CardNode node)
+    {
+        return true;
     }
 
     protected abstract TInputHandler GetInputHandler();

@@ -70,8 +70,9 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff
         return null;
     }
 
-    public void Setup(SetupArgs args)
+    public virtual void Setup(object o)
     {
+        var args = (SetupArgs)o;
         Nodes.Add(args.Node);
         GameMgr = args.GameMgr;
         Battle = args.Battle;

@@ -61,6 +61,9 @@ public partial class GameMgr : Node
 		var battleScene = (BattleScene)CurrentScene;
 		BattleLog = battleScene.GetNode<BattleLog>("LogBox");
 		CurrentBattle = battleScene.Battle;
+		var playerBattleEntityInitArgs = PlayerBattleEntity.InitArgs(BattleEntityDefs.PiratePlayerBattleEntityDef);
+		playerBattleEntityInitArgs.Deck.MixIn(DeckDefs.Standard52Deck());
+		
 		CurrentBattle.Setup(new Battle.SetupArgs
 		{
 			DealCommunityCardCount = Configuration.CommunityCardCount,
@@ -69,7 +72,7 @@ public partial class GameMgr : Node
 			RequiredHoleCardCountMax = 2,
 			EntitySetupArgs = new List<BattleEntity.SetupArgs>()
 			{
-				PlayerBattleEntity.InitArgs(BattleEntityDefs.DefaultPlayerBattleEntityDef),
+				playerBattleEntityInitArgs,
 				BattleEntity.InitArgs(BattleEntityDefs.DefaultEnemyBattleEntityDef)
 			}
 		});
@@ -123,17 +126,8 @@ public partial class GameMgr : Node
 		
 	}
 
-	public async Task AwaitAndDisableProceed(Task task)
+	public async Task AwaitAndDisableInput(Task task)
 	{
-		if (CurrentScene is BattleScene battleScene)
-		{
-			battleScene.ProceedButton.Disabled = true;
-			await task;
-			battleScene.ProceedButton.Disabled = false;
-		}
-		else
-		{
-			await task;
-		}
+		await InputMgr.CurrentInputHandler.AwaitAndDisableInput(task);
 	}
 }

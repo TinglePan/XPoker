@@ -22,4 +22,24 @@ public class Deck
             }
         }
     }
+
+    public void MixIn(List<BaseCardDef> cardDefs)
+    {
+        if (cardDefs != null)
+        {
+            foreach (var cardDef in cardDefs)
+            {
+                var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
+                CardList.Add(card);
+            }
+        }
+    }
+
+    public void MixIn(List<BaseCard> cards)
+    {
+        foreach (var card in cards)
+        {
+            CardList.Add(card);
+        }
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
+using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
@@ -12,7 +13,7 @@ public class AttackAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
     public float Leech { get; set; }
     
     public AttackAgainstEntityEffect(BaseCard originateCard, BattleEntity src, BattleEntity dst, int rawValue, float powerScale, float leech = 0f) : 
-        base(Utils._("Attack"), Utils._($"Deal {rawValue} base damage, plus {{}} * power"), originateCard, src, dst)
+        base(Utils._("Attack"), Utils._($"Deal {rawValue} base damage, plus {{}} * attack"), originateCard, src, dst)
     {
         RawValue = rawValue;
         PowerScale = powerScale;
@@ -25,11 +26,11 @@ public class AttackAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
         int power = 0;
         if (PowerScale > 0)
         {
-            power = Src.GetPower(Battle.RoundHands[Src].Tier);
+            power = Src.GetPower(Battle.RoundHands[Src].Tier, Enums.EngageRole.Attacker);
             rawAttackValue = CalculateValue(power);
         }
         
-        Battle.GameMgr.BattleLog.Log(Utils._($"{Src} attacks! Power:{power}. Value:{rawAttackValue}"));
+        Battle.GameMgr.BattleLog.Log(Utils._($"{Src} attacks! Atk:{power}. Base:{rawAttackValue}"));
         var attack = new Attack(Battle, Src, Dst, power, rawAttackValue);
         var damage = attack.Resolve();
         if (Leech > 0)

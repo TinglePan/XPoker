@@ -119,7 +119,7 @@ public class Engage
             {
                 var cardNode = (CardNode)node;
                 tasks.Add(targetContainer.MoveCardNodeToContainer(cardNode, CardPositionBeforeResolve[cardNode]));
-                cardNode.IsSelected = false;
+                // cardNode.IsSelected = false;
                 // await Utils.Wait(Battle, Configuration.AnimateCardTransformInterval);
             }
             await Task.WhenAll(tasks);

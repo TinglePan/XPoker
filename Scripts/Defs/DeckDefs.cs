@@ -58,7 +58,7 @@ public static class DeckDefs
         {
             foreach (var rank in ranks)
             {
-                cardDefs.Add(new PokerCardDef()
+                cardDefs.Add(new BaseCardDef()
                 {
                     BasePrice = 0,
                     DescriptionTemplate = "{} of {}",
@@ -71,8 +71,14 @@ public static class DeckDefs
 
         return cardDefs;
     }
-    
+
     public static List<BaseCardDef> Standard52Deck()
+    {
+        var res = StandardDeck(_standardSuits, _standardRanks);
+        return res;
+    }
+    
+    public static List<BaseCardDef> Enhanced52Deck()
     {
         var res = StandardDeck(_standardSuits, _standardRanks);
         res.Add(CardDefs.SpadesRule);

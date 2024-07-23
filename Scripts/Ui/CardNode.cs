@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Cards.InteractCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
@@ -67,14 +68,15 @@ public partial class CardNode: BaseContentNode, ISelect
 		InitPosition = Position;
 	}
 
-	public void Setup(SetupArgs args)
+	public override void Setup(object o)
     {
-	    base.Setup(args);
 	    Battle = GameMgr.CurrentBattle;
+	    base.Setup(o);
+	    var args = (SetupArgs)o;
 	    MainIcon.Setup(new IconWithTextFallback.SetupArgs
 	    {
-		    IconPath = Card.IconPath,
-		    DisplayName =  Card.Def.Name,
+		    IconPath = Card?.IconPath,
+		    DisplayName =  Card?.Def.Name,
 	    });
 	    OriginalFaceDirection = args.FaceDirection;
 	    FaceDirection.Value = OriginalFaceDirection;
@@ -119,14 +121,21 @@ public partial class CardNode: BaseContentNode, ISelect
 		}
 	}
 
-	public async Task AnimateReveal(bool to, float tweenTime)
+	public async Task AnimateReveal(bool to, float time)
 	{
 		if (IsRevealed.Value == to) return;
-		var newTween = CreateTween();
-		newTween.TweenProperty(Back, "modulate:a", !to ? 1f : 0f, tweenTime);
-		TweenControl.AddTween("IsRevealed", newTween, tweenTime);
-		await ToSignal(newTween, Tween.SignalName.Finished);
-		IsRevealed.Value = to;
+		var controlledTween = TweenControl.CreateTween("modulate_back", time);
+		if (controlledTween != null)
+		{
+			var tween = controlledTween.Tween.Value;
+			tween.TweenProperty(Back, "modulate:a", !to ? 1f : 0f, controlledTween.Time);
+			await TweenControl.WaitComplete("modulate_back");
+			IsRevealed.Value = to;
+		}
+		else
+		{
+			GD.Print("Animate reveal did not preempt");
+		}
 	}
 
 	public async Task AnimateFlip(Enums.CardFace toFaceDir)
@@ -146,22 +155,33 @@ public partial class CardNode: BaseContentNode, ISelect
 
 	public async Task AnimateSelect(bool to, float time)
 	{
-		if (IsSelected != to)
+		GD.Print($"Animate Select {this} to {to}");
+		IsSelected = to;
+		await AnimateLift(to, time);
+		if (IsSelected)
 		{
-			await AnimateLift(to, time);
-			IsSelected = to;
+			OnSelected?.Invoke();
 		}
 	}
 
 	public async Task AnimateLift(bool to, float time)
 	{
-		if (Position == InitPosition ^ to)
+		if ((Position == InitPosition) == to || TweenControl.IsRunning("position"))
 		{
-			var newTween = CreateTween();
-			var offset = Configuration.SelectedCardOffset;
-			newTween.TweenProperty(this, "position", to ? InitPosition + offset : InitPosition, time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
-			TweenControl.AddTween("transform", newTween, time);
-			await ToSignal(newTween, Tween.SignalName.Finished);
+			var controlledTween = TweenControl.CreateTween("position", time, Configuration.CardLiftTweenPriority);
+			if (controlledTween != null)
+			{
+				var tween = controlledTween.Tween.Value;
+				var offset = Configuration.SelectedCardOffset;
+				var targetPosition = to ? InitPosition + offset : InitPosition;
+				// GD.Print($"Animate lift: {this} to {targetPosition}");
+				tween.TweenProperty(this, "position", targetPosition, controlledTween.Time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+				await TweenControl.WaitComplete("position");
+			}
+			else
+			{
+				// GD.Print("Animate lift did not preempt");
+			}
 		}
 	}
 
@@ -170,24 +190,48 @@ public partial class CardNode: BaseContentNode, ISelect
 		FaceDirection.Value = FaceDirection.Value == Enums.CardFace.Down ? Enums.CardFace.Up : Enums.CardFace.Down;
 	}
 
-	public async Task AnimateTap(bool to, float tweenTime)
+	public async Task AnimateTap(bool to, float time)
 	{
 		if (IsTapped.Value == to) return;
-		var newTween = CreateTween();
-		newTween.TweenProperty(this, "rotation_degrees", to ? 90f : 0, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
-		TweenControl.AddTween("tap", newTween, tweenTime);
-		await ToSignal(newTween, Tween.SignalName.Finished);
-		IsTapped.Value = to;
+		var controlledTween = TweenControl.CreateTween("rotation", time, Configuration.CardTapTweenPriority);
+		if (controlledTween != null)
+		{
+			var tween = controlledTween.Tween.Value;
+			var toDegrees = to ? 90f : 0;
+			tween.TweenProperty(this, "rotation_degrees", toDegrees, controlledTween.Time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+			await TweenControl.WaitComplete("rotation");
+			IsTapped.Value = to;
+		}
+		else
+		{
+			GD.Print("Animate tap did not preempt");
+		}
 	}
 
-	public async Task AnimateNegate(bool toState, float tweenTime)
+	public async Task AnimateNegate(bool toState, float time)
 	{
 		if (Card.IsNegated.Value == toState) return;
-		var newTween = CreateTween();
-		newTween.TweenProperty(this, "modulate", toState ? Colors.DimGray : Colors.White, tweenTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
-		TweenControl.AddTween("negate", newTween, tweenTime);
-		await ToSignal(newTween, Tween.SignalName.Finished);
-		Card.IsNegated.Value = toState;
+		var controlledTween = TweenControl.CreateTween("modulate", time);
+		if (controlledTween != null)
+		{
+			var tween = controlledTween.Tween.Value;
+			tween.TweenProperty(this, "modulate", toState ? Colors.DimGray : Colors.White, controlledTween.Time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+			await TweenControl.WaitComplete("modulate");
+			Card.IsNegated.Value = toState;
+		}
+		else
+		{
+			GD.Print("Animate negate did not preempt");
+		}
+	}
+
+	public override async Task AnimateTransform(Vector2 position, float rotationDegrees, float animationTime, 
+		int priority = 0, Action callback = null,
+		TweenControl.ConflictTweenAction conflictTweenAction = TweenControl.ConflictTweenAction.Interrupt)
+	{
+		await base.AnimateTransform(position, rotationDegrees, animationTime, priority, callback, conflictTweenAction);
+		// GD.Print($"Animate transform: {this} to {position} res: {Position}");
+		InitPosition = Position;
 	}
 
 	protected void OnCardFaceChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardFace> args)
@@ -239,6 +283,11 @@ public partial class CardNode: BaseContentNode, ISelect
 		    JokerMark.Hide();
 	    }
     }
+    
+    protected void OnCardCostChanged(object sender, ValueChangedEventDetailedArgs<int> args)
+	{
+	    CostLabel.Text = args.NewValue.ToString();
+	}
 
 	protected override void OnContentAttached(IContent content)
 	{
@@ -257,6 +306,17 @@ public partial class CardNode: BaseContentNode, ISelect
 		card.Suit.FireValueChangeEventsOnInit();
 		card.IsNegated.DetailedValueChanged += OnToggleIsNegated;
 		card.IsNegated.FireValueChangeEventsOnInit();
+		if (card is BaseInteractCard interactCard)
+		{
+			CostLabel.Show();
+			interactCard.Cost.DetailedValueChanged += OnCardCostChanged;
+			interactCard.Cost.FireValueChangeEventsOnInit();
+		}
+		else
+		{
+			CostLabel.Hide();
+		}
+		MainIcon.DisplayName.Value = card.Def.Name;
 		MainIcon.ResetIconPath(card.IconPath);
 		if (!OnlyDisplay)
 		{
@@ -272,6 +332,12 @@ public partial class CardNode: BaseContentNode, ISelect
 		card.Rank.DetailedValueChanged -= OnCardRankChanged;
 		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
 		card.IsNegated.DetailedValueChanged -= OnToggleIsNegated;
+		if (card is BaseInteractCard interactCard)
+		{
+			CostLabel.Hide();
+			interactCard.Cost.DetailedValueChanged -= OnCardCostChanged;
+		}
+		MainIcon.DisplayName.Value = null;
 		MainIcon.ResetIconPath(null);
 		if (!OnlyDisplay)
 		{

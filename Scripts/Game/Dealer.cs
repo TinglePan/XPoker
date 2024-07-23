@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Cards.InteractCards;
+using XCardGame.Scripts.Cards.InteractCards.ItemCards;
+using XCardGame.Scripts.Cards.InteractCards.RuleCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def.Card;
@@ -36,11 +38,11 @@ public partial class Dealer: Node2D
         DealCardPile = GetNode<CardPile>("DealPile");
         DiscardCardPile = GetNode<CardPile>("DiscardPile");
         CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
-        SourceDecks = new List<Deck>();
     }
 
-    public void Setup(SetupArgs args)
+    public virtual void Setup(object o)
     {
+        var args = (SetupArgs)o;
         Battle = GameMgr.CurrentBattle;
         SourceDecks = args.SourceDecks;
         DealCardPile.Setup(new CardPile.SetupArgs
@@ -49,7 +51,7 @@ public partial class Dealer: Node2D
         });
         DiscardCardPile.Setup(new CardPile.SetupArgs
         {
-            TopCardFaceDirection = Enums.CardFace.Down,
+            TopCardFaceDirection = Enums.CardFace.Up,
         });
         Reset();
     }
@@ -66,7 +68,7 @@ public partial class Dealer: Node2D
     
     public void MixIn(Deck deck)
     {
-        foreach (var card in deck.CardList.OfType<PokerCard>())
+        foreach (var card in deck.CardList)
         {
             DealCardPile.Cards.Add(card);
         }
@@ -78,14 +80,15 @@ public partial class Dealer: Node2D
         // GD.Print("animate shuffle");
         var shuffleAnimateCardCount = Mathf.Min(DiscardCardPile.Cards.Count, Configuration.ShuffleAnimateCards);
         var takeCountForEachAnimatedShuffleCard = DiscardCardPile.Cards.Count / shuffleAnimateCardCount;
+        var tasks = new List<Task>();
         for (int i = 0; i < shuffleAnimateCardCount; i++)
         {
             var card = await DrawCardFromPile(DiscardCardPile);
             if (card == null) return;
             var cardNode = CreateCardNodeOnPile(card, DiscardCardPile);
             cardNode.Reparent(DealCardPile);
-            cardNode.AnimateTransform(DealCardPile.TopCard.Position, DealCardPile.TopCard.RotationDegrees, 
-                Configuration.AnimateCardTransformInterval, () =>
+            tasks.Add(cardNode.AnimateTransform(DealCardPile.TopCard.Position, DealCardPile.TopCard.RotationDegrees, 
+                Configuration.AnimateCardTransformInterval, Configuration.CardMoveTweenPriority, () =>
                 {
                     DealCardPile.Cards.Add(card);
                     var cards = DiscardCardPile.TakeN(takeCountForEachAnimatedShuffleCard);
@@ -98,10 +101,11 @@ public partial class Dealer: Node2D
                     {
                         Shuffle();
                     }
-                });
+                }));
             await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
             // await ToSignal(cardNode.TweenControl.GetTween("transform"), Tween.SignalName.Finished);
         }
+        await Task.WhenAll(tasks);
     }
     
     public void Shuffle()
@@ -129,20 +133,21 @@ public partial class Dealer: Node2D
     public async Task DealInnateCards()
     {
         var tasks = new List<Task>();
-        foreach (var card in DealCardPile.Cards)
+        foreach (var card in DealCardPile.Cards.ToList())
         {
             if (card is BaseInteractCard interactCard && ((InteractCardDef)interactCard.Def).IsInnate)
             {
+                DealCardPile.Cards.Remove(card);
                 var cardNode = CreateCardNodeOnPile(card, DealCardPile);
                 Battle.OnDealCard?.Invoke(Battle, cardNode);
                 if (interactCard is BaseRuleCard)
                 {
                     Battle.RuleCardContainer.ContentNodes.Add(cardNode);
-                    tasks.Add(cardNode.TweenControl.WaitComplete("transform"));
+                    tasks.Add(cardNode.TweenControl.WaitTransformComplete());
                 } else if (interactCard is BaseItemCard && Battle.ItemCardContainer.ContentNodes.Count < Battle.Player.ItemPocketSize.Value)
                 {
                     Battle.ItemCardContainer.ContentNodes.Add(cardNode);
-                    tasks.Add(cardNode.TweenControl.WaitComplete("transform"));
+                    tasks.Add(cardNode.TweenControl.WaitTransformComplete());
                 }
             }
         }
@@ -153,18 +158,56 @@ public partial class Dealer: Node2D
     {
         var cardNode = CreateCardNodeOnCardNode(card, onCardNode, faceDirection);
         targetContainer.ContentNodes.Add(cardNode);
-        await cardNode.TweenControl.WaitComplete("transform");
+        await cardNode.TweenControl.WaitTransformComplete();
     }
     
-    public async Task DealCardIntoContainer(CardContainer targetContainer)
+    public async Task DealCardIntoContainer(CardContainer targetContainer, bool collectItem = true)
     {
         var cardNode = await AnimateDrawCard();
-        
+        // if (collectItem && targetContainer.ShouldCollectDealtItemAndRuleCards)
+        // {
+        //     if (cardNode.Content.Value is BaseRuleCard)
+        //     {
+        //         shouldReDeal = true;
+        //         Battle.RuleCardContainer.ContentNodes.Add(cardNode);
+        //     } else if (cardNode.Content.Value is BaseItemCard)
+        //     {
+        //         shouldReDeal = true;
+        //         Battle.ItemCardContainer.ContentNodes.Add(cardNode);
+        //     }
+        //     else
+        //     {
+        //         targetContainer.ContentNodes.Add(cardNode);
+        //     }
+        // }
+        // else
+        // {
+        //     targetContainer.ContentNodes.Add(cardNode);
+        // }
         targetContainer.ContentNodes.Add(cardNode);
-        await cardNode.TweenControl.WaitComplete("transform");
+        await cardNode.TweenControl.WaitTransformComplete();
+        var shouldReDeal = false;
+        var tasks = new List<Task>();
+        if (collectItem && targetContainer.ShouldCollectDealtItemAndRuleCards)
+        {
+            if (cardNode.Content.Value is BaseRuleCard)
+            {
+                shouldReDeal = true;
+                tasks.Add(targetContainer.MoveCardNodeToContainer(cardNode, Battle.RuleCardContainer));
+            } else if (cardNode.Content.Value is BaseItemCard)
+            {
+                shouldReDeal = true;
+                tasks.Add(targetContainer.MoveCardNodeToContainer(cardNode, Battle.ItemCardContainer));
+            }
+        }
+        if (shouldReDeal)
+        {
+            tasks.Add(DealCardIntoContainer(targetContainer, collectItem));
+        }
+        await Task.WhenAll(tasks);
     }
 
-    public async Task DealCardAndReplace(CardNode node)
+    public async Task DealCardAndReplace(CardNode node, bool collectItem = true)
     {
         var cardNode = await AnimateDrawCard();
         var tasks = new List<Task>();
@@ -174,7 +217,29 @@ public partial class Dealer: Node2D
             var index = cardContainer.ContentNodes.IndexOf(node);
             tasks.Add(AnimateDiscard(node));
             cardContainer.ContentNodes.Insert(index, cardNode);
-            tasks.Add(cardNode.TweenControl.WaitComplete("transform"));
+            tasks.Add(cardNode.TweenControl.WaitTransformComplete());
+            var card = (BaseCard)cardNode.Content.Value;
+            card?.OnDealt?.Invoke(card);
+            await Task.WhenAll(tasks);
+            tasks.Clear();
+            var shouldReDeal = false;
+            if (collectItem && cardContainer.ShouldCollectDealtItemAndRuleCards)
+            {
+                if (cardNode.Content.Value is BaseRuleCard)
+                {
+                    shouldReDeal = true;
+                    tasks.Add(cardContainer.MoveCardNodeToContainer(cardNode, Battle.RuleCardContainer));
+                } else if (cardNode.Content.Value is BaseItemCard)
+                {
+                    shouldReDeal = true;
+                    tasks.Add(cardContainer.MoveCardNodeToContainer(cardNode, Battle.ItemCardContainer));
+                }
+            }
+            if (shouldReDeal)
+            {
+                tasks.Add(DealCardIntoContainer(cardContainer, collectItem));
+            }
+            await Task.WhenAll(tasks);
         }
         else
         {
@@ -182,9 +247,10 @@ public partial class Dealer: Node2D
             tasks.Add(AnimateDiscard(node));
             cardNode.Reparent(parent);
             tasks.Add(cardNode.AnimateTransform(node.Position, node.RotationDegrees, Configuration.AnimateCardTransformInterval,
-                conflictTweenAction:TweenControl.ConflictTweenAction.Finish));
+                conflictTweenAction:TweenControl.ConflictTweenAction.InterruptContinue));
+            await Task.WhenAll(tasks);
         }
-        await Task.WhenAll(tasks);
+        
     }
 
     public async Task<CardNode> AnimateDrawCard()
@@ -198,15 +264,14 @@ public partial class Dealer: Node2D
 
     public async Task AnimateDiscard(CardNode node)
     {
-        // GD.Print($"animate discard {node}");
+        GD.Print($"animate discard {node}, time:  {Time.GetTicksMsec()}");
         if (node.CurrentContainer != null)
         {
-            node.CurrentContainer.Value.Contents.Remove(node.Content.Value);
+            node.CurrentContainer.Value.ContentNodes.Remove(node);
         }
         node.Reparent(DiscardCardPile);
-        node.AnimateTransform(DiscardCardPile.TopCard.Position, DiscardCardPile.TopCard.RotationDegrees, 
-            Configuration.AnimateCardTransformInterval);
-        await node.TweenControl.WaitComplete("transform");
+        await node.AnimateTransform(DiscardCardPile.TopCard.Position, DiscardCardPile.TopCard.RotationDegrees, 
+            Configuration.AnimateCardTransformInterval, priority: Configuration.CardMoveTweenPriority);
         Discard(node);
     }
 
@@ -230,8 +295,10 @@ public partial class Dealer: Node2D
 
     protected void Discard(CardNode cardNode)
     {
-        GD.Print($"discard {cardNode}");
+        // GD.Print($"discard {cardNode}");
         DiscardCardPile.Cards.Insert(0, cardNode.Card);
+        var card = (BaseCard)cardNode.Content.Value;
+        card?.OnDiscard?.Invoke(card);
         cardNode.QueueFree();
     }
     
@@ -258,6 +325,12 @@ public partial class Dealer: Node2D
             Content = card,
             FaceDirection = faceDirection,
             HasPhysics = true,
+        });
+        card.Setup(new BaseCard.SetupArgs()
+        {
+            GameMgr = GameMgr,
+            Battle = Battle,
+            Node = cardNode
         });
         cardNode.Position = onCardNode.Position;
         return cardNode;

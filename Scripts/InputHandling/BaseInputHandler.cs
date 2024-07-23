@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 
 namespace XCardGame.Scripts.InputHandling;
@@ -11,25 +12,38 @@ public class BaseInputHandler: IHandleInput
     public Action<InputEventAction> OnInputAction;
     public Action<Vector2> OnLMouseButtonPressed;
     public Action<Vector2> OnRMouseButtonPressed;
+
+    protected bool ReceiveInput;
     
     public BaseInputHandler(GameMgr gameMgr)
     {
         GameMgr = gameMgr;
+        ReceiveInput = true;
+    }
+    
+    public virtual async Task AwaitAndDisableInput(Task task)
+    {
+        ReceiveInput = false;
+        await task;
+        ReceiveInput = true;
     }
     
     public void HandleInputEvent(InputEvent @event)
     {
-        if (@event is InputEventAction { Pressed: true } action)
+        if (ReceiveInput)
         {
-            OnActionPressed(action);
-        } else if (@event is InputEventMouseButton { Pressed: true } mouse)
-        {
-            if (mouse.ButtonIndex == MouseButton.Left)
+            if (@event is InputEventAction { Pressed: true } action)
             {
-                OnLeftMouseButtonPressed(mouse.Position);
-            } else if (mouse.ButtonIndex == MouseButton.Right)
+                OnActionPressed(action);
+            } else if (@event is InputEventMouseButton { Pressed: true } mouse)
             {
-                OnRightMouseButtonPressed(mouse.Position);
+                if (mouse.ButtonIndex == MouseButton.Left)
+                {
+                    OnLeftMouseButtonPressed(mouse.Position);
+                } else if (mouse.ButtonIndex == MouseButton.Right)
+                {
+                    OnRightMouseButtonPressed(mouse.Position);
+                }
             }
         }
     }

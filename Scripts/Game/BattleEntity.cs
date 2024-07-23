@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Godot;
 using XCardGame.Scripts.Buffs;
 using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
+using XCardGame.Scripts.Cards.InteractCards.ItemCards;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Common.DataBinding;
@@ -22,7 +22,8 @@ public partial class BattleEntity: Node
         public BattleEntityDef Def;
         public Deck Deck;
         public int DealCardCount;
-        public int BaseHandPower;
+        public int Attack;
+        public int Defence;
         public Dictionary<Enums.HandTier, int> HandPowers;
         public int MaxHp;
         public bool IsHoleCardDealtVisible;
@@ -32,7 +33,7 @@ public partial class BattleEntity: Node
     public Battle Battle;
     public CardContainer HoleCardContainer;
     public BuffContainer BuffContainer;
-    public Sprite2D Sprite;
+    public IconWithTextFallback CharacterIcon;
     public Node2D DefenceIcon;
     public Label DefenceLabel;
     public ProgressBar HpBar;
@@ -45,10 +46,10 @@ public partial class BattleEntity: Node
     public BattleEntityDef Def;
     public Deck Deck;
     public int DealCardCount;
-    public int Speed;
-    public int BaseHandPower;
+    public int Attack;
+    public int Defence;
     public Dictionary<Enums.HandTier, int> HandPowers;
-    public ObservableProperty<int> Defence;
+    public ObservableProperty<int> Guard;
     public ObservableProperty<int> Hp;
     public ObservableProperty<int> MaxHp;
     // public ObservableProperty<int> Level;
@@ -65,7 +66,8 @@ public partial class BattleEntity: Node
             Def = def,
             Deck = new Deck(def.InitDeckDef),
             DealCardCount = Configuration.DefaultHoleCardCount,
-            BaseHandPower = def.InitBaseHandPower,
+            Attack = def.InitAttack,
+            Defence = def.InitDefence,
             HandPowers = def.InitHandPowers,
             MaxHp = def.InitHp,
             IsHoleCardDealtVisible = def is PlayerBattleEntityDef
@@ -78,7 +80,7 @@ public partial class BattleEntity: Node
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
         HoleCardContainer = GetNode<CardContainer>("HoleCards");
         BuffContainer = GetNode<BuffContainer>("Buffs");
-        Sprite = GetNode<Sprite2D>("Sprite");
+        CharacterIcon = GetNode<IconWithTextFallback>("Sprite");
         DefenceLabel = GetNode<Label>("Defence/Value");
         DefenceIcon = GetNode<Node2D>("Defence");
         HpBar = GetNode<ProgressBar>("HpBar/Bar");
@@ -92,19 +94,21 @@ public partial class BattleEntity: Node
         Hp.ValueChanged += HpChanged;
         MaxHp.ValueChanged += HpChanged;
         // Level = new ObservableProperty<int>(nameof(Level), this, 0);
-        Defence = new ObservableProperty<int>(nameof(Defence), this, 0);
-        Defence.DetailedValueChanged += DefenceChanged;
-        Defence.FireValueChangeEventsOnInit();
+        Guard = new ObservableProperty<int>(nameof(Guard), this, 0);
+        Guard.DetailedValueChanged += GuardChanged;
+        Guard.FireValueChangeEventsOnInit();
         RoundRole = new ObservableProperty<Enums.EngageRole>(nameof(RoundRole), this, Enums.EngageRole.None);
         RoundHandTier = new ObservableProperty<Enums.HandTier>(nameof(RoundHandTier), this, Enums.HandTier.HighCard);
         RoundRole.ValueChanged += UpdateRoundHandLabel;
         RoundHandTier.ValueChanged += UpdateRoundHandLabel;
+        RoundRole.FireValueChangeEventsOnInit();
         // HoleCards = new ObservableCollection<BaseCard>();
         // Buffs = new ObservableCollection<BaseBuff>();
     }
 
-    public void Setup(SetupArgs args)
+    public virtual void Setup(object o)
     {
+        var args = (SetupArgs)o;
         Battle = GameMgr.CurrentBattle;
         Def = args.Def;
         Deck = args.Deck;
@@ -113,9 +117,17 @@ public partial class BattleEntity: Node
             card.OwnerEntity = this;
         }
 
+        CharacterIcon.Setup(new IconWithTextFallback.SetupArgs()
+        {
+            DisplayName = Def.Name,
+            IconPath = new ObservableProperty<string>("", this, Def.SpritePath)
+        });
+
         DealCardCount = args.DealCardCount;
         HandPowers = args.HandPowers;
-        BaseHandPower = args.BaseHandPower;
+        Attack = args.Attack;
+        Defence = args.Defence;
+        
         MaxHp.Value = args.MaxHp;
         Hp.Value = MaxHp.Value;
         IsHoleCardDealtVisible = args.IsHoleCardDealtVisible;
@@ -126,6 +138,11 @@ public partial class BattleEntity: Node
             PivotDirection = Enums.Direction2D8Ways.Neutral,
             DefaultCardFaceDirection = IsHoleCardDealtVisible ? Enums.CardFace.Up : Enums.CardFace.Down,
             Margins = Configuration.DefaultContentContainerMargins,
+            HasBorder = true,
+            MinContentNodeCountForBorder = DealCardCount,
+            HasName = true,
+            ShouldCollectDealtItemAndRuleCards = true,
+            ContainerName = "Hole cards:"
         });
         BuffContainer.Setup(new BaseContentContainer.SetupArgs
         {
@@ -156,34 +173,46 @@ public partial class BattleEntity: Node
             }
             await Task.WhenAll(tasks);
         }
+        RoundRole.Value = Enums.EngageRole.None;
+        Guard.Value = 0;
         await DiscardCards(HoleCardContainer.ContentNodes.ToList());
     }
 
-    public int GetPower(Enums.HandTier handTier, bool useCharge = true)
+    public int GetPower(Enums.HandTier handTier, Enums.EngageRole role)
     {
-        var power = BaseHandPower + HandPowers[handTier];
+        var power = HandPowers[handTier];
         foreach (var buff in BuffContainer.Contents)
         {
-            if (buff is ChargeBuff chargePowerBuff)
+            switch (buff)
             {
-                if (useCharge)
-                {
-                    power += chargePowerBuff.Stack.Value;
-                    chargePowerBuff.Consume();
-                }
-            } else if (buff is FeebleDeBuff feebleDeBuff)
-            {
-                if (useCharge)
-                {
-                    power -= feebleDeBuff.Stack.Value;
-                    feebleDeBuff.Consume();
-                }
-            } else if (buff is EmpowerBuff empowerBuff)
-            {
-                power += empowerBuff.Stack.Value;
-            } else if (buff is CrippleDeBuff crippleDeBuff)
-            {
-                power -= crippleDeBuff.Stack.Value;
+                case ChargeBuff chargeBuff:
+                    power += chargeBuff.Stack.Value;
+                    chargeBuff.Consume();
+                    break;
+                case BeefUpBuff beefUpBuff:
+                    if (role == Enums.EngageRole.Attacker)
+                    {
+                        power += beefUpBuff.Stack.Value;
+                    }
+                    break;
+                case CrippleDeBuff crippleDeBuff:
+                    if (role == Enums.EngageRole.Attacker)
+                    {
+                        power -= crippleDeBuff.Stack.Value;
+                    }
+                    break;
+                case ResistBuff resistBuff:
+                    if (role == Enums.EngageRole.Defender)
+                    {
+                        power += resistBuff.Stack.Value;
+                    }
+                    break;
+                case FragileDeBuff fragileDeBuff:
+                    if (role == Enums.EngageRole.Defender)
+                    {
+                        power -= fragileDeBuff.Stack.Value;
+                    }
+                    break;
             }
         }
         return power;
@@ -275,7 +304,7 @@ public partial class BattleEntity: Node
 
     public void ChangeDefence(int amount)
     {
-        Defence.Value = Mathf.Clamp(Defence.Value + amount, 0, Configuration.MaxDefence);
+        Guard.Value = Mathf.Clamp(Guard.Value + amount, 0, Configuration.MaxDefence);
     }
 
     public int TakeDamage(int damage, bool bypassDefence = false)
@@ -286,7 +315,7 @@ public partial class BattleEntity: Node
         }
         else
         {
-            var reduceDefence = Mathf.Min(damage, Defence.Value);
+            var reduceDefence = Mathf.Min(damage, Guard.Value);
             ChangeDefence(-reduceDefence);
             damage -= reduceDefence;
             if (damage > 0)
@@ -333,7 +362,7 @@ public partial class BattleEntity: Node
         HpBar.MaxValue = MaxHp.Value;
     }
 
-    protected void DefenceChanged(object sender, ValueChangedEventDetailedArgs<int> args)
+    protected void GuardChanged(object sender, ValueChangedEventDetailedArgs<int> args)
     {
         if (args.NewValue <= 0)
         {
@@ -353,6 +382,10 @@ public partial class BattleEntity: Node
 
     protected string GetRoundHandText()
     {
+        if (RoundRole.Value == Enums.EngageRole.None)
+        {
+            return Utils._("Round Hand:");
+        }
         return Utils._($"Round hand: {Utils.PrettyPrintHandTier(RoundHandTier.Value)}({RoundRole.Value.ToString()})");
     }
 }

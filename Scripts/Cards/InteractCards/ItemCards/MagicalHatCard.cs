@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using XCardGame.Scripts.Cards.CardInputHandlers;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Game;
@@ -27,22 +28,23 @@ public class MagicalHatCard: BaseItemCard
             }
         }
 
-        protected override void Confirm()
+        protected override async void Confirm()
         {
             if (SelectedNodes.Count == 2)
             {
+                var tasks = new List<Task>();
                 var fromNode = SelectedNodes[0];
                 var toNode = SelectedNodes[1];
-                var fromContainer = fromNode.CurrentContainer.Value;
-                var toContainer = toNode.CurrentContainer.Value;
+                var fromContainer = (CardContainer)fromNode.CurrentContainer.Value;
+                var toContainer = (CardContainer)toNode.CurrentContainer.Value;
                 var fromIndex = fromContainer.ContentNodes.IndexOf(fromNode);
                 var toIndex = toContainer.ContentNodes.IndexOf(toNode);
-                (toContainer.ContentNodes[toIndex], fromContainer.ContentNodes[fromIndex]) = (fromContainer.ContentNodes[fromIndex], toContainer.ContentNodes[toIndex]);
-                fromNode.IsSelected = false;
-                toNode.IsSelected = false;
-                SelectedNodes.Clear();
+                tasks.Add(fromContainer.MoveCardNodeToContainer(fromNode, toContainer, toIndex));
+                tasks.Add(toContainer.MoveCardNodeToContainer(toNode, fromContainer, fromIndex));
                 OriginateCard.Use(OriginateCardNode);
                 GameMgr.InputMgr.QuitCurrentInputHandler();
+                SelectedNodes.Clear();
+                await Task.WhenAll(tasks);
             }
             else
             {
@@ -57,9 +59,9 @@ public class MagicalHatCard: BaseItemCard
     {
     }
     
-    public override void Setup(SetupArgs args)
+    public override void Setup(object o)
     {
-        base.Setup(args);
+        base.Setup(o);
         ValidTargetContainers = new List<CardContainer>
         {
             Battle.CommunityCardContainer,

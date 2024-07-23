@@ -3,4 +3,5 @@
 public class InteractCardDef: BaseCardDef
 {
     public bool IsInnate;
+    public int Cost;
 }

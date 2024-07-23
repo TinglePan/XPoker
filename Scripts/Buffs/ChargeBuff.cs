@@ -1,4 +1,5 @@
 ﻿using XCardGame.Scripts.Cards;
+using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 
 
@@ -7,7 +8,7 @@ namespace XCardGame.Scripts.Buffs;
 public class ChargeBuff: BaseBuff
 {
     public ChargeBuff(int stack) :
-        base("Charge", "Increase power of following skill by 1 per stack.", "res://Sprites/BuffIcons/charge_power.png", 
+        base(Utils._("Charge"), Utils._("Double the attack value of following attack. Consume on effect"), "res://Sprites/BuffIcons/charge.png", 
             true, stack:stack, maxStack:Configuration.PowerBasedBuffMaxStack, isTemporary:true)
     {
     }

@@ -92,6 +92,7 @@ public partial class BattleLog: DialogueBox
 
     public void Log(string logEntry)
     {
+        GD.Print($"BattleLog: {logEntry}");
         LogEntriesToDisplay.Add(logEntry);
     }
     
@@ -104,6 +105,7 @@ public partial class BattleLog: DialogueBox
     
     public async Task LogAndWait(string logEntry, float interval = 0f) 
     {
+        GD.Print($"BattleLog: {logEntry}");
         LogEntriesToDisplay.Add(logEntry);
         await HandleLogEntries(interval);
     }

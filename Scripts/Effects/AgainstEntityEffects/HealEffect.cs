@@ -1,5 +1,6 @@
 ﻿using XCardGame.Scripts.Cards;
 using XCardGame.Scripts.Common;
+using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Game;
 
 namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
@@ -21,7 +22,7 @@ public class HealEffect: BaseAgainstEntityEffect
         int power = 0;
         if (PowerScale > 0)
         {
-            power = Src.GetPower(Battle.RoundHands[Src].Tier);
+            power = Src.GetPower(Battle.RoundHands[Src].Tier, Enums.EngageRole.Defender);
             healValue = CalculateValue(power);
         }
         var roundedHealValue = (int)(healValue);

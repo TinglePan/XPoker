@@ -2,7 +2,7 @@
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Cards.InteractCards.EquipmentCards;
+namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
 
 public class DarknessCard: BaseRuleCard
 {

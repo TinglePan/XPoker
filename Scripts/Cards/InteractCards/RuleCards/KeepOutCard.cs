@@ -119,9 +119,10 @@ public class KeepOutCard: BaseRuleCard
         Rule = null;
     }
     
-    public override void Setup(SetupArgs args)
+    public override void Setup(object o)
     {
-        base.Setup(args);
+        base.Setup(o);
+        var args = (SetupArgs)o;
         CardContainers = new List<CardContainer>
         {
             Battle.CommunityCardContainer,

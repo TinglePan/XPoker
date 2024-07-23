@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://87j6cwak3dn2" path="res://Scenes/Card.tscn" id="3_0wv0m"]
 [ext_resource type="PackedScene" uid="uid://2yj0yi24lkar" path="res://Scenes/BuffContainer.tscn" id="4_q43le"]
 [ext_resource type="PackedScene" uid="uid://cfh3qchowgcu0" path="res://Scenes/Buff.tscn" id="5_tx2ya"]
-[ext_resource type="Texture2D" uid="uid://b3ktwe6xf0o5c" path="res://Sprites/duster_guy.png" id="6_oeeb1"]
+[ext_resource type="PackedScene" uid="uid://vx8l6eyd1n4o" path="res://Scenes/IconWithTextFallback.tscn" id="6_v753w"]
 [ext_resource type="LabelSettings" uid="uid://8qnntxqwa647" path="res://Resources/11pxLabelSetting.tres" id="7_mdk1p"]
 [ext_resource type="LabelSettings" uid="uid://ch1l3y7aj324" path="res://Resources/11pxLabelSettingOutline.tres" id="8_8g3g5"]
 [ext_resource type="Texture2D" uid="uid://cct87hjq0q0qu" path="res://Sprites/shield.png" id="8_8khex"]
@@ -44,9 +44,7 @@ position = Vector2(0, -28)
 
 [node name="Buff" parent="Buffs" instance=ExtResource("5_tx2ya")]
 
-[node name="Sprite" type="Sprite2D" parent="."]
-texture_filter = 1
-texture = ExtResource("6_oeeb1")
+[node name="Sprite" parent="." instance=ExtResource("6_v753w")]
 
 [node name="HpBar" type="Node2D" parent="."]
 

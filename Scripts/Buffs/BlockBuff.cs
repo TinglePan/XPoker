@@ -1,12 +1,13 @@
-﻿using XCardGame.Scripts.Common.Constants;
+﻿using XCardGame.Scripts.Common;
+using XCardGame.Scripts.Common.Constants;
 
 namespace XCardGame.Scripts.Buffs;
 
 public class BlockBuff: BaseBuff
 {
     public BlockBuff(int stack) : base(
-        "Block", "Negate incoming attack with power less than {} this round",
-        "res://Sprites/BuffIcons/invincible.png", true, stackOnRepeat: false, stack:stack, 
+        Utils._("Block"), Utils._("Negate incoming attack with strength less than"),
+        "res://Sprites/BuffIcons/block.png", true, stackOnRepeat: false, stack:stack, 
         maxStack:Configuration.PowerBasedBuffMaxStack, isTemporary:true)
     {
     }

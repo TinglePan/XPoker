@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Godot;
 using XCardGame.Scripts.Common;
 using XCardGame.Scripts.Common.Constants;
 using XCardGame.Scripts.Defs.Def.Card;
 using XCardGame.Scripts.Game;
 using XCardGame.Scripts.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
+namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
 
 public class GoldenEyeCard: BaseItemCard
 {
@@ -19,9 +18,9 @@ public class GoldenEyeCard: BaseItemCard
         // RevealedCardNodes = new List<CardNode>();
     }
     
-    public override void Setup(SetupArgs args)
+    public override void Setup(object o)
     {
-        base.Setup(args);
+        base.Setup(o);
         CardContainers = new List<CardContainer>
         {
             Battle.CommunityCardContainer,
@@ -44,7 +43,7 @@ public class GoldenEyeCard: BaseItemCard
             foreach (var cardNode in cardContainer.CardNodes)
             {
                 if (cardNode.FaceDirection.Value == Enums.CardFace.Up) continue;
-                tasks.Add(GameMgr.AwaitAndDisableProceed(cardNode.AnimateReveal(true, Configuration.RevealTweenTime)));
+                tasks.Add(GameMgr.AwaitAndDisableInput(cardNode.AnimateReveal(true, Configuration.RevealTweenTime)));
                 await Utils.Wait(node, Configuration.AnimateCardTransformInterval);
             }
         }

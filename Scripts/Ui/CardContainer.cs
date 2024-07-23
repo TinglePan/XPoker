@@ -22,19 +22,7 @@ public partial class CardContainer: BaseContentContainer
 		public Enums.CardFace DefaultCardFaceDirection;
 		public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
 		public bool OnlyDisplay;
-
-		public SetupArgs()
-		{
-		}
-		
-		public SetupArgs(SetupArgs other): base(other)
-		{
-			AllowInteract = other.AllowInteract;
-			ExpectedInteractCardDefType = other.ExpectedInteractCardDefType;
-			DefaultCardFaceDirection = other.DefaultCardFaceDirection;
-			GetCardFaceDirectionFunc = other.GetCardFaceDirectionFunc;
-			OnlyDisplay = other.OnlyDisplay;
-		}
+		public bool ShouldCollectDealtItemAndRuleCards;
 	}
 	
 	public PackedScene CardPrefab;
@@ -48,6 +36,7 @@ public partial class CardContainer: BaseContentContainer
 
 	public bool AllowInteract;
 	public Type ExpectedInteractCardDefType;
+	public bool ShouldCollectDealtItemAndRuleCards;
 	public bool OnlyDisplay;
 	
 	public override void _Ready()
@@ -56,9 +45,10 @@ public partial class CardContainer: BaseContentContainer
 		CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
 	}
 
-	public void Setup(SetupArgs args)
+	public override void Setup(object o)
 	{
-		base.Setup(args);
+		base.Setup(o);
+		var args = (SetupArgs)o;
 		Battle = GameMgr.CurrentBattle;
 		AllowInteract = args.AllowInteract;
 		OnlyDisplay = args.OnlyDisplay;
@@ -68,6 +58,7 @@ public partial class CardContainer: BaseContentContainer
 		{
 			ExpectedInteractCardDefType = args.ExpectedInteractCardDefType;
 		}
+		ShouldCollectDealtItemAndRuleCards = args.ShouldCollectDealtItemAndRuleCards;
 	}
 
 	public async void MoveCardNodesToContainer(CardContainer targetContainer, float delay = 0f)
@@ -87,6 +78,7 @@ public partial class CardContainer: BaseContentContainer
 	
 	public async Task MoveCardNodeToContainer(CardNode cardNode, CardContainer targetContainer, int index = -1)
 	{
+		GD.Print($"move card node to container {cardNode} to {targetContainer} at {index}");
 		var sourceContainer = cardNode.CurrentContainer.Value;
 		sourceContainer.ContentNodes.Remove(cardNode);
 		if (index < 0)
@@ -97,7 +89,7 @@ public partial class CardContainer: BaseContentContainer
 		{
 			targetContainer.ContentNodes.Insert(index, cardNode);
 		}
-		await cardNode.TweenControl.WaitComplete("transform");
+		await cardNode.TweenControl.WaitTransformComplete();
 	}
 
 	protected override void OnV2MAddNodes(int startingIndex, IList nodes)
@@ -144,10 +136,7 @@ public partial class CardContainer: BaseContentContainer
 			}
 			index++;
 		}
-		for (int i = 0; i < ContentNodes.Count; i++)
-		{
-			AdjustContentNode(i, true);
-		}
+		AdjustLayout();
 		SuppressNotifications = false;
 	}
 

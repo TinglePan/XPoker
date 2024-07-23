@@ -8,40 +8,49 @@ namespace XCardGame.Scripts.Common;
 
 public class TweenControl
 {
-
     public enum ConflictTweenAction
     {
-        FastForwardAndFinish,
-        Finish,
-        InterruptEnsureOldCallback,
-        Interrupt
+        Interrupt,
+        InterruptContinue,
+        FastForward,
+        FastForwardContinue,
     }
     
-    public class ControlledTween: IEquatable<ControlledTween>
+    public class ControlledTween
     {
         public string Tag;
+        public int Priority;
         public ObservableProperty<Tween> Tween;
-        public float Time;
-        public ObservableProperty<Action> Callback;
         public TaskCompletionSource Complete;
+        public float Time;
+        public Action Callback;
         
-        public ControlledTween(string tag, Tween tween, float time, Action callback = null)
+        public ControlledTween(string tag, Tween tween, float time, int priority = 0, Action callback = null)
         {
             Tag = tag;
+            Priority = priority;
             Tween = new ObservableProperty<Tween>(nameof(Tween), this, tween);
             Tween.DetailedValueChanged += TweenChanged;
             Time = time;
-            Callback = new ObservableProperty<Action>(nameof(Callback), this, callback);
-            Callback.DetailedValueChanged += CallbackChanged;
+            Callback += callback;
             Tween.FireValueChangeEventsOnInit();
             Complete = new TaskCompletionSource();
             // Callback.FireValueChangeEventsOnInit();
         }
 
-        public bool Equals(ControlledTween other)
+        public void Reset()
         {
-            return Tag == other?.Tag;
-        }
+            Priority = 0;
+            Tween.Value = null;
+            Time = 0;
+            Callback = null;
+            Complete = new TaskCompletionSource();
+        } 
+
+        // public bool Equals(ControlledTween other)
+        // {
+        //     return Tag == other?.Tag;
+        // }
 
         public bool IsRunning()
         {
@@ -53,115 +62,98 @@ public class TweenControl
             if (valueChangedEventDetailedArgs.OldValue != null)
             {
                 valueChangedEventDetailedArgs.OldValue.Stop();
-                if (Callback.Value != null)
-                {
-                    valueChangedEventDetailedArgs.OldValue.Finished -= Callback.Value;
-                }
-                valueChangedEventDetailedArgs.OldValue.Finished -= MarkComplete;
+                valueChangedEventDetailedArgs.OldValue.Finished -= OnTweenFinished;
             }
             if (valueChangedEventDetailedArgs.NewValue != null)
             {
-                if (Callback.Value != null)
-                {
-                    valueChangedEventDetailedArgs.NewValue.Finished += Callback.Value;
-                }
-                valueChangedEventDetailedArgs.NewValue.Finished += MarkComplete;
+                valueChangedEventDetailedArgs.NewValue.Finished += OnTweenFinished;
             }
         }
 
-        protected void CallbackChanged(object sender, ValueChangedEventDetailedArgs<Action> valueChangedEventDetailedArgs)
-        {
-            if (Tween.Value != null)
-            {
-                if (valueChangedEventDetailedArgs.OldValue != null)
-                {
-                    Tween.Value.Finished -= valueChangedEventDetailedArgs.OldValue;
-                }
-                if (valueChangedEventDetailedArgs.NewValue != null)
-                {
-                    Tween.Value.Finished += valueChangedEventDetailedArgs.NewValue;
-                }
-            }
-        }
-
-        protected void MarkComplete()
+        protected void OnTweenFinished()
         {
             Complete.TrySetResult();
+            Callback?.Invoke();
+            Reset();
         }
     }
-    
+
+    public Node Node;
     public Dictionary<string, ControlledTween> TweenMap;
 
-    public TweenControl()
+    public TweenControl(Node node)
     {
+        Node = node;
         TweenMap = new Dictionary<string, ControlledTween>();
     }
 
-    public void AddTween(string tag, Tween tween, float time, Action callback = null,
-        ConflictTweenAction conflictAction = ConflictTweenAction.InterruptEnsureOldCallback)
+    public bool CanTween(string tag, int priority)
     {
-        if (TweenMap.ContainsKey(tag) && TweenMap[tag] is {} existingControlledTween)
+        if (!TweenMap.ContainsKey(tag) || TweenMap[tag] == null) return true;
+        if (TweenMap[tag].Priority <= priority) return true;
+        return !TweenMap[tag].IsRunning();
+    }
+    
+    public ControlledTween CreateTween(string tag, float time, int priority = 0, Action callback = null,
+        ConflictTweenAction conflictAction = ConflictTweenAction.Interrupt)
+    {
+        if (!CanTween(tag, priority))
         {
-            if (existingControlledTween.IsRunning())
+            GD.Print($"Create tween for [{tag}] failed with priority {priority}.");
+            return null;
+        }
+        var tween = Node.CreateTween();
+        if (TweenMap.ContainsKey(tag) && TweenMap[tag] is {} existingControlledTween && existingControlledTween.Priority <= priority && existingControlledTween.IsRunning())
+        {
+            var oldTween = existingControlledTween.Tween.Value;
+            switch (conflictAction)
             {
-                switch (conflictAction)
-                {
-                    case ConflictTweenAction.Interrupt:
-                        existingControlledTween.Tween.Value.Stop();
-                        break;
-                    case ConflictTweenAction.InterruptEnsureOldCallback:
-                        existingControlledTween.Tween.Value.Stop();
-                        if (callback != existingControlledTween.Callback.Value)
-                        {
-                            existingControlledTween.Callback.Value?.Invoke();
-                            existingControlledTween.Callback.Value = callback;
-                        }
-                        break;
-                    case ConflictTweenAction.Finish:
-                        existingControlledTween.Tween.Value.Stop();
-                        existingControlledTween.Callback.Value?.Invoke();
-                        if (callback != existingControlledTween.Callback.Value)
-                        {
-                            existingControlledTween.Callback.Value = callback;
-                        }
-                        break;
-                    case ConflictTweenAction.FastForwardAndFinish:
-                        existingControlledTween.Tween.Value.Pause();
-                        existingControlledTween.Tween.Value.CustomStep(existingControlledTween.Time);
-                        existingControlledTween.Tween.Value.Stop();
-                        existingControlledTween.Callback.Value?.Invoke();
-                        if (callback != existingControlledTween.Callback.Value)
-                        {
-                            existingControlledTween.Callback.Value = callback;
-                        }
-                        break;
-                }
-            }
-            else
-            {
-                if (callback != null)
-                {
-                    existingControlledTween.Callback.Value = callback;
-                }
+                case ConflictTweenAction.Interrupt:
+                    oldTween.Stop();
+                    break;
+                case ConflictTweenAction.InterruptContinue:
+                    oldTween.Stop();
+                    time = (float)Mathf.Max(0, time - oldTween.GetTotalElapsedTime());
+                    break;
+                case ConflictTweenAction.FastForward:
+                    oldTween.Pause();
+                    oldTween.CustomStep(existingControlledTween.Time);
+                    oldTween.Stop();
+                    break;
+                case ConflictTweenAction.FastForwardContinue:
+                    oldTween.Pause();
+                    oldTween.CustomStep(existingControlledTween.Time);
+                    oldTween.Stop();
+                    time = (float)Mathf.Max(0, time - oldTween.GetTotalElapsedTime());
+                    break;
             }
             existingControlledTween.Tween.Value = tween;
             existingControlledTween.Time = time;
         }
         else
         {
-            var controlledTween = new ControlledTween(tag, tween, time, callback);
-            TweenMap.Add(tag, controlledTween);
+            TweenMap[tag] = new ControlledTween(tag, tween, time, priority, callback);
         }
+        return TweenMap[tag];
     }
 
-    public ControlledTween GetControlledTween(string tag)
-    {
-        return TweenMap.GetValueOrDefault(tag);
-    }
+    // public ControlledTween GetControlledTween(string tag)
+    // {
+    //     return TweenMap.GetValueOrDefault(tag);
+    // }
 
     public Task WaitComplete(string tag)
     {
-        return GetControlledTween(tag)?.Complete.Task;
+        return TweenMap.GetValueOrDefault(tag)?.Complete.Task;
+    }
+
+    public Task WaitTransformComplete()
+    {
+        return Task.WhenAll(new List<Task>
+        {
+            WaitComplete("position") ?? Task.CompletedTask,
+            WaitComplete("rotation") ?? Task.CompletedTask,
+        });
     }
     
     public bool IsRunning(string tag)

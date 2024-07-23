@@ -24,7 +24,6 @@ public abstract class BaseSelectTargetInputHandler<TTargetNode>: BaseInputHandle
         foreach (var selectTarget in GetValidSelectTargets())
         {
             selectTarget.OnMousePressed += OnTargetPressed;
-            selectTarget.IsSelected = false;
         }
     }
 
@@ -55,22 +54,26 @@ public abstract class BaseSelectTargetInputHandler<TTargetNode>: BaseInputHandle
     
     protected void OnTargetPressed(BaseContentNode node, MouseButton mouseButton)
     {
-        if (mouseButton == MouseButton.Left)
+        if (ReceiveInput)
         {
-            var contentNode = (TTargetNode)node;
-            if (contentNode.IsSelected)
+            if (mouseButton == MouseButton.Left)
             {
-                UnSelectNode(contentNode);
-            }
-            else
-            {
-                SelectNode(contentNode);
+                var contentNode = (TTargetNode)node;
+                if (contentNode.IsSelected)
+                {
+                    UnSelectNode(contentNode);
+                }
+                else
+                {
+                    SelectNode(contentNode);
+                }
             }
         }
     }
     
     protected override void OnActionPressed(InputEventAction action)
     {
+        base.OnActionPressed(action);
         if (action.Action == "ui_escape")
         {
             Exit();

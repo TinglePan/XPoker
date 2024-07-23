@@ -16,7 +16,7 @@ public partial class IconWithTextFallback: Node2D
     public Sprite2D Icon;
     public Label FallbackLabel;
 
-    public string DisplayName;
+    public ObservableProperty<string> DisplayName;
     public ObservableProperty<string> IconPath;
 
     public override void _Ready()
@@ -25,6 +25,8 @@ public partial class IconWithTextFallback: Node2D
         Icon = GetNode<Sprite2D>("Icon");
         FallbackLabel = GetNode<Label>("Label");
         FallbackLabel.Hide();
+        DisplayName = new ObservableProperty<string>(nameof(DisplayName), this, null);
+        DisplayName.DetailedValueChanged += OnDisplayNameChanged;
     }
     
     public override void _ExitTree()
@@ -36,10 +38,11 @@ public partial class IconWithTextFallback: Node2D
         }
     }
 
-    public void Setup(SetupArgs args)
+    public void Setup(object o)
+    
     {
-        DisplayName = args.DisplayName;
-        FallbackLabel.Text = DisplayName[0].ToString();
+        var args = (SetupArgs)o;
+        DisplayName.Value = args.DisplayName;
         ResetIconPath(args.IconPath);
     }
 
@@ -54,6 +57,18 @@ public partial class IconWithTextFallback: Node2D
             IconPath = iconPath;
             IconPath.DetailedValueChanged += OnIconPathChanged;
             IconPath.FireValueChangeEventsOnInit();
+        }
+    }
+    
+    protected void OnDisplayNameChanged(object sender, ValueChangedEventDetailedArgs<string> args)
+    {
+        if (args.NewValue != null)
+        {
+            FallbackLabel.Text = args.NewValue[0].ToString();
+        }
+        else
+        {
+            FallbackLabel.Text = "_";
         }
     }
     

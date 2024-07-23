@@ -24,6 +24,8 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
         public GameMgr GameMgr;
         public Battle Battle;
         public BaseContentNode Node;
+        public Enums.CardSuit Suit;
+        public Enums.CardRank Rank;
     }
     // public string Name;
     // public string Description;
@@ -35,10 +37,15 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
     public GameMgr GameMgr;
     public Battle Battle;
     public BattleEntity OwnerEntity;
+
+    public Action<BaseCard> OnDealt;
+    public Action<BaseCard> OnDiscard;
     
     public BaseCardDef Def;
     public HashSet<BaseContentNode> Nodes { get; private set; }
     public ObservableProperty<string> IconPath;
+    public Enums.CardSuit OriginalSuit;
+    public Enums.CardRank OriginalRank;
     public ObservableProperty<Enums.CardSuit> Suit;
     public ObservableProperty<Enums.CardRank> Rank;
     public ObservableProperty<bool> IsNegated;
@@ -46,12 +53,15 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
     public BaseCard(BaseCardDef def)
     {
         Def = def;
+        OriginalRank = def.Rank;
+        OriginalSuit = def.Suit;
         Nodes = new HashSet<BaseContentNode>();
         IconPath = new ObservableProperty<string>(nameof(IconPath), this, def.IconPath);
         Suit = new ObservableProperty<Enums.CardSuit>(nameof(Suit), this, def.Suit);
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, def.Rank);
         IsNegated = new ObservableProperty<bool>(nameof(IsNegated), this, false);
         IsNegated.DetailedValueChanged += OnToggleIsNegated;
+        OnDiscard += ResetCard;
     }
 
     public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode
@@ -66,11 +76,22 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
         return null;
     }
 
-    public virtual void Setup(SetupArgs args)
+    public virtual void Setup(object o)
     {
+        var args = (SetupArgs)o;
         GameMgr = args.GameMgr;
         Battle = args.Battle;
         Nodes.Add(args.Node);
+        if (OriginalRank == Enums.CardRank.None)
+        {
+            OriginalRank = args.Rank != Enums.CardRank.None ? args.Rank : RandRank();
+            Rank.Value = OriginalRank;
+        }
+        if (OriginalSuit == Enums.CardSuit.None)
+        {
+            OriginalSuit = args.Suit != Enums.CardSuit.None ? args.Suit : RandSuit();
+            Suit.Value = OriginalSuit;
+        }
     }
     
     public int CompareTo(BaseCard other)
@@ -163,12 +184,14 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
             GameMgr = GameMgr,
             Battle = battle,
         });
-        Battle.GameMgr.BattleLog.Log($"Resolving {this}");
+        GameMgr.BattleLog.Log($"Resolving {this}");
         // GD.Print($"Resolve of {this}, effect {effect}");
         effect?.Resolve();
 
         if (applyHeartsRule)
         {
+            
+            
             effect = new HealEffect(this, entity, entity,
                 Utils.GetCardRankValue(Rank.Value) / 2, 0);
             effect.Setup(new BaseEffect.SetupArgs
@@ -178,6 +201,13 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
             });
             effect?.Resolve();
         }
+    }
+
+    public virtual void ResetCard(BaseCard card)
+    {
+        Rank.Value = Def.Rank;
+        Suit.Value = Def.Suit;
+        IsNegated.Value = false;
     }
 
     protected void OnToggleIsNegated(object sender, ValueChangedEventDetailedArgs<bool> args)
@@ -190,5 +220,18 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
         {
             OnStart(Battle);
         }
+    }
+
+    protected Enums.CardRank RandRank()
+    {
+        var rankValue = GameMgr.Rand.Next(Utils.GetCardRankValue(Enums.CardRank.Ace),
+            Utils.GetCardRankValue(Enums.CardRank.King) + 1);
+        return Utils.GetCardRank(rankValue);
+    }
+
+    protected Enums.CardSuit RandSuit()
+    {
+        var suitValue = GameMgr.Rand.Next(1, 5);
+        return (Enums.CardSuit)suitValue;
     }
 }

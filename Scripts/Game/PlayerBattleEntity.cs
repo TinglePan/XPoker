@@ -38,7 +38,8 @@ public partial class PlayerBattleEntity: BattleEntity
             Def = def,
             Deck = new Deck(def.InitDeckDef),
             DealCardCount = Configuration.DefaultHoleCardCount,
-            BaseHandPower = def.InitBaseHandPower,
+            Attack = def.InitAttack,
+            Defence = def.InitDefence,
             HandPowers = def.InitHandPowers,
             MaxHp = def.InitHp,
             IsHoleCardDealtVisible = true,
@@ -55,10 +56,11 @@ public partial class PlayerBattleEntity: BattleEntity
         EnergyLabel = GetNode<Label>("Energy/Label");
     }
 
-    public void Setup(SetupArgs args)
+    public override void Setup(object o)
     {
         // LevelUpTable = (Dictionary<int, LevelUpInfo>)args["levelUpTable"];
-        base.Setup(args);
+        base.Setup(o);
+        var args = (SetupArgs)o;
         Energy = new ObservableProperty<int>(nameof(Energy), this, args.Energy);
         MaxEnergy = new ObservableProperty<int>(nameof(MaxEnergy), this, args.MaxEnergy);
         Energy.ValueChanged += UpdateEnergyLabel;

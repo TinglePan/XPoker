@@ -1,7 +1,4 @@
-﻿using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Game;
-
-namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
+﻿namespace XCardGame;
 
 public class ClubsRuleCard: BaseRuleCard
 {

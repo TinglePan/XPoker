@@ -1,12 +1,6 @@
 ﻿using System.Collections.Generic;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def;
-using XCardGame.Scripts.Defs.Def.BattleEntity;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Defs.Tables;
 
-
-namespace XCardGame.Scripts.Defs;
+namespace XCardGame;
 
 public static class BattleEntityDefs
 {

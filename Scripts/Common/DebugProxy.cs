@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 using Godot;
 using hamsterbyte.DeveloperConsole;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Common;
+
+namespace XCardGame.Common;
 
 public partial class DebugProxy: Node
 {

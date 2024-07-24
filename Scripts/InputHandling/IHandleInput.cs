@@ -1,4 +1,4 @@
-﻿namespace XCardGame.Scripts.InputHandling;
+﻿namespace XCardGame;
 
 public interface IHandleInput
 {

@@ -1,5 +1,8 @@
-﻿namespace XCardGame.Scripts.Defs.Def.Card;
+﻿using System;
 
+namespace XCardGame;
+
+[Serializable]
 public class RuleCardDef: InteractCardDef
 {
     public int RankChangePerTurn;

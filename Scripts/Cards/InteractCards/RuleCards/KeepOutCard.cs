@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Effects;
-using XCardGame.Scripts.Effects.FieldEffects;
-using XCardGame.Scripts.Game;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
+namespace XCardGame;
 
 
 public class KeepOutCard: BaseRuleCard
@@ -64,9 +60,9 @@ public class KeepOutCard: BaseRuleCard
             NegatedCardNodes = new List<CardNode>();
         }
 
-        public override async void OnStart(Battle battle)
+        public override async void OnStartEffect(Battle battle)
         {
-            base.OnStart(battle);
+            base.OnStartEffect(battle);
             var tasks = new List<Task>();
             var keepOutCard = (KeepOutCard)OriginateCard;
             foreach (var container in keepOutCard.CardContainers)
@@ -84,7 +80,7 @@ public class KeepOutCard: BaseRuleCard
             await Task.WhenAll(tasks);
         }
         
-        public override async void OnStop(Battle battle)
+        public override async void OnStopEffect(Battle battle)
         {
             var tasks = new List<Task>();
             foreach (var cardNode in NegatedCardNodes)
@@ -137,9 +133,9 @@ public class KeepOutCard: BaseRuleCard
         });
     }
 
-    public override void OnStart(Battle battle)
+    public override void OnStartEffect(Battle battle)
     {
-        base.OnStart(battle);
+        base.OnStartEffect(battle);
         if (IsFunctioning() && !AlreadyFunctioning)
         {
             Battle.StartEffect(Effect);
@@ -147,9 +143,9 @@ public class KeepOutCard: BaseRuleCard
         }
     }
 
-    public override void OnStop(Battle battle)
+    public override void OnStopEffect(Battle battle)
     {
-        base.OnStop(battle);
+        base.OnStopEffect(battle);
         if (AlreadyFunctioning)
         {
             Battle.StopEffect(Effect);

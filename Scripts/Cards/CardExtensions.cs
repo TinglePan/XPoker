@@ -1,7 +1,7 @@
 ﻿using System;
-using XCardGame.Scripts.Common.Constants;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Cards;
+namespace XCardGame;
 
 public static class CardExtensions
 {

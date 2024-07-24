@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using XCardGame.Scripts.Cards;
+using XCardGame.Common;
 
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
-
-namespace XCardGame.Scripts.HandEvaluate;
+namespace XCardGame;
 
 public class CompletedHandEvaluator: BaseHandEvaluator
 {

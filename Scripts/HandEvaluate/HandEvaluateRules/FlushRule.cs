@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using XCardGame.Scripts.Cards;
+using XCardGame.Common;
 
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-
-namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
+namespace XCardGame;
 
 public class FlushRule: BaseHandEvaluateRule
 {

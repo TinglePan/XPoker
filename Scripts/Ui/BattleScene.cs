@@ -1,7 +1,6 @@
 ﻿using Godot;
-using XCardGame.Scripts.Game;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class BattleScene: Node
 {

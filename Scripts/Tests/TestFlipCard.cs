@@ -1,14 +1,8 @@
-﻿using System.Collections.Generic;
-using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def.Card;
+﻿using Godot;
+using XCardGame.Common;
+using CardNode = XCardGame.Ui.CardNode;
 
-using CardNode = XCardGame.Scripts.Ui.CardNode;
-
-namespace XCardGame.Scripts.Tests;
+namespace XCardGame.Tests;
 
 public partial class TestFlipCard: Node
 {
@@ -28,6 +22,6 @@ public partial class TestFlipCard: Node
             HasPhysics = true,
         });
         CardNode.AnimateFlip(Enums.CardFace.Down);
-        GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");
+        // GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");
     }
 }

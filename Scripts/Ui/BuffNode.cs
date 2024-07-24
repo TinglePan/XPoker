@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using Godot;
-using XCardGame.Scripts.Buffs;
-using XCardGame.Scripts.Common;
+﻿using Godot;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class BuffNode: BaseContentNode
 {
@@ -28,7 +26,7 @@ public partial class BuffNode: BaseContentNode
         base.OnContentAttached(content);
         var buff = (BaseBuff)content;
         Icon.Texture = ResourceCache.Instance.Load<Texture2D>(buff.IconPath);
-        buff.OnStart(buff.Battle);
+        buff.OnStartEffect(buff.Battle);
     }
 
     protected override void OnContentDetached(IContent content)
@@ -36,6 +34,6 @@ public partial class BuffNode: BaseContentNode
         base.OnContentDetached(content);
         Icon.Texture = null;
         var buff = (BaseBuff)content;
-        buff.OnStop(buff.Battle);
+        buff.OnStopEffect(buff.Battle);
     }
 }

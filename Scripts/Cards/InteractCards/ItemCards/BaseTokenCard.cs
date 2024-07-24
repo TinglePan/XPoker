@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using XCardGame.Scripts.Cards.CardInputHandlers;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Ui;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
+namespace XCardGame;
 
 public class BaseTokenCardInputHandler<TCard> : BaseItemCardSelectTargetInputHandler<TCard> where TCard : BaseTokenCard<TCard, BaseTokenCardInputHandler<TCard>>
 {
@@ -31,7 +29,7 @@ public class BaseTokenCardInputHandler<TCard> : BaseItemCardSelectTargetInputHan
 
             if (toNode.PreviousContainer == null)
             {
-                tasks.Add(Battle.Dealer.AnimateDiscard(toNode));
+                tasks.Add(toNode.AnimateLeaveBattle());
             }
             // else
             // {

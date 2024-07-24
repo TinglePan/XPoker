@@ -1,14 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using XCardGame.Scripts.Cards.CardInputHandlers;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Game;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
+namespace XCardGame;
 
 public class CopyPasteCard: BaseItemCard
 {

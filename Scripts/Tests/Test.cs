@@ -1,6 +1,6 @@
 using Godot;
 
-namespace XCardGame.Scripts.Tests;
+namespace XCardGame.Tests;
 
 
 

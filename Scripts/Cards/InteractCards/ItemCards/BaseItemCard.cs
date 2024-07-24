@@ -1,7 +1,6 @@
-﻿using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Ui;
+﻿using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
+namespace XCardGame;
 
 public class BaseItemCard: BaseInteractCard
 {

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Godot;
-using XCardGame.Scripts.Cards;
+using XCardGame.Ui;
 
-
-using XCardGame.Scripts.Ui;
-
-namespace XCardGame.Scripts.InputHandling;
+namespace XCardGame;
 
 public abstract class BaseSelectTargetInputHandler<TTargetNode>: BaseInputHandler 
     where TTargetNode: BaseContentNode, ISelect

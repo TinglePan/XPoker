@@ -2,13 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.HandEvaluate;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public class Engage
 {

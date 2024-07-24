@@ -1,6 +1,6 @@
 using System;
 
-namespace XCardGame.Scripts.Common.DataBinding;
+namespace XCardGame.Common;
 
 public class DerivedObservableProperty<T> : IObservableProperty<T>, INotifyValueChanged<Lazy<T>>
 {

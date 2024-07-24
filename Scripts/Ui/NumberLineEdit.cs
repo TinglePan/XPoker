@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Godot;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class NumberLineEdit: LineEdit
 {

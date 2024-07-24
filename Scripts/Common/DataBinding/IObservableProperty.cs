@@ -1,4 +1,4 @@
-﻿namespace XCardGame.Scripts.Common.DataBinding;
+﻿namespace XCardGame.Common;
 
 public interface IObservableProperty<out T>: INotifyValueChanged
 {

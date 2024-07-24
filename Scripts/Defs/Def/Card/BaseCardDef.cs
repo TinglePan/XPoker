@@ -1,9 +1,11 @@
-﻿using XCardGame.Scripts.Common.Constants;
+﻿using System;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Defs.Def.Card;
+namespace XCardGame;
 
 
-public class BaseCardDef
+[Serializable]
+public class BaseCardDef: BaseDef
 {
     public string Name;
     public string ConcreteClassPath;

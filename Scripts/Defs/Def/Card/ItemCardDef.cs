@@ -1,7 +1,8 @@
-﻿using XCardGame.Scripts.Cards;
+﻿using System;
 
-namespace XCardGame.Scripts.Defs.Def.Card;
+namespace XCardGame;
 
+[Serializable]
 public class ItemCardDef: InteractCardDef
 {
     public int RankChangePerUse;

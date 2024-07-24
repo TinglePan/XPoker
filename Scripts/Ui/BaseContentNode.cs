@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public abstract partial class BaseContentNode : Node2D
 {
@@ -69,11 +68,11 @@ public abstract partial class BaseContentNode : Node2D
             {
                 var tween = controlledTween.Tween.Value;
                 // tween.SetParallel();
+                // GD.Print($"Animate transform tween time: {controlledTween.Time}");
                 tween.TweenProperty(this, "position", position, controlledTween.Time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
                 // tween.TweenProperty(this, "rotation_degrees", rotationDegrees, animationTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
                 tasks.Add(TweenControl.WaitComplete("position"));
                 callback = null;
-                GD.Print($"animate transform {this} done {position}/{Position}");
             }
         }
         if (Math.Abs(RotationDegrees - rotationDegrees) > 0.1f || TweenControl.IsRunning("rotation"))
@@ -87,6 +86,7 @@ public abstract partial class BaseContentNode : Node2D
             }
         }
         await Task.WhenAll(tasks);
+        // GD.Print($"animate transform {this} done {position}/{Position}");
     }
 
     protected void OnMouseEnter()

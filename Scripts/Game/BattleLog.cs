@@ -4,12 +4,10 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public partial class BattleLog: DialogueBox
 {

@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using Godot;
 
-using XCardGame.Scripts.InputHandling;
-
-namespace XCardGame.Scripts;
+namespace XCardGame;
 
 public partial class InputMgr: Node
 {

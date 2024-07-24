@@ -1,7 +1,6 @@
-﻿using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
+﻿using XCardGame.Common;
 
-namespace XCardGame.Scripts.Buffs;
+namespace XCardGame;
 
 public class CrippleDeBuff: BaseBuff
 {

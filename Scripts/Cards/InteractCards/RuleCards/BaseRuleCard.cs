@@ -1,9 +1,7 @@
-﻿using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Game;
-using XCardGame.Scripts.Ui;
+﻿using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
+namespace XCardGame;
 
 public class BaseRuleCard: BaseInteractCard
 {
@@ -36,7 +34,7 @@ public class BaseRuleCard: BaseInteractCard
         node.AnimateTap(!node.IsTapped.Value, Configuration.TapTweenTime);
     }
     
-    public override void OnStart(Battle battle)
+    public override void OnStartEffect(Battle battle)
     {
         if (IsFunctioning() && !AlreadyFunctioning)
         {
@@ -46,9 +44,9 @@ public class BaseRuleCard: BaseInteractCard
         }
     }
     
-    public override void OnStop(Battle battle)
+    public override void OnStopEffect(Battle battle)
     {
-        base.OnStop(battle);
+        base.OnStopEffect(battle);
         if (AlreadyFunctioning)
         {
             battle.OnRoundStart -= OnRoundStart;

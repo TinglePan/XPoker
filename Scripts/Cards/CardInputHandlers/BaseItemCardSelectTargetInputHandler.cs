@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Ui;
-using Battle = XCardGame.Scripts.Game.Battle;
-using CardNode = XCardGame.Scripts.Ui.CardNode;
+using XCardGame.Common;
+using XCardGame.Ui;
+using CardNode = XCardGame.Ui.CardNode;
 
-namespace XCardGame.Scripts.Cards.CardInputHandlers;
+namespace XCardGame;
 
-public abstract class BaseItemCardSelectTargetInputHandler<TOriginateCard>: BaseSelectTargetInputHandler<CardNode> where TOriginateCard: BaseCard
+public abstract class BaseItemCardSelectTargetInputHandler<TOriginateCard>: BaseSelectTargetInputHandler<Ui.CardNode> where TOriginateCard: BaseCard
 {
     public Battle Battle;
     public BaseButton ProceedButton;

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using XCardGame.Scripts.Common.Constants;
+using XCardGame.Common;
+using CardNode = XCardGame.Ui.CardNode;
 
-
-using Battle = XCardGame.Scripts.Game.Battle;
-using CardNode = XCardGame.Scripts.Ui.CardNode;
-
-namespace XCardGame.Scripts.Cards.CardMarkers;
+namespace XCardGame;
 
 public class ChangeCardsMarker: BaseCardMarker
 {
@@ -163,13 +160,13 @@ public class ChangeCardsMarker: BaseCardMarker
 
     }
 
-    public override void OnStart(Battle battle)
+    public override void OnStartEffect(Battle battle)
     {
         var cards = CardSelector(battle, Card).ToList();
         ChangeFunc(cards, Card, Battle);
     }
 
-    public override void OnStop(Battle battle)
+    public override void OnStopEffect(Battle battle)
     {
         var cards = CardSelector(battle, Card).ToList();
         RevertFunc(cards, Card, Battle);

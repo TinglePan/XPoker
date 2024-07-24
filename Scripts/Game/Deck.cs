@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Defs.Def;
-using XCardGame.Scripts.Defs.Def.Card;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public class Deck
 {

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Reflection;
-using XCardGame.Scripts.Common;
 
-namespace XCardGame.Scripts.Cards;
+namespace XCardGame;
 
 public static class CardFactory
 {

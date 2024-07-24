@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Defs.Def;
-using XCardGame.Scripts.Defs.Def.BattleEntity;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Defs;
+namespace XCardGame;
 
 public static class EnemyRandBoxDefs
 {

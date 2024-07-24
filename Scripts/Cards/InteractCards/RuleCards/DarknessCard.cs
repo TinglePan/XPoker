@@ -1,8 +1,6 @@
-﻿using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Game;
+﻿using XCardGame.Common;
 
-namespace XCardGame.Scripts.Cards.InteractCards.RuleCards;
+namespace XCardGame;
 
 public class DarknessCard: BaseRuleCard
 {
@@ -12,9 +10,9 @@ public class DarknessCard: BaseRuleCard
     {
     }
     
-    public override void OnStart(Battle battle)
+    public override void OnStartEffect(Battle battle)
     {
-        base.OnStart(battle);
+        base.OnStartEffect(battle);
         if (IsFunctioning() && !AlreadyFunctioning)
         {
             Count = Utils.GetCardRankValue(Rank.Value);
@@ -23,9 +21,9 @@ public class DarknessCard: BaseRuleCard
         }
     }
     
-    public override void OnStop(Battle battle)
+    public override void OnStopEffect(Battle battle)
     {
-        base.OnStop(battle);
+        base.OnStopEffect(battle);
         if (AlreadyFunctioning)
         {
             battle.FaceDownCommunityCardCount -= Count;

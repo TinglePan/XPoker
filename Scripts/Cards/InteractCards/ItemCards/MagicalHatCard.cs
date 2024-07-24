@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using XCardGame.Scripts.Cards.CardInputHandlers;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Game;
-using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Ui;
-using CardNode = XCardGame.Scripts.Ui.CardNode;
+using XCardGame.Ui;
+using CardNode = XCardGame.Ui.CardNode;
 
-namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
+namespace XCardGame;
 
 public class MagicalHatCard: BaseItemCard
 {

@@ -1,17 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Game;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class CardContainer: BaseContentContainer
 {
@@ -78,7 +73,7 @@ public partial class CardContainer: BaseContentContainer
 	
 	public async Task MoveCardNodeToContainer(CardNode cardNode, CardContainer targetContainer, int index = -1)
 	{
-		GD.Print($"move card node to container {cardNode} to {targetContainer} at {index}");
+		// GD.Print($"move card node to container {cardNode} to {targetContainer} at {index}");
 		var sourceContainer = cardNode.CurrentContainer.Value;
 		sourceContainer.ContentNodes.Remove(cardNode);
 		if (index < 0)

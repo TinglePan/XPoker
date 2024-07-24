@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using Godot;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public class RewardUpgradeIcon: IContentContractGetIcon<Texture2D>
 {

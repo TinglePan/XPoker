@@ -1,9 +1,6 @@
-﻿using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Game;
+﻿using XCardGame.Common;
 
-namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
+namespace XCardGame;
 
 public class DefendAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEffect
 {

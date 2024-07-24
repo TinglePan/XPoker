@@ -1,8 +1,7 @@
 ﻿using System.Numerics;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Defs.Def.BattleEntity;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Defs.Def;
+namespace XCardGame;
 
 public class EnemyRandBoxDef
 {

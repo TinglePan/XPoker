@@ -1,9 +1,7 @@
-﻿using XCardGame.Scripts.Buffs;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Ui;
+﻿using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
+namespace XCardGame;
 
 public class BigShieldCard: BaseItemCard
 {

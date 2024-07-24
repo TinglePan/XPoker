@@ -1,19 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Game;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-using XCardGame.Scripts.HandEvaluate;
-
-using XCardGame.Scripts.Ui;
-using Battle = XCardGame.Scripts.Game.Battle;
-using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
-using BuffNode = XCardGame.Scripts.Ui.BuffNode;
-
-namespace XCardGame.Scripts.Buffs;
+namespace XCardGame;
 
 public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff>
 {
@@ -91,12 +82,12 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff
         Entity.BuffContainer.Buffs.Add(this);
     }
 
-    public virtual void OnStart(Battle battle)
+    public virtual void OnStartEffect(Battle battle)
     {
         Battle.OnRoundEnd += OnRoundEnd;
     }
 
-    public virtual void OnStop(Battle battle)
+    public virtual void OnStopEffect(Battle battle)
     {
         Battle.OnRoundEnd -= OnRoundEnd;
     }
@@ -123,7 +114,7 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff
                 }
             }
         }
-        OnStart(battle);
+        OnStartEffect(battle);
     }
 
     public virtual void Consume()

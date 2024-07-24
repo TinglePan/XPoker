@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Game;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class CardEntry: BaseContentNode, ISelect
 {
@@ -191,11 +186,11 @@ public partial class CardEntry: BaseContentNode, ISelect
 	
 	protected void StartCard()
 	{
-		Card?.OnStart(Card.Battle);
+		Card?.OnStartEffect(Card.Battle);
 	}
 
 	protected void StopCard()
 	{
-		Card?.OnStop(Card.Battle);
+		Card?.OnStopEffect(Card.Battle);
 	}
 }

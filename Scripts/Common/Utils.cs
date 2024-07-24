@@ -2,14 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Common.Constants;
 
-using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
-
-namespace XCardGame.Scripts.Common;
+namespace XCardGame.Common;
 
 public static class Utils
 {
@@ -264,7 +260,7 @@ public static class Utils
         return 0;
     }
 
-    public static int[] GetCardBlackJackValue(Enums.CardRank rank)
+    public static int[] GetCardBlackJackValues(Enums.CardRank rank)
     {
         switch (rank)
         {
@@ -287,6 +283,34 @@ public static class Utils
                 return new[] { 10 };
             default:
                 return null;
+        }
+    }
+
+    public static int GetCardBlackJackValue(Enums.CardRank rank)
+    {
+        
+        switch (rank)
+        {
+            case Enums.CardRank.Ace:
+                return 11;
+            case Enums.CardRank.Two:
+            case Enums.CardRank.Three:
+            case Enums.CardRank.Four:
+            case Enums.CardRank.Five:
+            case Enums.CardRank.Six:
+            case Enums.CardRank.Seven:
+            case Enums.CardRank.Eight:
+            case Enums.CardRank.Nine:
+            case Enums.CardRank.Ten:
+                return GetCardRankValue(rank);
+            case Enums.CardRank.Jack:
+            case Enums.CardRank.Queen:
+            case Enums.CardRank.King:
+                return 10;
+            case Enums.CardRank.Joker:
+                return 20;
+            default:
+                return 0;
         }
     }
     

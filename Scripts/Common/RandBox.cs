@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Godot.Collections;
 
-namespace XCardGame.Scripts.Common;
+namespace XCardGame.Common;
 
 public class RandBox<TContent>
 {

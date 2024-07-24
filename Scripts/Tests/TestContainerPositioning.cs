@@ -1,17 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def.Card;
+﻿using Godot;
+using XCardGame.Common;
+using CardContainer = XCardGame.Ui.CardContainer;
+using CardNode = XCardGame.Ui.CardNode;
 
-using CardContainer = XCardGame.Scripts.Ui.CardContainer;
-using CardNode = XCardGame.Scripts.Ui.CardNode;
-
-namespace XCardGame.Scripts.Tests;
+namespace XCardGame.Tests;
 
 
 public partial class TestContainerPositioning: Node

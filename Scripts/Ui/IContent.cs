@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public interface IContent
 {

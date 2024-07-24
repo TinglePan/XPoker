@@ -1,24 +1,14 @@
 ﻿using System.Collections.Generic;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards.ItemCards;
+namespace XCardGame;
 
 public class CopyCard : BaseTokenCard<CopyCard, BaseTokenCardInputHandler<CopyCard>>
 {
     protected static ItemCardDef CreateDefFromCopiedCard(ItemCardDef def, BaseCard card)
     {
-        var res = new ItemCardDef()
-        {
-            Name = def.Name,
-            DescriptionTemplate = def.DescriptionTemplate,
-            ConcreteClassPath = def.ConcreteClassPath,
-            Rarity = def.Rarity,
-            IconPath = def.IconPath,
-            Cost = def.Cost,
-            RankChangePerUse = def.RankChangePerUse,
-        };
+        var res = def.Clone<ItemCardDef>();
         res.Rank = card.Def.Rank;
         res.Suit = card.Def.Suit;
         return res;

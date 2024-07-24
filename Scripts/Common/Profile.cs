@@ -2,7 +2,7 @@
 using System.Linq;
 using Godot;
 
-namespace XCardGame.Scripts.Common;
+namespace XCardGame.Common;
 
 public static class Profile
 {

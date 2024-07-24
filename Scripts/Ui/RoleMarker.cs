@@ -1,14 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
+using XCardGame.Common;
 
-using Battle = XCardGame.Scripts.Game.Battle;
-using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
-
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class RoleMarker: Node2D
 {

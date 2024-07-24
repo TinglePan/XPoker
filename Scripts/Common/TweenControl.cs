@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Common.DataBinding;
 
-namespace XCardGame.Scripts.Common;
+namespace XCardGame.Common;
 
 public class TweenControl
 {
@@ -109,18 +108,22 @@ public class TweenControl
             switch (conflictAction)
             {
                 case ConflictTweenAction.Interrupt:
+                    // GD.Print($"interrupt {oldTween}");
                     oldTween.Stop();
                     break;
                 case ConflictTweenAction.InterruptContinue:
+                    // GD.Print($"interrupt continue {oldTween} / {time - oldTween.GetTotalElapsedTime()}");
                     oldTween.Stop();
                     time = (float)Mathf.Max(0, time - oldTween.GetTotalElapsedTime());
                     break;
                 case ConflictTweenAction.FastForward:
+                    // GD.Print("fast forward");
                     oldTween.Pause();
                     oldTween.CustomStep(existingControlledTween.Time);
                     oldTween.Stop();
                     break;
                 case ConflictTweenAction.FastForwardContinue:
+                    // GD.Print("fast forward");
                     oldTween.Pause();
                     oldTween.CustomStep(existingControlledTween.Time);
                     oldTween.Stop();

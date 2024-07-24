@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Defs.Tables;
-using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public partial class SelectRewardUpgrade: Control
 {

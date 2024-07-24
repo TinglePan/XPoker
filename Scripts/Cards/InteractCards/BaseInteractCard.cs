@@ -1,12 +1,8 @@
 ﻿using Godot;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Game;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Cards.InteractCards;
+namespace XCardGame;
 
 public class BaseInteractCard: BaseCard, IInteractCard
 {
@@ -33,7 +29,7 @@ public class BaseInteractCard: BaseCard, IInteractCard
         
     }
     
-    public override void OnStart(Battle battle)
+    public override void OnStartEffect(Battle battle)
     {
         if (IsFunctioning() && !AlreadyFunctioning)
         {
@@ -41,7 +37,7 @@ public class BaseInteractCard: BaseCard, IInteractCard
         }
     }
 
-    public override void OnStop(Battle battle)
+    public override void OnStopEffect(Battle battle)
     {
         if (AlreadyFunctioning)
         {
@@ -59,7 +55,7 @@ public class BaseInteractCard: BaseCard, IInteractCard
         Rank.Value = resultRank;
         if (resultRankValue <= 0)
         {
-            await GameMgr.AwaitAndDisableInput(Battle.Dealer.AnimateDiscard(cardNode));
+            await GameMgr.AwaitAndDisableInput(cardNode.AnimateLeaveBattle());
         }
     }
 }

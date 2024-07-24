@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using XCardGame.Scripts.Common.Constants;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Defs.Tables;
+namespace XCardGame;
 
 public static class HandPowerTables
 {

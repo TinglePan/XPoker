@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Game;
 
-using XCardGame.Scripts.HandEvaluate;
-
-using Battle = XCardGame.Scripts.Game.Battle;
-using BuffNode = XCardGame.Scripts.Ui.BuffNode;
-
-namespace XCardGame.Scripts.Effects;
+namespace XCardGame;
 
 public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
 {
@@ -52,11 +42,11 @@ public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
         return DescriptionTemplate;
     }
 
-    public virtual void OnStart(Battle battle)
+    public virtual void OnStartEffect(Battle battle)
     {
     }
 
-    public virtual void OnStop(Battle battle)
+    public virtual void OnStopEffect(Battle battle)
     {
     }
 

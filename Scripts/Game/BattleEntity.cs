@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Buffs;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.InteractCards.ItemCards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Defs.Def.BattleEntity;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public partial class BattleEntity: Node
 {
@@ -168,7 +161,7 @@ public partial class BattleEntity: Node
             var tasks = new List<Task>();
             foreach (var node in nodes)
             {
-                tasks.Add(Battle.Dealer.AnimateDiscard((CardNode)node));
+                tasks.Add(((CardNode)node).AnimateLeaveBattle());
                 await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
             }
             await Task.WhenAll(tasks);

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Godot;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class SplitCardContainer: Node2D
 {
@@ -68,7 +67,8 @@ public partial class SplitCardContainer: Node2D
         for (int i = 0; i < CardContainers.Count; i++)
         {
             var childContainerPivotOffset = GetPivotOffsetOfContainer(i);
-            CardContainers[i].Position = childContainerPivotOffset - pivotOffset;
+            var position = childContainerPivotOffset - pivotOffset;
+            CardContainers[i].AnimateTransform(position, 0, Configuration.AnimateCardTransformInterval);
         }
     }
 

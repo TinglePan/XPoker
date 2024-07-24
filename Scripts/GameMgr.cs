@@ -1,25 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def.BattleEntity;
-using XCardGame.Scripts.Game;
-using XCardGame.Scripts.InputHandling;
-using XCardGame.Scripts.Ui;
-using Battle = XCardGame.Scripts.Game.Battle;
-using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
-using BattleScene = XCardGame.Scripts.Ui.BattleScene;
-using PlayerBattleEntity = XCardGame.Scripts.Game.PlayerBattleEntity;
+using XCardGame.Common;
+using BattleScene = XCardGame.Ui.BattleScene;
 
-namespace XCardGame.Scripts;
+namespace XCardGame;
 
 public partial class GameMgr : Node
 {

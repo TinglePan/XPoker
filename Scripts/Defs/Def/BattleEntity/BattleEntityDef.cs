@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def.Card;
+﻿using System;
+using System.Collections.Generic;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Defs.Def.BattleEntity;
+namespace XCardGame;
 
-public class BattleEntityDef
+[Serializable]
+public class BattleEntityDef: BaseDef
 {
     public string Name;
     public string PortraitPath;

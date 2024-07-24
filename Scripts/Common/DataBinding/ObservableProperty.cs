@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace XCardGame.Scripts.Common.DataBinding;
+namespace XCardGame.Common;
 
 public class ObservableProperty<T>: IObservableProperty<T>
 {

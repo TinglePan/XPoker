@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
+namespace XCardGame;
 
 public class NPlusMRule: NOfAKindRule
 {

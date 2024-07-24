@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.InteractCards.RuleCards;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Game;
+﻿using System.Collections.Generic;
+using XCardGame.Common;
 
-
-namespace XCardGame.Scripts.Defs;
+namespace XCardGame;
 
 public static class DeckDefs
 {

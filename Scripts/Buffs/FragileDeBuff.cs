@@ -1,6 +1,6 @@
-﻿using XCardGame.Scripts.Common.Constants;
+﻿using XCardGame.Common;
 
-namespace XCardGame.Scripts.Buffs;
+namespace XCardGame;
 
 public class FragileDeBuff: BaseBuff
 {

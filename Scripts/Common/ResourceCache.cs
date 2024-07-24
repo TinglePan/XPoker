@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Godot;
 
-namespace XCardGame.Scripts.Common;
+namespace XCardGame.Common;
 
 public class ResourceCache
 {

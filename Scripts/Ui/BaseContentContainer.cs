@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
+using XCardGame.Common;
 using Vector2 = Godot.Vector2;
 using Vector4 = Godot.Vector4;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public abstract partial class BaseContentContainer: Node2D
 {
@@ -69,6 +69,8 @@ public abstract partial class BaseContentContainer: Node2D
     
     public ObservableCollection<IContent> Contents;
     public ObservableCollection<BaseContentNode> ContentNodes;
+
+    protected TweenControl TweenControl;
     protected bool SuppressNotifications;
     
     public override void _Ready()
@@ -84,6 +86,7 @@ public abstract partial class BaseContentContainer: Node2D
         HasBorder = false;
         HasName = false;
         SuppressNotifications = false;
+        TweenControl = new TweenControl(this);
     }
 
     public virtual void Setup(object o)
@@ -182,6 +185,38 @@ public abstract partial class BaseContentContainer: Node2D
         return pivotOffsetFromBottomLeft;
     }
 
+    public async void AnimateTransform(Vector2 position, float rotationDegrees, float animationTime,
+        int priority = 0, Action callback = null,
+        TweenControl.ConflictTweenAction conflictTweenAction = TweenControl.ConflictTweenAction.Interrupt)
+    {
+        var tasks = new List<Task>();
+        if (position != Position || TweenControl.IsRunning("position"))
+        {
+            var controlledTween = TweenControl.CreateTween("position", animationTime, priority, callback, conflictTweenAction);
+            if (controlledTween != null)
+            {
+                var tween = controlledTween.Tween.Value;
+                // tween.SetParallel();
+                // GD.Print($"Animate transform tween time: {controlledTween.Time}");
+                tween.TweenProperty(this, "position", position, controlledTween.Time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+                // tween.TweenProperty(this, "rotation_degrees", rotationDegrees, animationTime).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+                tasks.Add(TweenControl.WaitComplete("position"));
+                callback = null;
+            }
+        }
+        if (Math.Abs(RotationDegrees - rotationDegrees) > 0.1f || TweenControl.IsRunning("rotation"))
+        {
+            var controlledTween = TweenControl.CreateTween("rotation", animationTime, priority, callback, conflictTweenAction);
+            if (controlledTween != null)
+            {
+                var tween = controlledTween.Tween.Value;
+                tween.TweenProperty(this, "rotation_degrees", rotationDegrees, controlledTween.Time).SetTrans(Tween.TransitionType.Linear).SetEase(Tween.EaseType.Out);
+                tasks.Add(TweenControl.WaitComplete("rotation"));
+            }
+        }
+        await Task.WhenAll(tasks);
+    }
+
     protected int EffectiveNodeCount()
     {
         if (HasBorder && MinContentNodeCountForBorder > 0)
@@ -219,7 +254,7 @@ public abstract partial class BaseContentContainer: Node2D
 
     protected virtual void OnV2MAddNodes(int startingIndex, IList nodes)
     {
-        GD.Print($"On V2M Add Nodes {this}");
+        // GD.Print($"On V2M Add Nodes {this}");
         SuppressNotifications = true;
         var index = startingIndex;
         foreach (var node in nodes)
@@ -249,7 +284,7 @@ public abstract partial class BaseContentContainer: Node2D
 
     protected virtual void OnV2MRemoveNodes(int startingIndex, IList nodes)
     {
-        GD.Print($"On V2M Remove Nodes {this}");
+        // GD.Print($"On V2M Remove Nodes {this}");
         SuppressNotifications = true;
         var index = startingIndex;
         foreach (var node in nodes)
@@ -394,7 +429,7 @@ public abstract partial class BaseContentContainer: Node2D
 
     protected void AdjustLayout()
     {
-        GD.Print("Adjust layout");
+        // GD.Print("Adjust layout");
         for (int i = 0; i < ContentNodes.Count; i++)
         {
             AdjustContentNode(i, true);
@@ -407,7 +442,7 @@ public abstract partial class BaseContentContainer: Node2D
     protected async void AdjustContentNode(int index, bool useTween)
     {
         var node = ContentNodes[index];
-        GD.Print($"Adjust content node {index} {node}");
+        // GD.Print($"Adjust content node {index} {node}");
         var position = CalculateContentNodePosition(index, true);
         var rotation = CalculateContentNodeRotation(index);
         if (useTween)

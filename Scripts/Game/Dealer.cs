@@ -2,16 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.InteractCards;
-using XCardGame.Scripts.Cards.InteractCards.ItemCards;
-using XCardGame.Scripts.Cards.InteractCards.RuleCards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public partial class Dealer: Node2D
 {
@@ -187,68 +181,62 @@ public partial class Dealer: Node2D
         targetContainer.ContentNodes.Add(cardNode);
         await cardNode.TweenControl.WaitTransformComplete();
         var shouldReDeal = false;
-        var tasks = new List<Task>();
         if (collectItem && targetContainer.ShouldCollectDealtItemAndRuleCards)
         {
             if (cardNode.Content.Value is BaseRuleCard)
             {
                 shouldReDeal = true;
-                tasks.Add(targetContainer.MoveCardNodeToContainer(cardNode, Battle.RuleCardContainer));
+                await targetContainer.MoveCardNodeToContainer(cardNode, Battle.RuleCardContainer);
             } else if (cardNode.Content.Value is BaseItemCard)
             {
                 shouldReDeal = true;
-                tasks.Add(targetContainer.MoveCardNodeToContainer(cardNode, Battle.ItemCardContainer));
+                await targetContainer.MoveCardNodeToContainer(cardNode, Battle.ItemCardContainer);
             }
         }
         if (shouldReDeal)
         {
-            tasks.Add(DealCardIntoContainer(targetContainer, collectItem));
+            await DealCardIntoContainer(targetContainer, collectItem);
         }
-        await Task.WhenAll(tasks);
     }
 
     public async Task DealCardAndReplace(CardNode node, bool collectItem = true)
     {
         var cardNode = await AnimateDrawCard();
-        var tasks = new List<Task>();
         if (node.CurrentContainer.Value != null)
         {
             var cardContainer = (CardContainer)node.CurrentContainer.Value; 
             var index = cardContainer.ContentNodes.IndexOf(node);
-            tasks.Add(AnimateDiscard(node));
+            await node.AnimateLeaveBattle();
             cardContainer.ContentNodes.Insert(index, cardNode);
-            tasks.Add(cardNode.TweenControl.WaitTransformComplete());
+            await cardNode.TweenControl.WaitTransformComplete();
             var card = (BaseCard)cardNode.Content.Value;
             card?.OnDealt?.Invoke(card);
-            await Task.WhenAll(tasks);
-            tasks.Clear();
             var shouldReDeal = false;
             if (collectItem && cardContainer.ShouldCollectDealtItemAndRuleCards)
             {
                 if (cardNode.Content.Value is BaseRuleCard)
                 {
                     shouldReDeal = true;
-                    tasks.Add(cardContainer.MoveCardNodeToContainer(cardNode, Battle.RuleCardContainer));
+                    await cardContainer.MoveCardNodeToContainer(cardNode, Battle.RuleCardContainer);
                 } else if (cardNode.Content.Value is BaseItemCard)
                 {
                     shouldReDeal = true;
-                    tasks.Add(cardContainer.MoveCardNodeToContainer(cardNode, Battle.ItemCardContainer));
+                    await cardContainer.MoveCardNodeToContainer(cardNode, Battle.ItemCardContainer);
                 }
             }
             if (shouldReDeal)
             {
-                tasks.Add(DealCardIntoContainer(cardContainer, collectItem));
+                await DealCardIntoContainer(cardContainer, collectItem);
             }
-            await Task.WhenAll(tasks);
         }
         else
         {
             var parent = node.GetParent();
-            tasks.Add(AnimateDiscard(node));
+            await node.AnimateLeaveBattle();
             cardNode.Reparent(parent);
-            tasks.Add(cardNode.AnimateTransform(node.Position, node.RotationDegrees, Configuration.AnimateCardTransformInterval,
-                conflictTweenAction:TweenControl.ConflictTweenAction.InterruptContinue));
-            await Task.WhenAll(tasks);
+            await cardNode.AnimateTransform(node.Position, node.RotationDegrees, 
+                Configuration.AnimateCardTransformInterval,
+                conflictTweenAction:TweenControl.ConflictTweenAction.InterruptContinue);
         }
         
     }
@@ -264,7 +252,7 @@ public partial class Dealer: Node2D
 
     public async Task AnimateDiscard(CardNode node)
     {
-        GD.Print($"animate discard {node}, time:  {Time.GetTicksMsec()}");
+        // GD.Print($"animate discard {node}, time:  {Time.GetTicksMsec()}");
         if (node.CurrentContainer != null)
         {
             node.CurrentContainer.Value.ContentNodes.Remove(node);

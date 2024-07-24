@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Game;
-using XCardGame.Scripts.HandEvaluate;
-
-namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
+﻿namespace XCardGame;
 
 public class BaseAgainstEntityEffect: BaseEffect
 {

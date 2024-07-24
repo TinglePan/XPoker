@@ -1,4 +1,4 @@
-﻿namespace XCardGame.Scripts.Buffs;
+﻿namespace XCardGame;
 
 public class InvincibleBuff: BaseBuff
 {

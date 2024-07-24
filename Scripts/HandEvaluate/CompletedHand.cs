@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using XCardGame.Scripts.Cards;
+using XCardGame.Common;
 
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
-
-namespace XCardGame.Scripts.HandEvaluate;
+namespace XCardGame;
 
 public class CompletedHand: IComparable<CompletedHand>
 {

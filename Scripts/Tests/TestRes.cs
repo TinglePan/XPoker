@@ -1,7 +1,7 @@
 using Godot;
 using Godot.Collections;
 
-namespace XCardGame.Scripts.Tests;
+namespace XCardGame.Tests;
 
 [GlobalClass]
 public partial class TestRes : Resource

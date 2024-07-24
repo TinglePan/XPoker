@@ -1,13 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Godot;
-using XCardGame.Scripts.Buffs;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Game;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class BuffContainer: BaseContentContainer
 { 

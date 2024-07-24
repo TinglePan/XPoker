@@ -1,7 +1,6 @@
-﻿using XCardGame.Scripts.Buffs;
-using XCardGame.Scripts.Common;
+﻿using XCardGame.Common;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public class Attack
 {

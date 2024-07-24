@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using Godot;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.DataBinding;
+﻿using Godot;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class IconWithTextFallback: Node2D
 {

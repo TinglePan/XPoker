@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public interface ISelect
 {

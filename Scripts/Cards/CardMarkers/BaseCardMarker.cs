@@ -1,9 +1,4 @@
-﻿using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Game;
-
-using Battle = XCardGame.Scripts.Game.Battle;
-
-namespace XCardGame.Scripts.Cards.CardMarkers;
+﻿namespace XCardGame;
 
 public class BaseCardMarker: ILifeCycleTriggeredInBattle
 {
@@ -21,12 +16,12 @@ public class BaseCardMarker: ILifeCycleTriggeredInBattle
         Battle = card.Battle;
     }
 
-    public virtual void OnStart(Battle battle)
+    public virtual void OnStartEffect(Battle battle)
     {
         
     }
 
-    public virtual void OnStop(Battle battle)
+    public virtual void OnStopEffect(Battle battle)
     {
         
     }

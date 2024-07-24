@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using XCardGame.Scripts.Buffs;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Game;
+﻿using XCardGame.Common;
 
-namespace XCardGame.Scripts.Effects.AgainstEntityEffects;
+namespace XCardGame;
 
 public class BuffAgainstEntityEffect: BaseAgainstEntityEffect
 {

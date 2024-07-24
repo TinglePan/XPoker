@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using XCardGame.Scripts.Cards;
+using XCardGame.Common;
+using Utils = XCardGame.Common.Utils;
 
-using XCardGame.Scripts.Common.Constants;
-using Utils = XCardGame.Scripts.Common.Utils;
-
-namespace XCardGame.Scripts.HandEvaluate.HandEvaluateRules;
+namespace XCardGame;
 
 public class NOfAKindRule: BaseHandEvaluateRule
 {

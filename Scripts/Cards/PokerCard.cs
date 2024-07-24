@@ -1,17 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using XCardGame.Scripts.Cards.CardMarkers;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Game;
+using XCardGame.Common;
 
-using Battle = XCardGame.Scripts.Game.Battle;
-
-namespace XCardGame.Scripts.Cards;
+namespace XCardGame;
 
 public class PokerCard: BaseCard
 {
@@ -30,18 +19,18 @@ public class PokerCard: BaseCard
 		Suit.DetailedValueChanged += OnSuitChanged;
 	}
 
-	public override void OnStart(Battle battle)
+	public override void OnStartEffect(Battle battle)
 	{
-		base.OnStart(battle);
+		base.OnStartEffect(battle);
 		if (IsFunctioning() && !AlreadyFunctioning)
 		{
 			AlreadyFunctioning = true;
 		}
 	}
 	
-	public override void OnStop(Battle battle)
+	public override void OnStopEffect(Battle battle)
 	{
-		base.OnStop(battle);
+		base.OnStopEffect(battle);
 		if (AlreadyFunctioning)
 		{
 			AlreadyFunctioning = false;

@@ -4,20 +4,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Buffs;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.InteractCards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Effects;
-using XCardGame.Scripts.HandEvaluate;
-using XCardGame.Scripts.Ui;
+using XCardGame.Common;
+using XCardGame.Ui;
+
 // using Godot.Collections;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public partial class Battle: Node2D
 {
@@ -257,9 +249,9 @@ public partial class Battle: Node2D
             var tasks = new List<Task>();
             foreach (var cardNode in cardNodes)
             {
-                tasks.Add(Dealer.AnimateDiscard(cardNode));
+                tasks.Add(cardNode.AnimateLeaveBattle());
                 await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
-                GD.Print($"time: {Time.GetTicksMsec()}");
+                // GD.Print($"time: {Time.GetTicksMsec()}");
             }
             await Task.WhenAll(tasks);
         }
@@ -285,7 +277,7 @@ public partial class Battle: Node2D
             var tasks = new List<Task>();
             foreach (var cardNode in cardNodes)
             {
-                tasks.Add(Dealer.AnimateDiscard(cardNode));
+                tasks.Add(cardNode.AnimateLeaveBattle());
                 await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
             }
             await Task.WhenAll(tasks);
@@ -407,7 +399,7 @@ public partial class Battle: Node2D
         if (!Effects.Contains(effect))
         {
             Effects.Add(effect);
-            effect.OnStart(this);
+            effect.OnStartEffect(this);
         }
     }
 
@@ -415,7 +407,7 @@ public partial class Battle: Node2D
     {
         if (Effects.Contains(effect))
         {
-            effect.OnStop(this);
+            effect.OnStopEffect(this);
             Effects.Remove(effect);
         }
     }
@@ -528,7 +520,7 @@ public partial class Battle: Node2D
     {
         if (ItemCardContainer.ContentNodes.Count > Player.ItemPocketSize.Value)
         {
-            await GameMgr.AwaitAndDisableInput(Dealer.AnimateDiscard((CardNode)ItemCardContainer.ContentNodes[0]));
+            await GameMgr.AwaitAndDisableInput(((CardNode)ItemCardContainer.ContentNodes[0]).AnimateLeaveBattle());
         }
     }
 }

@@ -1,8 +1,6 @@
-using System.Text;
-using System.Threading.Tasks;
 using Godot;
 
-namespace XCardGame.Scripts.Tests;
+namespace XCardGame.Tests;
 
 public partial class TestFreedAwait : Node2D
 {

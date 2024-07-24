@@ -1,4 +1,4 @@
-﻿namespace XCardGame.Scripts.Cards.CardMarkers;
+﻿namespace XCardGame;
 
 public class DamageModifierMarker: BaseCardMarker
 {

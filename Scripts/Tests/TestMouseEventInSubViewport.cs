@@ -1,12 +1,8 @@
-using System.Collections.Generic;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Defs.Def.Card;
+using XCardGame.Common;
+using CardNode = XCardGame.Ui.CardNode;
 
-using CardNode = XCardGame.Scripts.Ui.CardNode;
-
-namespace XCardGame.Scripts.Tests;
+namespace XCardGame.Tests;
 
 public partial class TestMouseEventInSubViewport : Control
 {
@@ -25,6 +21,6 @@ public partial class TestMouseEventInSubViewport : Control
 			FaceDirection = Enums.CardFace.Up,
 			HasPhysics = true,
 		});
-		GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");
+		// GD.Print($"Animate flip called {CardNode.FaceDirection.Value}");
 	}
 }

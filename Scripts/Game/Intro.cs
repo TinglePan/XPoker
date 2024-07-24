@@ -1,7 +1,7 @@
 ﻿using Godot;
-using XCardGame.Scripts.Common;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Game;
+namespace XCardGame;
 
 public partial class Intro: Node
 {

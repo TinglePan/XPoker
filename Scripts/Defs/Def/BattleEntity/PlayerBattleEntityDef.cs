@@ -1,5 +1,8 @@
-﻿namespace XCardGame.Scripts.Defs.Def.BattleEntity;
+﻿using System;
 
+namespace XCardGame;
+
+[Serializable]
 public class PlayerBattleEntityDef: BattleEntityDef
 {
     public int InitEnergy;

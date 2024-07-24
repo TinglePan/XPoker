@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 
-namespace XCardGame.Scripts.InputHandling;
+namespace XCardGame;
 
 public class BaseInputHandler: IHandleInput
 {

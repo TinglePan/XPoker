@@ -1,6 +1,6 @@
 ﻿using Godot;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class IconNode: BaseContentNode
 {

@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using XCardGame.Scripts.Common.Constants;
+﻿using CardNode = XCardGame.Ui.CardNode;
 
-using CardNode = XCardGame.Scripts.Ui.CardNode;
-
-namespace XCardGame.Scripts.Cards;
+namespace XCardGame;
 
 public interface IInteractCard
 {

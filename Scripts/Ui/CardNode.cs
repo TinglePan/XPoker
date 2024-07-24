@@ -2,14 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Cards.InteractCards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Game;
+using XCardGame.Common;
 
-namespace XCardGame.Scripts.Ui;
+namespace XCardGame.Ui;
 
 public partial class CardNode: BaseContentNode, ISelect
 {
@@ -67,6 +62,14 @@ public partial class CardNode: BaseContentNode, ISelect
 		IsTapped.DetailedValueChanged += OnToggleIsTapped;
 		InitPosition = Position;
 	}
+	
+	// public override void _Process(double delta)
+	// {
+	// 	if (TweenControl.IsRunning("position") && CurrentContainer.Value == Battle.CommunityCardContainer)
+	// 	{
+	// 		GD.Print($"{this} position is {Position}");
+	// 	}
+	// }
 
 	public override void Setup(object o)
     {
@@ -155,7 +158,7 @@ public partial class CardNode: BaseContentNode, ISelect
 
 	public async Task AnimateSelect(bool to, float time)
 	{
-		GD.Print($"Animate Select {this} to {to}");
+		// GD.Print($"Animate Select {this} to {to}");
 		IsSelected = to;
 		await AnimateLift(to, time);
 		if (IsSelected)
@@ -188,6 +191,39 @@ public partial class CardNode: BaseContentNode, ISelect
 	public void OnFlipAnimationToggleCardFace()
 	{
 		FaceDirection.Value = FaceDirection.Value == Enums.CardFace.Down ? Enums.CardFace.Up : Enums.CardFace.Down;
+	}
+
+	public async Task AnimateLeaveBattle()
+	{
+		if (Card.Def is InteractCardDef { IsExhaust: true })
+		{
+			await AnimateExhaust(Configuration.ExhaustAnimationTime);
+		}
+		else
+		{
+			await Battle.Dealer.AnimateDiscard(this);
+		}
+	}
+
+	public async Task AnimateExhaust(float time)
+	{
+		GD.Print("Animate exhaust");
+		var controlledTween = TweenControl.CreateTween("modulate", time);
+		if (controlledTween != null)
+		{
+			var tween = controlledTween.Tween.Value;
+			tween.TweenProperty(this, "modulate:a", 0f, controlledTween.Time);
+			await TweenControl.WaitComplete("modulate");
+			if (CurrentContainer != null)
+			{
+				CurrentContainer.Value.ContentNodes.Remove(this);
+			}
+			QueueFree();
+		}
+		else
+		{
+			GD.Print("Animate negate did not preempt");
+		}
 	}
 
 	public async Task AnimateTap(bool to, float time)
@@ -341,7 +377,7 @@ public partial class CardNode: BaseContentNode, ISelect
 		MainIcon.ResetIconPath(null);
 		if (!OnlyDisplay)
 		{
-			card.OnStop(card.Battle);
+			card.OnStopEffect(card.Battle);
 		}
 	}
 
@@ -395,21 +431,21 @@ public partial class CardNode: BaseContentNode, ISelect
 	{
 		if (args.NewValue)
 		{
-			Modulate = new Color(Modulate.R, Modulate.G, Modulate.B, 0);
+			Back.Modulate = new Color(Back.Modulate.R, Back.Modulate.G, Back.Modulate.B, 0);
 		}
 		else
 		{
-			Modulate = new Color(Modulate.R, Modulate.G, Modulate.B, 1);
+			Back.Modulate = new Color(Back.Modulate.R, Back.Modulate.G, Back.Modulate.B, 1);
 		}
 	}
 
 	protected void StartCard()
 	{
-		Card?.OnStart(Card.Battle);
+		Card?.OnStartEffect(Card.Battle);
 	}
 
 	protected void StopCard()
 	{
-		Card?.OnStop(Card.Battle);
+		Card?.OnStopEffect(Card.Battle);
 	}
 }

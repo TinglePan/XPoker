@@ -1,21 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Godot;
-using XCardGame.Scripts.Cards.InteractCards.RuleCards;
-using XCardGame.Scripts.Common;
-using XCardGame.Scripts.Common.Constants;
-using XCardGame.Scripts.Common.DataBinding;
-using XCardGame.Scripts.Defs;
-using XCardGame.Scripts.Defs.Def.Card;
-using XCardGame.Scripts.Effects;
-using XCardGame.Scripts.Effects.AgainstEntityEffects;
-using XCardGame.Scripts.Game;
-using XCardGame.Scripts.Ui;
-using Battle = XCardGame.Scripts.Game.Battle;
-using BattleEntity = XCardGame.Scripts.Game.BattleEntity;
-using CardNode = XCardGame.Scripts.Ui.CardNode;
+using XCardGame.Common;
+using XCardGame.Ui;
+using CardNode = XCardGame.Ui.CardNode;
 
-namespace XCardGame.Scripts.Cards;
+namespace XCardGame;
 
 public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCard>
 {
@@ -61,7 +50,7 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
         Rank = new ObservableProperty<Enums.CardRank>(nameof(Rank), this, def.Rank);
         IsNegated = new ObservableProperty<bool>(nameof(IsNegated), this, false);
         IsNegated.DetailedValueChanged += OnToggleIsNegated;
-        OnDiscard += ResetCard;
+        OnDiscard += OnDiscardHandler;
     }
 
     public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode
@@ -135,12 +124,12 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
         return Def.DescriptionTemplate;
     }
 
-    public virtual void OnStart(Battle battle)
+    public virtual void OnStartEffect(Battle battle)
     {
         
     }
 
-    public virtual void OnStop(Battle battle)
+    public virtual void OnStopEffect(Battle battle)
     {
         
     }
@@ -152,7 +141,7 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
         if (entity.RoundRole.Value == Enums.EngageRole.Attacker)
         {
             effect = new AttackAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
-                Utils.GetCardRankValue(Rank.Value), 1);
+                Utils.GetCardBlackJackValue(Rank.Value), 1);
             foreach (var ruleCard in battle.RuleCardContainer.Cards)
             {
                 if (ruleCard is SpadesRuleCard)
@@ -167,7 +156,7 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
         else if (entity.RoundRole.Value == Enums.EngageRole.Defender)
         {
             effect = new DefendAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
-                Utils.GetCardRankValue(Rank.Value), 1);
+                Utils.GetCardBlackJackValue(Rank.Value), 1);
             foreach (var ruleCard in battle.RuleCardContainer.Cards)
             {
                 if (ruleCard is HeartsRuleCard)
@@ -203,7 +192,7 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
         }
     }
 
-    public virtual void ResetCard(BaseCard card)
+    public virtual void OnDiscardHandler(BaseCard card)
     {
         Rank.Value = Def.Rank;
         Suit.Value = Def.Suit;
@@ -214,11 +203,11 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
     {
         if (args.NewValue)
         {
-            OnStop(Battle);
+            OnStopEffect(Battle);
         }
         else
         {
-            OnStart(Battle);
+            OnStartEffect(Battle);
         }
     }
 

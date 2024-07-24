@@ -2,13 +2,11 @@
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Godot;
-using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Ui;
-using Battle = XCardGame.Scripts.Game.Battle;
-using CardContainer = XCardGame.Scripts.Ui.CardContainer;
-using CardNode = XCardGame.Scripts.Ui.CardNode;
+using XCardGame.Ui;
+using CardContainer = XCardGame.Ui.CardContainer;
+using CardNode = XCardGame.Ui.CardNode;
 
-namespace XCardGame.Scripts.InputHandling;
+namespace XCardGame;
 
 public class BattleMainInputHandler: BaseInputHandler
 {

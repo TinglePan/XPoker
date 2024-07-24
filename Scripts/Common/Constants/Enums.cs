@@ -1,4 +1,4 @@
-﻿namespace XCardGame.Scripts.Common.Constants;
+﻿namespace XCardGame.Common;
 
 public static class Enums
 {

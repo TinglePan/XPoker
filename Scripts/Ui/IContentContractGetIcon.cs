@@ -1,6 +1,4 @@
-﻿using Godot;
-
-namespace XCardGame.Scripts.Ui;
+﻿namespace XCardGame.Ui;
 
 public interface IContentContractGetIcon<out TIcon>: IContent
 {

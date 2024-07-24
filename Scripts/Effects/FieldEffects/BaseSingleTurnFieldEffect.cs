@@ -1,7 +1,4 @@
-﻿using XCardGame.Scripts.Cards;
-using XCardGame.Scripts.Game;
-
-namespace XCardGame.Scripts.Effects.FieldEffects;
+﻿namespace XCardGame;
 
 public class BaseSingleTurnFieldEffect: BaseFieldEffect
 {
@@ -10,15 +7,15 @@ public class BaseSingleTurnFieldEffect: BaseFieldEffect
     {
     }
 
-    public override void OnStart(Battle battle)
+    public override void OnStartEffect(Battle battle)
     {
-        base.OnStart(battle);
+        base.OnStartEffect(battle);
         battle.OnRoundEnd += OnRoundEnd;
     }
 
-    public override void OnStop(Battle battle)
+    public override void OnStopEffect(Battle battle)
     {
-        base.OnStop(battle);
+        base.OnStopEffect(battle);
         battle.OnRoundEnd -= OnRoundEnd;
     }
 

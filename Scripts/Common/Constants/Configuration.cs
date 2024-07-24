@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using Godot;
+﻿using Godot;
 
-namespace XCardGame.Scripts.Common.Constants;
+namespace XCardGame.Common;
 
 public static class Configuration
 {
@@ -17,6 +15,7 @@ public static class Configuration
     public static readonly Vector2 SelectedCardOffset = new Vector2(0, -24);
     
     public static readonly float RevealTweenTime = 1f;
+    public static readonly float ExhaustAnimationTime = .5f;
     public static readonly float RevealDuration = 2f;
     public static readonly float FlipTweenTime = 0.5f;
     public static readonly float TapTweenTime = 0.5f;
@@ -29,7 +28,7 @@ public static class Configuration
     public static readonly int SplitCardContainerSeparation = 24;
     public static readonly int ShockDecreaseDamageDealtMultiplierPerStack = -10;
     public static readonly int ShockIncreaseDamageReceivedMultiplierPerStack = 10;
-    public static readonly float AnimateCardTransformInterval = .1f;
+    public static readonly float AnimateCardTransformInterval = 0.1f;
     public static readonly float ContentContainerAdjustTweenTime = 0.2f;
     public static readonly float DelayBetweenResolveSteps = 0.5f;
     public static readonly float LogInterval = 0.5f;

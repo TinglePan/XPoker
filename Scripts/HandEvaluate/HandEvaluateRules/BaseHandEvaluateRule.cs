@@ -38,8 +38,7 @@ public class BaseHandEvaluateRule
     
     protected virtual List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
-        var res = new List<List<BaseCard>>();
-        return res;
+        return null;
     }
     
     protected virtual List<BaseCard> GetPrimaryComparerCards(List<BaseCard> pick, List<BaseCard> cards)

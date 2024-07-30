@@ -17,9 +17,10 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Six,
         
+        ExcludeFromRewards = true,
         IsInnate = true,
         Cost = 1,
-        RankChangePerUse = -2,
+        RankChangePerUse = -1,
     };
 
     public static ItemCardDef LesserD6 = new()
@@ -30,8 +31,9 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/d6.png",
         BasePrice = 0,
         Rarity = 1,
-        Rank = Enums.CardRank.Ace,
+        Rank = Enums.CardRank.Six,
 
+        ExcludeFromRewards = true,
         Cost = 1,
         RankChangePerUse = -99,
     };
@@ -44,8 +46,9 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/magical_hat.png",
         BasePrice = 5,
         Rarity = 1,
-        Rank = Enums.CardRank.Three,
+        Rank = Enums.CardRank.Four,
         
+        ExcludeFromRewards = true,
         IsInnate = true,
         Cost = 1,
         RankChangePerUse = -1,
@@ -61,6 +64,7 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Ace,
         
+        ExcludeFromRewards = true,
         Cost = 1,
         RankChangePerUse = -99,
     };
@@ -73,8 +77,9 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/balatroll_hand.png",
         BasePrice = 5,
         Rarity = 1,
-        Rank = Enums.CardRank.Three,
+        Rank = Enums.CardRank.Four,
         
+        ExcludeFromRewards = true,
         IsInnate = true,
         Cost = 1,
         RankChangePerUse = -1,
@@ -90,6 +95,7 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Ace,
 
+        ExcludeFromRewards = true,
         Cost = 1,
         RankChangePerUse = -99,
     };
@@ -105,6 +111,7 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Three,
         
+        ExcludeFromRewards = true,
         IsInnate = true,
         Cost = 1,
         RankChangePerUse = -1,
@@ -122,6 +129,7 @@ public static class CardDefs
         Rarity = 1,
         Rank = Enums.CardRank.Ace,
         
+        ExcludeFromRewards = true,
         Cost = 1,
         RankChangePerUse = -99,
     };
@@ -135,22 +143,10 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/copy.png",
         Rarity = 1,
 
+        ExcludeFromRewards = true,
         IsExhaust = true,
         Cost = 1,
         RankChangePerUse = 0,
-    };
-    
-    public static ItemCardDef BigShield = new ()
-    {
-        Name = Utils._("Big shield"),
-        ConcreteClassPath = "BigShieldCard",
-        DescriptionTemplate = Utils._("Increase defend value while decrease attack value"),
-        IconPath = "res://Sprites/Cards/big_shield.png",
-        BasePrice = 5,
-        Rarity = 1,
-        
-        Cost = 1,
-        RankChangePerUse = -99,
     };
     
     public static ItemCardDef GoldenEye = new ()

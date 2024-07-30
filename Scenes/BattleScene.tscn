@@ -1,10 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://nko5a5mn6ufg"]
+[gd_scene load_steps=7 format=3 uid="uid://nko5a5mn6ufg"]
 
 [ext_resource type="Script" path="res://Scripts/Ui/BattleScene.cs" id="1_54v76"]
 [ext_resource type="PackedScene" uid="uid://cmlbufighcu1t" path="res://Scenes/Battle.tscn" id="2_b2wp5"]
 [ext_resource type="PackedScene" uid="uid://cu8cytigbn45" path="res://Scenes/DialogueBox.tscn" id="2_drmk1"]
 [ext_resource type="PackedScene" uid="uid://std0bcv2y0bf" path="res://Scenes/BattleLog.tscn" id="2_x6k3h"]
-[ext_resource type="Theme" uid="uid://dwpbfhy3isgh5" path="res://Resources/button_theme.tres" id="4_lascm"]
 [ext_resource type="Script" path="res://Scripts/Common/DebugProxy.cs" id="5_hv0ab"]
 
 [sub_resource type="Theme" id="Theme_rrsrm"]
@@ -66,23 +65,20 @@ texture_filter = 1
 
 [node name="Battle" parent="BattleUi/SubViewportContainer/SubViewport" instance=ExtResource("2_b2wp5")]
 
-[node name="ProceedButton" type="Button" parent="BattleUi"]
-texture_filter = 1
+[node name="Buttons" type="Control" parent="BattleUi"]
+custom_minimum_size = Vector2(300, 44)
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -408.0
+offset_left = -514.0
 offset_top = -180.0
-offset_right = -316.0
+offset_right = -314.0
 offset_bottom = -136.0
 grow_horizontal = 0
 grow_vertical = 0
-theme = ExtResource("4_lascm")
-theme_type_variation = &"FlatButton"
-text = "Proceed"
 
 [node name="DebugProxy" type="Node" parent="."]
 script = ExtResource("5_hv0ab")

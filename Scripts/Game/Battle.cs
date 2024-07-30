@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
@@ -17,7 +18,10 @@ public partial class Battle: Node2D
     public class SetupArgs
     {
         public int DealCommunityCardCount;
-        public int FaceDownCommunityCardCount;
+        public int FirstFlipCommunityCardCount;
+        public bool AllowLastFlip;
+        public int LastFlipCommunityCardCount;
+        public bool KeepHeatMultiplierOnNewRound;
         public int RequiredHoleCardCountMin;
         public int RequiredHoleCardCountMax;
         public List<BattleEntity.SetupArgs> EntitySetupArgs;
@@ -28,26 +32,25 @@ public partial class Battle: Node2D
     {
         BeforeDealCards,
         BeforeShowDown,
-        BeforeResolve,
-        AfterResolve,
+        BeforeEngage,
+        AfterEngage,
     }
     
     public GameMgr GameMgr;
     public Dealer Dealer;
     public CardContainer CommunityCardContainer;
-    public SplitCardContainer ResolveCardContainer;
+    public SplitCardContainer EngageCardContainer;
     public CardContainer ItemCardContainer;
     public CardContainer RuleCardContainer;
     public PlayerBattleEntity Player;
     public BattleEntity Enemy;
     public BattleEntity[] Entities;
+    public Node2D ButtonRoot;
 
-    public BaseButton BigButton;
     public PackedScene GameOverScene;
     public PackedScene GameWinScene;
     public PackedScene SelectRewardCardScene;
     
-    public Action<Battle> OnBattleProceed;
     public Action<Battle, CardNode> OnDealCard;
     public Action<Battle, CardNode> OnDealtCard;
     public Action<Battle> AfterDealCards;
@@ -68,18 +71,24 @@ public partial class Battle: Node2D
     public CompletedHandEvaluator HandEvaluator;
     
     public int DealCommunityCardCount;
-    public int FaceDownCommunityCardCount;
+    public int FirstFlipCommunityCardCount;
+    public bool AllowLastFlip;
+    public int LastFlipCommunityCardCount;
     public int RequiredHoleCardCountMin;
     public int RequiredHoleCardCountMax;
+    public bool KeepHeatMultiplierOnNewRound;
+    
     
     public int RoundCount;
     public Dictionary<BattleEntity, CompletedHand> RoundHands;
     public Engage RoundEngage;
+    public int CurrentFaceUpCommunityCardCount => CommunityCardContainer.ContentNodes.Count(x => ((CardNode)x).FaceDirection.Value == Enums.CardFace.Up);
 
     public ObservableCollection<Enums.HandTier> HandTierOrderDescend;
     
     public List<BaseEffect> Effects;
-    public State CurrentState;
+    public ObservableProperty<State> CurrentState;
+    public float HeatMultiplier;
 
     protected List<EnemyRandBoxDef> AllEnemyRandBoxDefs;
     
@@ -89,7 +98,7 @@ public partial class Battle: Node2D
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
         Dealer = GetNode<Dealer>("Dealer");
         CommunityCardContainer = GetNode<CardContainer>("CommunityCards");
-        ResolveCardContainer = GetNode<SplitCardContainer>("ResolveCards");
+        EngageCardContainer = GetNode<SplitCardContainer>("EngageCards");
         ItemCardContainer = GetNode<CardContainer>("ItemCards");
         RuleCardContainer = GetNode<CardContainer>("RuleCards");
         
@@ -106,16 +115,21 @@ public partial class Battle: Node2D
         // KickerCards = new ObservableCollection<BaseCard>();
         // RuleCards = new ObservableCollection<BaseCard>();
         HandTierOrderDescend = new ObservableCollection<Enums.HandTier>();
+        CurrentState = new ObservableProperty<State>(nameof(CurrentState), this, State.BeforeDealCards);
         Effects = new List<BaseEffect>();
+        ButtonRoot = GetNode<Node2D>("Buttons");
     }
 
     public virtual void Setup(object o)
     {
         var args = (SetupArgs)o;
         DealCommunityCardCount = args.DealCommunityCardCount;
-        FaceDownCommunityCardCount = args.FaceDownCommunityCardCount;
+        FirstFlipCommunityCardCount = args.FirstFlipCommunityCardCount;
+        AllowLastFlip = args.AllowLastFlip;
+        LastFlipCommunityCardCount = args.LastFlipCommunityCardCount;
         RequiredHoleCardCountMin = args.RequiredHoleCardCountMin;
         RequiredHoleCardCountMax = args.RequiredHoleCardCountMax;
+        KeepHeatMultiplierOnNewRound = args.KeepHeatMultiplierOnNewRound;
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, 
             RequiredHoleCardCountMin, RequiredHoleCardCountMax);
         
@@ -136,7 +150,7 @@ public partial class Battle: Node2D
             Margins = Configuration.DefaultContentContainerMargins,
         };
         
-        var resolveCardContainerSetupArgs = new SplitCardContainer.SetupArgs
+        var engageCardContainerSetupArgs = new SplitCardContainer.SetupArgs
         {
             CardContainersSetupArgs = new List<CardContainer.SetupArgs>
             {
@@ -147,12 +161,12 @@ public partial class Battle: Node2D
             PivotDirection = Enums.Direction2D8Ways.Neutral,
         };
         
-        ResolveCardContainer.Setup(resolveCardContainerSetupArgs);
+        EngageCardContainer.Setup(engageCardContainerSetupArgs);
         
-        containerSetupArgs.GetCardFaceDirectionFunc = GetCommunityCardFaceDirectionFunc;
+        containerSetupArgs.DefaultCardFaceDirection = Enums.CardFace.Down;
         containerSetupArgs.ShouldCollectDealtItemAndRuleCards = true;
         CommunityCardContainer.Setup(containerSetupArgs);
-        containerSetupArgs.GetCardFaceDirectionFunc = null;
+        containerSetupArgs.DefaultCardFaceDirection = Enums.CardFace.Up;
         containerSetupArgs.ShouldCollectDealtItemAndRuleCards = false;
         
         containerSetupArgs.AllowInteract = true;
@@ -176,6 +190,7 @@ public partial class Battle: Node2D
         }
 
         AllEnemyRandBoxDefs = EnemyRandBoxDefs.All();
+        CurrentState.FireValueChangeEventsOnInit();
         
         Reset();
     }
@@ -183,68 +198,16 @@ public partial class Battle: Node2D
     public async void Start()
     {
         Reset();
-        Dealer.Shuffle();
         await GameMgr.AwaitAndDisableInput(Dealer.DealInnateCards());
         await GameMgr.AwaitAndDisableInput(NewRound());
-        CurrentState = State.BeforeDealCards;
-    }
-
-    public async void Proceed()
-    {
-        switch (CurrentState)
-        {
-            case State.BeforeDealCards:
-                await GameMgr.AwaitAndDisableInput(DealCards());
-                CurrentState = State.BeforeShowDown;
-                break;
-            case State.BeforeShowDown:
-                await GameMgr.AwaitAndDisableInput(ShowDown());
-                CurrentState = State.BeforeResolve;
-                break;
-            case State.BeforeResolve:
-                await GameMgr.AwaitAndDisableInput(RoundEngage.Resolve());
-                CurrentState = State.AfterResolve;
-                break;
-            case State.AfterResolve:
-                OnRoundEnd?.Invoke(this);
-                var isPlayerDefeated = Player.IsDefeated();
-                var isEnemyDefeated = Enemy.IsDefeated();
-                await GameMgr.AwaitAndDisableInput(NewRound());
-                if (isPlayerDefeated)
-                {
-                    GameOver();
-                    return;
-                }
-                if (isEnemyDefeated)
-                {
-                    if (GameMgr.ProgressCounter.Value >= Configuration.ProgressCountRequiredToWin)
-                    {
-                        GameWin();
-                    }
-                    else
-                    {
-                        await GameMgr.AwaitAndDisableInput(Dealer.AnimateShuffle());
-                        var selectRewardCard = GameMgr.OverlayScene(SelectRewardCardScene) as SelectRewardCard;
-                        selectRewardCard.OnQuit += AfterSelectRewardCard;
-                        selectRewardCard.Setup(new SelectRewardCard.SetupArgs
-                        {
-                            RewardCardCount = Configuration.DefaultRewardCardCount,
-                            RewardCardDefType = typeof(ItemCardDef),
-                            InitReRollPrice = Configuration.DefaultReRollPrice,
-                            ReRollPriceIncrease = Configuration.DefaultReRollPriceIncrease,
-                            SkipReward = Configuration.DefaultSkipReward
-                        });
-                    }
-                }
-                CurrentState = State.BeforeDealCards;
-                break;
-        }
-        OnBattleProceed?.Invoke(this);
+        Dealer.Shuffle();
+        CurrentState.Value = State.BeforeDealCards;
+        HeatMultiplier = 1.0f;
     }
     
     public async Task NewRound()
     {
-        async Task DiscardCards(List<CardNode> cardNodes)
+        async Task RemoveCards(List<CardNode> cardNodes)
         {
             var tasks = new List<Task>();
             foreach (var cardNode in cardNodes)
@@ -259,45 +222,38 @@ public partial class Battle: Node2D
         {
             await entity.RoundReset();
         }
-        await DiscardCards(CommunityCardContainer.CardNodes);
-        foreach (var cardContainer in ResolveCardContainer.CardContainers)
+        
+        await RemoveCards(CommunityCardContainer.CardNodes);
+        foreach (var cardContainer in EngageCardContainer.CardContainers)
         {
-            await DiscardCards(cardContainer.CardNodes);
+            await RemoveCards(cardContainer.CardNodes);
         }
         RoundCount++;
         OnRoundStart?.Invoke(this);
         RoundHands.Clear();
         RoundEngage = null;
+        HeatMultiplier = KeepHeatMultiplierOnNewRound ? HeatMultiplier : 1.0f;
     }
     
     public void Reset()
     {
-        async Task DiscardCards(List<CardNode> cardNodes)
-        {
-            var tasks = new List<Task>();
-            foreach (var cardNode in cardNodes)
-            {
-                tasks.Add(cardNode.AnimateLeaveBattle());
-                await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
-            }
-            await Task.WhenAll(tasks);
-        }
-        var tasks = new List<Task>();
         RoundCount = 0;
-        CurrentState = State.BeforeDealCards;
+        CurrentState.Value = State.BeforeDealCards;
         foreach (var entity in Entities)
         {
             entity.Reset();
         }
         Dealer.Reset();
-        tasks.Add(DiscardCards(ItemCardContainer.CardNodes));
-        tasks.Add(DiscardCards(RuleCardContainer.CardNodes));
-        Task.WhenAll(tasks);
+        CommunityCardContainer.ContentNodes.Clear();
+        EngageCardContainer.Reset();
+        ItemCardContainer.ContentNodes.Clear();
+        RuleCardContainer.ContentNodes.Clear();
     }
 
     public async Task DealCards()
     {
         var tasks = new List<Task>();
+        HeatMultiplier += Configuration.AllFaceDownHeatMultiplierAdd;
         foreach (var entity in Entities)
         {
             for (int i = 0; i < entity.DealCardCount; i++)
@@ -314,22 +270,72 @@ public partial class Battle: Node2D
         await Task.WhenAll(tasks);
         AfterDealCards?.Invoke(this);
     }
-    
+
+    public bool CanFlipCards()
+    {
+        if (CommunityCardContainer.ContentNodes.Count - CurrentFaceUpCommunityCardCount > LastFlipCommunityCardCount)
+        {
+            return true;
+        }
+        if (AllowLastFlip) return true;
+        return false;
+    }
+
+    public async Task FlipCards()
+    {
+        var tasks = new List<Task>();
+        var faceUpCommunityCardCount = CurrentFaceUpCommunityCardCount;
+        var faceDownCommunityCardCount = CommunityCardContainer.ContentNodes.Count - faceUpCommunityCardCount;
+        int flipCount;
+        if (faceUpCommunityCardCount == 0)
+        {
+            HeatMultiplier -= Configuration.AllFaceDownHeatMultiplierAdd;
+            flipCount = FirstFlipCommunityCardCount;
+        } else if (faceDownCommunityCardCount <= LastFlipCommunityCardCount)
+        {
+            HeatMultiplier = Configuration.AllFlipHeatMultiplier;
+            flipCount = Mathf.Min(faceDownCommunityCardCount, LastFlipCommunityCardCount);
+        }
+        else
+        {
+            flipCount = 1;
+        }
+        foreach (var cardNode in CommunityCardContainer.CardNodes)
+        {
+            if (flipCount <= 0) break;
+            if (cardNode.FaceDirection.Value == Enums.CardFace.Down)
+            {
+                tasks.Add(cardNode.AnimateFlip(Enums.CardFace.Up));
+                flipCount--;
+            }
+        }
+        await Task.WhenAll(tasks);
+    }
+
+    public async Task Fold()
+    {
+        var tasks = new List<Task>();
+        HeatMultiplier = Configuration.FoldHeatMultiplier;
+        foreach (var cardNode in Player.HoleCardContainer.CardNodes)
+        {
+            if (cardNode.FaceDirection.Value == Enums.CardFace.Up)
+            {
+                tasks.Add(cardNode.AnimateFlip(Enums.CardFace.Down));
+            }
+        }
+        foreach (var cardNode in Enemy.HoleCardContainer.CardNodes)
+        {
+            if (cardNode.FaceDirection.Value == Enums.CardFace.Down)
+            {
+                tasks.Add(cardNode.AnimateFlip(Enums.CardFace.Up));
+            }
+        }
+        await Task.WhenAll(tasks);
+    }
+
     public async Task ShowDown()
     {
         BeforeShowDown?.Invoke(this);
-        
-        // var startTime = Time.GetTicksUsec();
-
-        // var validCommunityCards = GetValidCards(CommunityCards);
-        foreach (var entity in Entities)
-        {
-            // var validHoleCards = GetValidCards(entity.HoleCards);
-            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCardContainer.Cards, entity.HoleCardContainer.Cards, HandTierOrderDescend.ToList());
-            entity.RoundHandTier.Value = bestHand.Tier;
-            RoundHands.Add(entity, bestHand);
-        }
-
         var tasks = new List<Task>();
         foreach (var entity in Entities)
         {
@@ -348,11 +354,27 @@ public partial class Battle: Node2D
                 tasks.Add(cardNode.AnimateFlip(Enums.CardFace.Up));
             }
         }
+        await Task.WhenAll(tasks);
+    }
+    
+    public async Task Engage()
+    {
+        // var startTime = Time.GetTicksUsec();
+        // var validCommunityCards = GetValidCards(CommunityCards);
+        foreach (var entity in Entities)
+        {
+            // var validHoleCards = GetValidCards(entity.HoleCards);
+            var bestHand = HandEvaluator.EvaluateBestHand(CommunityCardContainer.FaceUpCards(), entity.HoleCardContainer.FaceUpCards(), HandTierOrderDescend.ToList());
+            entity.RoundHandTier.Value = bestHand.Tier;
+            RoundHands.Add(entity, bestHand);
+        }
+
+        var tasks = new List<Task>();
         var playerHand = RoundHands[Player];
         var enemyHand = RoundHands[Enemy];
         RoundEngage = new Engage(GameMgr, playerHand, enemyHand);
         tasks.Add(GameMgr.BattleLog.LogAndWait(
-            Utils._($"Showdown: {Player}({playerHand.Tier}) vs {Enemy}({enemyHand.Tier}). {Player} is {Player.RoundRole.Value}. {Enemy} is {Enemy.RoundRole.Value}"),
+            Utils._($"Engage: {Player}({playerHand.Tier}) vs {Enemy}({enemyHand.Tier}). {Player} is {Player.RoundRole.Value}. {Enemy} is {Enemy.RoundRole.Value}"),
             Configuration.LogInterval));
         BeforeEngage?.Invoke(this, RoundEngage);
         await Task.WhenAll(tasks);
@@ -362,6 +384,42 @@ public partial class Battle: Node2D
         // GD.Print($"Hand evaluation time: {endTime - startTime} us");
         // GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
         // GD.Print($"{Players[1]} Best Hand: {opponentBestHand.Rank}, {string.Join(",", opponentBestHand.PrimaryCards)}, Kickers: {string.Join(",", opponentBestHand.Kickers)}");
+    }
+
+    public async Task RoundEnd()
+    {
+        OnRoundEnd?.Invoke(this);
+        var isPlayerDefeated = Player.IsDefeated();
+        var isEnemyDefeated = Enemy.IsDefeated();
+        if (isEnemyDefeated)
+        {
+            if (GameMgr.ProgressCounter.Value >= Configuration.ProgressCountRequiredToWin)
+            {
+                GameWin();
+            }
+            else
+            {
+                // await GameMgr.AwaitAndDisableInput(Dealer.AnimateShuffle());
+                var selectRewardCard = GameMgr.OverlayScene(SelectRewardCardScene) as SelectRewardCard;
+                selectRewardCard.OnQuit += AfterSelectRewardCard;
+                selectRewardCard.Setup(new SelectRewardCard.SetupArgs
+                {
+                    RewardCardCount = Configuration.DefaultRewardCardCount,
+                    RewardCardDefType = typeof(ItemCardDef),
+                    InitReRollPrice = Configuration.DefaultReRollPrice,
+                    ReRollPriceIncrease = Configuration.DefaultReRollPriceIncrease,
+                    SkipReward = Configuration.DefaultSkipReward
+                });
+            }
+            return;
+        }
+        if (isPlayerDefeated)
+        {
+            GameOver();
+            return;
+        }
+        await GameMgr.AwaitAndDisableInput(NewRound());
+        CurrentState.Value = State.BeforeDealCards;
     }
 
     public BattleEntity GetOpponentOf(BattleEntity entity)
@@ -424,67 +482,6 @@ public partial class Battle: Node2D
         }
     }
 
-    protected Enums.CardFace GetCommunityCardFaceDirectionFunc(int i)
-    {
-        if (CurrentState >= State.BeforeResolve)
-        {
-            return Enums.CardFace.Up;
-        }
-        else
-        {
-            return i < DealCommunityCardCount - FaceDownCommunityCardCount ? Enums.CardFace.Up : Enums.CardFace.Down;
-        }
-    }
-
-    // protected void OnEntityAbilityCardsChanged(object sender, NotifyCollectionChangedEventArgs args)
-    // {
-    //     switch (args.Action)
-    //     {
-    //         case NotifyCollectionChangedAction.Add:
-    //             if (args.NewItems != null)
-    //                 foreach (var t in args.NewItems)
-    //                 {
-    //                     if (t is BaseCard card)
-    //                     {
-    //                         FieldCards.Add(card);
-    //                     }
-    //                 }
-    //             break;
-    //         case NotifyCollectionChangedAction.Remove:
-    //             if (args.OldItems != null)
-    //                 foreach (var t in args.OldItems)
-    //                 {
-    //                     if (t is BaseCard card)
-    //                     {
-    //                         FieldCards.Remove(card);
-    //                     }
-    //                 }
-    //             break;
-    //         case NotifyCollectionChangedAction.Reset:
-    //             var removedCards = new List<BaseCard>();
-    //             foreach (var fieldCard in FieldCards)
-    //             {
-    //                 var found = false;
-    //                 foreach (var entity in Entities)
-    //                 {
-    //                     if (entity.AbilityCards.Contains(fieldCard))
-    //                     {
-    //                         found = true;
-    //                         break;
-    //                     }
-    //                 }
-    //                 if (!found) removedCards.Add(fieldCard);
-    //             }
-    //
-    //             foreach (var removedCard in removedCards)
-    //             {
-    //                 FieldCards.Remove(removedCard);
-    //             }
-    //
-    //             break;
-    //     }
-    // }
-
     protected void GameOver()
     {
         GameMgr.InputMgr.QuitCurrentInputHandler();
@@ -501,7 +498,8 @@ public partial class Battle: Node2D
     {
         var boxes = AllEnemyRandBoxDefs
             .Where(def => def.ProgressRange.X <= GameMgr.ProgressCounter.Value
-                          && GameMgr.ProgressCounter.Value < def.ProgressRange.Y).ToList();
+                          && GameMgr.ProgressCounter.Value <= def.ProgressRange.Y).ToList();
+        Debug.Assert(boxes.Count > 0, "No enemy box available");
         var i = Utils.RandOnWeight(boxes.Select(x => x.RandBox.RandBoxWeight).ToList(), GameMgr.Rand);
         var boxDef = boxes[i];
         var box = boxDef.RandBox;

@@ -15,6 +15,7 @@ public class NPlusMRule: NOfAKindRule
 
     protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
+        if (cards.Count < M + N) return null;
         var res = new List<List<BaseCard>>();
         var nPicks = base.Pick(cards);
         var cardsByRank = new Dictionary<Enums.CardRank, List<BaseCard>>();

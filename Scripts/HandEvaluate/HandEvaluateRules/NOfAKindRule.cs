@@ -21,6 +21,7 @@ public class NOfAKindRule: BaseHandEvaluateRule
 
     protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
+        if (cards.Count < N) return null;
         var picks = new List<List<BaseCard>>();
         var cardsByRank = new Dictionary<Enums.CardRank, List<BaseCard>>();
         foreach (var card in cards)

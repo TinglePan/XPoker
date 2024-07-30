@@ -24,17 +24,22 @@ public class BalaTrollHandCard: BaseItemCard
         protected override async void Confirm()
         {
             var tasks = new List<Task>();
+            var tasks2 = new List<Task>();
             if (SelectedNodes.Count > 0)
             {
                 foreach (var selectedNode in SelectedNodes)
                 {
-                    tasks.Add(Battle.Dealer.DealCardAndReplace(selectedNode));
+                    var sourceContainer = selectedNode.CurrentContainer.Value;
+                    selectedNode.IsSelected = false;
+                    tasks.Add(selectedNode.AnimateLeaveBattle());
+                    tasks2.Add(Battle.Dealer.DealCardIntoContainer((CardContainer)sourceContainer));
                     await Utils.Wait(OriginateCardNode, Configuration.AnimateCardTransformInterval);
                 }
                 OriginateCard.Use(OriginateCardNode);
                 GameMgr.InputMgr.QuitCurrentInputHandler();
                 SelectedNodes.Clear();
                 await Task.WhenAll(tasks);
+                await Task.WhenAll(tasks2);
             }
             else
             {
@@ -57,7 +62,7 @@ public class BalaTrollHandCard: BaseItemCard
     
     public override bool CanInteract(CardNode node)
     {
-        return base.CanInteract(node) && Battle.CurrentState == Battle.State.BeforeShowDown;
+        return base.CanInteract(node) && Battle.CurrentState.Value == Battle.State.BeforeShowDown;
     }
 
     public override void ChooseTargets(CardNode node)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using XCardGame.Common;
 
 namespace XCardGame;
@@ -11,6 +12,11 @@ public class StraightGraph
         public Enums.CardRank Rank;
         public bool IsTerminal;
         public List<StraightGraphNode> ValidNextNodes;
+        
+        public List<StraightGraphNode> AllPossibleStraightNextNodes(bool isTerminal = false)
+        {
+            return ValidNextNodes.Where(node => !node.IsTerminal || isTerminal).ToList();
+        }
     }
 
     public static StraightGraph StandardStraightGraph(bool allowWrap = false, bool allowShort = false)
@@ -46,6 +52,7 @@ public class StraightGraph
         res.AddEdge(Enums.CardRank.Ten, Enums.CardRank.Jack);
         res.AddEdge(Enums.CardRank.Jack, Enums.CardRank.Queen);
         res.AddEdge(Enums.CardRank.Queen, Enums.CardRank.King);
+        res.AddEdge(Enums.CardRank.King, Enums.CardRank.Ace);
         
         if (allowShort)
         {
@@ -71,20 +78,20 @@ public class StraightGraph
         }
     }
     
-    public bool IsValidNext(Enums.CardRank currentRank, Enums.CardRank nextRank)
+    public bool IsValidNext(Enums.CardRank currentRank, Enums.CardRank nextRank, bool isTerminal = false)
     {
         if (!NodeIndex.ContainsKey(currentRank)) return false;
         var currentNode = NodeIndex[currentRank];
-        return currentNode.ValidNextNodes.Any(node => node.Rank == nextRank);
+        return currentNode.ValidNextNodes.Any(node => node.Rank == nextRank && (!node.IsTerminal || isTerminal));
     }
     
-    public List<Enums.CardRank> AllPossibleStraightNext(Enums.CardRank startRank)
+    public List<Enums.CardRank> AllPossibleStraightNext(Enums.CardRank startRank, bool isTerminal = false)
     {
         if (!NodeIndex.TryGetValue(startRank, out var startNode)) return null;
-        return startNode.ValidNextNodes.Select(node => node.Rank).ToList();
+        return startNode.ValidNextNodes.Where(node => !node.IsTerminal || isTerminal).Select(node => node.Rank).ToList();
     }
     
-    public List<List<Enums.CardRank>> AllPossibleStraightSequences(Enums.CardRank startRank, int steps)
+    public List<List<Enums.CardRank>> AllPossibleStraightSequences(Enums.CardRank startRank, int steps, bool isTerminal = false)
     {
         if (!NodeIndex.TryGetValue(startRank, out var startNode)) return null;
         var res = new List<List<Enums.CardRank>>(); 
@@ -99,6 +106,7 @@ public class StraightGraph
 
             foreach (var nextNode in currentNode.ValidNextNodes)
             {
+                if (!isTerminal && nextNode.IsTerminal) continue;
                 currentRoute.Add(nextNode);
                 Helper(nextNode, stepsLeft - 1);
                 currentRoute.RemoveAt(currentRoute.Count - 1);

@@ -140,6 +140,14 @@ public class TweenControl
         return TweenMap[tag];
     }
 
+    public void StopAll()
+    {
+        foreach (var tween in TweenMap.Values)
+        {
+            tween.Tween.Value?.Stop();
+        }
+    }
+
     // public ControlledTween GetControlledTween(string tag)
     // {
     //     return TweenMap.GetValueOrDefault(tag);

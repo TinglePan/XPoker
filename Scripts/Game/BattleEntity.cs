@@ -229,9 +229,6 @@ public partial class BattleEntity: Node
             {
                 res.Add(1 - (float)Configuration.WeakenMultiplier / 100);
                 weakenDeBuff.Consume();
-            } else if (buff is BigShieldCard.BigShieldBuff)
-            {
-                res.Add(0);
             }
         }
         return res;
@@ -259,10 +256,6 @@ public partial class BattleEntity: Node
             {
                 res.Add(1 + (float)Configuration.VulnerableMultiplier / 100);
                 vulnerableDeBuff.Consume();
-            }
-            else if (buff is BigShieldCard.BigShieldBuff)
-            {
-                res.Add(0);
             }
         }
         return res;

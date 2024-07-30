@@ -29,7 +29,7 @@ public static class BattleEntityDefs
         InitDefence = 0,
         InitItemPocketSize = 3,
         InitHandPowers = HandPowerTables.DefaultPlayerHandPowerTable,
-        InitHp = 1000,
+        InitHp = 100,
         InitEnergy = 3,
         InitCredit = 100
     };
@@ -132,7 +132,7 @@ public static class BattleEntityDefs
         Name = "Man in black",
         PortraitPath = "res://Sprites/man_in_black.png",
         SpritePath = "res://Sprites/man_in_black.png",
-        InitDeckDef = null,
+        InitDeckDef = new List<BaseCardDef> { CardDefs.SpadesRule, CardDefs.ClubsRule},
         InitAttack = 0,
         InitDefence = 0,
         InitHandPowers = HandPowerTables.StraightFlushEnhancedHandPowerTable,

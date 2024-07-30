@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8kp4dqa7xtfn"]
+
+[ext_resource type="Theme" uid="uid://dwpbfhy3isgh5" path="res://Resources/button_theme.tres" id="1_0itg2"]
+
+[node name="MenuButton" type="Button"]
+texture_filter = 1
+size_flags_horizontal = 3
+theme = ExtResource("1_0itg2")
+theme_type_variation = &"FlatButton"
+text = "Test"
+flat = true

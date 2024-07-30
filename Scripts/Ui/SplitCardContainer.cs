@@ -45,6 +45,14 @@ public partial class SplitCardContainer: Node2D
         }
     }
 
+    public void Reset()
+    {
+        foreach (var cardContainer in CardContainers)
+        {
+            cardContainer.ContentNodes.Clear();
+        }
+    }
+
     public Vector2 Size()
     {
         var size = Vector2.Zero;

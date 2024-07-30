@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Common;
-using BattleScene = XCardGame.Ui.BattleScene;
+using XCardGame.Ui;
 
 namespace XCardGame;
 
@@ -15,6 +15,7 @@ public partial class GameMgr : Node
 	public InputMgr InputMgr;
 	
 	public Node CurrentScene => SceneStack[^1];
+	public Control BattleUiRoot;
 	public Battle CurrentBattle;
 	public BattleLog BattleLog;
 
@@ -47,16 +48,18 @@ public partial class GameMgr : Node
 		var battleScene = (BattleScene)CurrentScene;
 		BattleLog = battleScene.GetNode<BattleLog>("LogBox");
 		CurrentBattle = battleScene.Battle;
-		var playerBattleEntityInitArgs = PlayerBattleEntity.InitArgs(BattleEntityDefs.PiratePlayerBattleEntityDef);
+		var playerBattleEntityInitArgs = PlayerBattleEntity.InitArgs(BattleEntityDefs.TricksterPlayerBattleEntityDef);
 		playerBattleEntityInitArgs.Deck.MixIn(DeckDefs.Standard52Deck());
 		
 		CurrentBattle.Setup(new Battle.SetupArgs
 		{
 			DealCommunityCardCount = Configuration.CommunityCardCount,
-			FaceDownCommunityCardCount = Configuration.DefaultFaceDownCommunityCardCount,
-			RequiredHoleCardCountMin = 0,
-			RequiredHoleCardCountMax = 2,
-			EntitySetupArgs = new List<BattleEntity.SetupArgs>()
+			FirstFlipCommunityCardCount = Configuration.DefaultFirstFlipCommunityCardCount,
+			AllowLastFlip = true,
+			LastFlipCommunityCardCount = Configuration.DefaultLastFlipCommunityCardCount,
+			RequiredHoleCardCountMin = Configuration.DefaultRequiredHoleCardCountMin,
+			RequiredHoleCardCountMax = Configuration.DefaultRequiredHoleCardCountMax,
+			EntitySetupArgs = new List<BattleEntity.SetupArgs>
 			{
 				playerBattleEntityInitArgs,
 				BattleEntity.InitArgs(BattleEntityDefs.DefaultEnemyBattleEntityDef)

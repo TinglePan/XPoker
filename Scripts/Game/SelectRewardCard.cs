@@ -123,7 +123,7 @@ public partial class SelectRewardCard: Control
             Margins = Configuration.DefaultContentContainerMargins,
             OnlyDisplay = true,
         });
-        AllRewardCardDefs = FilterCardDefs(CardDefs.All(), x => x.GetType().IsAssignableTo(typeof(InteractCardDef)));
+        AllRewardCardDefs = FilterCardDefs(CardDefs.All(), x => x.GetType().IsAssignableTo(typeof(InteractCardDef)) && !x.ExcludeFromRewards);
         
         if (RewardCardDefType != null)
         {

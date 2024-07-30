@@ -33,16 +33,16 @@ public class CompletedHand: IComparable<CompletedHand>
                 }).ToDictionary(x => x.Rank, x => x.Cards);
                 PrimaryCards.Sort((x, y) =>
                 {
-                    var deltaCount = groups[y.Rank.Value].Count() - groups[x.Rank.Value].Count();
+                    var deltaCount = groups[x.Rank.Value].Count() - groups[y.Rank.Value].Count();
                     if (deltaCount != 0) return deltaCount;
-                    return y.CompareTo(x, true);
+                    return x.CompareTo(y, true);
                 });
                 break;
             default:
-                PrimaryCards.Sort((x, y) => y.CompareTo(x, true));
+                PrimaryCards.Sort((x, y) => x.CompareTo(y, true));
                 break;
         }
-        Kickers?.Sort((x, y) => y.CompareTo(x, true));
+        Kickers?.Sort((x, y) => x.CompareTo(y, true));
     }
 
     public int CompareTo(CompletedHand other)

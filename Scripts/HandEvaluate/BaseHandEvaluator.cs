@@ -30,14 +30,14 @@ public class BaseHandEvaluator
         Enums.CardSuit.Spades,
     };
 
-    public static List<BaseHandEvaluateRule> FiveCardHRules = new()
+    public static List<BaseHandEvaluateRule> FiveCardRules = new()
     {
-        new RoyalFlushRule(5, false, true),
+        new RoyalFlushRule(5, false, false),
         new StraightFlushRule(5, false, false),
         new NOfAKindRule(Enums.HandTier.Quads, 4, NumericCardRanks),
         new NPlusMRule(Enums.HandTier.FullHouse, 3, 2, NumericCardRanks),
         new FlushRule(5, SuitWithColor),
-        new StraightRule(5, false, true),
+        new StraightRule(5, false, false),
         new NOfAKindRule(Enums.HandTier.ThreeOfAKind, 3, NumericCardRanks),
         new NPlusMRule(Enums.HandTier.TwoPairs, 2, 2, NumericCardRanks),
         new NOfAKindRule(Enums.HandTier.Pair, 2, NumericCardRanks),
@@ -53,7 +53,7 @@ public class BaseHandEvaluator
     public BaseHandEvaluator(int cardCount, int requiredHoleCardCountMin, int requiredHoleCardCountMax,
         List<BaseHandEvaluateRule> rules = null)
     {
-        Rules = rules ?? FiveCardHRules;
+        Rules = rules ?? FiveCardRules;
         CardCount = cardCount;
         RequiredHoleCardCountMin = requiredHoleCardCountMin;
         RequiredHoleCardCountMax = requiredHoleCardCountMax;

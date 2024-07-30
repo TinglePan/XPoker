@@ -56,6 +56,11 @@ public partial class CardContainer: BaseContentContainer
 		ShouldCollectDealtItemAndRuleCards = args.ShouldCollectDealtItemAndRuleCards;
 	}
 
+	public List<BaseCard> FaceUpCards()
+	{
+		return CardNodes.Where(x => x.FaceDirection.Value == Enums.CardFace.Up).Select(x => x.Card).ToList();
+	}
+
 	public async void MoveCardNodesToContainer(CardContainer targetContainer, float delay = 0f)
 	{
 		var tasks = new List<Task>();

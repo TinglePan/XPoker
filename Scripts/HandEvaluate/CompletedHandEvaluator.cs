@@ -15,7 +15,7 @@ public class CompletedHandEvaluator: BaseHandEvaluator
     public CompletedHandEvaluator(int cardCount,
         int requiredHoleCardCountMin, int requiredHoleCardCountMax, List<BaseHandEvaluateRule> rules = null): base(cardCount, requiredHoleCardCountMin, requiredHoleCardCountMax, rules)
     {
-        Rules = rules ?? FiveCardHRules;
+        Rules = rules ?? FiveCardRules;
         CardCount = cardCount;
         RequiredHoleCardCountMin = requiredHoleCardCountMin;
         RequiredHoleCardCountMax = requiredHoleCardCountMax;
@@ -28,8 +28,15 @@ public class CompletedHandEvaluator: BaseHandEvaluator
         CalculatedHands.Clear();
         // GD.Print($"valid Community cards: {validCommunityCards.Count}");
         // Profile.StartWatch("evaluate best hand 1");
+
+        var cardCount = Mathf.Min(CardCount, validCommunityCards.Count + validHoleCards.Count);
+        if (cardCount == 0)
+        {
+            return new CompletedHand(Enums.HandTier.None, null, null, null);
+        }
+        
         foreach (var cards in Utils.GetCombinationsWithXToYFromA(validHoleCards, validCommunityCards, 
-                     CardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
+                     cardCount, RequiredHoleCardCountMin, RequiredHoleCardCountMax))
         {
             // Profile.StartWatch("evaluate best hand 2");
             Dictionary<Enums.HandTier, List<CompletedHand>> calculatedHands = new();

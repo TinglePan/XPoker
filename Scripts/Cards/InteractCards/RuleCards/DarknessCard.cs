@@ -16,7 +16,7 @@ public class DarknessCard: BaseRuleCard
         if (IsFunctioning() && !AlreadyFunctioning)
         {
             Count = Utils.GetCardRankValue(Rank.Value);
-            battle.FaceDownCommunityCardCount += Count;
+            battle.LastFlipCommunityCardCount += Count;
             AlreadyFunctioning = true;
         }
     }
@@ -26,7 +26,7 @@ public class DarknessCard: BaseRuleCard
         base.OnStopEffect(battle);
         if (AlreadyFunctioning)
         {
-            battle.FaceDownCommunityCardCount -= Count;
+            battle.LastFlipCommunityCardCount -= Count;
             AlreadyFunctioning = false;
         }
     }

@@ -76,6 +76,7 @@ public static class Enums
     
     public enum HandTier
     {
+        None,
         HighCard,
         Pair,
         TwoPairs,

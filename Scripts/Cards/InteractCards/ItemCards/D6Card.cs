@@ -26,7 +26,7 @@ public class D6Card: BaseItemCard
 
     public override bool CanInteract(CardNode node)
     {
-        return base.CanInteract(node) && Battle.CurrentState == Battle.State.BeforeShowDown;
+        return base.CanInteract(node) && Battle.CurrentState.Value == Battle.State.BeforeShowDown;
     }
 
     public override async void Use(CardNode node)

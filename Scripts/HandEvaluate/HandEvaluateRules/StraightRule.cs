@@ -20,6 +20,7 @@ public class StraightRule: BaseHandEvaluateRule
     
     protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
+        if (cards.Count < CardCount) return null;
         List<List<BaseCard>> picks = new List<List<BaseCard>>();
         List<BaseCard> currPick = new List<BaseCard>();
         var cardsByRank = new Dictionary<Enums.CardRank, List<BaseCard>>();
@@ -38,7 +39,7 @@ public class StraightRule: BaseHandEvaluateRule
                 return;
             }
             if (!Graph.NodeIndex.TryGetValue(rank, out var value)) return;
-            foreach (var nextNode in value.ValidNextNodes)
+            foreach (var nextNode in value.AllPossibleStraightNextNodes(currPick.Count == 0 || currPick.Count == CardCount - 2))
             {
                 if (!cardsByRank.TryGetValue(nextNode.Rank, out var cardsOfRank)) continue;
                 foreach (var card in cardsOfRank)
@@ -62,16 +63,18 @@ public class StraightRule: BaseHandEvaluateRule
     {
         var pickCardByRank = pick.ToDictionary(card => card.Rank.Value);
         var successorRankHashSet = new HashSet<Enums.CardRank>();
+        int i = 0;
         foreach (var card in pick)
         {
             var rank = card.Rank.Value;
-            foreach (var nextRank in Graph.AllPossibleStraightNext(rank))
+            foreach (var nextRank in Graph.AllPossibleStraightNext(rank, i == 0 || i == pick.Count - 2))
             {
                 if (pickCardByRank.ContainsKey(nextRank))
                 {
                     successorRankHashSet.Add(nextRank);
                 }
             }
+            i++;
         }
 
         BaseCard startCard = null;

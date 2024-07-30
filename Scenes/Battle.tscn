@@ -16,7 +16,7 @@ position = Vector2(0, -64)
 
 [node name="Card" parent="CommunityCards" instance=ExtResource("3_0wwqy")]
 
-[node name="ResolveCards" parent="." instance=ExtResource("4_i02sy")]
+[node name="EngageCards" parent="." instance=ExtResource("4_i02sy")]
 position = Vector2(0, 64)
 
 [node name="Enemy" parent="." instance=ExtResource("5_yc2t5")]
@@ -37,3 +37,6 @@ position = Vector2(144, 256)
 
 [node name="Dealer" parent="." instance=ExtResource("7_ppf5v")]
 position = Vector2(0, -256)
+
+[node name="Buttons" type="Node2D" parent="."]
+position = Vector2(0, 180)

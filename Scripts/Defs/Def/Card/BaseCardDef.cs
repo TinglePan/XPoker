@@ -15,6 +15,7 @@ public class BaseCardDef: BaseDef
     public Enums.CardRank Rank;
     public int Rarity;
     public int BasePrice;
+    public bool ExcludeFromRewards;
 
     public BaseCardDef()
     {

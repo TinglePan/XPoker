@@ -8,7 +8,8 @@ public static class Configuration
     
     public static readonly int CompletedHandCardCount = 5;
     public static readonly int CommunityCardCount = 5;
-    public static readonly int DefaultFaceDownCommunityCardCount = 1;
+    public static readonly int DefaultFirstFlipCommunityCardCount = 3;
+    public static readonly int DefaultLastFlipCommunityCardCount = 1;
     public static readonly int DefaultHoleCardCount = 2;
     public static readonly int RoundSkillsCount = 1;
 
@@ -63,4 +64,12 @@ public static class Configuration
     public static readonly int CardLiftTweenPriority = 1;
     public static readonly int CardTapTweenPriority = 2;
     public static readonly int CardMoveTweenPriority = 3;
+    
+    public static readonly float BaseHeatMultiplier = 1.0f;
+    public static readonly float AllFlipHeatMultiplier = 0.75f;
+    public static readonly float FoldHeatMultiplier = 0.5f;
+    public static readonly float AllFaceDownHeatMultiplierAdd = 1.0f;
+
+    public static readonly int DefaultRequiredHoleCardCountMin = 0;
+    public static readonly int DefaultRequiredHoleCardCountMax = 2;
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using XCardGame.Common;
 
 namespace XCardGame;
@@ -18,6 +19,7 @@ public class FlushRule: BaseHandEvaluateRule
     
     protected override List<List<BaseCard>> Pick(List<BaseCard> cards)
     {
+        if (cards.Count < CardCount) return null;
         List<List<BaseCard>> picks = new List<List<BaseCard>>();
         var cardsBySuit = new Dictionary<Enums.CardSuit, List<BaseCard>>();
         foreach (var card in cards)

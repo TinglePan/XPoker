@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
@@ -54,12 +55,18 @@ public class Engage
         {
             await ResolveEntity(player);
             await ClearResolveArea();
-            await ResolveEntity(enemy);
+            if (!(enemy.Hp.Value <= 0 || player.Hp.Value <= 0))
+            {
+                await ResolveEntity(enemy);
+            }
         } else
         {
             await ResolveEntity(enemy);
             await ClearResolveArea();
-            await ResolveEntity(player);
+            if (!(enemy.Hp.Value <= 0 || player.Hp.Value <= 0))
+            {
+                await ResolveEntity(player);
+            }
         }
     }
     
@@ -73,6 +80,7 @@ public class Engage
                 var cardNode = card.Node<CardNode>();
                 var sourceContainer = (CardContainer)cardNode.CurrentContainer.Value;
                 CardPositionBeforeResolve[cardNode] = sourceContainer;
+                Debug.Assert(sourceContainer != null, "sourceContainer is supposed to be not null");
                 tasks.Add(sourceContainer.MoveCardNodeToContainer(cardNode, targetContainer));
                 // await Utils.Wait(Battle, Configuration.AnimateCardTransformInterval);
             }
@@ -81,10 +89,10 @@ public class Engage
         var tasks = new List<Task>();
         hand.Sort();
         
-        tasks.Add(PrepareCards(hand.PrimaryCards, Battle.ResolveCardContainer.CardContainers[0]));
+        tasks.Add(PrepareCards(hand.PrimaryCards, Battle.EngageCardContainer.CardContainers[0]));
         if (hand.Kickers != null)
         {
-            tasks.Add(PrepareCards(hand.Kickers, Battle.ResolveCardContainer.CardContainers[1]));
+            tasks.Add(PrepareCards(hand.Kickers, Battle.EngageCardContainer.CardContainers[1]));
         }
         await Task.WhenAll(tasks);
     }
@@ -94,7 +102,7 @@ public class Engage
         await PrepareEntity(entity, Battle.RoundHands[entity]);
         var timer = Battle.GetTree().CreateTimer(Configuration.DelayBetweenResolveSteps);
         await Battle.ToSignal(timer, Timer.SignalName.Timeout);
-        var resolveCardContainer = Battle.ResolveCardContainer.CardContainers[0];
+        var resolveCardContainer = Battle.EngageCardContainer.CardContainers[0];
         foreach (var node in resolveCardContainer.ContentNodes)
         {
             var cardNode = (CardNode)node;
@@ -124,7 +132,7 @@ public class Engage
         
         var tasks = new List<Task>();
         
-        foreach (var cardContainer in Battle.ResolveCardContainer.CardContainers)
+        foreach (var cardContainer in Battle.EngageCardContainer.CardContainers)
         {
             tasks.Add(ClearCardContainer(cardContainer));
         }

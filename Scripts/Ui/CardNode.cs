@@ -84,7 +84,7 @@ public partial class CardNode: BaseContentNode, ISelect
 	    OriginalFaceDirection = args.FaceDirection;
 	    FaceDirection.Value = OriginalFaceDirection;
 	    OnlyDisplay = args.OnlyDisplay;
-	    
+
 	    CurrentContainer.DetailedValueChanged += OnContainerChanged;
 	    CurrentContainer.FireValueChangeEventsOnInit();
     }
@@ -158,7 +158,8 @@ public partial class CardNode: BaseContentNode, ISelect
 
 	public async Task AnimateSelect(bool to, float time)
 	{
-		// GD.Print($"Animate Select {this} to {to}");
+		if (to == IsSelected) return;
+		GD.Print($"Animate Select {this} to {to}");
 		IsSelected = to;
 		await AnimateLift(to, time);
 		if (IsSelected)

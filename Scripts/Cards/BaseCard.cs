@@ -194,8 +194,13 @@ public class BaseCard: ILifeCycleTriggeredInBattle, IContent, IComparable<BaseCa
 
     public virtual void OnDiscardHandler(BaseCard card)
     {
-        Rank.Value = Def.Rank;
-        Suit.Value = Def.Suit;
+        Reset();
+    }
+
+    public void Reset()
+    {
+        Rank.Value = OriginalRank;
+        Suit.Value = OriginalSuit;
         IsNegated.Value = false;
     }
 

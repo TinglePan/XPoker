@@ -319,7 +319,7 @@ public static class Utils
     {
         switch (value)
         {
-            case <= 1:
+            case 1:
                 return Enums.CardRank.Ace;
             case 2:
                 return Enums.CardRank.Two;
@@ -343,8 +343,10 @@ public static class Utils
                 return Enums.CardRank.Jack;
             case 12:
                 return Enums.CardRank.Queen;
-            default:
+            case 13:
                 return Enums.CardRank.King;
+            default:
+                return Enums.CardRank.None;
         }
     }
 

@@ -14,6 +14,7 @@ public partial class PlayerBattleEntity: BattleEntity
         public int MaxEnergy;
         public int Credit;
         public int ItemPocketSize;
+        public int ItemRecharge;
     }
     
     public Label EnergyLabel;
@@ -23,6 +24,7 @@ public partial class PlayerBattleEntity: BattleEntity
     public ObservableProperty<int> Credit;
 
     public ObservableProperty<int> ItemPocketSize;
+    public ObservableProperty<int> ItemRecharge;
     // public Dictionary<int, LevelUpInfo> LevelUpTable;
 
     public static SetupArgs InitArgs(PlayerBattleEntityDef def)
@@ -41,6 +43,7 @@ public partial class PlayerBattleEntity: BattleEntity
             MaxEnergy = def.InitEnergy,
             Credit = def.InitCredit,
             ItemPocketSize = def.InitItemPocketSize,
+            ItemRecharge = def.InitItemRecharge,
         };
     }
     
@@ -61,9 +64,14 @@ public partial class PlayerBattleEntity: BattleEntity
         MaxEnergy.ValueChanged += UpdateEnergyLabel;
         Energy.FireValueChangeEventsOnInit();
         Credit = new ObservableProperty<int>(nameof(Credit), this, 0);
+        // TODO: Credit display binding
         Credit.FireValueChangeEventsOnInit();
         ItemPocketSize = new ObservableProperty<int>(nameof(ItemPocketSize), this, args.ItemPocketSize);
+        // TODO: Item pocket size display binding
         ItemPocketSize.FireValueChangeEventsOnInit();
+        ItemRecharge = new ObservableProperty<int>(nameof(ItemRecharge), this, args.ItemRecharge);
+        // TODO: Item recharge count display binding
+        ItemRecharge.FireValueChangeEventsOnInit();
     }
 
     public override async Task RoundReset()

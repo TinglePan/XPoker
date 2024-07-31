@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using System;
+using Godot;
 using XCardGame.Common;
 using XCardGame.Ui;
 
@@ -7,6 +8,7 @@ namespace XCardGame;
 public class BaseInteractCard: BaseCard, IInteractCard
 {
     public ObservableProperty<int> Cost;
+    public Action<BaseInteractCard> OnOverload;
     
     protected bool AlreadyFunctioning;
     
@@ -45,17 +47,24 @@ public class BaseInteractCard: BaseCard, IInteractCard
         }
     }
 
-    public override async void ChangeRank(int delta)
+    public override void ChangeRank(int delta)
     {
-        var cardNode = Node<CardNode>();
-        var currentRankValue = Utils.GetCardRankValue(Rank.Value);
-        var resultRankValue = currentRankValue + delta;
-        var resultRank = Utils.GetCardRank(Mathf.Clamp(resultRankValue, 1,
-            Utils.GetCardRankValue(Enums.CardRank.King)));
-        Rank.Value = resultRank;
-        if (resultRankValue <= 0)
+        if (Rank.Value != Enums.CardRank.None)
         {
-            await GameMgr.AwaitAndDisableInput(cardNode.AnimateLeaveBattle());
+            base.ChangeRank(delta);
+            if (Rank.Value == Enums.CardRank.None)
+            {
+                OnOverload?.Invoke(this);
+            }
+        }
+    }
+
+    protected virtual async void OnRoundEnd(Battle battle)
+    {
+        if (Rank.Value == Enums.CardRank.None)
+        {
+            var cardNode = Node<CardNode>();
+            await GameMgr.AwaitAndDisableInput(cardNode?.AnimateLeaveBattle());
         }
     }
 }

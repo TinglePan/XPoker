@@ -24,6 +24,8 @@ public partial class CardNode: BaseContentNode, ISelect
     public Sprite2D JokerMark;
     public Label CostLabel;
     public AnimationPlayer AnimationPlayer;
+    public NinePatchRect PileImage;
+    public CardContainer PileContainer;
     
     public BaseCard Card => (BaseCard)Content.Value;
     public Enums.CardFace OriginalFaceDirection;
@@ -50,6 +52,8 @@ public partial class CardNode: BaseContentNode, ISelect
 		JokerMark = GetNode<Sprite2D>("Outline/Front/Joker");
 		CostLabel = GetNode<Label>("Outline/Front/Cost");
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+		PileImage = GetNode<NinePatchRect>("Pile/Image");
+		PileContainer = GetNode<CardContainer>("Pile/Container");
 		
 		FaceDirection = new ObservableProperty<Enums.CardFace>(nameof(FaceDirection), this, Enums.CardFace.Down);
 		FaceDirection.DetailedValueChanged += OnCardFaceChanged;

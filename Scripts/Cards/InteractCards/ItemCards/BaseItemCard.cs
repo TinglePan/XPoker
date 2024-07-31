@@ -1,4 +1,6 @@
-﻿using XCardGame.Ui;
+﻿using Godot;
+using XCardGame.Common;
+using XCardGame.Ui;
 
 namespace XCardGame;
 
@@ -33,5 +35,14 @@ public class BaseItemCard: BaseInteractCard
         var interactCardDef = (ItemCardDef)Def;
         ChangeRank(interactCardDef.RankChangePerUse);
         Battle.Player.Energy.Value -= interactCardDef.Cost;
+    }
+
+    protected override void OnRoundEnd(Battle battle)
+    {
+        base.OnRoundEnd(battle);
+        if (Rank.Value != Enums.CardRank.None && Rank.Value < OriginalRank)
+        {
+            ChangeRank(Mathf.Min(Battle.Player.ItemRecharge.Value, OriginalRank - Rank.Value));
+        }
     }
 }

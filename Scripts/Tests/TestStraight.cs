@@ -17,27 +17,27 @@ public partial class TestStraight : Node
         var evaluator = new CompletedHandEvaluator(5, 0, 2);
         var communityCards = new List<BaseCard>
         {
-            new PokerCard(new BaseCardDef
+            new SimpleCard(new CardDef
             {
                 Rank = Enums.CardRank.Ace,
                 Suit = Enums.CardSuit.Clubs
             }),
-            new PokerCard(new BaseCardDef
+            new SimpleCard(new CardDef
             {
                 Rank = Enums.CardRank.Two,
                 Suit = Enums.CardSuit.Clubs
             }),
-            new PokerCard(new BaseCardDef
+            new SimpleCard(new CardDef
             {
                 Rank = Enums.CardRank.Three,
                 Suit = Enums.CardSuit.Hearts
             }),
-            new PokerCard(new BaseCardDef
+            new SimpleCard(new CardDef
             {
                 Rank = Enums.CardRank.Seven,
                 Suit = Enums.CardSuit.Hearts
             }),
-            new PokerCard(new BaseCardDef
+            new SimpleCard(new CardDef
             {
                 Rank = Enums.CardRank.Ten,
                 Suit = Enums.CardSuit.Hearts
@@ -45,12 +45,12 @@ public partial class TestStraight : Node
         };
         var holeCards = new List<BaseCard>
         {
-            new PokerCard(new BaseCardDef
+            new SimpleCard(new CardDef
             {
                 Rank = Enums.CardRank.Four,
                 Suit = Enums.CardSuit.Clubs
             }),
-            new PokerCard(new BaseCardDef
+            new SimpleCard(new CardDef
             {
                 Rank = Enums.CardRank.Five,
                 Suit = Enums.CardSuit.Clubs

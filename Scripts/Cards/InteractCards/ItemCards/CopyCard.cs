@@ -1,45 +1,65 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using XCardGame.CardProperties;
 using XCardGame.Common;
 using XCardGame.Ui;
 
 namespace XCardGame;
 
-public class CopyCard : BaseTokenCard<CopyCard, BaseTokenCardInputHandler<CopyCard>>
+public class CopyCard : BaseCard
 {
-    protected static ItemCardDef CreateDefFromCopiedCard(ItemCardDef def, BaseCard card)
+    
+    public class CopyCardInputHandler: BaseCardReplaceInputHandler
     {
-        var res = def.Clone<ItemCardDef>();
+        public CopyCardInputHandler(GameMgr gameMgr, CardNode node) : base(gameMgr, node)
+        {
+        }
+        
+        protected override IEnumerable<CardNode> GetValidSelectTargets()
+        {
+            return Helper.OriginateCard.GetProp<CopyCardItemReplaceProp>().ValidCardContainers.SelectMany(x => x.CardNodes).Where(x => x.FaceDirection.Value == Enums.CardFace.Up);
+        }
+    }
+
+    public class CopyCardItemReplaceProp : CardPropItemReplace
+    {
+        public List<CardContainer> ValidCardContainers;
+        public CopyCardItemReplaceProp(BaseCard card, List<CardContainer> validTargetContainers) : base(card)
+        {
+            ValidCardContainers = validTargetContainers;
+        }
+        
+        public override bool CanUse()
+        {
+            if (!base.CanUse()) return false;
+            return Battle.CurrentState.Value == Battle.State.BeforeShowDown;
+        }
+
+        protected override BaseCardReplaceInputHandler GetInputHandler()
+        {
+            return new CopyCardInputHandler(GameMgr, CardNode);
+        }
+    }
+    
+    protected static CardDef CreateDefFromCopiedCard(CardDef def, BaseCard card)
+    {
+        var res = def.Clone<CardDef>();
         res.Rank = card.Def.Rank;
         res.Suit = card.Def.Suit;
         return res;
     }
         
-    public CopyCard(ItemCardDef def, BaseCard target) : base(CreateDefFromCopiedCard(def, target))
+    public CopyCard(CardDef def, BaseCard target) : base(CreateDefFromCopiedCard(def, target))
     {
     }
 
-    public override void Setup(object o)
+    protected override CardPropItem CreateItemProp()
     {
-        base.Setup(o);
-        Rank.Value = Def.Rank;
-        Suit.Value = Def.Suit;
-    }
-    
-    protected override IEnumerable<CardContainer> GetValidTargetContainers()
-    {
-        yield return Battle.CommunityCardContainer;
-        yield return Battle.Player.HoleCardContainer;
-        yield return Battle.Enemy.HoleCardContainer;
-    }
-    
-    protected override bool FilterValidCardNodes(CardNode node)
-    {
-        return node.FaceDirection.Value == Enums.CardFace.Up;
-    }
-
-    protected override BaseTokenCardInputHandler<CopyCard> GetInputHandler()
-    {
-        var cardNode = Node<CardNode>();
-        return new BaseTokenCardInputHandler<CopyCard>(GameMgr, cardNode);
+        var validTargetContainers = new List<CardContainer>
+        {
+            Battle.Player.HoleCardContainer,
+            Battle.CommunityCardContainer
+        };
+        return new CopyCardItemReplaceProp(this, validTargetContainers);
     }
 }

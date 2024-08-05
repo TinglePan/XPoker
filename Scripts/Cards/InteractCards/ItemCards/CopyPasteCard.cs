@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using XCardGame.CardProperties;
 using XCardGame.Common;
 using XCardGame.Ui;
 
 namespace XCardGame;
 
-public class CopyPasteCard: BaseItemCard
+public class CopyPasteCard: BaseCard
 {
-    public class CopyPasteCardInputHandler : BaseItemCardSelectTargetInputHandler<CopyPasteCard>
+    public class CopyPasteCardInputHandler : BaseCardSelectTargetInputHandlerWithConfirmConstraints
     {
         public CopyPasteCardInputHandler(GameMgr gameMgr, CardNode node) : base(gameMgr, node, 1)
         {
@@ -15,61 +17,48 @@ public class CopyPasteCard: BaseItemCard
 
         protected override IEnumerable<CardNode> GetValidSelectTargets()
         {
-            foreach (var cardContainer in OriginateCard.ValidTargetContainers)
-            {
-                foreach (var node in cardContainer.CardNodes)
-                {
-                    yield return node;
-                }
-            }
+            return Helper.OriginateCard.GetProp<CopyPasteCardItemProp>().ValidCardContainers.SelectMany(x => x.CardNodes);
+        }
+    }
+    
+    public class CopyPasteCardItemProp : CardPropItem
+    {
+        public List<CardContainer> ValidCardContainers;
+        
+        public CopyPasteCardItemProp(BaseCard card, List<CardContainer> validContainers) : base(card)
+        {
+            ValidCardContainers = validContainers;
+        }
+        
+        public override bool CanUse()
+        {
+            if (!base.CanUse()) return false;
+            return Battle.CurrentState.Value == Battle.State.BeforeShowDown;
         }
 
-        protected override async void Confirm()
+        public override async Task Effect(List<CardNode> targets)
         {
             var tasks = new List<Task>();
-            if (SelectedNodes.Count == 1)
-            {
-                var selectedNode = SelectedNodes[0];
-                var copiedCard = new CopyCard(CardDefs.Copy, selectedNode.Card);
-                tasks.Add(GameMgr.AwaitAndDisableInput(Battle.Dealer.CreateCardAndPutInto(copiedCard, selectedNode, Enums.CardFace.Up, Battle.ItemCardContainer)));
-                OriginateCard.Use(OriginateCardNode);
-                GameMgr.InputMgr.QuitCurrentInputHandler();
-                SelectedNodes.Clear();
-                await Task.WhenAll(tasks);
+            tasks.Add(base.Effect(targets));
+            var selectedNode = targets[0];
+            var copiedCard = new CopyCard(CardDefs.Copy, selectedNode.Card);
+            tasks.Add(GameMgr.AwaitAndDisableInput(Battle.Dealer.CreateCardAndPutInto(copiedCard, selectedNode, Enums.CardFace.Up, Battle.ItemCardContainer)));
+            await Task.WhenAll(tasks);
+        }
 
-            }
-            else
-            {
-                // TODO: Hint on invalid confirm
-            }
+        protected override BaseInputHandler GetInputHandler()
+        {
+            return new CopyPasteCardInputHandler(GameMgr, CardNode);
         }
     }
     
-    public List<CardContainer> ValidTargetContainers;
-    
-    public CopyPasteCard(ItemCardDef def) : base(def)
+    public CopyPasteCard(CardDef def) : base(def)
     {
-    }
-
-    public override void Setup(object o)
-    {
-        base.Setup(o);
-        ValidTargetContainers = new List<CardContainer>
-        {
-            Battle.CommunityCardContainer,
-            Battle.Player.HoleCardContainer,
-            Battle.Enemy.HoleCardContainer
-        };
     }
     
-    public override bool CanInteract(CardNode node)
+    protected override CardPropItem CreateItemProp()
     {
-        return base.CanInteract(node) && Battle.CurrentState.Value == Battle.State.BeforeShowDown;
-    }
-
-    public override void ChooseTargets(CardNode node)
-    {
-        var inputHandler = new CopyPasteCardInputHandler(GameMgr, node);
-        GameMgr.InputMgr.SwitchToInputHandler(inputHandler);
+        var validContainers = new List<CardContainer> { Battle.Player.HoleCardContainer, Battle.CommunityCardContainer, Battle.Enemy.HoleCardContainer };
+        return new CopyPasteCardItemProp(this, validContainers);
     }
 }

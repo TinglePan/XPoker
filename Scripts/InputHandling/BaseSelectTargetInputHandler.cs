@@ -29,11 +29,13 @@ public abstract class BaseSelectTargetInputHandler<TTargetNode>: BaseInputHandle
         foreach (var selectTarget in GetValidSelectTargets())
         {
             selectTarget.OnMousePressed -= OnTargetPressed;
-            selectTarget.IsSelected = false;
         }
     }
 
-    protected abstract IEnumerable<TTargetNode> GetValidSelectTargets();
+    protected virtual IEnumerable<TTargetNode> GetValidSelectTargets()
+    {
+        yield break;
+    }
 
     protected virtual void SelectNode(TTargetNode node)
     {

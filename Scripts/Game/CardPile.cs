@@ -11,16 +11,17 @@ namespace XCardGame;
 
 public partial class CardPile: Node2D
 {
-
     public class SetupArgs
     {
         public List<BaseCard> Cards;
+        public bool CountAsField;
         public Enums.CardFace TopCardFaceDirection;
     }
     
-    public CardNode TopCard;
-    public NinePatchRect PileImage;
-    public ObservableCollection<BaseCard> Cards;
+    public CardNode TopCard { get; private set; }
+    public NinePatchRect PileImage { get; private set; }
+    public ObservableCollection<BaseCard> Cards { get; private set; }
+    public bool CountAsField { get; set; }
     public Enums.CardFace TopCardFaceDirection;
 
     public bool HasSetup { get; set; }
@@ -44,6 +45,7 @@ public partial class CardPile: Node2D
                 Cards.Add(card);
             }
         }
+        CountAsField = args.CountAsField;
         TopCardFaceDirection = args.TopCardFaceDirection;
         TopCard.Setup(new CardNode.SetupArgs
         {
@@ -113,6 +115,25 @@ public partial class CardPile: Node2D
     {
         return Cards.FirstOrDefault(filter);
     }
+    
+    protected void AdjustPileImage()
+    {
+        var count = Cards.Count;
+        if (count == 0)
+        {
+            PileImage.Hide();
+        }
+        else
+        {
+            PileImage.Show();
+        }
+        TopCard.Position = GetTopCardOffset(count);
+    }
+
+    protected Vector2 GetTopCardOffset(int count)
+    {
+        return Configuration.PiledCardOffsetMax * Mathf.Clamp((float)count / Configuration.PileCardCountAtMaxOffset, 0, 1);
+    }
 
     protected void OnCardsChanged(object sender, NotifyCollectionChangedEventArgs args)
     {
@@ -122,12 +143,13 @@ public partial class CardPile: Node2D
             case NotifyCollectionChangedAction.Remove:
             case NotifyCollectionChangedAction.Reset:
                 CheckTopCard();
-                CheckPile();
+                AdjustPileImage();
                 break;
             case NotifyCollectionChangedAction.Replace:
                 CheckTopCard();
                 break;
         }
+        
     }
 
     protected void CheckTopCard()
@@ -140,20 +162,6 @@ public partial class CardPile: Node2D
         else
         {
             TopCard.Hide();
-        }
-    }
-
-    protected void CheckPile()
-    {
-        switch (Cards.Count)
-        {
-            // NYI: update pile sprite according to left card count
-            case 0:
-                PileImage.Hide();
-                break;
-            default:
-                PileImage.Show();
-                break;
         }
     }
 }

@@ -1,44 +1,63 @@
 ﻿using System.Collections.Generic;
+using XCardGame.CardProperties;
 using XCardGame.Common;
 
 namespace XCardGame;
 
-public class NerfFlushCard: BaseRuleCard
+public class NerfFlushCard: BaseCard
 {
-    protected List<Enums.HandTier> NerfHandRanksInDescendingOrder;
-    
-
-    public NerfFlushCard(RuleCardDef def) : base(def)
+    public class NerfFlushCardRuleProp: CardPropRule
     {
-    }
-    
-    public override void OnStartEffect(Battle battle)
-    {
-        base.OnStartEffect(battle);
-        if (IsFunctioning() && !AlreadyFunctioning)
+        public List<Enums.HandTier> HandRanksInDescendingOrderBeforeNerf;
+        
+        public NerfFlushCardRuleProp(BaseCard card): base(card)
         {
-            var flushIndex = battle.HandTierOrderDescend.IndexOf(Enums.HandTier.Flush);
-            if (flushIndex < battle.HandTierOrderDescend.Count - 1)
+            HandRanksInDescendingOrderBeforeNerf = null;
+        }
+        
+        public override bool CanUse()
+        {
+            if (!base.CanUse()) return false;
+            return Battle.CurrentState.Value == Battle.State.BeforeShowDown;
+        }
+        
+        public override void OnStartEffect()
+        {
+            if (!IsEffectActive)
             {
-                (battle.HandTierOrderDescend[flushIndex], battle.HandTierOrderDescend[flushIndex + 1]) = (battle.HandTierOrderDescend[flushIndex + 1], battle.HandTierOrderDescend[flushIndex]);
+                
+                HandRanksInDescendingOrderBeforeNerf = new List<Enums.HandTier>(Battle.HandTierOrderDescend);
+                
+                var flushIndex = Battle.HandTierOrderDescend.IndexOf(Enums.HandTier.Flush);
+                if (flushIndex < Battle.HandTierOrderDescend.Count - 1)
+                {
+                    (Battle.HandTierOrderDescend[flushIndex], Battle.HandTierOrderDescend[flushIndex + 1]) = (Battle.HandTierOrderDescend[flushIndex + 1], Battle.HandTierOrderDescend[flushIndex]);
+                }
+                IsEffectActive = true;
             }
+        }
 
-            AlreadyFunctioning = true;
+        public override void OnStopEffect()
+        {
+            if (IsEffectActive)
+            {
+                for (int i = 0; i < HandRanksInDescendingOrderBeforeNerf.Count; i++)
+                {
+                    if (HandRanksInDescendingOrderBeforeNerf[i] != Battle.HandTierOrderDescend[i])
+                    {
+                        Battle.HandTierOrderDescend[i] = HandRanksInDescendingOrderBeforeNerf[i];
+                    }
+                }
+            }
         }
     }
 
-    public override void OnStopEffect(Battle battle)
+    public NerfFlushCard(CardDef def) : base(def)
     {
-        base.OnStopEffect(battle);
-        if (AlreadyFunctioning)
-        {
-            var flushIndex = battle.HandTierOrderDescend.IndexOf(Enums.HandTier.Flush);
-            if (flushIndex > 0)
-            {
-                (battle.HandTierOrderDescend[flushIndex], battle.HandTierOrderDescend[flushIndex - 1]) = (battle.HandTierOrderDescend[flushIndex - 1], battle.HandTierOrderDescend[flushIndex]);
-            }
-
-            AlreadyFunctioning = false;
-        }
+    }
+    
+    protected override CardPropRule CreateRuleProp()
+    {
+        return new NerfFlushCardRuleProp(this);
     }
 }

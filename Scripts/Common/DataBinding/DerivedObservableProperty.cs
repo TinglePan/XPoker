@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace XCardGame.Common;
 
@@ -6,6 +8,7 @@ public class DerivedObservableProperty<T> : IObservableProperty<T>, INotifyValue
 {
     private Lazy<T> _value;
     private readonly Func<T> _valueGetter;
+    private List<INotifyValueChanged> _valueChangesToObserve;
     
     public DerivedObservableProperty(
         string derivedPropertyName, Func<T> valueGetter,
@@ -14,9 +17,21 @@ public class DerivedObservableProperty<T> : IObservableProperty<T>, INotifyValue
         Name = derivedPropertyName;
         _valueGetter = valueGetter;
         _value = new Lazy<T>(valueGetter);
-        foreach (var valueChangeToObserve in valueChangesToObserve)
+        _valueChangesToObserve = new List<INotifyValueChanged>();
+        if (valueChangesToObserve != null)
         {
-            valueChangeToObserve.ValueChanged += (sender, e) => RefreshProperty();
+            foreach (var valueChangeToObserve in valueChangesToObserve)
+            {
+                Watch(valueChangeToObserve);
+            }
+        }
+    }
+    
+    ~DerivedObservableProperty()
+    {
+        foreach (var valueChangeToObserve in _valueChangesToObserve.ToList())
+        {
+            Unwatch(valueChangeToObserve);
         }
     }
 
@@ -41,4 +56,20 @@ public class DerivedObservableProperty<T> : IObservableProperty<T>, INotifyValue
         });
     }
 
+    public void Watch(INotifyValueChanged valueToWatch)
+    {
+        valueToWatch.ValueChanged += OnObservedValueChanged;
+        _valueChangesToObserve.Add(valueToWatch);
+    }
+    
+    public void Unwatch(INotifyValueChanged valueToUnwatch)
+    {
+        valueToUnwatch.ValueChanged -= OnObservedValueChanged;
+        _valueChangesToObserve.Remove(valueToUnwatch);
+    }
+    
+    protected void OnObservedValueChanged(object sender, ValueChangedEventArgs args)
+    {
+        RefreshProperty();
+    }
 }

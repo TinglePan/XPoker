@@ -1,8 +1,8 @@
 ﻿namespace XCardGame;
 
-public class DiamondsRuleCard: BaseRuleCard
+public class DiamondsRuleCard: BaseCard
 {
-    public DiamondsRuleCard(RuleCardDef def) : base(def)
+    public DiamondsRuleCard(CardDef def) : base(def)
     {
     }
 }

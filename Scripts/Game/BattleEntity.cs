@@ -63,7 +63,7 @@ public partial class BattleEntity: Node
             Defence = def.InitDefence,
             HandPowers = def.InitHandPowers,
             MaxHp = def.InitHp,
-            IsHoleCardDealtVisible = def is PlayerBattleEntityDef
+            IsHoleCardDealtVisible = def.IsPlayer
         };
     }
 
@@ -107,7 +107,7 @@ public partial class BattleEntity: Node
         Deck = args.Deck;
         foreach (var card in Deck.CardList)
         {
-            card.OwnerEntity = this;
+            card.Owner = this;
         }
 
         CharacterIcon.Setup(new IconWithTextFallback.SetupArgs()
@@ -161,7 +161,7 @@ public partial class BattleEntity: Node
             var tasks = new List<Task>();
             foreach (var node in nodes)
             {
-                tasks.Add(((CardNode)node).AnimateLeaveBattle());
+                tasks.Add(((CardNode)node).AnimateLeaveField());
                 await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
             }
             await Task.WhenAll(tasks);
@@ -169,6 +169,27 @@ public partial class BattleEntity: Node
         RoundRole.Value = Enums.EngageRole.None;
         Guard.Value = 0;
         await DiscardCards(HoleCardContainer.ContentNodes.ToList());
+    }
+
+    public void AddBuff(BaseBuff buff)
+    {
+        foreach (var content in BuffContainer.Contents)
+        {
+            var existingBuff = (BaseBuff)content;
+            if (existingBuff.Name == buff.Name)
+            {
+                buff.RepeatOn(existingBuff);
+                return;
+            }
+        }
+
+        buff.Effect();
+        BuffContainer.Contents.Add(buff);
+    }
+
+    public void RemoveBuff(BaseBuff buff)
+    {
+        
     }
 
     public int GetPower(Enums.HandTier handTier, Enums.EngageRole role)

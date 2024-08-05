@@ -12,8 +12,9 @@ public partial class CardContainer: BaseContentContainer
 {
 	public new class SetupArgs: BaseContentContainer.SetupArgs
 	{
-		public bool AllowInteract;
-		public Type ExpectedInteractCardDefType;
+		public bool AllowUseItemCard;
+		public bool AllowUseRuleCard;
+		public Type ExpectedUsableCardDefType;
 		public Enums.CardFace DefaultCardFaceDirection;
 		public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
 		public bool OnlyDisplay;
@@ -29,8 +30,8 @@ public partial class CardContainer: BaseContentContainer
 	public Enums.CardFace DefaultCardFaceDirection; 
 	public Func<int, Enums.CardFace> GetCardFaceDirectionFunc;
 
-	public bool AllowInteract;
-	public Type ExpectedInteractCardDefType;
+	public bool AllowUseItemCard;
+	public bool AllowUseRuleCard;
 	public bool ShouldCollectDealtItemAndRuleCards;
 	public bool OnlyDisplay;
 	
@@ -45,14 +46,11 @@ public partial class CardContainer: BaseContentContainer
 		base.Setup(o);
 		var args = (SetupArgs)o;
 		Battle = GameMgr.CurrentBattle;
-		AllowInteract = args.AllowInteract;
+		AllowUseItemCard = args.AllowUseItemCard;
+		AllowUseRuleCard = args.AllowUseRuleCard;
 		OnlyDisplay = args.OnlyDisplay;
 		DefaultCardFaceDirection = args.DefaultCardFaceDirection;
 		GetCardFaceDirectionFunc = args.GetCardFaceDirectionFunc;
-		if (AllowInteract)
-		{
-			ExpectedInteractCardDefType = args.ExpectedInteractCardDefType;
-		}
 		ShouldCollectDealtItemAndRuleCards = args.ShouldCollectDealtItemAndRuleCards;
 	}
 

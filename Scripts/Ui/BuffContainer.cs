@@ -41,11 +41,6 @@ public partial class BuffContainer: BaseContentContainer
                     Content = buff,
                     Container = this,
                 });
-                buff.Setup(new BaseBuff.SetupArgs
-                {
-                    GameMgr = GameMgr,
-                    Node = buffNode,
-                });
                 ContentNodes.Insert(index, buffNode);
                 OnAddContentNode?.Invoke(buffNode);
             }

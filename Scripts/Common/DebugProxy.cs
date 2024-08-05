@@ -20,7 +20,7 @@ public partial class DebugProxy: Node
     [ConsoleCommand]
     public void Reward(string defName)
     {
-        var defs = new List<BaseCardDef>();
+        var defs = new List<CardDef>();
         foreach (var def in CardDefs.All())
         {
             if (def.Name == defName)
@@ -33,7 +33,6 @@ public partial class DebugProxy: Node
         selectRewardCard.Setup(new SelectRewardCard.SetupArgs
         {
             RewardCardCount = defs.Count,
-            RewardCardDefType = typeof(InteractCardDef),
             InitReRollPrice = Configuration.DefaultReRollPrice,
             ReRollPriceIncrease = Configuration.DefaultReRollPriceIncrease,
             SkipReward = Configuration.DefaultSkipReward,

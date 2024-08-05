@@ -7,7 +7,7 @@ public class Deck
 {
     public ObservableCollection<BaseCard> CardList;
 
-    public Deck(List<BaseCardDef> cardDefs)
+    public Deck(List<CardDef> cardDefs)
     {
         CardList = new ObservableCollection<BaseCard>();
         if (cardDefs != null)
@@ -20,7 +20,7 @@ public class Deck
         }
     }
 
-    public void MixIn(List<BaseCardDef> cardDefs)
+    public void MixIn(List<CardDef> cardDefs)
     {
         if (cardDefs != null)
         {

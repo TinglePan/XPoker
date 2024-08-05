@@ -1,8 +1,8 @@
 ﻿namespace XCardGame;
 
-public class XomCard: BaseRuleCard
+public class XomCard: BaseCard
 {
-    public XomCard(RuleCardDef def): base(def)
+    public XomCard(CardDef def): base(def)
     {
     }
     

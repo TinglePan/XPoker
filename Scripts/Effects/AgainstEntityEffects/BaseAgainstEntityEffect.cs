@@ -13,16 +13,6 @@ public class BaseAgainstEntityEffect: BaseEffect
         Dst = dst;
     }
 
-    public virtual string GetDescription()
-    {
-        return DescriptionTemplate;
-    }
-
-    public virtual bool CanTrigger(CompletedHand hand)
-    {
-        return OriginateCard.IsFunctioning();
-    }
-
     public virtual void Resolve()
     {
         

@@ -7,258 +7,234 @@ namespace XCardGame;
 
 public static class CardDefs
 {
-    public static ItemCardDef D6 = new ()
+    public static CardDef D6 = new ()
     {
         Name = Utils._("D6"),
         ConcreteClassPath = "D6Card",
         DescriptionTemplate = Utils._("Randomized destiny."),
         IconPath = "res://Sprites/Cards/d6.png",
-        BasePrice = 5,
-        Rarity = 1,
         Rank = Enums.CardRank.Six,
         
+        IsItem = true,
+        ExcludeFromShop = true, 
         ExcludeFromRewards = true,
         IsInnate = true,
         Cost = 1,
         RankChangePerUse = -1,
     };
 
-    public static ItemCardDef LesserD6 = new()
+    public static CardDef LesserD6 = new()
     {
         Name = Utils._("Lesser d6"),
         ConcreteClassPath = "D6Card",
         DescriptionTemplate = Utils._("Randomized destiny."),
         IconPath = "res://Sprites/Cards/d6.png",
-        BasePrice = 0,
-        Rarity = 1,
         Rank = Enums.CardRank.Six,
 
+        IsItem = true,
+        ExcludeFromShop = true, 
         ExcludeFromRewards = true,
         Cost = 1,
         RankChangePerUse = -99,
     };
     
-    public static ItemCardDef MagicalHat = new ()
+    public static CardDef MagicalHat = new ()
     {
         Name = Utils._("Magical hat"),
         ConcreteClassPath = "MagicalHatCard",
         DescriptionTemplate = Utils._("Swap two cards."),
         IconPath = "res://Sprites/Cards/magical_hat.png",
-        BasePrice = 5,
-        Rarity = 1,
         Rank = Enums.CardRank.Four,
         
+        IsItem = true,
+        ExcludeFromShop = true, 
         ExcludeFromRewards = true,
         IsInnate = true,
         Cost = 1,
         RankChangePerUse = -1,
     };
     
-    public static ItemCardDef LesserMagicalHat = new ()
+    public static CardDef LesserMagicalHat = new ()
     {
         Name = Utils._("Lesser magical hat"),
         ConcreteClassPath = "MagicalHatCard",
         DescriptionTemplate = Utils._("Swap two cards."),
         IconPath = "res://Sprites/Cards/magical_hat.png",
-        BasePrice = 0,
-        Rarity = 1,
         Rank = Enums.CardRank.Ace,
         
+        IsItem = true,
+        ExcludeFromShop = true, 
         ExcludeFromRewards = true,
         Cost = 1,
         RankChangePerUse = -99,
     };
     
-    public static ItemCardDef BalaTrollHand = new ()
+    public static CardDef BalaTroll = new ()
     {
-        Name = Utils._("BalaTroll Hand"),
-        ConcreteClassPath = "BalaTrollHandCard",
+        Name = Utils._("BalaTroll"),
+        ConcreteClassPath = "BalaTrollCard",
         DescriptionTemplate = Utils._("Discard and redraw, like what you would do in balatro."),
-        IconPath = "res://Sprites/Cards/balatroll_hand.png",
-        BasePrice = 5,
-        Rarity = 1,
+        IconPath = "res://Sprites/Cards/balatroll.png",
         Rank = Enums.CardRank.Four,
         
+        IsItem = true,
+        IsPiled = true,
+        ExcludeFromShop = true, 
         ExcludeFromRewards = true,
         IsInnate = true,
         Cost = 1,
         RankChangePerUse = -1,
     };
 
-    public static ItemCardDef LesserBalaTrollHand = new()
-    {
-        Name = Utils._("Lesser balaTroll Hand"),
-        ConcreteClassPath = "BalaTrollHandCard",
-        DescriptionTemplate = Utils._("Discard and redraw, like what you would do in balatro."),
-        IconPath = "res://Sprites/Cards/balatroll_hand.png",
-        BasePrice = 0,
-        Rarity = 1,
-        Rank = Enums.CardRank.Ace,
-
-        ExcludeFromRewards = true,
-        Cost = 1,
-        RankChangePerUse = -99,
-    };
-
-    public static ItemCardDef CopyPaste = new()
+    public static CardDef CopyPaste = new()
     {
         Name = Utils._("Copy & paste"),
         ConcreteClassPath = "CopyPasteCard",
-        DescriptionTemplate =
-            Utils._("Create a copy of a selected card."),
+        DescriptionTemplate = Utils._("Create a copy of a selected card."),
         IconPath = "res://Sprites/Cards/copy_paste.png",
-        BasePrice = 5,
-        Rarity = 1,
         Rank = Enums.CardRank.Three,
         
+        IsItem = true,
+        ExcludeFromShop = true, 
         ExcludeFromRewards = true,
         IsInnate = true,
         Cost = 1,
         RankChangePerUse = -1,
     };
 
-    public static ItemCardDef LesserCopyPaste = new()
+    public static CardDef LesserCopyPaste = new()
     {
 
         Name = Utils._("Lesser copy & paste"),
         ConcreteClassPath = "CopyPasteCard",
-        DescriptionTemplate =
-            Utils._("Create a copy of a selected card."),
+        DescriptionTemplate = Utils._("Create a copy of a selected card."),
         IconPath = "res://Sprites/Cards/copy_paste.png",
-        BasePrice = 0,
-        Rarity = 1,
         Rank = Enums.CardRank.Ace,
         
+        IsItem = true,
+        ExcludeFromShop = true, 
         ExcludeFromRewards = true,
         Cost = 1,
         RankChangePerUse = -99,
     };
 
-    public static ItemCardDef Copy = new()
+    public static CardDef Copy = new()
     {
         Name = Utils._("Copy"),
         ConcreteClassPath = "CopyCard",
-        DescriptionTemplate =
-            Utils._("A copy. You can replace a card with it when needed. Exhaust."),
+        DescriptionTemplate = Utils._("A copy. You can replace a card with it when needed. Exhaust."),
         IconPath = "res://Sprites/Cards/copy.png",
-        Rarity = 1,
 
+        IsItem = true,
+        ExcludeFromShop = true, 
         ExcludeFromRewards = true,
         IsExhaust = true,
         Cost = 1,
         RankChangePerUse = 0,
     };
     
-    public static ItemCardDef GoldenEye = new ()
+    public static CardDef GoldenEye = new ()
     {
         Name = Utils._("Golden eye"),
         ConcreteClassPath = "GoldenEyeCard",
         DescriptionTemplate = Utils._("This trinket reveals the face-down cards."),
         IconPath = "res://Sprites/Cards/golden_eye.png",
+        
+        IsItem = true,
         BasePrice = 5,
         Rarity = 1,
-        
         Cost = 2,
         RankChangePerUse = -99,
     };
     
-    public static RuleCardDef Darkness = new ()
+    public static CardDef Darkness = new ()
     {
         Name = Utils._("Darkness"),
         ConcreteClassPath = "DarknessCard",
-        DescriptionTemplate = Utils._("Add face-down community cards."),
+        DescriptionTemplate = Utils._("Add last flip face down community cards."),
         IconPath = "res://Sprites/Cards/darkness.png",
-        Rarity = 1,
+        
+        IsRule = true,
+        IsUnstable = true,
+        ExcludeFromShop = true, 
+        ExcludeFromRewards = true,
         
         Cost = 1,
-        AutoUnSeal = true,
+        UnstableWhenTapped = true,
     };
     
-    public static RuleCardDef KeepOut = new ()
+    public static CardDef KeepOut = new ()
     {
         Name = Utils._("Keep out"),
         ConcreteClassPath = "KeepOutCard",
         DescriptionTemplate = Utils._("Certain cards do not count. Current rule:\n{}"),
         IconPath = "res://Sprites/Cards/keep_out.png",
-        Rarity = 1,
+        
+        IsRule = true,
+        IsUnstable = true,
+        ExcludeFromShop = true, 
+        ExcludeFromRewards = true,
         
         Cost = 1,
-        AutoUnSeal = true,
+        UnstableWhenTapped = true,
     };
     
-    public static RuleCardDef TheTieBreaker = new ()
-    {
-        Name = Utils._("The tie breaker"),
-        ConcreteClassPath = "TheTieBreakerCard",
-        DescriptionTemplate = Utils._("Card suit is used to break a tie. Current suit order:\n{}"),
-        IconPath = "res://Sprites/Cards/the_tie_breaker.png",
-        Rarity = 1,
-        
-        Cost = 1,
-        AutoUnSeal = true,
-    };
-    
-    public static RuleCardDef Xom = new ()
+    public static CardDef Xom = new ()
     {
         Name = Utils._("Xom"),
         ConcreteClassPath = "XomCard",
         DescriptionTemplate = Utils._("Random effects that change every turn. Current effects:\n{}"),
         IconPath = "res://Sprites/Cards/xom.png",
-        Rarity = 1,
         Rank = Enums.CardRank.Joker,
         Suit = Enums.CardSuit.Joker,
         
-        Cost = 1,
-        AutoUnSeal = true,
-    };
-    
-    public static RuleCardDef Separation = new ()
-    {
-        Name = Utils._("Separation"),
-        ConcreteClassPath = "SeparationCard",
-        DescriptionTemplate = Utils._("You will not be dealt cards from your opponent's deck, vice versa."),
-        IconPath = "res://Sprites/Cards/hand_shake.png",
-        Rarity = 1,
+        IsRule = true,
+        ExcludeFromShop = true, 
+        ExcludeFromRewards = true,
         
+        Cost = 1,
     };
     
-    public static RuleCardDef SpadesRule = new ()
+    public static CardDef SpadesRule = new ()
     {
         Name = Utils._("Spades rule"),
         ConcreteClassPath = "SpadesRuleCard",
         DescriptionTemplate = Utils._("When attack, spades resolve with 50% life leech."),
         IconPath = "res://Sprites/Cards/spades_rule.png",
-        Rarity = 1,
         
+        IsRule = true,
+        ExcludeFromShop = true, 
+        ExcludeFromRewards = true,
         Cost = 1,
-        AutoUnSeal = true,
     };
     
-    public static RuleCardDef HeartsRule = new ()
+    public static CardDef HeartsRule = new ()
     {
         Name = Utils._("Hearts rule"),
         ConcreteClassPath = "HeartsRuleCard",
         DescriptionTemplate = Utils._("When defend, hearts resolve with life recovery of 50% card rank value."),
         IconPath = "res://Sprites/Cards/hearts_rule.png",
-        Rarity = 1,
         
+        IsRule = true,
+        ExcludeFromShop = true, 
+        ExcludeFromRewards = true,
         Cost = 1,
-        AutoUnSeal = true,
     };
     
-    public static RuleCardDef ClubsRule = new ()
+    public static CardDef ClubsRule = new ()
     {
         Name = Utils._("Clubs rule"),
         ConcreteClassPath = "ClubsRuleCard",
         DescriptionTemplate = Utils._("When attack, clubs resolve with double card rank value."),
         IconPath = "res://Sprites/Cards/clubs_rule.png",
-        Rarity = 1,
         
+        IsRule = true,
+        ExcludeFromShop = true, 
+        ExcludeFromRewards = true,
         Cost = 1,
-        AutoUnSeal = true,
     };
     
-    public static RuleCardDef DiamondsRule = new ()
+    public static CardDef DiamondsRule = new ()
     {
         Name = Utils._("Diamonds rule"),
         ConcreteClassPath = "DiamondsRuleCard",
@@ -266,11 +242,13 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/diamonds_rule.png",
         Rarity = 1,
         
+        IsRule = true,
+        ExcludeFromShop = true, 
+        ExcludeFromRewards = true,
         Cost = 1,
-        AutoUnSeal = true,
     };
     
-    public static RuleCardDef NerfFlush = new ()
+    public static CardDef NerfFlush = new ()
     {
         Name = Utils._("Nerf flush"),
         ConcreteClassPath = "NerfFlushCard",
@@ -278,31 +256,35 @@ public static class CardDefs
         IconPath = "res://Sprites/Cards/nerf_flush.png",
         Rarity = 1,
         
+        IsRule = true,
+        ExcludeFromShop = true, 
+        ExcludeFromRewards = true,
         Cost = 1,
-        AutoUnSeal = true,
     };
     
-    public static RuleCardDef ShortDeckRule = new ()
+    public static CardDef ShortDeckRule = new ()
     {
         Name = Utils._("Short deck rule"),
         ConcreteClassPath = "ShortDeckRuleCard",
         DescriptionTemplate = Utils._("Straight connects Ace and 6 "),
         IconPath = "res://Sprites/Cards/short_deck_rule.png",
-        Rarity = 1,
         
+        IsInnate = true,
+        IsRule = true,
+        ExcludeFromShop = true, 
+        ExcludeFromRewards = true,
         Cost = 1,
-        AutoUnSeal = true,
     };
     
-    public static List<BaseCardDef> All()
+    public static List<CardDef> All()
     {
         Type cards = typeof(CardDefs);
-        var res = new List<BaseCardDef>();
+        var res = new List<CardDef>();
         FieldInfo[] staticFields = cards.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
         foreach (FieldInfo field in staticFields)
         {
             var value = field.GetValue(null);
-            var cardDef = (BaseCardDef)value;
+            var cardDef = (CardDef)value;
             res.Add(cardDef);
         }
         return res;

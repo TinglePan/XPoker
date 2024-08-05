@@ -27,7 +27,7 @@ public partial class PlayerBattleEntity: BattleEntity
     public ObservableProperty<int> ItemRecharge;
     // public Dictionary<int, LevelUpInfo> LevelUpTable;
 
-    public static SetupArgs InitArgs(PlayerBattleEntityDef def)
+    public new static SetupArgs InitArgs(BattleEntityDef def)
     {
         return new SetupArgs
         {

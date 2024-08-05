@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Godot;
+using XCardGame.CardProperties;
 using XCardGame.Common;
 using XCardGame.Ui;
 
@@ -12,7 +14,7 @@ public class BattleMainInputHandler: BaseInputHandler
     public BattleScene BattleScene;
     public Battle Battle;
     public PackedScene MenuPrefab;
-    public List<CardContainer> InteractCardContainers;
+    public List<CardContainer> UsableCardContainers;
     public Dictionary<Battle.State, HMenuButtons> Menus;
     
     public BattleMainInputHandler(GameMgr gameMgr) : base(gameMgr)
@@ -49,18 +51,23 @@ public class BattleMainInputHandler: BaseInputHandler
         SetupButtons();
         Battle.CurrentState.DetailedValueChanged += OnBattleStateChanged;
 
-        InteractCardContainers = new List<CardContainer>()
+        UsableCardContainers = new List<CardContainer>()
         {
             Battle.ItemCardContainer,
             Battle.RuleCardContainer
         };
 
-        foreach (var cardContainer in InteractCardContainers)
+        foreach (var cardContainer in UsableCardContainers)
         {
-            cardContainer.ContentNodes.CollectionChanged += OnInteractCardNodesCollectionChanged;
+            cardContainer.ContentNodes.CollectionChanged += OnUsableCardNodesCollectionChanged;
             foreach (var cardNode in cardContainer.ContentNodes)
             {
                 cardNode.OnMousePressed += OnCardNodePressed;
+                if (cardNode is PiledCardNode piledCardNode)
+                {
+                    piledCardNode.OnHover += piledCardNode.OnHoverHandler;
+                    piledCardNode.OnUnHover += piledCardNode.OnUnHoverHandler;
+                }
             }
         }
     }
@@ -76,12 +83,17 @@ public class BattleMainInputHandler: BaseInputHandler
             }
         }
         Battle.CurrentState.DetailedValueChanged -= OnBattleStateChanged;
-        foreach (var cardContainer in InteractCardContainers)
+        foreach (var cardContainer in UsableCardContainers)
         {
-            cardContainer.ContentNodes.CollectionChanged -= OnInteractCardNodesCollectionChanged;
+            cardContainer.ContentNodes.CollectionChanged -= OnUsableCardNodesCollectionChanged;
             foreach (var cardNode in cardContainer.ContentNodes)
             {
                 cardNode.OnMousePressed -= OnCardNodePressed;
+                if (cardNode is PiledCardNode piledCardNode)
+                {
+                    piledCardNode.OnHover -= piledCardNode.OnHoverHandler;
+                    piledCardNode.OnUnHover -= piledCardNode.OnUnHoverHandler;
+                }
             }
         }
     }
@@ -107,12 +119,11 @@ public class BattleMainInputHandler: BaseInputHandler
             menu.Setup(new HMenuButtons.SetupArgs
             {
                 Name = menuName,
-                ButtonTagsAndLabels = new List<(string, string)>
+                ButtonSetupArgs = new List<(string, string, Action)>
                 {
-                    ("DealCards", Utils._("Deal cards")),
+                    ("DealCards", Utils._("Deal cards"), OnDealCardsButtonPressed),
                 }
             });
-            menu.Buttons["DealCards"].Pressed += OnDealCardsButtonPressed;
             menu.Hide();
             Menus[Battle.State.BeforeDealCards] = menu;
         }
@@ -124,16 +135,13 @@ public class BattleMainInputHandler: BaseInputHandler
             menu.Setup(new HMenuButtons.SetupArgs
             {
                 Name = menuName,
-                ButtonTagsAndLabels = new List<(string, string)>
+                ButtonSetupArgs = new List<(string, string, Action)>
                 {
-                    ("Flip", Utils._("Flip")),
-                    ("ShowDown", Utils._("Show down")),
-                    ("Fold", Utils._("Fold")),
+                    ("Flip", Utils._("Flip"), OnFlipButtonPressed),
+                    ("ShowDown", Utils._("Show down"), OnShowDownButtonPressed),
+                    ("Fold", Utils._("Fold"), OnFoldButtonPressed),
                 }
             });
-            menu.Buttons["Flip"].Pressed += OnFlipButtonPressed;
-            menu.Buttons["ShowDown"].Pressed += OnShowDownButtonPressed;
-            menu.Buttons["Fold"].Pressed += OnFoldButtonPressed;
             menu.Hide();
             Menus[Battle.State.BeforeShowDown] = menu;
         }
@@ -145,12 +153,11 @@ public class BattleMainInputHandler: BaseInputHandler
             menu.Setup(new HMenuButtons.SetupArgs
             {
                 Name = menuName,
-                ButtonTagsAndLabels = new List<(string, string)>
+                ButtonSetupArgs = new List<(string, string, Action)>
                 {
-                    ("Engage", Utils._("Engage!")),
+                    ("Engage", Utils._("Engage!"), OnEngageButtonPressed),
                 }
             });
-            menu.Buttons["Engage"].Pressed += OnEngageButtonPressed;
             menu.Hide();
             Menus[Battle.State.BeforeEngage] = menu;
         }
@@ -162,12 +169,11 @@ public class BattleMainInputHandler: BaseInputHandler
             menu.Setup(new HMenuButtons.SetupArgs
             {
                 Name = menuName,
-                ButtonTagsAndLabels = new List<(string, string)>
+                ButtonSetupArgs = new List<(string, string, Action)>
                 {
-                    ("NextRound", Utils._("Next round")),
+                    ("NextRound", Utils._("Next round"), OnNextRoundButtonPressed),
                 }
             });
-            menu.Buttons["NextRound"].Pressed += OnNextRoundButtonPressed;
             menu.Hide();
             Menus[Battle.State.AfterEngage] = menu;
         }
@@ -180,16 +186,15 @@ public class BattleMainInputHandler: BaseInputHandler
         {
             if (mouseButton == MouseButton.Left)
             {
-                var cardNode = (CardNode)node;
-                if (node.Content.Value is IInteractCard interactCard && interactCard.CanInteract(cardNode))
+                if (node.Content.Value is BaseCard card && card.GetProp<BaseCardPropUsable>() is { } usable && usable.CanUse())
                 {
-                    interactCard.Interact(cardNode);
+                    usable.Use();
                 }
             }
         }
     }
     
-    protected void OnInteractCardNodesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+    protected void OnUsableCardNodesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
     {
         switch (args.Action)
         {

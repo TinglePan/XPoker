@@ -4,7 +4,7 @@ namespace XCardGame;
 
 public static class BattleEntityDefs
 {
-    public static PlayerBattleEntityDef DefaultPlayerBattleEntityDef = new ()
+    public static BattleEntityDef DefaultPlayerBattleEntityDef = new ()
     {
         Name = "You",
         PortraitPath = "res://Sprites/duster_guy.png",
@@ -14,145 +14,131 @@ public static class BattleEntityDefs
         InitDefence = 0,
         InitItemPocketSize = 3,
         InitItemRecharge = 1,
-        InitHandPowers = HandPowerTables.DefaultPlayerHandPowerTable,
-        InitHp = 100,
-        InitEnergy = 3,
-        InitCredit = 0
-    };
-
-    public static PlayerBattleEntityDef GamblerPlayerBattleEntityDef = new()
-    {
-        Name = "Gambler",
-        PortraitPath = "res://Sprites/gambler.png",
-        SpritePath = "res://Sprites/gambler.png",
-        InitDeckDef = new List<BaseCardDef> { CardDefs.D6, CardDefs.LesserD6, CardDefs.LesserD6 },
-        InitAttack = 0,
-        InitDefence = 0,
-        InitItemPocketSize = 3,
-        InitItemRecharge = 1,
+        IsPlayer = true,
         InitHandPowers = HandPowerTables.DefaultPlayerHandPowerTable,
         InitHp = 100,
         InitEnergy = 3,
         InitCredit = 100
     };
-    
-    public static PlayerBattleEntityDef TricksterPlayerBattleEntityDef = new()
-    {
-        Name = "Trickster",
-        PortraitPath = "res://Sprites/trickster.png",
-        SpritePath = "res://Sprites/trickster.png",
-        InitDeckDef = new List<BaseCardDef> { CardDefs.MagicalHat, CardDefs.LesserMagicalHat, CardDefs.LesserMagicalHat },
-        InitAttack = 0,
-        InitDefence = 0,
-        InitItemPocketSize = 3,
-        InitItemRecharge = 1,
-        InitHandPowers = HandPowerTables.DefaultPlayerHandPowerTable,
-        InitHp = 100,
-        InitEnergy = 3,
-        InitCredit = 0
-    };
 
-    public static PlayerBattleEntityDef PiratePlayerBattleEntityDef = new()
-    {
-        Name = "Pirate",
-        PortraitPath = "res://Sprites/trickster.png",
-        SpritePath = "res://Sprites/trickster.png",
-        InitDeckDef = new List<BaseCardDef> { CardDefs.CopyPaste, CardDefs.LesserCopyPaste, CardDefs.LesserCopyPaste },
-        InitAttack = 0,
-        InitDefence = 0,
-        InitItemPocketSize = 3,
-        InitItemRecharge = 1,
-        InitHandPowers = HandPowerTables.DefaultPlayerHandPowerTable,
-        InitHp = 100,
-        InitEnergy = 3,
-        InitCredit = 0
-    };
+    public static BattleEntityDef GamblerPlayerBattleEntityDef = GetGamblerPlayerBattleEntityDef();
     
-    public static PlayerBattleEntityDef ClownPlayerBattleEntityDef = new()
+    private static BattleEntityDef GetGamblerPlayerBattleEntityDef()
     {
-        Name = "You",
-        PortraitPath = "res://Sprites/clown.png",
-        SpritePath = "res://Sprites/clown.png",
-        InitDeckDef = new List<BaseCardDef> { CardDefs.BalaTrollHand, CardDefs.LesserBalaTrollHand, CardDefs.LesserBalaTrollHand },
-        InitAttack = 0,
-        InitDefence = 0,
-        InitItemPocketSize = 3,
-        InitItemRecharge = 1,
-        InitHandPowers = HandPowerTables.DefaultPlayerHandPowerTable,
-        InitHp = 100,
-        InitEnergy = 3,
-        InitCredit = 0
-    };
+        var res = DefaultPlayerBattleEntityDef.Clone<BattleEntityDef>();
+        res.Name = "Gambler";
+        res.PortraitPath = "res://Sprites/gambler.png";
+        res.SpritePath = "res://Sprites/gambler.png";
+        res.InitDeckDef = new List<CardDef> { CardDefs.D6, CardDefs.LesserD6, CardDefs.LesserD6 };
+        return res;
+    }
+    
+    public static BattleEntityDef TricksterPlayerBattleEntityDef = GetTricksterPlayerBattleEntityDef();
+    
+    private static BattleEntityDef GetTricksterPlayerBattleEntityDef()
+    {
+        var res = DefaultPlayerBattleEntityDef.Clone<BattleEntityDef>();
+        res.Name = "Trickster";
+        res.PortraitPath = "res://Sprites/trickster.png";
+        res.SpritePath = "res://Sprites/trickster.png";
+        res.InitDeckDef = new List<CardDef> { CardDefs.MagicalHat, CardDefs.LesserMagicalHat, CardDefs.LesserMagicalHat };
+        return res;
+    }
 
-    public static BattleEntityDef TestEnemyBattleEntityDef = new()
+    public static BattleEntityDef PiratePlayerBattleEntityDef = GetPiratePlayerBattleEntityDef();
+
+    private static BattleEntityDef GetPiratePlayerBattleEntityDef()
     {
-        Name = "Test",
-        PortraitPath = "res://Sprites/duster_guy.png",
-        SpritePath = "res://Sprites/duster_guy.png",
-        InitDeckDef = null,
-        InitAttack = 0,
-        InitDefence = 0,
-        InitHandPowers = HandPowerTables.DefaultPlayerHandPowerTable,
-        InitHp = 1,
-    };
+        var res = DefaultPlayerBattleEntityDef.Clone<BattleEntityDef>();
+        res.Name = "Pirate";
+        res.PortraitPath = "res://Sprites/pirate.png";
+        res.SpritePath = "res://Sprites/pirate.png";
+        res.InitDeckDef = new List<CardDef> { CardDefs.CopyPaste, CardDefs.LesserCopyPaste, CardDefs.LesserCopyPaste };
+        return res;
+    }
+    
+    public static BattleEntityDef ClownPlayerBattleEntityDef = GetClownPlayerBattleEntityDef(); 
+        
+    private static BattleEntityDef GetClownPlayerBattleEntityDef()
+    {
+        var res = DefaultPlayerBattleEntityDef.Clone<BattleEntityDef>();
+        res.Name = "Clown";
+        res.PortraitPath = "res://Sprites/clown.png";
+        res.SpritePath = "res://Sprites/clown.png";
+        res.InitDeckDef = new List<CardDef> { CardDefs.BalaTroll };
+        return res;
+    }
     
     public static BattleEntityDef DefaultEnemyBattleEntityDef = new ()
     {
         Name = "Enemy",
-        PortraitPath = "res://Sprites/duster_guy.png",
-        SpritePath = "res://Sprites/duster_guy.png",
+        PortraitPath = "res://Sprites/enemy.png",
+        SpritePath = "res://Sprites/enemy.png",
         InitDeckDef = null,
         InitAttack = 0,
-        InitDefence = 0,
-        InitHandPowers = HandPowerTables.DefaultPlayerHandPowerTable,
-        InitHp = 100,
-    };
-
-    public static BattleEntityDef TallBoyBattleEntityDef = new()
-    {
-        Name = "Tall boy",
-        PortraitPath = "res://Sprites/tall_boy.png",
-        SpritePath = "res://Sprites/tall_boy.png",
-        InitDeckDef = null,
-        InitAttack = 0,
-        InitDefence = 0,
-        InitHandPowers = HandPowerTables.HighCardEnhancedHandPowerTable,
-        InitHp = 100,
-    };
-
-    public static BattleEntityDef NinjaBattleEntityDef = new()
-    {
-        Name = "Ninja",
-        PortraitPath = "res://Sprites/ninja.png",
-        SpritePath = "res://Sprites/ninja.png",
-        InitDeckDef = null,
-        InitAttack = 0,
-        InitDefence = 0,
-        InitHandPowers = HandPowerTables.NoaKEnhancedHandPowerTable,
-        InitHp = 100,
-    };
-
-    public static BattleEntityDef ManInBlackBattleEntityDef = new()
-    {
-        Name = "Man in black",
-        PortraitPath = "res://Sprites/man_in_black.png",
-        SpritePath = "res://Sprites/man_in_black.png",
-        InitDeckDef = new List<BaseCardDef> { CardDefs.SpadesRule, CardDefs.ClubsRule},
-        InitAttack = 0,
-        InitDefence = 0,
-        InitHandPowers = HandPowerTables.StraightFlushEnhancedHandPowerTable,
-        InitHp = 100,
-    };
-
-    public static BattleEntityDef AssassinBattleEntityDef = new()
-    {
-        Name = "Assassin",
-        PortraitPath = "res://Sprites/assassin.png",
-        SpritePath = "res://Sprites/assassin.png",
-        InitDeckDef = null,
-        InitAttack = 20,
         InitDefence = 0,
         InitHandPowers = HandPowerTables.DefaultEnemyHandPowerTable,
-        InitHp = 1,
+        InitHp = 100,
     };
+
+    public static BattleEntityDef TestEnemyBattleEntityDef = GetTestEnemyBattleEntityDef();
+
+    private static BattleEntityDef GetTestEnemyBattleEntityDef()
+    {
+        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        res.Name = "Test";
+        res.PortraitPath = "res://Sprites/test.png";
+        res.SpritePath = "res://Sprites/test.png";
+        res.InitHp = 1;
+        return res;
+    }
+
+    public static BattleEntityDef TallBoyBattleEntityDef = GetTallBoyBattleEntityDef();
+
+    private static BattleEntityDef GetTallBoyBattleEntityDef()
+    {
+        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        res.Name = "Tall boy";
+        res.PortraitPath = "res://Sprites/tall_boy.png";
+        res.SpritePath = "res://Sprites/tall_boy.png";
+        res.InitHandPowers = HandPowerTables.HighCardEnhancedHandPowerTable;
+        return res;
+    }
+
+    public static BattleEntityDef NinjaBattleEntityDef = GetNinjaBattleEntityDef();
+
+    private static BattleEntityDef GetNinjaBattleEntityDef()
+    {
+        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        res.Name = "Ninja";
+        res.PortraitPath = "res://Sprites/ninja.png";
+        res.SpritePath = "res://Sprites/ninja.png";
+        res.InitDeckDef = null;
+        res.InitHandPowers = HandPowerTables.NoaKEnhancedHandPowerTable;
+        return res;
+    }
+
+    public static BattleEntityDef ManInBlackBattleEntityDef = GetManInBlackBattleEntityDef();
+
+    private static BattleEntityDef GetManInBlackBattleEntityDef()
+    {
+        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        res.Name = "Man in black";
+        res.PortraitPath = "res://Sprites/man_in_black.png";
+        res.SpritePath = "res://Sprites/man_in_black.png";
+        res.InitDeckDef = new List<CardDef> { CardDefs.SpadesRule, CardDefs.ClubsRule };
+        res.InitHandPowers = HandPowerTables.StraightFlushEnhancedHandPowerTable;
+        return res;
+    }
+
+    public static BattleEntityDef AssassinBattleEntityDef = GetAssassinBattleEntityDef();
+    private static BattleEntityDef GetAssassinBattleEntityDef()
+    {
+        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        res.Name = "Assassin";
+        res.PortraitPath = "res://Sprites/assassin.png";
+        res.SpritePath = "res://Sprites/assassin.png";
+        res.InitAttack = 20;
+        return res;
+    }
 }

@@ -88,21 +88,6 @@ public static class Enums
         StraightFlush,
         RoyalFlush
     }
-    
-    public enum PlayerAction
-    {
-        None,
-        Fold,
-        Check,
-        Call,
-        Raise
-    }
-
-    public enum TapDirection
-    {
-        Tapped,
-        UnTapped
-    }
 
     public enum EngageRole
     {
@@ -111,39 +96,10 @@ public static class Enums
         Defender
     }
 
-    public enum InteractCardType
-    {
-        None,
-        Item,
-        Equipment,
-        Rule
-    }
-
-    public enum InteractionType
-    {
-        Use,
-        Seal,
-        Custom
-    }
-
     public enum RuleNature
     {
         Blessing,
         Neutral,
         Curse
-    }
-    
-    public enum UseUpOperation
-    {
-        Tap,
-        Discard,
-        Exhaus
-    }
-
-    public enum TerminateBehavior
-    {
-        Tap,
-        Discard,
-        Exhaust
     }
 }

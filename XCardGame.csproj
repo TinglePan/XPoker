@@ -29,4 +29,7 @@
     <Content Include="addons\raw\icon.png" />
     <Content Include="addons\raw\icon.png.import" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scripts\Cards\CardInputHandlers\" />
+  </ItemGroup>
 </Project>

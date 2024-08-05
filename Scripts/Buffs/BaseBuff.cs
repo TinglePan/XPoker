@@ -2,19 +2,25 @@
 using System.Collections.Generic;
 using Godot;
 using XCardGame.Common;
+using XCardGame.TimingInterfaces;
 using XCardGame.Ui;
 
 namespace XCardGame;
 
-public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff>
+public class BaseBuff:IContent, IRoundEnd, IStartStopEffect
 {
 
     public class SetupArgs
     {
         public GameMgr GameMgr;
         public Battle Battle;
-        public BaseContentNode Node;
+        public BuffNode Node;
+        public BattleEntity Entity;
+        public BattleEntity InflictedBy;
+        public BaseCard InflictedByCard;
     }
+    
+    public bool IsEffectActive => Entity?.BuffContainer.Contents.Contains(this) ?? false;
     
     public string Name;
     public string DescriptionTemplate;
@@ -25,37 +31,53 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff
     public BaseCard InflictedByCard;
 
     public bool IsStackable;
+    public bool ConsumeAllStack;
     public bool StackOnRepeat;
+    public bool RecastOnRepeat;
     public ObservableProperty<int> Stack;
     public int MaxStack;
 
     public bool IsTemporary;
     
-    public HashSet<BaseContentNode> Nodes { get; private set; }
+    public HashSet<BaseContentNode> Nodes { get; }
 
     public GameMgr GameMgr;
     public Battle Battle;
 
-    public BaseBuff(string name, string descriptionTemplate, string iconPath, bool isStackable = false, bool stackOnRepeat = true, int stack = 0, int maxStack = 0, bool isTemporary = false)
+    public BaseBuff(string name, string descriptionTemplate, string iconPath, bool isStackable = false,
+        bool consumeAllStack = true, bool recastOnRepeat = true, bool stackOnRepeat = true, int stack = 0,
+        int maxStack = 0, bool isTemporary = false)
     {
         Nodes = new HashSet<BaseContentNode>();
         Name = name;
         DescriptionTemplate = descriptionTemplate;
         IconPath = iconPath;
         IsStackable = isStackable;
+        ConsumeAllStack = consumeAllStack;
+        RecastOnRepeat = recastOnRepeat;
         StackOnRepeat = stackOnRepeat;
         Stack = new ObservableProperty<int>(nameof(Stack), this, stack);
         MaxStack = maxStack;
         IsTemporary = isTemporary;
     }
     
-    public TContentNode Node<TContentNode>() where TContentNode : BaseContentNode
+    public TContentNode Node<TContentNode>(bool strict = true) where TContentNode : BaseContentNode
     {
         foreach (var node in Nodes)
         {
-            if (node is TContentNode contentNode)
+            if (strict)
             {
-                return contentNode;
+                if (node is TContentNode contentNode)
+                {
+                    return contentNode;
+                }
+            }
+            else
+            {
+                if (node.GetType().IsAssignableTo(typeof(TContentNode)))
+                {
+                    return (TContentNode)node;
+                }
             }
         }
         return null;
@@ -64,69 +86,38 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff
     public virtual void Setup(object o)
     {
         var args = (SetupArgs)o;
-        Nodes.Add(args.Node);
         GameMgr = args.GameMgr;
         Battle = args.Battle;
+        if (args.Node != null)
+        {
+            Nodes.Add(args.Node);
+        }
+        Entity = args.Entity;
+        InflictedBy = args.InflictedBy;
+        InflictedByCard = args.InflictedByCard;
     }
 
     public override string ToString()
     {
         return Description();
     }
-
-    public void InflictOn(BattleEntity target, BattleEntity source, BaseCard sourceCard)
+    
+    public void OnStartEffect()
     {
-        Entity = target;
-        InflictedBy = source;
-        InflictedByCard = sourceCard;
-        Entity.BuffContainer.Buffs.Add(this);
+        Entity.AddBuff(this);
+        Effect();
+    }
+    
+    public void OnStopEffect()
+    {
+        Entity.RemoveBuff(this);
     }
 
-    public virtual void OnStartEffect(Battle battle)
-    {
-        Battle.OnRoundEnd += OnRoundEnd;
-    }
-
-    public virtual void OnStopEffect(Battle battle)
-    {
-        Battle.OnRoundEnd -= OnRoundEnd;
-    }
-
-    public virtual void Repeat(Battle battle, BattleEntity entity, BattleEntity inflictedBy, BaseCard inflictedByCard)
-    {
-        InflictedBy = inflictedBy;
-        InflictedByCard = inflictedByCard;
-        if (IsStackable)
-        {
-            foreach (var buff in entity.BuffContainer.Buffs)
-            {
-                if (buff.Equals(this))
-                {
-                    if (StackOnRepeat)
-                    {
-                        buff.ChangeStack(Stack.Value);
-                    }
-                    else
-                    {
-                        buff.Stack.Value = Mathf.Max(buff.Stack.Value, Stack.Value);
-                    }
-                    break;
-                }
-            }
-        }
-        OnStartEffect(battle);
-    }
-
-    public virtual void Consume()
-    {
-        Entity.BuffContainer.Buffs.Remove(this);
-    }
-
-    public virtual void OnRoundEnd(Battle battle)
+    public virtual void OnRoundEnd()
     {
         if (IsTemporary)
         {
-            Entity.BuffContainer.Buffs.Remove(this);
+            OnStopEffect();
             return;
         }
         if (IsStackable)
@@ -135,9 +126,40 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff
         }
     }
 
-    public bool Equals(BaseBuff other)
+    public virtual void Effect()
     {
-        return Name == other?.Name;
+        
+    }
+    
+    public void RepeatOn(BaseBuff existingBuff)
+    {
+        if (IsStackable)
+        {
+            if (StackOnRepeat)
+            {
+                existingBuff.ChangeStack(Stack.Value);
+            }
+            else
+            {
+                existingBuff.Stack.Value = Mathf.Max(existingBuff.Stack.Value, Stack.Value);
+            }
+        }
+        if (RecastOnRepeat)
+        {
+            existingBuff.Effect();
+        }
+    }
+
+    public virtual void Consume()
+    {
+        if (IsStackable && !ConsumeAllStack)
+        {
+            ChangeStack(-1);
+        }
+        else
+        {
+            OnStopEffect();
+        }
     }
 
     public virtual string Description()
@@ -158,11 +180,11 @@ public class BaseBuff:ILifeCycleTriggeredInBattle, IContent, IEquatable<BaseBuff
         }
         else
         {
-            Stack.Value = Mathf.Clamp(Stack.Value + StackDecreasePerRound(), 0, MaxStack);
+            Stack.Value = Mathf.Clamp(Stack.Value + amount, 0, MaxStack);
         }
         if (Stack.Value <= 0)
         {
-            Entity.BuffContainer.Buffs.Remove(this);
+            OnStopEffect();
         }
     }
 }

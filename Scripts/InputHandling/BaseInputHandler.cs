@@ -12,7 +12,7 @@ public class BaseInputHandler: IHandleInput
     public Action<Vector2> OnLMouseButtonPressed;
     public Action<Vector2> OnRMouseButtonPressed;
 
-    protected bool ReceiveInput;
+    public bool ReceiveInput;
     
     public BaseInputHandler(GameMgr gameMgr)
     {

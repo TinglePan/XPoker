@@ -1,26 +1,19 @@
-﻿namespace XCardGame;
+﻿using XCardGame.TimingInterfaces;
 
-public class BaseSingleTurnFieldEffect: BaseFieldEffect
+namespace XCardGame;
+
+public class BaseSingleTurnFieldEffect: BaseFieldEffect, IRoundEnd
 {
     public BaseSingleTurnFieldEffect(string name, string descriptionTemplate, BaseCard originateCard) :
         base(name, descriptionTemplate, originateCard)
     {
     }
 
-    public override void OnStartEffect(Battle battle)
+    public void OnRoundEnd()
     {
-        base.OnStartEffect(battle);
-        battle.OnRoundEnd += OnRoundEnd;
-    }
-
-    public override void OnStopEffect(Battle battle)
-    {
-        base.OnStopEffect(battle);
-        battle.OnRoundEnd -= OnRoundEnd;
-    }
-
-    protected void OnRoundEnd(Battle battle)
-    {
-        battle.StopEffect(this);
+        if (IsEffectActive)
+        {
+            Battle.Effects.Remove(this);
+        }
     }
 }

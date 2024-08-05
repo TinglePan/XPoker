@@ -1,6 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://4ck8kyonxpu0"]
-
-[ext_resource type="PackedScene" uid="uid://c8kp4dqa7xtfn" path="res://Scenes/MenuButton.tscn" id="1_f8ges"]
+[gd_scene format=3 uid="uid://4ck8kyonxpu0"]
 
 [node name="BeforeDealCardsButtons" type="HBoxContainer"]
 custom_minimum_size = Vector2(324, 44)
@@ -15,7 +13,3 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
 alignment = 1
-
-[node name="DealCardsButton" parent="." instance=ExtResource("1_f8ges")]
-layout_mode = 2
-text = "Deal cards"

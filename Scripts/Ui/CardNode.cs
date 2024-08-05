@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
+using XCardGame.CardProperties;
 using XCardGame.Common;
 
 namespace XCardGame.Ui;
@@ -24,8 +25,6 @@ public partial class CardNode: BaseContentNode, ISelect
     public Sprite2D JokerMark;
     public Label CostLabel;
     public AnimationPlayer AnimationPlayer;
-    public NinePatchRect PileImage;
-    public CardContainer PileContainer;
     
     public BaseCard Card => (BaseCard)Content.Value;
     public Enums.CardFace OriginalFaceDirection;
@@ -33,6 +32,7 @@ public partial class CardNode: BaseContentNode, ISelect
     public bool OnlyDisplay;
     public ObservableProperty<bool> IsRevealed;
     public ObservableProperty<bool> IsTapped;
+    public DerivedObservableProperty<bool> IsEffective;
 
     private ObservableProperty<bool> _isSelected;
     public bool IsSelected { get; set; }
@@ -52,8 +52,6 @@ public partial class CardNode: BaseContentNode, ISelect
 		JokerMark = GetNode<Sprite2D>("Outline/Front/Joker");
 		CostLabel = GetNode<Label>("Outline/Front/Cost");
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-		PileImage = GetNode<NinePatchRect>("Pile/Image");
-		PileContainer = GetNode<CardContainer>("Pile/Container");
 		
 		FaceDirection = new ObservableProperty<Enums.CardFace>(nameof(FaceDirection), this, Enums.CardFace.Down);
 		FaceDirection.DetailedValueChanged += OnCardFaceChanged;
@@ -64,6 +62,9 @@ public partial class CardNode: BaseContentNode, ISelect
 		IsRevealed.DetailedValueChanged += OnToggleIsRevealed;
 		IsTapped = new ObservableProperty<bool>(nameof(IsTapped), this, false);
 		IsTapped.DetailedValueChanged += OnToggleIsTapped;
+		IsEffective = new DerivedObservableProperty<bool>(nameof(IsEffective), GetIsEffective,
+			IsTapped, FaceDirection, CurrentContainer);
+		IsEffective.DetailedValueChanged += OnIsEffectiveChanged;
 		InitPosition = Position;
 	}
 	
@@ -98,9 +99,24 @@ public partial class CardNode: BaseContentNode, ISelect
 		return true;
 	}
 
-	public void ToggleSelect(bool to)
+	public bool GetIsEffective()
 	{
-		IsSelected = to;
+		if (FaceDirection.Value == Enums.CardFace.Down) return false;
+		if (IsTapped.Value) return false;
+		if (CurrentContainer.Value is CardContainer { OnlyDisplay: true }) return false;
+		return true;
+	}
+	
+	public void OnIsEffectiveChanged(object sender, ValueChangedEventDetailedArgs<Lazy<bool>> args)
+	{
+		if (args.NewValue.Value)
+		{
+			StartCard();
+		}
+		else
+		{
+			StopCard();
+		}
 	}
 
 	public async void Reset(bool useTween = true)
@@ -149,14 +165,6 @@ public partial class CardNode: BaseContentNode, ISelect
 	{
 		if (FaceDirection.Value == toFaceDir) return;
 		AnimationPlayer.Play("flip");
-		if (toFaceDir == Enums.CardFace.Down)
-		{
-			StopCard();
-		}
-		else
-		{
-			StartCard();
-		}
 		await ToSignal(AnimationPlayer, AnimationMixer.SignalName.AnimationFinished);
 	}
 
@@ -198,9 +206,10 @@ public partial class CardNode: BaseContentNode, ISelect
 		FaceDirection.Value = FaceDirection.Value == Enums.CardFace.Down ? Enums.CardFace.Up : Enums.CardFace.Down;
 	}
 
-	public async Task AnimateLeaveBattle()
+	public async Task AnimateLeaveField()
 	{
-		if (Card.Def is InteractCardDef { IsExhaust: true })
+		Card.OnLeaveField();
+		if (Card.Def is { IsExhaust: true })
 		{
 			await AnimateExhaust(Configuration.ExhaustAnimationTime);
 		}
@@ -281,13 +290,11 @@ public partial class CardNode: BaseContentNode, ISelect
 		{
 			Back.Show();
 			Front.Hide();
-			StartCard();
 		}
 		else
 		{
 			Back.Hide();
 			Front.Show();
-			StopCard();
 		}
 	}
     
@@ -347,11 +354,12 @@ public partial class CardNode: BaseContentNode, ISelect
 		card.Suit.FireValueChangeEventsOnInit();
 		card.IsNegated.DetailedValueChanged += OnToggleIsNegated;
 		card.IsNegated.FireValueChangeEventsOnInit();
-		if (card is BaseInteractCard interactCard)
+		if (card.Def.IsUsable)
 		{
 			CostLabel.Show();
-			interactCard.Cost.DetailedValueChanged += OnCardCostChanged;
-			interactCard.Cost.FireValueChangeEventsOnInit();
+			var prop = card.GetProp<BaseCardPropUsable>();
+			prop.Cost.DetailedValueChanged += OnCardCostChanged;
+			prop.Cost.FireValueChangeEventsOnInit();
 		}
 		else
 		{
@@ -359,7 +367,7 @@ public partial class CardNode: BaseContentNode, ISelect
 		}
 		MainIcon.DisplayName.Value = card.Def.Name;
 		MainIcon.ResetIconPath(card.IconPath);
-		if (!OnlyDisplay)
+		if (IsEffective.Value)
 		{
 			StartCard();
 		}
@@ -373,16 +381,17 @@ public partial class CardNode: BaseContentNode, ISelect
 		card.Rank.DetailedValueChanged -= OnCardRankChanged;
 		card.Suit.DetailedValueChanged -= OnCardSuitChanged;
 		card.IsNegated.DetailedValueChanged -= OnToggleIsNegated;
-		if (card is BaseInteractCard interactCard)
+		if (card.Def.IsUsable)
 		{
 			CostLabel.Hide();
-			interactCard.Cost.DetailedValueChanged -= OnCardCostChanged;
+			var prop = card.GetProp<BaseCardPropUsable>();
+			prop.Cost.DetailedValueChanged -= OnCardCostChanged;
 		}
 		MainIcon.DisplayName.Value = null;
 		MainIcon.ResetIconPath(null);
-		if (!OnlyDisplay)
+		if (!IsEffective.Value)
 		{
-			card.OnStopEffect(card.Battle);
+			StopCard();
 		}
 	}
 
@@ -423,12 +432,10 @@ public partial class CardNode: BaseContentNode, ISelect
 		if (args.NewValue)
 		{
 			Modulate = Colors.DimGray;
-			StartCard();
 		}
 		else
 		{
 			Modulate = Colors.White;
-			StopCard();
 		}
 	}
 	
@@ -446,11 +453,11 @@ public partial class CardNode: BaseContentNode, ISelect
 
 	protected void StartCard()
 	{
-		Card?.OnStartEffect(Card.Battle);
+		Card?.OnStartEffect();
 	}
 
 	protected void StopCard()
 	{
-		Card?.OnStopEffect(Card.Battle);
+		Card?.OnStopEffect();
 	}
 }

@@ -82,7 +82,7 @@ public partial class Shop: Control
     // public ObservableCollection<BaseCard> AbilityCards;
     // public ObservableCollection<BaseCardMarker> Markers;
 
-    public List<BaseCardDef> AllCardDefs; 
+    public List<CardDef> AllCardDefs; 
     
     public bool HasSetup { get; set; }
 
@@ -155,22 +155,22 @@ public partial class Shop: Control
         return Utils.RandOnOdds(odds, GameMgr.Rand);
     }
 
-    protected List<BaseCardDef> FilterCardDefs(int rarity)
+    protected List<CardDef> FilterCardDefs(int rarity)
     {
         return AllCardDefs.FindAll(x => rarity == x.Rarity).ToList();
     }
     
-    protected List<BaseCardDef> FilterCardDefs(Type type)
+    protected List<CardDef> FilterCardDefs(Type type)
     {
         return AllCardDefs.FindAll(x => x.GetType() == type).ToList();
     }
     
-    protected List<BaseCardDef> FilterCardDefs(Type type, int rarity)
+    protected List<CardDef> FilterCardDefs(Type type, int rarity)
     {
         return AllCardDefs.FindAll(x => x.GetType() == type && rarity == x.Rarity).ToList();
     }
 
-    protected List<BaseCardDef> RandNCardDefsOfType(List<BaseCardDef> cardDefs, int n, Type type)
+    protected List<CardDef> RandNCardDefsOfType(List<CardDef> cardDefs, int n, Type type)
     {
         var filteredCardDefs = cardDefs.FindAll(x => x.GetType() == type).ToList();
         return Utils.RandMFrom(filteredCardDefs, n, GameMgr.Rand);

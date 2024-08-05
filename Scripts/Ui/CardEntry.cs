@@ -65,11 +65,6 @@ public partial class CardEntry: BaseContentNode, ISelect
     {
 	    return true;
     }
-
-    public void ToggleSelect(bool to)
-    {
-	    IsSelected = to;
-    }
     
     protected void InputEventHandler(Node viewport, InputEvent @event, long shapeIdx)
     {
@@ -170,27 +165,13 @@ public partial class CardEntry: BaseContentNode, ISelect
 		}
 	}
 	
-	protected void OnToggleIsNegated(object sender, ValueChangedEventDetailedArgs<bool> args)
-	{
-		if (args.NewValue)
-		{
-			Modulate = Colors.DimGray;
-			StartCard();
-		}
-		else
-		{
-			Modulate = Colors.White;
-			StopCard();
-		}
-	}
-	
 	protected void StartCard()
 	{
-		Card?.OnStartEffect(Card.Battle);
+		Card?.OnStartEffect();
 	}
 
 	protected void StopCard()
 	{
-		Card?.OnStopEffect(Card.Battle);
+		Card?.OnStopEffect();
 	}
 }

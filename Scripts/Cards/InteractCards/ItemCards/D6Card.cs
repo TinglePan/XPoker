@@ -1,52 +1,58 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
+using XCardGame.CardProperties;
 using XCardGame.Common;
 using XCardGame.Ui;
 
 namespace XCardGame;
 
-public class D6Card: BaseItemCard
+public class D6Card: BaseCard
 {
-    public List<CardContainer> CardContainers;
-    public D6Card(ItemCardDef def): base(def)
-    {
-    }
 
-    public override void Setup(object o)
+    public class D6CardItemProp : CardPropItem
     {
-        base.Setup(o);
-        CardContainers = new List<CardContainer>
+        public List<CardContainer> ValidCardContainers;
+        
+        public D6CardItemProp(BaseCard card, List<CardContainer> validCardContainers) : base(card)
         {
-            Battle.CommunityCardContainer,
-            Battle.Player.HoleCardContainer,
-            Battle.Enemy.HoleCardContainer
-        };
-    }
-
-    public override bool CanInteract(CardNode node)
-    {
-        return base.CanInteract(node) && Battle.CurrentState.Value == Battle.State.BeforeShowDown;
-    }
-
-    public override async void Use(CardNode node)
-    {
-        async Task Run()
+            ValidCardContainers = validCardContainers;
+        }
+        
+        public override bool CanUse()
+        {
+            if (!base.CanUse()) return false;
+            return Battle.CurrentState.Value == Battle.State.BeforeShowDown;
+        }
+        
+        public override async Task Effect(List<CardNode> targets)
         {
             var tasks = new List<Task>();
-            foreach (var cardContainer in CardContainers)
+            tasks.Add(base.Effect(targets));
+            foreach (var cardContainer in ValidCardContainers)
             {
                 foreach (var cardNode in cardContainer.CardNodes)
                 {
                     if (cardNode.FaceDirection.Value != Enums.CardFace.Up) continue;
-                    tasks.Add(Battle.Dealer.DealCardAndReplace(cardNode));
-                    await Utils.Wait(node, Configuration.AnimateCardTransformInterval);
+                    tasks.Add(Battle.Dealer.DrawCardAndReplace(cardNode));
+                    await Utils.Wait(CardNode, Configuration.AnimateCardTransformInterval);
                 }
             }
             await Task.WhenAll(tasks);
         }
-        GD.Print("Use d6");
-        await GameMgr.AwaitAndDisableInput(Run());
-        base.Use(node);
+    }
+    
+    public D6Card(CardDef def): base(def)
+    {
+    }
+
+    protected override CardPropItem CreateItemProp()
+    {
+        var validTargetContainers = new List<CardContainer>
+        {
+            Battle.Player.HoleCardContainer,
+            Battle.CommunityCardContainer
+        };
+        return new D6CardItemProp(this, validTargetContainers);
     }
 }

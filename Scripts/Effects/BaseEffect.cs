@@ -2,7 +2,7 @@
 
 namespace XCardGame;
 
-public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
+public class BaseEffect: IEquatable<BaseEffect>
 {
 
     public class SetupArgs
@@ -40,14 +40,6 @@ public class BaseEffect: ILifeCycleTriggeredInBattle, IEquatable<BaseEffect>
     public virtual string Description()
     {
         return DescriptionTemplate;
-    }
-
-    public virtual void OnStartEffect(Battle battle)
-    {
-    }
-
-    public virtual void OnStopEffect(Battle battle)
-    {
     }
 
 }

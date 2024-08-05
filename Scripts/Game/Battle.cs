@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Common;
+using XCardGame.TimingInterfaces;
 using XCardGame.Ui;
 
 // using Godot.Collections;
@@ -52,7 +53,6 @@ public partial class Battle: Node2D
     public PackedScene SelectRewardCardScene;
     
     public Action<Battle, CardNode> OnDealCard;
-    public Action<Battle, CardNode> OnDealtCard;
     public Action<Battle> AfterDealCards;
     public Action<Battle> OnRoundStart;
     public Action<Battle> OnRoundEnd;
@@ -169,14 +169,14 @@ public partial class Battle: Node2D
         containerSetupArgs.DefaultCardFaceDirection = Enums.CardFace.Up;
         containerSetupArgs.ShouldCollectDealtItemAndRuleCards = false;
         
-        containerSetupArgs.AllowInteract = true;
-        containerSetupArgs.ExpectedInteractCardDefType = typeof(ItemCardDef);
-        
+        containerSetupArgs.AllowUseItemCard = true;
         ItemCardContainer.Setup(containerSetupArgs);
         ItemCardContainer.OnAddContentNode += OnItemCardContainerAddNode;
+        containerSetupArgs.AllowUseItemCard = false;
 
-        containerSetupArgs.ExpectedInteractCardDefType = typeof(RuleCardDef);
+        containerSetupArgs.AllowUseRuleCard = true;
         RuleCardContainer.Setup(containerSetupArgs);
+        containerSetupArgs.AllowUseRuleCard = false;
 
 
         Dealer.Setup(new Dealer.SetupArgs
@@ -212,7 +212,7 @@ public partial class Battle: Node2D
             var tasks = new List<Task>();
             foreach (var cardNode in cardNodes)
             {
-                tasks.Add(cardNode.AnimateLeaveBattle());
+                tasks.Add(cardNode.AnimateLeaveField());
                 await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
                 // GD.Print($"time: {Time.GetTicksMsec()}");
             }
@@ -258,13 +258,13 @@ public partial class Battle: Node2D
         {
             for (int i = 0; i < entity.DealCardCount; i++)
             {
-                tasks.Add(Dealer.DealCardIntoContainer(entity.HoleCardContainer));
+                tasks.Add(Dealer.DrawCardIntoContainer(entity.HoleCardContainer));
                 await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
             }
         }
         for (int i = 0; i < DealCommunityCardCount; i++)
         {
-            tasks.Add(Dealer.DealCardIntoContainer(CommunityCardContainer));
+            tasks.Add(Dealer.DrawCardIntoContainer(CommunityCardContainer));
             await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
         }
         await Task.WhenAll(tasks);
@@ -405,7 +405,6 @@ public partial class Battle: Node2D
                 selectRewardCard.Setup(new SelectRewardCard.SetupArgs
                 {
                     RewardCardCount = Configuration.DefaultRewardCardCount,
-                    RewardCardDefType = typeof(ItemCardDef),
                     InitReRollPrice = Configuration.DefaultReRollPrice,
                     ReRollPriceIncrease = Configuration.DefaultReRollPriceIncrease,
                     SkipReward = Configuration.DefaultSkipReward
@@ -451,35 +450,18 @@ public partial class Battle: Node2D
         }
         OnBattleFinished?.Invoke(this);
     }
-    
-    public void StartEffect(BaseEffect effect)
-    {
-        if (!Effects.Contains(effect))
-        {
-            Effects.Add(effect);
-            effect.OnStartEffect(this);
-        }
-    }
-
-    public void StopEffect(BaseEffect effect)
-    {
-        if (Effects.Contains(effect))
-        {
-            effect.OnStopEffect(this);
-            Effects.Remove(effect);
-        }
-    }
 
     public void InflictBuffOn(BaseBuff buff, BattleEntity target, BattleEntity source, BaseCard sourceCard = null)
     {
-        if (target.BuffContainer.Buffs.Contains(buff))
+        buff.Setup(new BaseBuff.SetupArgs
         {
-            buff.Repeat(this, target, source, sourceCard);
-        }
-        else
-        {
-            buff.InflictOn(target, source, sourceCard);
-        }
+            GameMgr = GameMgr,
+            Battle = this,
+            Entity = target,
+            InflictedBy = source,
+            InflictedByCard = sourceCard,
+        });
+        target.AddBuff(buff);
     }
 
     protected void GameOver()
@@ -518,7 +500,7 @@ public partial class Battle: Node2D
     {
         if (ItemCardContainer.ContentNodes.Count > Player.ItemPocketSize.Value)
         {
-            await GameMgr.AwaitAndDisableInput(((CardNode)ItemCardContainer.ContentNodes[0]).AnimateLeaveBattle());
+            await GameMgr.AwaitAndDisableInput(((CardNode)ItemCardContainer.ContentNodes[0]).AnimateLeaveField());
         }
     }
 }

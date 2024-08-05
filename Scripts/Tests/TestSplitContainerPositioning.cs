@@ -50,7 +50,7 @@ public partial class TestSplitContainerPositioning: Node
     {
         for (int i = 0; i < 3; i++)
         {
-            var card = new PokerCard(new BaseCardDef
+            var card = new SimpleCard(new CardDef
             {
                 Rank = Enums.CardRank.Ace,
                 Suit = Enums.CardSuit.Clubs
@@ -68,7 +68,7 @@ public partial class TestSplitContainerPositioning: Node
         }
         for (int i = 0; i < 2; i++)
         {
-            var card = new PokerCard(new BaseCardDef
+            var card = new SimpleCard(new CardDef
             {
                 Rank = Enums.CardRank.Ace,
                 Suit = Enums.CardSuit.Clubs

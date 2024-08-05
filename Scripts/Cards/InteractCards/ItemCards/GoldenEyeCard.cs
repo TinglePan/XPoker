@@ -1,49 +1,57 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using XCardGame.CardProperties;
 using XCardGame.Common;
 using XCardGame.Ui;
 
 namespace XCardGame;
 
-public class GoldenEyeCard: BaseItemCard
+public class GoldenEyeCard: BaseCard
 {
-    public List<CardContainer> CardContainers;
-    // public List<CardNode> RevealedCardNodes;
-    
-    public GoldenEyeCard(ItemCardDef def): base(def)
+    public class GoldenEyeCardItemProp : CardPropItem
     {
-        // RevealedCardNodes = new List<CardNode>();
-    }
-    
-    public override void Setup(object o)
-    {
-        base.Setup(o);
-        CardContainers = new List<CardContainer>
+        public List<CardContainer> ValidCardContainers;
+        
+        public GoldenEyeCardItemProp(BaseCard card, List<CardContainer> validCardContainers) : base(card)
         {
-            Battle.CommunityCardContainer,
-            Battle.Enemy.HoleCardContainer
-        };
-    }
-    
-    
-    public override bool CanInteract(CardNode node)
-    {
-        return base.CanInteract(node) && Battle.CurrentState.Value == Battle.State.BeforeShowDown;
+            ValidCardContainers = validCardContainers;
+        }
+        
+        public override bool CanUse()
+        {
+            if (!base.CanUse()) return false;
+            return Battle.CurrentState.Value == Battle.State.BeforeShowDown;
+        }
+
+        public override async Task Effect(List<CardNode> targets)
+        {
+            var tasks = new List<Task>();
+            foreach (var cardContainer in ValidCardContainers)
+            {
+                foreach (var cardNode in cardContainer.CardNodes)
+                {
+                    if (cardNode.FaceDirection.Value == Enums.CardFace.Up) continue;
+                    tasks.Add(GameMgr.AwaitAndDisableInput(cardNode.AnimateReveal(true, Configuration.RevealTweenTime)));
+                    await Utils.Wait(CardNode, Configuration.AnimateCardTransformInterval);
+                }
+            }
+            tasks.Add(Card.Battle.Dealer.DealCardPile.TopCard.AnimateReveal(true, Configuration.RevealTweenTime));
+            await Task.WhenAll(tasks);
+        }
     }
 
-    public override async void Use(CardNode node)
+    public GoldenEyeCard(CardDef def): base(def)
     {
-        base.Use(node);
-        var tasks = new List<Task>();
-        foreach (var cardContainer in CardContainers)
+    }
+
+    protected override CardPropItem CreateItemProp()
+    {
+        var validTargetContainers = new List<CardContainer>
         {
-            foreach (var cardNode in cardContainer.CardNodes)
-            {
-                if (cardNode.FaceDirection.Value == Enums.CardFace.Up) continue;
-                tasks.Add(GameMgr.AwaitAndDisableInput(cardNode.AnimateReveal(true, Configuration.RevealTweenTime)));
-                await Utils.Wait(node, Configuration.AnimateCardTransformInterval);
-            }
-        }
-        await Task.WhenAll(tasks);
+            Battle.Player.HoleCardContainer,
+            Battle.Enemy.HoleCardContainer,
+            Battle.CommunityCardContainer
+        };
+        return new GoldenEyeCardItemProp(this, validTargetContainers);
     }
 }

@@ -10,7 +10,7 @@ public partial class TestMouseEventInSubViewport : Control
 	public override void _Ready()
 	{
 		base._Ready();
-		var card = new PokerCard(new BaseCardDef
+		var card = new SimpleCard(new CardDef
 		{
 			Rank = Enums.CardRank.Ace,
 			Suit = Enums.CardSuit.Clubs

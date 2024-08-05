@@ -43,15 +43,15 @@ public static class DeckDefs
         Enums.CardRank.King,
     };
 
-    public static List<BaseCardDef> StandardDeck(List<Enums.CardSuit> suits, List<Enums.CardRank> ranks)
+    public static List<CardDef> StandardDeck(List<Enums.CardSuit> suits, List<Enums.CardRank> ranks)
     {
         
-        var cardDefs = new List<BaseCardDef>();
+        var cardDefs = new List<CardDef>();
         foreach (var suit in suits)
         {
             foreach (var rank in ranks)
             {
-                cardDefs.Add(new BaseCardDef()
+                cardDefs.Add(new CardDef()
                 {
                     BasePrice = 0,
                     DescriptionTemplate = "{} of {}",
@@ -65,13 +65,13 @@ public static class DeckDefs
         return cardDefs;
     }
 
-    public static List<BaseCardDef> Standard52Deck()
+    public static List<CardDef> Standard52Deck()
     {
         var res = StandardDeck(_standardSuits, _standardRanks);
         return res;
     }
     
-    public static List<BaseCardDef> Enhanced52Deck()
+    public static List<CardDef> Enhanced52Deck()
     {
         var res = StandardDeck(_standardSuits, _standardRanks);
         res.Add(CardDefs.SpadesRule);
@@ -81,7 +81,7 @@ public static class DeckDefs
         return res;
     }
 
-    public static List<BaseCardDef> Short52Deck()
+    public static List<CardDef> Short52Deck()
     {
         var res = StandardDeck(_standardSuits, _shortRanks);
         res.Add(CardDefs.SpadesRule);
@@ -92,7 +92,7 @@ public static class DeckDefs
         return res;
     }
     
-    public static List<BaseCardDef> EnhancedBlackDeck()
+    public static List<CardDef> EnhancedBlackDeck()
     {
         var res = StandardDeck(new List<Enums.CardSuit> { Enums.CardSuit.Spades, Enums.CardSuit.Clubs }, _standardRanks);
         res.Add(CardDefs.SpadesRule);
@@ -101,7 +101,7 @@ public static class DeckDefs
         return res;
     }
     
-    public static List<BaseCardDef> EnhancedRedDeck()
+    public static List<CardDef> EnhancedRedDeck()
     {
         var res = StandardDeck(new List<Enums.CardSuit> { Enums.CardSuit.Hearts, Enums.CardSuit.Diamonds }, _standardRanks);
         res.Add(CardDefs.HeartsRule);
@@ -110,5 +110,5 @@ public static class DeckDefs
         return res;
     }
     
-    public static List<BaseCardDef> PlayerInitDeckDef = Standard52Deck();
+    public static List<CardDef> PlayerInitDeckDef = Standard52Deck();
 }

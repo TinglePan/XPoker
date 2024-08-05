@@ -1,8 +1,8 @@
 ﻿namespace XCardGame;
 
-public class ShortDeckRuleCard: BaseRuleCard
+public class ShortDeckRuleCard: BaseCard
 {
-    public ShortDeckRuleCard(RuleCardDef def) : base(def)
+    public ShortDeckRuleCard(CardDef def) : base(def)
     {
     }
 }

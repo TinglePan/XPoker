@@ -72,4 +72,9 @@ public static class Configuration
 
     public static readonly int DefaultRequiredHoleCardCountMin = 0;
     public static readonly int DefaultRequiredHoleCardCountMax = 2;
+
+    public static readonly Vector2 PiledCardOffsetMax = new Vector2(0, -16);
+    public static readonly int PileCardCountAtMaxOffset = 20;
+
+    public static readonly string StandardUsableCardOptionsMenuName = "StandardUsableCardOptionsMenu";
 }

@@ -25,15 +25,15 @@ public partial class BuffNode: BaseContentNode
     {
         base.OnContentAttached(content);
         var buff = (BaseBuff)content;
+        buff.Nodes.Add(this);
         Icon.Texture = ResourceCache.Instance.Load<Texture2D>(buff.IconPath);
-        buff.OnStartEffect(buff.Battle);
     }
 
     protected override void OnContentDetached(IContent content)
     {
         base.OnContentDetached(content);
-        Icon.Texture = null;
         var buff = (BaseBuff)content;
-        buff.OnStopEffect(buff.Battle);
+        buff.Nodes.Remove(this);
+        Icon.Texture = null;
     }
 }

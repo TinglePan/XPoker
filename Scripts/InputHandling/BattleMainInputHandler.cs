@@ -63,11 +63,6 @@ public class BattleMainInputHandler: BaseInputHandler
             foreach (var cardNode in cardContainer.ContentNodes)
             {
                 cardNode.OnMousePressed += OnCardNodePressed;
-                if (cardNode is PiledCardNode piledCardNode)
-                {
-                    piledCardNode.OnHover += piledCardNode.OnHoverHandler;
-                    piledCardNode.OnUnHover += piledCardNode.OnUnHoverHandler;
-                }
             }
         }
     }
@@ -179,16 +174,36 @@ public class BattleMainInputHandler: BaseInputHandler
         }
     }
     
-    protected void OnCardNodePressed(BaseContentNode node, MouseButton mouseButton)
+    protected async void OnCardNodePressed(BaseContentNode node, MouseButton mouseButton)
     {
         GD.Print($"on card node {node} pressed: {ReceiveInput}.");
         if (ReceiveInput)
         {
             if (mouseButton == MouseButton.Left)
             {
-                if (node.Content.Value is BaseCard card && card.GetProp<BaseCardPropUsable>() is { } usable && usable.CanUse())
+                if (node is PiledCardNode)
                 {
-                    usable.Use();
+                    var card = (BaseCard)node.Content.Value;
+                    var piledProp = card.GetProp<CardPropPiled>();
+                    if (piledProp.IsOpened)
+                    {
+                        await piledProp.Close();
+                    } else
+                    {
+                        await piledProp.Open();
+                    }
+                } else if (node is CardNode)
+                {
+                    if (node.Content.Value is BaseCard card)
+                    {
+                        foreach (var prop in card.GetProps<BaseCardPropUsable>())
+                        {
+                            if (prop.CanUse())
+                            {
+                                prop.Use();
+                            }
+                        }
+                    }
                 }
             }
         }

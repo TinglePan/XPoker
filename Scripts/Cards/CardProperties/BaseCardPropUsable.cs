@@ -8,6 +8,7 @@ namespace XCardGame.CardProperties;
 
 public abstract class BaseCardPropUsable: BaseCardProp, ICardReset, ICardUse
 {
+    public bool Enabled;
     public ObservableProperty<int> Cost;
     
     protected GameMgr GameMgr => Card.GameMgr;
@@ -15,6 +16,7 @@ public abstract class BaseCardPropUsable: BaseCardProp, ICardReset, ICardUse
     
     public BaseCardPropUsable(BaseCard card) : base(card)
     {
+        Enabled = true;
         Cost = new ObservableProperty<int>(nameof(Cost), this, Card.Def.Cost);
     }
 
@@ -25,6 +27,7 @@ public abstract class BaseCardPropUsable: BaseCardProp, ICardReset, ICardUse
     
     public virtual bool CanUse()
     {
+        if (!Enabled) return false;
         if (Battle.Player.Energy.Value < Card.Def.Cost) return false;
         return true;
     }
@@ -41,7 +44,7 @@ public abstract class BaseCardPropUsable: BaseCardProp, ICardReset, ICardUse
 
     public virtual Task Effect(List<CardNode> targets)
     {
-        Battle.Player.Energy.Value -= Card.Def.Cost;
+        Battle.Player.Energy.Value -= Cost.Value;
         return Task.CompletedTask;
     }
     

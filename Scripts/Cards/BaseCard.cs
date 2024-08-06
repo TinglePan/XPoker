@@ -207,6 +207,19 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
         return null;
     }
     
+    public List<TProp> GetProps<TProp>() where TProp : BaseCardProp
+    {
+        var res = new List<TProp>();
+        foreach (var (type, prop) in Props)
+        {
+            if (type.IsAssignableTo(typeof(TProp)))
+            {
+                res.Add((TProp)prop);
+            }
+        }
+        return res;
+    }
+    
     public virtual string Description()
     {
         return Def.DescriptionTemplate;
@@ -305,7 +318,7 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
     {
         if (Def.IsPiled)
         {
-            Props.Add(typeof(CardPropPiled), new CardPropPiled(this, Def.PileCardCountMax));
+            Props.Add(typeof(CardPropPiled), CreatePiledProp());
         }
         
         if (Def.IsUsable)
@@ -323,6 +336,11 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
                 Props.Add(typeof(CardPropRule), CreateRuleProp());
             }
         }
+    }
+    
+    protected virtual CardPropPiled CreatePiledProp()
+    {
+        return new CardPropPiled(this, Def.PileCardCountMax);
     }
     
     protected virtual CardPropItem CreateItemProp()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Common;
 using XCardGame.Ui;
@@ -17,6 +18,8 @@ public partial class CardPile: Node2D
         public bool CountAsField;
         public Enums.CardFace TopCardFaceDirection;
     }
+    
+    public PackedScene CardPrefab;
     
     public CardNode TopCard { get; private set; }
     public NinePatchRect PileImage { get; private set; }
@@ -60,6 +63,20 @@ public partial class CardPile: Node2D
         {
             GD.PrintErr($"{this} not setup yet");
         }
+    }
+    
+    public CardNode CreateCardNodeOnPile(BaseCard card)
+    {
+        var cardNode = CardPrefab.Instantiate<CardNode>();
+        AddChild(cardNode);
+        cardNode.Setup(new CardNode.SetupArgs()
+        {
+            Content = card,
+            FaceDirection = TopCardFaceDirection,
+            HasPhysics = true,
+        });
+        cardNode.Position = TopCard.Position;
+        return cardNode;
     }
     
     public BaseCard Take(int index = 0)

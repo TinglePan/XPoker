@@ -83,9 +83,9 @@ public partial class Dealer: Node2D
         var tasks = new List<Task>();
         for (int i = 0; i < shuffleAnimateCardCount; i++)
         {
-            var card = await DrawCardFromPile(DiscardCardPile);
+            var card = DiscardCardPile.Take();
             if (card == null) return;
-            var cardNode = CreateCardNodeOnPile(card, DiscardCardPile);
+            var cardNode = DiscardCardPile.CreateCardNodeOnPile(card);
             cardNode.Reparent(DealCardPile);
             tasks.Add(cardNode.AnimateTransform(DealCardPile.TopCard.Position, DealCardPile.TopCard.RotationDegrees, 
                 Configuration.AnimateCardTransformInterval, Configuration.CardMoveTweenPriority, () =>
@@ -167,7 +167,7 @@ public partial class Dealer: Node2D
         bool collectUsable = true)
     {
         fromPile.Cards.Remove(card);
-        var cardNode = CreateCardNodeOnPile(card, fromPile);
+        var cardNode = fromPile.CreateCardNodeOnPile(card);
         await DealDedicatedCardNodeIntoContainer(cardNode, targetContainer, index, collectUsable);
     }
     
@@ -205,7 +205,7 @@ public partial class Dealer: Node2D
     public async Task DealDedicatedCardAndReplace(BaseCard card, CardPile fromPile, CardNode targetNode, bool collectUsable = true)
     {
         fromPile.Cards.Remove(card);
-        var cardNode = CreateCardNodeOnPile(card, fromPile);
+        var cardNode = fromPile.CreateCardNodeOnPile(card);
         await DealDedicatedCardNodeAndReplace(cardNode, targetNode, collectUsable);
     }
 
@@ -254,7 +254,7 @@ public partial class Dealer: Node2D
     public async Task DealDedicatedCardToPile(BaseCard card, CardPile fromPile, CardPile pile)
     {
         fromPile.Cards.Remove(card);
-        var cardNode = CreateCardNodeOnPile(card, fromPile);
+        var cardNode = fromPile.CreateCardNodeOnPile(card);
         await DealDedicatedCardNodeToPile(cardNode, pile);
     }
     
@@ -277,9 +277,18 @@ public partial class Dealer: Node2D
 
     public async Task<CardNode> AnimateDrawCard()
     {
-        var card = await DrawCardFromPile(DealCardPile);
-        if (card == null) return null;
-        var cardNode = CreateCardNodeOnPile(card, DealCardPile);
+        var card = DealCardPile.Take();
+        if (card == null)
+        {
+            await AnimateShuffle();
+            card = DealCardPile.Take();
+            if (card == null)
+            {
+                GD.Print("No more cards to deal");
+                return null;
+            }
+        }
+        var cardNode = DealCardPile.CreateCardNodeOnPile(card);
         return cardNode;
     }
 
@@ -290,43 +299,11 @@ public partial class Dealer: Node2D
         Discard(node);
     }
 
-    protected async Task<BaseCard> DrawCardFromPile(CardPile pile)
-    {
-        var card = pile.Take();
-        if (card == null)
-        {
-            if (pile == DealCardPile)
-            {
-                await AnimateShuffle();
-                card = pile.Take();
-            }
-            if (card == null)
-            {
-                GD.Print("No more cards to deal");
-            }
-        }
-        return card;
-    }
-
     protected void Discard(CardNode cardNode)
     {
         // GD.Print($"discard {cardNode}");
         DiscardCardPile.Cards.Insert(0, cardNode.Card);
         cardNode.QueueFree();
-    }
-    
-    protected CardNode CreateCardNodeOnPile(BaseCard card, CardPile pile)
-    {
-        var cardNode = CardPrefab.Instantiate<CardNode>();
-        pile.AddChild(cardNode);
-        cardNode.Setup(new CardNode.SetupArgs()
-        {
-            Content = card,
-            FaceDirection = pile.TopCardFaceDirection,
-            HasPhysics = true,
-        });
-        cardNode.Position = pile.TopCard.Position;
-        return cardNode;
     }
 
     protected CardNode CreateCardNodeOnCardNode(BaseCard card, CardNode onCardNode, Enums.CardFace faceDirection)

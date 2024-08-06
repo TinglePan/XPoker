@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using XCardGame.Ui;
 
@@ -8,6 +9,7 @@ public class CardPropItemReplace: CardPropItem
 {
     public CardPropItemReplace(BaseCard card) : base(card)
     {
+        Debug.Assert(RankChangePerUse == 0, "Replace card should not have RankChangePerUse other than 0");
     }
     
     public override async Task Effect(List<CardNode> targets)

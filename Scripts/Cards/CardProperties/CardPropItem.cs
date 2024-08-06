@@ -11,10 +11,11 @@ namespace XCardGame.CardProperties;
 public class CardPropItem: BaseCardPropUsable, ICardRankChange, IRoundEnd
 {
     public Action<BaseCard> OnOverload;
+    public int RankChangePerUse;
     
     public CardPropItem(BaseCard card) : base(card)
     {
-        Cost = new ObservableProperty<int>(nameof(Cost), this, Card.Def.Cost);
+        RankChangePerUse = card.Def.RankChangePerUse;
     }
     
     public void OnCardRankChange()
@@ -35,7 +36,7 @@ public class CardPropItem: BaseCardPropUsable, ICardRankChange, IRoundEnd
     
     public override Task Effect(List<CardNode> targets)
     {
-        Card.ChangeRank(Card.Def.RankChangePerUse);
+        Card.ChangeRank(RankChangePerUse);
         return Task.CompletedTask;
     }
     

@@ -47,6 +47,7 @@ public partial class Battle: Node2D
     public BattleEntity Enemy;
     public BattleEntity[] Entities;
     public Node2D ButtonRoot;
+    public SplitCardContainer OpenedPiledCardContainer;
 
     public PackedScene GameOverScene;
     public PackedScene GameWinScene;
@@ -101,6 +102,7 @@ public partial class Battle: Node2D
         EngageCardContainer = GetNode<SplitCardContainer>("EngageCards");
         ItemCardContainer = GetNode<CardContainer>("ItemCards");
         RuleCardContainer = GetNode<CardContainer>("RuleCards");
+        OpenedPiledCardContainer = GetNode<SplitCardContainer>("OpenedPiledCards");
         
         Player = GetNode<PlayerBattleEntity>("Player");
         Enemy = GetNode<BattleEntity>("Enemy");

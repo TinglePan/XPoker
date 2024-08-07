@@ -48,21 +48,16 @@ public class KeepOutCard: BaseCard
             if (!IsEffectActive)
             {
                 FieldEffect = new KeepOutEffect(Card.Def.Name, Card.Description(), Card, PiledCardNode.CardPile.Cards.ToList());
-                FieldEffect.Setup(new BaseEffect.SetupArgs()
-                {
-                    GameMgr = GameMgr,
-                    Battle = Battle
-                });
-                Battle.Effects.Add(FieldEffect);
+                Battle.FieldEffects.Add(FieldEffect);
                 IsEffectActive = true;
             }
         }
         
         public override void OnStopEffect()
         {
-            if (IsEffectActive && Battle.Effects.Contains(FieldEffect))
+            if (IsEffectActive && Battle.FieldEffects.Contains(FieldEffect))
             {
-                Battle.Effects.Remove(FieldEffect);
+                Battle.FieldEffects.Remove(FieldEffect);
                 IsEffectActive = false;
             }
         }

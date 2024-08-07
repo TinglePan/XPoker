@@ -1,4 +1,5 @@
-﻿using XCardGame.Common;
+﻿using System.Threading.Tasks;
+using XCardGame.Common;
 
 namespace XCardGame;
 
@@ -14,7 +15,7 @@ public class DefendAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
         PowerScale = powerScale;
     }
     
-    public override void Resolve()
+    public override Task Apply()
     {
         float defenceValue = RawValue;
         int power = 0;
@@ -29,6 +30,7 @@ public class DefendAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
         Src.ChangeDefence(roundedDefenceValue);
         Battle.GameMgr.BattleLog.Log(Utils._($"{Src} defends! Def:{power}. Base:{defenceValue}"));
         Battle.GameMgr.BattleLog.Log(Utils._($"Gained {roundedDefenceValue} guard"));
+        return Task.CompletedTask;
     }
     
     public override string Description()

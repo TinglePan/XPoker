@@ -74,20 +74,12 @@ public static class DeckDefs
     public static List<CardDef> Enhanced52Deck()
     {
         var res = StandardDeck(_standardSuits, _standardRanks);
-        res.Add(CardDefs.SpadesRule);
-        res.Add(CardDefs.HeartsRule);
-        res.Add(CardDefs.ClubsRule);
-        res.Add(CardDefs.DiamondsRule);
         return res;
     }
 
     public static List<CardDef> Short52Deck()
     {
         var res = StandardDeck(_standardSuits, _shortRanks);
-        res.Add(CardDefs.SpadesRule);
-        res.Add(CardDefs.HeartsRule);
-        res.Add(CardDefs.ClubsRule);
-        res.Add(CardDefs.DiamondsRule);
         res.Add(CardDefs.ShortDeckRule);
         return res;
     }
@@ -95,8 +87,6 @@ public static class DeckDefs
     public static List<CardDef> EnhancedBlackDeck()
     {
         var res = StandardDeck(new List<Enums.CardSuit> { Enums.CardSuit.Spades, Enums.CardSuit.Clubs }, _standardRanks);
-        res.Add(CardDefs.SpadesRule);
-        res.Add(CardDefs.ClubsRule);
         res.Add(CardDefs.NerfFlush);
         return res;
     }
@@ -104,8 +94,6 @@ public static class DeckDefs
     public static List<CardDef> EnhancedRedDeck()
     {
         var res = StandardDeck(new List<Enums.CardSuit> { Enums.CardSuit.Hearts, Enums.CardSuit.Diamonds }, _standardRanks);
-        res.Add(CardDefs.HeartsRule);
-        res.Add(CardDefs.DiamondsRule);
         res.Add(CardDefs.NerfFlush);
         return res;
     }

@@ -195,59 +195,6 @@ public static class CardDefs
         Cost = 1,
     };
     
-    public static CardDef SpadesRule = new ()
-    {
-        Name = Utils._("Spades rule"),
-        ConcreteClassPath = "SpadesRuleCard",
-        DescriptionTemplate = Utils._("When attack, spades resolve with 50% life leech."),
-        IconPath = "res://Sprites/Cards/spades_rule.png",
-        
-        IsRule = true,
-        ExcludeFromShop = true, 
-        ExcludeFromRewards = true,
-        Cost = 1,
-    };
-    
-    public static CardDef HeartsRule = new ()
-    {
-        Name = Utils._("Hearts rule"),
-        ConcreteClassPath = "HeartsRuleCard",
-        DescriptionTemplate = Utils._("When defend, hearts resolve with life recovery of 50% card rank value."),
-        IconPath = "res://Sprites/Cards/hearts_rule.png",
-        
-        IsRule = true,
-        ExcludeFromShop = true, 
-        ExcludeFromRewards = true,
-        Cost = 1,
-    };
-    
-    public static CardDef ClubsRule = new ()
-    {
-        Name = Utils._("Clubs rule"),
-        ConcreteClassPath = "ClubsRuleCard",
-        DescriptionTemplate = Utils._("When attack, clubs resolve with double card rank value."),
-        IconPath = "res://Sprites/Cards/clubs_rule.png",
-        
-        IsRule = true,
-        ExcludeFromShop = true, 
-        ExcludeFromRewards = true,
-        Cost = 1,
-    };
-    
-    public static CardDef DiamondsRule = new ()
-    {
-        Name = Utils._("Diamonds rule"),
-        ConcreteClassPath = "DiamondsRuleCard",
-        DescriptionTemplate = Utils._("When defend, diamonds are the only suit that matters."),
-        IconPath = "res://Sprites/Cards/diamonds_rule.png",
-        Rarity = 1,
-        
-        IsRule = true,
-        ExcludeFromShop = true, 
-        ExcludeFromRewards = true,
-        Cost = 1,
-    };
-    
     public static CardDef NerfFlush = new ()
     {
         Name = Utils._("Nerf flush"),

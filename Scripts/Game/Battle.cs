@@ -87,7 +87,7 @@ public partial class Battle: Node2D
 
     public ObservableCollection<Enums.HandTier> HandTierOrderDescend;
     
-    public List<BaseEffect> Effects;
+    public List<BaseFieldEffect> FieldEffects;
     public ObservableProperty<State> CurrentState;
     public float HeatMultiplier;
 
@@ -118,7 +118,7 @@ public partial class Battle: Node2D
         // RuleCards = new ObservableCollection<BaseCard>();
         HandTierOrderDescend = new ObservableCollection<Enums.HandTier>();
         CurrentState = new ObservableProperty<State>(nameof(CurrentState), this, State.BeforeDealCards);
-        Effects = new List<BaseEffect>();
+        FieldEffects = new List<BaseFieldEffect>();
         ButtonRoot = GetNode<Node2D>("Buttons");
     }
 
@@ -379,9 +379,8 @@ public partial class Battle: Node2D
             Utils._($"Engage: {Player}({playerHand.Tier}) vs {Enemy}({enemyHand.Tier}). {Player} is {Player.RoundRole.Value}. {Enemy} is {Enemy.RoundRole.Value}"),
             Configuration.LogInterval));
         BeforeEngage?.Invoke(this, RoundEngage);
+        tasks.Add(RoundEngage.Resolve());
         await Task.WhenAll(tasks);
-        // RoundEngage.PrepareRoundSkills();
-        // GameMgr.InputMgr.SwitchToInputHandler(new PrepareRoundSkillInputHandler(GameMgr));
         // var endTime = Time.GetTicksUsec();
         // GD.Print($"Hand evaluation time: {endTime - startTime} us");
         // GD.Print($"{Players[0]} Best Hand: {playerBestHand.Rank}, {string.Join(",", playerBestHand.PrimaryCards)}, Kickers: {string.Join(",", playerBestHand.Kickers)}");
@@ -464,6 +463,21 @@ public partial class Battle: Node2D
             InflictedByCard = sourceCard,
         });
         target.AddBuff(buff);
+    }
+
+    public bool CheckResolveCard(BaseCard card)
+    {
+        foreach (var effect in FieldEffects)
+        {
+            if (effect is KeepOutCard.KeepOutEffect keepOutEffect)
+            {
+                if (keepOutEffect.KeepOutSuits.Contains(card.Suit.Value) || keepOutEffect.KeepOutRanks.Contains(card.Rank.Value))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     protected void GameOver()

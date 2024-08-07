@@ -21,7 +21,7 @@ public class Attack
         RawAttackValue = rawAttackValue;
     }
     
-    public int Resolve()
+    public int Apply()
     {
         var attackerDamageModifier = Attacker.GetAttackerDamageModifier();
         var attackerDamageMultipliers = Attacker.GetAttackerDamageMultipliers();

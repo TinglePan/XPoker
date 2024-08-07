@@ -1,4 +1,5 @@
-﻿using XCardGame.Common;
+﻿using System.Threading.Tasks;
+using XCardGame.Common;
 
 namespace XCardGame;
 
@@ -17,17 +18,16 @@ public class BuffAgainstEntityEffect: BaseAgainstEntityEffect
         Buff = buff;
     }
 
-    public override void Setup(object o)
+    public void Setup(object o)
     {
-        base.Setup(o);
         var args = (SetupArgs)o;
         Buff.Setup(args.BuffSetupArgs);
     }
 
-
-    public override void Resolve()
+    public override Task Apply()
     {
         Battle.InflictBuffOn(Buff, Dst, Src, OriginateCard);
+        return Task.CompletedTask;
     }
 
     public override string Description()

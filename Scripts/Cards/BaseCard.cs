@@ -251,59 +251,35 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
         }
     }
 
-    public virtual void Resolve(Battle battle, Engage engage, BattleEntity entity)
+    public virtual void Resolve(BattleEntity entity)
     {
-        BaseAgainstEntityEffect effect = null;
-        bool applyHeartsRule = false;
+        if (!Battle.CheckResolveCard(this))
+        {
+            return;
+        }
         if (entity.RoundRole.Value == Enums.EngageRole.Attacker)
         {
-            effect = new AttackAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
-                Utils.GetCardBlackJackValue(Rank.Value), 1);
-            foreach (var ruleCard in battle.RuleCardContainer.Cards)
-            {
-                if (ruleCard is SpadesRuleCard)
-                {
-                    ((AttackAgainstEntityEffect)effect).Leech = 0.5f;
-                } else if (ruleCard is ClubsRuleCard)
-                {
-                    ((AttackAgainstEntityEffect)effect).RawValue *= 2;
-                }
-            }
+            Battle.RoundEngage.PendingEffects.Add(new AttackAgainstEntityEffect(this, entity, Battle.GetOpponentOf(entity),
+                Utils.GetCardBlackJackValue(Rank.Value), 1));
         }
         else if (entity.RoundRole.Value == Enums.EngageRole.Defender)
         {
-            effect = new DefendAgainstEntityEffect(this, entity, battle.GetOpponentOf(entity),
-                Utils.GetCardBlackJackValue(Rank.Value), 1);
-            foreach (var ruleCard in battle.RuleCardContainer.Cards)
-            {
-                if (ruleCard is HeartsRuleCard)
-                {
-                    applyHeartsRule = true;
-                } else if (ruleCard is DiamondsRuleCard)
-                {
-                    ((DefendAgainstEntityEffect)effect).RawValue *= 2;
-                }
-            }
+            Battle.RoundEngage.PendingEffects.Add(new DefendAgainstEntityEffect(this, entity, Battle.GetOpponentOf(entity),
+                Utils.GetCardBlackJackValue(Rank.Value), 1));
         }
-        effect?.Setup(new BaseEffect.SetupArgs
-        {
-            GameMgr = GameMgr,
-            Battle = battle,
-        });
         GameMgr.BattleLog.Log($"Resolving {this}");
         // GD.Print($"Resolve of {this}, effect {effect}");
-        effect?.Resolve();
-
-        if (applyHeartsRule)
+        
+        foreach (var prop in Props.Values)
         {
-            effect = new HealEffect(this, entity, entity,
-                Utils.GetCardRankValue(Rank.Value) / 2, 0);
-            effect.Setup(new BaseEffect.SetupArgs
+            if (prop is ICardResolve resolve)
             {
-                GameMgr = GameMgr,
-                Battle = battle,
-            });
-            effect.Resolve();
+                resolve.OnResolve();
+            }
+        }
+        foreach (var effect in Battle.RoundEngage.PendingEffects)
+        {
+            effect.Apply();
         }
     }
 

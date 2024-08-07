@@ -1,4 +1,5 @@
-﻿using XCardGame.Common;
+﻿using System.Threading.Tasks;
+using XCardGame.Common;
 
 namespace XCardGame;
 
@@ -7,17 +8,14 @@ public class AttackAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
     public int RawValue { get; set; }
     public float PowerScale { get; }
     
-    public float Leech { get; set; }
-    
     public AttackAgainstEntityEffect(BaseCard originateCard, BattleEntity src, BattleEntity dst, int rawValue, float powerScale, float leech = 0f) : 
         base(Utils._("Attack"), Utils._($"Deal {rawValue} base damage, plus {{}} * attack"), originateCard, src, dst)
     {
         RawValue = rawValue;
         PowerScale = powerScale;
-        Leech = leech;
     }
 
-    public override void Resolve()
+    public override Task Apply()
     {
         var rawAttackValue = RawValue;
         int power = 0;
@@ -29,13 +27,8 @@ public class AttackAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEff
         
         Battle.GameMgr.BattleLog.Log(Utils._($"{Src} attacks! Atk:{power}. Base:{rawAttackValue}"));
         var attack = new Attack(Battle, Src, Dst, power, rawAttackValue);
-        var damage = attack.Resolve();
-        if (Leech > 0)
-        {
-            var leechValue = (int)(damage * Leech);
-            Src.ChangeHp(leechValue);
-            Battle.GameMgr.BattleLog.Log(Utils._($"{Src} leeches {leechValue} HP!"));
-        }
+        attack.Apply();
+        return Task.CompletedTask;
     }
 
     public override string Description()

@@ -1,4 +1,6 @@
-﻿namespace XCardGame;
+﻿using System.Threading.Tasks;
+
+namespace XCardGame;
 
 public class BaseAgainstEntityEffect: BaseEffect
 {
@@ -13,9 +15,9 @@ public class BaseAgainstEntityEffect: BaseEffect
         Dst = dst;
     }
 
-    public virtual void Resolve()
+    public virtual Task Apply()
     {
-        
+        return Task.CompletedTask;
     }
     
     

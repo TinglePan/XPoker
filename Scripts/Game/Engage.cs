@@ -17,6 +17,7 @@ public class Engage
     public Enums.EngageRole TieRole;
 
     public Dictionary<CardNode, CardContainer> CardPositionBeforeResolve;
+    public List<BaseAgainstEntityEffect> PendingEffects = new List<BaseAgainstEntityEffect>();
     
     public Engage(GameMgr gameMgr, CompletedHand playerHand, CompletedHand enemyHand, Enums.EngageRole tieRole = Enums.EngageRole.Attacker)
     {
@@ -108,7 +109,8 @@ public class Engage
             var cardNode = (CardNode)node;
             await cardNode.AnimateLift(true, Configuration.SelectTweenTime);
             var card = cardNode.Card;
-            card.Resolve(Battle, this, entity);
+            card.Resolve(entity);
+            await ResolvePendingEffects();
             await GameMgr.BattleLog.HandleLogEntries();
         }
         // await Battle.RoleMarkers[entity].TweenEmphasize(false, Configuration.EmphasizeTweenTime);
@@ -135,6 +137,16 @@ public class Engage
         foreach (var cardContainer in Battle.EngageCardContainer.CardContainers)
         {
             tasks.Add(ClearCardContainer(cardContainer));
+        }
+        await Task.WhenAll(tasks);
+    }
+
+    protected async Task ResolvePendingEffects()
+    {
+        var tasks = new List<Task>();
+        foreach (var effect in PendingEffects)
+        {
+            tasks.Add(effect.Apply());
         }
         await Task.WhenAll(tasks);
     }

@@ -1,4 +1,5 @@
-﻿using XCardGame.Common;
+﻿using System.Threading.Tasks;
+using XCardGame.Common;
 
 namespace XCardGame;
 
@@ -13,18 +14,18 @@ public class HealEffect: BaseAgainstEntityEffect
         PowerScale = powerScale;
     }
     
-    public override void Resolve()
+    public override Task Apply()
     {
         float healValue = RawValue;
-        int power = 0;
         if (PowerScale > 0)
         {
-            power = Src.GetPower(Battle.RoundHands[Src].Tier, Enums.EngageRole.Defender);
+            var power = Src.GetPower(Battle.RoundHands[Src].Tier, Enums.EngageRole.Defender);
             healValue = CalculateValue(power);
         }
         var roundedHealValue = (int)(healValue);
         Src.ChangeHp(roundedHealValue);
         Battle.GameMgr.BattleLog.Log(Utils._($"{Src} heals for {roundedHealValue}"));
+        return Task.CompletedTask;
     }
     
     public override string Description()

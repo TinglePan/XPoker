@@ -126,7 +126,7 @@ public static class BattleEntityDefs
         res.Name = "Man in black";
         res.PortraitPath = "res://Sprites/man_in_black.png";
         res.SpritePath = "res://Sprites/man_in_black.png";
-        res.InitDeckDef = new List<CardDef> { CardDefs.SpadesRule, CardDefs.ClubsRule };
+        res.InitDeckDef = null;
         res.InitHandPowers = HandPowerTables.StraightFlushEnhancedHandPowerTable;
         return res;
     }

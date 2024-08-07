@@ -13,7 +13,7 @@ public class BaseSingleTurnFieldEffect: BaseFieldEffect, IRoundEnd
     {
         if (IsEffectActive)
         {
-            Battle.Effects.Remove(this);
+            Battle.FieldEffects.Remove(this);
         }
     }
 }

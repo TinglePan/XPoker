@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://4ck8kyonxpu0"]
+[gd_scene load_steps=2 format=3 uid="uid://4ck8kyonxpu0"]
+
+[ext_resource type="Script" path="res://Scripts/Ui/HMenuButtons.cs" id="1_ayrs4"]
 
 [node name="BeforeDealCardsButtons" type="HBoxContainer"]
 custom_minimum_size = Vector2(324, 44)
@@ -13,3 +15,4 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
 alignment = 1
+script = ExtResource("1_ayrs4")

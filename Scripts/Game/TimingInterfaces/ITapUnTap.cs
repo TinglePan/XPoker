@@ -1,4 +1,4 @@
-﻿namespace XCardGame.TimingInterfaces;
+﻿namespace XCardGame;
 
 public interface ITapUnTap
 {

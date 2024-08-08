@@ -1,6 +1,4 @@
-﻿using Godot;
-
-namespace XCardGame.TimingInterfaces;
+﻿namespace XCardGame;
 
 public interface IPlayerInteract
 {

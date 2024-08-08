@@ -51,6 +51,12 @@ public static class Enums
         Right
     }
 
+    public enum GrowDirection
+    {
+        FromBegin,
+        FromEnd
+    }
+
     public enum Direction2D4Ways
     {
         Neutral,

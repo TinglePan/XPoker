@@ -52,14 +52,14 @@ public class BaseInputHandler: IHandleInput
         GameMgr.InputMgr.QuitCurrentInputHandler();
     }
 
-    public virtual void OnEnter()
+    public virtual Task OnEnter()
     {
-        
+        return Task.CompletedTask;
     }
 
-    public virtual void OnExit()
+    public virtual Task OnExit()
     {
-        
+        return Task.CompletedTask;
     }
     
     protected virtual void OnLeftMouseButtonPressed(Vector2 position)

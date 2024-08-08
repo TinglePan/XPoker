@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Common;
 using XCardGame.Ui;
@@ -24,9 +25,9 @@ public partial class Shop: Control
             Shop = shop;
         }
         
-        public override void OnEnter()
+        public override async Task OnEnter()
         {
-            base.OnEnter();
+            await base.OnEnter();
             Battle = GameMgr.CurrentBattle;
             Player = Battle.Player;
             foreach (var cardContainer in CardContainers)
@@ -38,9 +39,9 @@ public partial class Shop: Control
             }
         }
         
-        public override void OnExit()
+        public override async Task OnExit()
         {
-            base.OnExit();
+            await base.OnExit();
             foreach (var cardContainer in CardContainers)
             {
                 foreach (var cardNode in cardContainer.ContentNodes)

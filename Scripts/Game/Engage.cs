@@ -54,8 +54,11 @@ public class Engage
         var enemy = Battle.Enemy;
         if (player.RoundRole.Value == enemy.RoundRole.Value || player.RoundRole.Value == Enums.EngageRole.Defender)
         {
+            GD.Print($"before resolve1 {Time.GetTicksMsec()}");
             await ResolveEntity(player);
+            GD.Print($"after resolve1 {Time.GetTicksMsec()}");
             await ClearResolveArea();
+            GD.Print($"after clear {Time.GetTicksMsec()}");
             if (!(enemy.Hp.Value <= 0 || player.Hp.Value <= 0))
             {
                 await ResolveEntity(enemy);
@@ -76,14 +79,17 @@ public class Engage
         async Task PrepareCards(List<BaseCard> cards, CardContainer targetContainer)
         {
             var tasks = new List<Task>();
-            foreach (var card in cards)
+            if (cards != null)
             {
-                var cardNode = card.Node<CardNode>();
-                var sourceContainer = (CardContainer)cardNode.CurrentContainer.Value;
-                CardPositionBeforeResolve[cardNode] = sourceContainer;
-                Debug.Assert(sourceContainer != null, "sourceContainer is supposed to be not null");
-                tasks.Add(sourceContainer.MoveCardNodeToContainer(cardNode, targetContainer));
-                // await Utils.Wait(Battle, Configuration.AnimateCardTransformInterval);
+                foreach (var card in cards)
+                {
+                    var cardNode = card.Node<CardNode>();
+                    var sourceContainer = (CardContainer)cardNode.CurrentContainer.Value;
+                    CardPositionBeforeResolve[cardNode] = sourceContainer;
+                    Debug.Assert(sourceContainer != null, "sourceContainer is supposed to be not null");
+                    tasks.Add(sourceContainer.MoveCardNodeToContainer(cardNode, targetContainer));
+                    // await Utils.Wait(Battle, Configuration.AnimateCardTransformInterval);
+                }
             }
             await Task.WhenAll(tasks);
         }
@@ -100,18 +106,25 @@ public class Engage
 
     protected async Task ResolveEntity(BattleEntity entity)
     {
-        await PrepareEntity(entity, Battle.RoundHands[entity]);
-        var timer = Battle.GetTree().CreateTimer(Configuration.DelayBetweenResolveSteps);
-        await Battle.ToSignal(timer, Timer.SignalName.Timeout);
-        var resolveCardContainer = Battle.EngageCardContainer.CardContainers[0];
-        foreach (var node in resolveCardContainer.ContentNodes)
+        if (Battle.RoundHands[entity].Tier != Enums.HandTier.None)
         {
-            var cardNode = (CardNode)node;
-            await cardNode.AnimateLift(true, Configuration.SelectTweenTime);
-            var card = cardNode.Card;
-            card.Resolve(entity);
-            await ResolvePendingEffects();
-            await GameMgr.BattleLog.HandleLogEntries();
+            await PrepareEntity(entity, Battle.RoundHands[entity]);
+            var timer = Battle.GetTree().CreateTimer(Configuration.DelayBetweenResolveSteps);
+            await Battle.ToSignal(timer, Timer.SignalName.Timeout);
+            var resolveCardContainer = Battle.EngageCardContainer.CardContainers[0];
+            foreach (var node in resolveCardContainer.ContentNodes)
+            {
+                var cardNode = (CardNode)node;
+                await cardNode.AnimateLift(true, Configuration.SelectTweenTime);
+                var card = cardNode.Card;
+                card.Resolve(entity);
+                await ResolvePendingEffects();
+                await GameMgr.BattleLog.HandleLogEntries();
+            }
+        }
+        else
+        {
+            GameMgr.BattleLog.Log($"{entity} skipped.");
         }
         // await Battle.RoleMarkers[entity].TweenEmphasize(false, Configuration.EmphasizeTweenTime);
 
@@ -149,5 +162,6 @@ public class Engage
             tasks.Add(effect.Apply());
         }
         await Task.WhenAll(tasks);
+        PendingEffects.Clear();
     }
 }

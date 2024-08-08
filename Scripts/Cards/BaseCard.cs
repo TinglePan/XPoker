@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using XCardGame.CardProperties;
 using XCardGame.Common;
-using XCardGame.TimingInterfaces;
 using XCardGame.Ui;
 
 namespace XCardGame;
@@ -65,12 +64,11 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
     public virtual void Setup(object o)
     {
         var args = (SetupArgs)o;
-        SetupProps();
         GameMgr = args.GameMgr;
         Battle = args.Battle;
         Owner = args.Owner;
         Nodes.Add(args.Node);
-        
+        SetupProps();
         if (OriginalRank == Enums.CardRank.None)
         {
             OriginalRank = args.Rank != Enums.CardRank.None ? args.Rank : RandRank();
@@ -260,12 +258,12 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
         if (entity.RoundRole.Value == Enums.EngageRole.Attacker)
         {
             Battle.RoundEngage.PendingEffects.Add(new AttackAgainstEntityEffect(this, entity, Battle.GetOpponentOf(entity),
-                Utils.GetCardBlackJackValue(Rank.Value), 1));
+                Utils.GetCardBlackJackValue(Rank.Value)));
         }
         else if (entity.RoundRole.Value == Enums.EngageRole.Defender)
         {
             Battle.RoundEngage.PendingEffects.Add(new DefendAgainstEntityEffect(this, entity, Battle.GetOpponentOf(entity),
-                Utils.GetCardBlackJackValue(Rank.Value), 1));
+                Utils.GetCardBlackJackValue(Rank.Value)));
         }
         GameMgr.BattleLog.Log($"Resolving {this}");
         // GD.Print($"Resolve of {this}, effect {effect}");
@@ -276,10 +274,6 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
             {
                 resolve.OnResolve();
             }
-        }
-        foreach (var effect in Battle.RoundEngage.PendingEffects)
-        {
-            effect.Apply();
         }
     }
 
@@ -292,24 +286,27 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
 
     protected virtual void SetupProps()
     {
-        if (Def.IsPiled)
+        if (Def.IsPiled && GetProp<CardPropPiled>() == null)
         {
-            Props.Add(typeof(CardPropPiled), CreatePiledProp());
+            var prop = CreatePiledProp();
+            Props.Add(prop.GetType(), prop);
         }
         
         if (Def.IsUsable)
         {
-            if (Def.IsInnate)
+            if (Def.IsInnate && GetProp<CardPropInnate>() == null)
             {
                 Props.Add(typeof(CardPropInnate), new CardPropInnate(this));
             }
-            if (Def.IsItem)
+            if (Def.IsItem && GetProp<CardPropItem>() == null)
             {
-                Props.Add(typeof(CardPropItem), CreateItemProp());
+                var prop = CreateItemProp();
+                Props.Add(prop.GetType(), prop);
             }
-            if (Def.IsRule)
+            if (Def.IsRule && GetProp<CardPropRule>() == null)
             {
-                Props.Add(typeof(CardPropRule), CreateRuleProp());
+                var prop = CreateRuleProp();
+                Props.Add(prop.GetType(), prop);
             }
         }
     }

@@ -85,7 +85,7 @@ public static class BattleEntityDefs
 
     private static BattleEntityDef GetTestEnemyBattleEntityDef()
     {
-        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        var res = DefaultPlayerBattleEntityDef.Clone<BattleEntityDef>();
         res.Name = "Test";
         res.PortraitPath = "res://Sprites/test.png";
         res.SpritePath = "res://Sprites/test.png";
@@ -97,7 +97,7 @@ public static class BattleEntityDefs
 
     private static BattleEntityDef GetTallBoyBattleEntityDef()
     {
-        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        var res = DefaultPlayerBattleEntityDef.Clone<BattleEntityDef>();
         res.Name = "Tall boy";
         res.PortraitPath = "res://Sprites/tall_boy.png";
         res.SpritePath = "res://Sprites/tall_boy.png";
@@ -109,7 +109,7 @@ public static class BattleEntityDefs
 
     private static BattleEntityDef GetNinjaBattleEntityDef()
     {
-        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        var res = DefaultPlayerBattleEntityDef.Clone<BattleEntityDef>();
         res.Name = "Ninja";
         res.PortraitPath = "res://Sprites/ninja.png";
         res.SpritePath = "res://Sprites/ninja.png";
@@ -122,7 +122,7 @@ public static class BattleEntityDefs
 
     private static BattleEntityDef GetManInBlackBattleEntityDef()
     {
-        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        var res = DefaultPlayerBattleEntityDef.Clone<BattleEntityDef>();
         res.Name = "Man in black";
         res.PortraitPath = "res://Sprites/man_in_black.png";
         res.SpritePath = "res://Sprites/man_in_black.png";
@@ -134,7 +134,7 @@ public static class BattleEntityDefs
     public static BattleEntityDef AssassinBattleEntityDef = GetAssassinBattleEntityDef();
     private static BattleEntityDef GetAssassinBattleEntityDef()
     {
-        var res = DefaultEnemyBattleEntityDef.Clone<BattleEntityDef>();
+        var res = DefaultPlayerBattleEntityDef.Clone<BattleEntityDef>();
         res.Name = "Assassin";
         res.PortraitPath = "res://Sprites/assassin.png";
         res.SpritePath = "res://Sprites/assassin.png";

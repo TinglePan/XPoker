@@ -3,43 +3,43 @@ using XCardGame.Common;
 
 namespace XCardGame;
 
-public class DefendAgainstEntityEffect: BaseAgainstEntityEffect, IPowerScaledEffect
+public class DefendAgainstEntityEffect: BaseAgainstEntityEffect
 {
-    public int RawValue { get; set; }
-    public float PowerScale { get; }
+    public int BaseValue;
+    public bool AddHandPower;
     
-    public DefendAgainstEntityEffect(BaseCard originateCard, BattleEntity src, BattleEntity dst, int rawValue, float powerScale) : 
-        base(Utils._("Defend"), Utils._($"Gain {rawValue} defence, plus {{}} * power"), originateCard, src, dst)
+    public DefendAgainstEntityEffect(BaseCard originateCard, BattleEntity src, BattleEntity dst, int baseValue, bool addHandPower = true) : 
+        base(Utils._("Defend"), Utils._($"Gain {baseValue} defence"), originateCard, src, dst)
     {
-        RawValue = rawValue;
-        PowerScale = powerScale;
+        BaseValue = baseValue;
+        AddHandPower = addHandPower;
     }
     
     public override Task Apply()
     {
-        float defenceValue = RawValue;
-        int power = 0;
-        if (PowerScale > 0)
+        var modifiedDef = BaseValue;
+        int defMod = Src.GetDefenceModifier();
+        modifiedDef += defMod;
+        int handPower = 0;
+        if (AddHandPower)
         {
-            power = Src.GetPower(Battle.RoundHands[Src].Tier, Enums.EngageRole.Defender);
-            defenceValue = CalculateValue(power);
+            handPower = Src.HandPowers[Battle.RoundHands[Src].Tier];
+            modifiedDef += handPower;
         }
-        defenceValue += Src.GetDefenceModifier();
-        var separatedMultipliers = Utils.AddUpSeparatedMultipliers(Src.GetDefenceMultipliers());
-        var roundedDefenceValue = (int)(defenceValue * separatedMultipliers.X * separatedMultipliers.Y);
-        Src.ChangeDefence(roundedDefenceValue);
-        Battle.GameMgr.BattleLog.Log(Utils._($"{Src} defends! Def:{power}. Base:{defenceValue}"));
-        Battle.GameMgr.BattleLog.Log(Utils._($"Gained {roundedDefenceValue} guard"));
+        var separatedMultipliers = Utils.AddUpSeparatedMultipliers(Src.GetAttackMultipliers());
+        var res = (int)(modifiedDef * separatedMultipliers.X * separatedMultipliers.Y);
+
+        if (AddHandPower)
+        {
+            Battle.GameMgr.BattleLog.Log(Utils._($"{Src} defends. Base:{BaseValue}, DefModifier:{defMod}, HandPower:{handPower}, FinalValue:{res}"));
+        }
+        else
+        {
+            Battle.GameMgr.BattleLog.Log(Utils._($"{Src} defends. Base:{BaseValue}, DefModifier:{defMod}, FinalValue:{res}"));
+        }
+        
+        Src.ChangeGuard(res);
+        Battle.GameMgr.BattleLog.Log(Utils._($"Gained {res} guard."));
         return Task.CompletedTask;
-    }
-    
-    public override string Description()
-    {
-        return string.Format(DescriptionTemplate, PowerScale);
-    }
-    
-    public int CalculateValue(int power)
-    {
-        return RawValue + (int)(power * PowerScale);
     }
 }

@@ -13,7 +13,6 @@ public class BaseUsableCardInputHandler: BaseInputHandler
     public BaseUsableCardInputHandler(GameMgr gameMgr, CardNode node) : base(gameMgr)
     {
         Helper = new CardInputHandlerHelper(this, node);
-        Helper.ReBindHandler("Confirm", Confirm);
     }
     
     public override async Task AwaitAndDisableInput(Task task)
@@ -21,15 +20,16 @@ public class BaseUsableCardInputHandler: BaseInputHandler
         await Helper.AwaitAndDisableInput(task);
     }
         
-    public override async void OnEnter()
+    public override async Task OnEnter()
     {
-        base.OnEnter();
+        await base.OnEnter();
         Helper.OnEnter(Configuration.StandardUsableCardOptionsMenuName);
+        Helper.ReBindHandler("Confirm", Confirm);
     }
         
-    public override async void OnExit()
+    public override async Task OnExit()
     {
-        base.OnExit();
+        await base.OnExit();
         await Helper.OriginateCardNode.AnimateSelect(false, Configuration.SelectTweenTime);
         Helper.OnExit();
     }

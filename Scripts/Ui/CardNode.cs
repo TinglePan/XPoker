@@ -33,12 +33,11 @@ public partial class CardNode: BaseContentNode, ISelect
     public ObservableProperty<bool> IsRevealed;
     public ObservableProperty<bool> IsTapped;
     public DerivedObservableProperty<bool> IsEffective;
-
-    private ObservableProperty<bool> _isSelected;
+    
     public bool IsSelected { get; set; }
     public Action OnSelected { get; }
     
-    protected Vector2 InitPosition;
+    public Vector2 InitPosition;
 
 	public override void _Ready()
 	{

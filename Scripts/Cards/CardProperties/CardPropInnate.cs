@@ -1,6 +1,4 @@
-﻿using XCardGame.TimingInterfaces;
-
-namespace XCardGame.CardProperties;
+﻿namespace XCardGame.CardProperties;
 
 public class CardPropInnate: BaseCardProp
 {

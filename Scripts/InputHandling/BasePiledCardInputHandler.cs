@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using System.Threading.Tasks;
+using Godot;
 using XCardGame.Common;
 using XCardGame.Ui;
 
@@ -15,16 +16,16 @@ public abstract class BasePiledCardInputHandler<TOriginateCard>: BaseInputHandle
         OriginateCard = (TOriginateCard)originate.Content.Value;
     }
 
-    public override async void OnEnter()
+    public override async Task OnEnter()
     {
-        base.OnEnter();
+        await base.OnEnter();
         await OriginateCardNode.AnimateSelect(true, Configuration.SelectTweenTime);
         await OriginateCardNode.ToSignal(OriginateCardNode.AnimationPlayer, "animation_finished");
     }
 
-    public override async void OnExit()
+    public override async Task OnExit()
     {
-        base.OnExit();
+        await base.OnExit();
         await OriginateCardNode.AnimateSelect(false, Configuration.SelectTweenTime);
     }
 }

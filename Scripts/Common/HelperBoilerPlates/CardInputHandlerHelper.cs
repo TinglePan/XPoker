@@ -9,7 +9,7 @@ namespace XCardGame.Common.HelperBoilerPlates;
 
 public class CardInputHandlerHelper
 {
-    public static readonly List<(string, string, Action)> StandardUsableCardOptionsMenuSetupArgs = new List<(string, string, Action)>
+    public static readonly List<(string, string, Action)> StandardUsableCardOptionsMenuSetupArgs = new ()
     {
         ("Cancel", Utils._("Cancel"), null),
         ("Confirm", Utils._("Confirm"), null)
@@ -30,6 +30,7 @@ public class CardInputHandlerHelper
         InputHandler = inputHandler;
         OriginateCardNode = originateCardNode;
         OriginateCard = (BaseCard)originateCardNode.Content.Value;
+        HandlerBindings = new Dictionary<string, Action>();
         Battle = originateCardNode.Battle;
     }
     
@@ -126,9 +127,15 @@ public class CardInputHandlerHelper
     {
         if (HandlerBindings.TryGetValue(buttonName, out var currFunc))
         {
-            Menu.Buttons[buttonName].Pressed -= currFunc;
+            if (currFunc != null)
+            {
+                Menu.Buttons[buttonName].Pressed -= currFunc;
+            }
         }
-        Menu.Buttons[buttonName].Pressed += handler;
+        if (handler != null)
+        {
+            Menu.Buttons[buttonName].Pressed += handler;
+        }
         HandlerBindings[buttonName] = handler;
     }
 

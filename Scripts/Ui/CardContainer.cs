@@ -113,8 +113,7 @@ public partial class CardContainer: BaseContentContainer
 		{
 			if (content is BaseCard card)
 			{
-				var cardNode = CardPrefab.Instantiate<CardNode>();
-				AddChild(cardNode);
+				var cardNode = Battle.InstantiateCardNode(card, this);
 				var faceDirection = GetCardFaceDirection(index);
 				cardNode.Setup(new CardNode.SetupArgs
 				{

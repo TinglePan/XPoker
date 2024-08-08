@@ -48,7 +48,7 @@ public partial class GameMgr : Node
 		var battleScene = (BattleScene)CurrentScene;
 		BattleLog = battleScene.GetNode<BattleLog>("LogBox");
 		CurrentBattle = battleScene.Battle;
-		var playerBattleEntityInitArgs = PlayerBattleEntity.InitArgs(BattleEntityDefs.TricksterPlayerBattleEntityDef);
+		var playerBattleEntityInitArgs = PlayerBattleEntity.InitArgs(BattleEntityDefs.ClownPlayerBattleEntityDef);
 		playerBattleEntityInitArgs.Deck.MixIn(DeckDefs.Standard52Deck());
 		
 		CurrentBattle.Setup(new Battle.SetupArgs

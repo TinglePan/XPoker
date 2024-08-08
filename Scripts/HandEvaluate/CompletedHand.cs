@@ -25,6 +25,8 @@ public class CompletedHand: IComparable<CompletedHand>
     {
         switch (Tier)
         {
+            case Enums.HandTier.None:
+                break;
             case Enums.HandTier.FullHouse:
                 var groups = PrimaryCards.GroupBy(card => card.Rank.Value, (rank, groupCards) => new
                 {
@@ -80,6 +82,4 @@ public class CompletedHand: IComparable<CompletedHand>
         }
         return 0;
     }
-
-    public Enums.CardRank LowestPrimaryCardRank => PrimaryCards.Count >= 1 ? PrimaryCards[0].Rank.Value : Enums.CardRank.None;
 }

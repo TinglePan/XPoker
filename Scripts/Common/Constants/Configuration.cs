@@ -27,8 +27,6 @@ public static class Configuration
     public static readonly Vector2 CardSize = new Vector2(48, 68);
     public static readonly Vector2 CardContainerSeparation = new Vector2(12, 8);
     public static readonly int SplitCardContainerSeparation = 24;
-    public static readonly int ShockDecreaseDamageDealtMultiplierPerStack = -10;
-    public static readonly int ShockIncreaseDamageReceivedMultiplierPerStack = 10;
     public static readonly float AnimateCardTransformInterval = 0.1f;
     public static readonly float ContentContainerAdjustTweenTime = 0.2f;
     public static readonly float DelayBetweenResolveSteps = 0.5f;
@@ -38,7 +36,7 @@ public static class Configuration
     // public static readonly int SkillCardCountPerRow = 6;
     public static readonly int BuffCountPerRow = 12;
     
-    public static readonly int MaxDefence = 999;
+    public static readonly int MaxGuard = 999;
     public static readonly int ProgressCountRequiredToWin = 8;
 
     public static readonly int DefaultRewardCardCount = 3;
@@ -55,9 +53,12 @@ public static class Configuration
     public static readonly int CommonBuffMaxStack = 99;
     public static readonly int PowerBasedBuffMaxStack = 999;
 
+    public static readonly int ChargeBuffMaxStack = 10;
+    public static readonly int ChargeMultiplierPerStack = 50;
+
+    public static readonly int BaseMultiplier = 100;
     public static readonly int VulnerableMultiplier = 50;
     public static readonly int WeakenMultiplier = 25;
-    public static readonly int FragileMultiplier = 50;
 
     public static readonly Vector4 DefaultContentContainerMargins = new Vector4(8, 4, 8, 4);
 
@@ -65,10 +66,10 @@ public static class Configuration
     public static readonly int CardTapTweenPriority = 2;
     public static readonly int CardMoveTweenPriority = 3;
     
-    public static readonly float BaseHeatMultiplier = 1.0f;
-    public static readonly float AllFlipHeatMultiplier = 0.75f;
-    public static readonly float FoldHeatMultiplier = 0.5f;
-    public static readonly float AllFaceDownHeatMultiplierAdd = 1.0f;
+    public static readonly int BaseHeatMultiplier = 100;
+    public static readonly int AllFlipHeatMultiplier = 75;
+    public static readonly int FoldHeatMultiplier = 50;
+    public static readonly int AllFaceDownHeatMultiplierAdd = 100;
 
     public static readonly int DefaultRequiredHoleCardCountMin = 0;
     public static readonly int DefaultRequiredHoleCardCountMax = 2;

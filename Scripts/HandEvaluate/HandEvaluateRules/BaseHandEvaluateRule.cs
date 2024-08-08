@@ -8,18 +8,18 @@ namespace XCardGame;
 public class BaseHandEvaluateRule
 {
     public virtual void EvaluateAndRecord(List<BaseCard> cards,
-        Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHands, Enums.HandTier? forRank=null)
+        Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHands, Enums.HandTier? forTier=null)
     {
-        forRank ??= Tier;
+        forTier ??= Tier;
         if (calculatedHands != null &&
-            calculatedHands.TryGetValue(forRank.Value, out var calculatedRes) && calculatedRes.Count > 0) return;
-        var res = Evaluate(cards, forRank);
-        if (calculatedHands!= null) calculatedHands[forRank.Value] = res;
+            calculatedHands.TryGetValue(forTier.Value, out var calculatedRes) && calculatedRes.Count > 0) return;
+        var res = Evaluate(cards, forTier);
+        if (calculatedHands!= null && res != null) calculatedHands[forTier.Value] = res;
     }
     
-    protected virtual List<CompletedHand> Evaluate(List<BaseCard> cards, Enums.HandTier? forRank=null)
+    protected virtual List<CompletedHand> Evaluate(List<BaseCard> cards, Enums.HandTier? forTier=null)
     {
-        forRank ??= Tier;
+        forTier ??= Tier;
         var picks = Pick(cards);
         List<CompletedHand> result = null;
         if (picks != null)
@@ -27,7 +27,7 @@ public class BaseHandEvaluateRule
             result = new List<CompletedHand>();
             foreach (var pick in picks)
             {
-                result.Add(new CompletedHand(forRank.Value, pick,
+                result.Add(new CompletedHand(forTier.Value, pick,
                     GetPrimaryComparerCards(pick, cards), GetKickers(pick, cards)));
             }
         }

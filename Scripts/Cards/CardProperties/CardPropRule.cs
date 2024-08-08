@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Godot;
 using XCardGame.Common;
 using XCardGame.Common.HelperBoilerPlates;
-using XCardGame.TimingInterfaces;
 using XCardGame.Ui;
 
 namespace XCardGame.CardProperties;
@@ -20,7 +19,7 @@ public class CardPropRule: BaseCardPropUsable, IStartStopEffect
     public override bool CanUse()
     {
         if (!base.CanUse()) return false;
-        if (CardNode.CurrentContainer.Value is CardContainer { AllowUseRuleCard: true }) return false;
+        if (CardNode.CurrentContainer.Value is CardContainer { AllowUseRuleCard: false }) return false;
         return true;
     }
 

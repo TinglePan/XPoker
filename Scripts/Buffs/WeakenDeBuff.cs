@@ -5,7 +5,7 @@ namespace XCardGame;
 public class WeakenDeBuff: BaseBuff
 {
     public WeakenDeBuff(int stack) : base(
-        "Vulnerable", $"Reduce damage dealt by {Configuration.WeakenMultiplier} percent, consumes 1 stack on taking effect",
+        "Vulnerable", $"Reduce dealing damage by {Configuration.WeakenMultiplier} percent, consumes 1 stack on taking effect",
         "res://Sprites/BuffIcons/weaken.png", true, stack:stack, maxStack:Configuration.CommonBuffMaxStack)
     {
     }

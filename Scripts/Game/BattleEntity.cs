@@ -27,8 +27,8 @@ public partial class BattleEntity: Node
     public CardContainer HoleCardContainer;
     public BuffContainer BuffContainer;
     public IconWithTextFallback CharacterIcon;
-    public Node2D DefenceIcon;
-    public Label DefenceLabel;
+    public Node2D GuardIcon;
+    public Label GuardLabel;
     public ProgressBar HpBar;
     public Label HpLabel;
     public Label RoundHandLabel;
@@ -74,8 +74,8 @@ public partial class BattleEntity: Node
         HoleCardContainer = GetNode<CardContainer>("HoleCards");
         BuffContainer = GetNode<BuffContainer>("Buffs");
         CharacterIcon = GetNode<IconWithTextFallback>("Sprite");
-        DefenceLabel = GetNode<Label>("Defence/Value");
-        DefenceIcon = GetNode<Node2D>("Defence");
+        GuardLabel = GetNode<Label>("Defence/Value");
+        GuardIcon = GetNode<Node2D>("Defence");
         HpBar = GetNode<ProgressBar>("HpBar/Bar");
         HpBar.MinValue = 0;
         HpBar.Step = 1;
@@ -192,70 +192,44 @@ public partial class BattleEntity: Node
         
     }
 
-    public int GetPower(Enums.HandTier handTier, Enums.EngageRole role)
+    public int GetAttackModifier()
     {
-        var power = HandPowers[handTier];
+        var res = 0;
         foreach (var buff in BuffContainer.Contents)
         {
             switch (buff)
             {
                 case ChargeBuff chargeBuff:
-                    power += chargeBuff.Stack.Value;
+                    res += chargeBuff.Stack.Value;
                     chargeBuff.Consume();
                     break;
-                case BeefUpBuff beefUpBuff:
-                    if (role == Enums.EngageRole.Attacker)
-                    {
-                        power += beefUpBuff.Stack.Value;
-                    }
+                case TempAtkBuff beefUpBuff:
+                    res += beefUpBuff.Stack.Value;
                     break;
-                case CrippleDeBuff crippleDeBuff:
-                    if (role == Enums.EngageRole.Attacker)
-                    {
-                        power -= crippleDeBuff.Stack.Value;
-                    }
-                    break;
-                case ResistBuff resistBuff:
-                    if (role == Enums.EngageRole.Defender)
-                    {
-                        power += resistBuff.Stack.Value;
-                    }
-                    break;
-                case FragileDeBuff fragileDeBuff:
-                    if (role == Enums.EngageRole.Defender)
-                    {
-                        power -= fragileDeBuff.Stack.Value;
-                    }
+                case TempAtkDeBuff crippleDeBuff:
+                    res -= crippleDeBuff.Stack.Value;
                     break;
             }
         }
-        return power;
-    }
-    
-    public int GetAttackerDamageModifier()
-    {
-        var res = 0;
-        // foreach (var buff in attacker.Buffs)
-        // {
-        // }
         return res;
     }
 
-    public List<float> GetAttackerDamageMultipliers()
+    public List<int> GetAttackMultipliers()
     {
-        List<float> res = new();
+        List<int> res = new();
+        
         foreach (var buff in BuffContainer.Contents)
         {
             if (buff is WeakenDeBuff weakenDeBuff)
             {
-                res.Add(1 - (float)Configuration.WeakenMultiplier / 100);
+                res.Add(-Configuration.WeakenMultiplier);
                 weakenDeBuff.Consume();
             }
         }
         return res;
     }
 
-    public int GetDefenderDamageModifier()
+    public int GetReceiveDamageModifier()
     {
         var res = 0;
         foreach (var buff in BuffContainer.Contents)
@@ -267,51 +241,64 @@ public partial class BattleEntity: Node
         }
         return res;
     }
-
-    public List<float> GetDefenderDamageMultipliers()
+    
+    public List<int> GetReceiveDamageMultipliers()
     {
-        List<float> res = new();
+        var res = new List<int>();
+        res.Add(Battle.HeatMultiplier.Value - 100);
+        
         foreach (var buff in BuffContainer.Contents)
         {
-            if (buff is VulnerableDeBuff vulnerableDeBuff)
+            switch (buff)
             {
-                res.Add(1 + (float)Configuration.VulnerableMultiplier / 100);
-                vulnerableDeBuff.Consume();
+                case VulnerableDeBuff vulnerableDeBuff:
+                    res.Add(Configuration.VulnerableMultiplier);
+                    vulnerableDeBuff.Consume();
+                    break;
             }
         }
         return res;
     }
+
     
     public int GetDefenceModifier()
     {
         var res = 0;
-        // foreach (var buff in self.Buffs)
-        // {
-        // }
-        return res;
-    }
-    
-    public List<float> GetDefenceMultipliers()
-    {
-        List<float> res = new();
         foreach (var buff in BuffContainer.Contents)
         {
-            if (buff is FragileDeBuff)
+            switch (buff)
             {
-                res.Add(1 - (float)Configuration.FragileMultiplier / 100);
+                case ChargeBuff chargeBuff:
+                    res += chargeBuff.Stack.Value;
+                    chargeBuff.Consume();
+                    break;
+                case TempAtkBuff beefUpBuff:
+                    res += beefUpBuff.Stack.Value;
+                    break;
+                case TempAtkDeBuff crippleDeBuff:
+                    res -= crippleDeBuff.Stack.Value;
+                    break;
             }
         }
         return res;
     }
+    
+    public List<int> GetDefenceMultipliers()
+    {
+        // List<int> res = new();
+        // return res;
+        return null;
+    }
+    
 
     public override string ToString()
     {
         return Def.Name;
     }
 
-    public void ChangeDefence(int amount)
+    public void ChangeGuard(int amount)
     {
-        Guard.Value = Mathf.Clamp(Guard.Value + amount, 0, Configuration.MaxDefence);
+        Guard.Value = Mathf.Clamp(Guard.Value + amount, 0, Configuration.MaxGuard);
     }
 
     public int TakeDamage(int damage, bool bypassDefence = false)
@@ -323,7 +310,7 @@ public partial class BattleEntity: Node
         else
         {
             var reduceDefence = Mathf.Min(damage, Guard.Value);
-            ChangeDefence(-reduceDefence);
+            ChangeGuard(-reduceDefence);
             damage -= reduceDefence;
             if (damage > 0)
             {
@@ -373,12 +360,12 @@ public partial class BattleEntity: Node
     {
         if (args.NewValue <= 0)
         {
-            DefenceIcon.Hide();
+            GuardIcon.Hide();
         }
         else
         {
-            DefenceIcon.Show();
-            DefenceLabel.Text = args.NewValue.ToString();
+            GuardIcon.Show();
+            GuardLabel.Text = args.NewValue.ToString();
         }
     }
     

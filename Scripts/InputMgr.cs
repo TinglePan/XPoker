@@ -22,27 +22,27 @@ public partial class InputMgr: Node
         CurrentInputHandler.HandleInputEvent(@event);
     }
     
-    public void SwitchToInputHandler(BaseInputHandler inputHandler)
+    public async void SwitchToInputHandler(BaseInputHandler inputHandler)
     {
         GD.Print($"Switching to new input handler {inputHandler}");
         if (CurrentInputHandler != null)
         {
             InputHandlerStack.Add(CurrentInputHandler);
-            CurrentInputHandler.OnExit();
+            await CurrentInputHandler.OnExit();
         }
         CurrentInputHandler = inputHandler;
-        inputHandler.OnEnter();
+        await inputHandler.OnEnter();
     }
     
-    public void QuitCurrentInputHandler()
+    public async void QuitCurrentInputHandler()
     {
         GD.Print($"Quit input handler {CurrentInputHandler}");
         if (InputHandlerStack.Count > 0)
         {
-            CurrentInputHandler.OnExit();
+            await CurrentInputHandler.OnExit();
             CurrentInputHandler = InputHandlerStack[^1];
             InputHandlerStack.RemoveAt(InputHandlerStack.Count - 1);
-            CurrentInputHandler.OnEnter();
+            await CurrentInputHandler.OnEnter();
         }
     }
     

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using XCardGame.Common;
-using XCardGame.TimingInterfaces;
 using XCardGame.Ui;
 
 namespace XCardGame.CardProperties;

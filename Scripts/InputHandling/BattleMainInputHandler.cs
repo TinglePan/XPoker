@@ -20,6 +20,7 @@ public class BattleMainInputHandler: BaseInputHandler
     public BattleMainInputHandler(GameMgr gameMgr) : base(gameMgr)
     {
         MenuPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/HMenuButtons.tscn");
+        Menus = new Dictionary<Battle.State, HMenuButtons>();
     }
 
     public override async Task AwaitAndDisableInput(Task task)
@@ -42,14 +43,14 @@ public class BattleMainInputHandler: BaseInputHandler
         // GD.Print("await and disable input 2");
     }
 
-    public override void OnEnter()
+    public override async Task OnEnter()
     {
-        base.OnEnter();
+        await base.OnEnter();
         BattleScene = (BattleScene)GameMgr.CurrentScene;
         Battle = GameMgr.CurrentBattle;
 
-        SetupButtons();
         Battle.CurrentState.DetailedValueChanged += OnBattleStateChanged;
+        SetupButtons();
 
         UsableCardContainers = new List<CardContainer>()
         {
@@ -67,9 +68,9 @@ public class BattleMainInputHandler: BaseInputHandler
         }
     }
     
-    public override void OnExit()
+    public override async Task OnExit()
     {
-        base.OnExit();
+        await base.OnExit();
         foreach (var child in Battle.ButtonRoot.GetChildren())
         {
             if (child is Control control)
@@ -84,11 +85,6 @@ public class BattleMainInputHandler: BaseInputHandler
             foreach (var cardNode in cardContainer.ContentNodes)
             {
                 cardNode.OnMousePressed -= OnCardNodePressed;
-                if (cardNode is PiledCardNode piledCardNode)
-                {
-                    piledCardNode.OnHover -= piledCardNode.OnHoverHandler;
-                    piledCardNode.OnUnHover -= piledCardNode.OnUnHoverHandler;
-                }
             }
         }
     }
@@ -172,6 +168,7 @@ public class BattleMainInputHandler: BaseInputHandler
             menu.Hide();
             Menus[Battle.State.AfterEngage] = menu;
         }
+        Battle.CurrentState.FireValueChangeEventsOnInit();
     }
     
     protected async void OnCardNodePressed(BaseContentNode node, MouseButton mouseButton)
@@ -246,6 +243,10 @@ public class BattleMainInputHandler: BaseInputHandler
     {
         await GameMgr.AwaitAndDisableInput(Battle.DealCards());
         Battle.CurrentState.Value = Battle.State.BeforeShowDown;
+        if (Battle.CanFlipCards())
+        {
+            Menus[Battle.State.BeforeShowDown].Buttons["Flip"].Show();
+        }
     }
 
     protected async void OnFlipButtonPressed()
@@ -253,7 +254,7 @@ public class BattleMainInputHandler: BaseInputHandler
         await GameMgr.AwaitAndDisableInput(Battle.FlipCards());
         if (!Battle.CanFlipCards())
         {
-            Battle.CurrentState.Value = Battle.State.BeforeEngage;
+            Menus[Battle.State.BeforeShowDown].Buttons["Flip"].Hide();
         }
     }
     

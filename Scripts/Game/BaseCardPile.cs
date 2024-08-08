@@ -10,29 +10,27 @@ using XCardGame.Ui;
 
 namespace XCardGame;
 
-public partial class CardPile: Node2D
+public abstract partial class BaseCardPile: Node2D
 {
+    
     public class SetupArgs
     {
+        public GameMgr GameMgr;
+        public Battle Battle;
         public List<BaseCard> Cards;
-        public bool CountAsField;
-        public Enums.CardFace TopCardFaceDirection;
+        public Enums.GrowDirection DefaultAddCardDirection; 
     }
-    
-    public PackedScene CardPrefab;
-    
-    public CardNode TopCard { get; private set; }
-    public NinePatchRect PileImage { get; private set; }
-    public ObservableCollection<BaseCard> Cards { get; private set; }
-    public bool CountAsField { get; set; }
-    public Enums.CardFace TopCardFaceDirection;
 
-    public bool HasSetup { get; set; }
+    public GameMgr GameMgr;
+    public Battle Battle;
+    public CardNode TopCardNode;
+    public NinePatchRect PileImage;
+    public ObservableCollection<BaseCard> Cards;
+    public Enums.GrowDirection DefaultAddCardDirection;
 
     public override void _Ready()
     {
         base._Ready();
-        TopCard = GetNode<CardNode>("Card");
         PileImage = GetNode<NinePatchRect>("PileImage");
         Cards = new ObservableCollection<BaseCard>();
         Cards.CollectionChanged += OnCardsChanged;
@@ -48,34 +46,21 @@ public partial class CardPile: Node2D
                 Cards.Add(card);
             }
         }
-        CountAsField = args.CountAsField;
-        TopCardFaceDirection = args.TopCardFaceDirection;
-        TopCard.Setup(new CardNode.SetupArgs
-        {
-            FaceDirection = TopCardFaceDirection,
-            HasPhysics = true,
-        });
-    }
-
-    public void EnsureSetup()
-    {
-        if (!HasSetup)
-        {
-            GD.PrintErr($"{this} not setup yet");
-        }
+        GameMgr = args.GameMgr;
+        Battle = args.Battle;
+        DefaultAddCardDirection = args.DefaultAddCardDirection;
     }
     
     public CardNode CreateCardNodeOnPile(BaseCard card)
     {
-        var cardNode = CardPrefab.Instantiate<CardNode>();
-        AddChild(cardNode);
+        var cardNode = Battle.InstantiateCardNode(card, this);
         cardNode.Setup(new CardNode.SetupArgs()
         {
             Content = card,
-            FaceDirection = TopCardFaceDirection,
+            FaceDirection = TopCardNode.FaceDirection.Value,
             HasPhysics = true,
         });
-        cardNode.Position = TopCard.Position;
+        cardNode.Position = TopCardNode.Position;
         return cardNode;
     }
     
@@ -117,7 +102,6 @@ public partial class CardPile: Node2D
         }
         return card;
     }
-    
 
     public BaseCard Peek(int index = 0)
     {
@@ -132,53 +116,30 @@ public partial class CardPile: Node2D
     {
         return Cards.FirstOrDefault(filter);
     }
-    
-    protected void AdjustPileImage()
+
+    public void AddCard(BaseCard card, int index = -1)
     {
-        var count = Cards.Count;
-        if (count == 0)
+        if (index >= 0)
         {
-            PileImage.Hide();
+            Cards.Insert(index, card);
         }
         else
         {
-            PileImage.Show();
+            if (DefaultAddCardDirection == Enums.GrowDirection.FromBegin)
+            {
+                Cards.Insert(0, card);
+            }
+            else
+            {
+                Cards.Add(card);
+            }
         }
-        TopCard.Position = GetTopCardOffset(count);
     }
-
-    protected Vector2 GetTopCardOffset(int count)
-    {
-        return Configuration.PiledCardOffsetMax * Mathf.Clamp((float)count / Configuration.PileCardCountAtMaxOffset, 0, 1);
-    }
-
+    
     protected void OnCardsChanged(object sender, NotifyCollectionChangedEventArgs args)
     {
-        switch (args.Action)
-        {
-            case NotifyCollectionChangedAction.Add:
-            case NotifyCollectionChangedAction.Remove:
-            case NotifyCollectionChangedAction.Reset:
-                CheckTopCard();
-                AdjustPileImage();
-                break;
-            case NotifyCollectionChangedAction.Replace:
-                CheckTopCard();
-                break;
-        }
-        
+        Adjust();
     }
 
-    protected void CheckTopCard()
-    {
-        if (Cards.Count > 0)
-        {
-            TopCard.Show();
-            TopCard.Content.Value = Cards[0];
-        }
-        else
-        {
-            TopCard.Hide();
-        }
-    }
+    protected abstract void Adjust();
 }

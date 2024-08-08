@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 using XCardGame.Ui;
 
@@ -14,18 +15,18 @@ public abstract class BaseSelectTargetInputHandler<TTargetNode>: BaseInputHandle
         SelectedNodes = new List<TTargetNode>();
     }
     
-    public override void OnEnter()
+    public override async Task OnEnter()
     {
-        base.OnEnter();
+        await base.OnEnter();
         foreach (var selectTarget in GetValidSelectTargets())
         {
             selectTarget.OnMousePressed += OnTargetPressed;
         }
     }
 
-    public override void OnExit()
+    public override async Task OnExit()
     {
-        base.OnExit();
+        await base.OnExit();
         foreach (var selectTarget in GetValidSelectTargets())
         {
             selectTarget.OnMousePressed -= OnTargetPressed;

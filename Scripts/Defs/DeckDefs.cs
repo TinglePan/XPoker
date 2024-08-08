@@ -54,8 +54,8 @@ public static class DeckDefs
                 cardDefs.Add(new CardDef()
                 {
                     BasePrice = 0,
-                    DescriptionTemplate = "{} of {}",
-                    ConcreteClassPath = "PokerCard",
+                    DescriptionTemplate = "{0} of {1}",
+                    ConcreteClassPath = "SimpleCard",
                     Rank = rank,
                     Suit = suit,
                 });

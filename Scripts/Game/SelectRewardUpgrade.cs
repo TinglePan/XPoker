@@ -22,9 +22,9 @@ public partial class SelectRewardUpgrade: Control
             SelectRewardUpgrade = selectRewardUpgrade;
         }
         
-        public override void OnEnter()
+        public override async Task OnEnter()
         {
-            base.OnEnter();
+            await base.OnEnter();
             Battle = GameMgr.CurrentBattle;
             foreach (var node in SelectRewardUpgrade.Container.ContentNodes)
             {
@@ -32,9 +32,9 @@ public partial class SelectRewardUpgrade: Control
             }
         }
         
-        public override void OnExit()
+        public override async Task OnExit()
         {
-            base.OnExit();
+            await base.OnExit();
             foreach (var node in SelectRewardUpgrade.Container.ContentNodes)
             {
                 node.OnMousePressed -= OnNodePressed;

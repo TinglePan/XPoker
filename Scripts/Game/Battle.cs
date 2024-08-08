@@ -5,8 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
+using XCardGame.CardProperties;
 using XCardGame.Common;
-using XCardGame.TimingInterfaces;
 using XCardGame.Ui;
 
 // using Godot.Collections;
@@ -48,21 +48,24 @@ public partial class Battle: Node2D
     public BattleEntity[] Entities;
     public Node2D ButtonRoot;
     public SplitCardContainer OpenedPiledCardContainer;
+    public Label Info;
 
     public PackedScene GameOverScene;
     public PackedScene GameWinScene;
     public PackedScene SelectRewardCardScene;
+    public PackedScene CardPrefab;
+    public PackedScene PiledCardPrefab;
     
-    public Action<Battle, CardNode> OnDealCard;
-    public Action<Battle> AfterDealCards;
-    public Action<Battle> OnRoundStart;
-    public Action<Battle> OnRoundEnd;
-    public Action<Battle> BeforeShowDown;
-    public Action<Battle, Engage> BeforeEngage;
-    public Action<Battle> OnPlayerDefeated;
-    public Action<Battle> OnEnemyDefeated;
-    public Action<Battle, BattleEntity> OnNewEnemy;
-    public Action<Battle> OnBattleFinished;
+    public Action<CardNode> OnDealCard;
+    public Action AfterDealCards;
+    public Action OnRoundStart;
+    public Action OnRoundEnd;
+    public Action BeforeShowDown;
+    public Action <Engage> BeforeEngage;
+    public Action OnPlayerDefeated;
+    public Action OnEnemyDefeated;
+    public Action <BattleEntity> OnNewEnemy;
+    public Action OnBattleFinished;
 
     // public ObservableCollection<BaseCard> CommunityCards;
     // public ObservableCollection<BaseCard> PrimaryCards;
@@ -80,16 +83,16 @@ public partial class Battle: Node2D
     public bool KeepHeatMultiplierOnNewRound;
     
     
-    public int RoundCount;
+    public ObservableProperty<int> RoundCount;
     public Dictionary<BattleEntity, CompletedHand> RoundHands;
     public Engage RoundEngage;
-    public int CurrentFaceUpCommunityCardCount => CommunityCardContainer.ContentNodes.Count(x => ((CardNode)x).FaceDirection.Value == Enums.CardFace.Up);
+    public int CurrentFaceUpCommunityCardCount;
 
     public ObservableCollection<Enums.HandTier> HandTierOrderDescend;
     
     public List<BaseFieldEffect> FieldEffects;
     public ObservableProperty<State> CurrentState;
-    public float HeatMultiplier;
+    public ObservableProperty<int> HeatMultiplier;
 
     protected List<EnemyRandBoxDef> AllEnemyRandBoxDefs;
     
@@ -102,13 +105,17 @@ public partial class Battle: Node2D
         EngageCardContainer = GetNode<SplitCardContainer>("EngageCards");
         ItemCardContainer = GetNode<CardContainer>("ItemCards");
         RuleCardContainer = GetNode<CardContainer>("RuleCards");
-        OpenedPiledCardContainer = GetNode<SplitCardContainer>("OpenedPiledCards");
+        OpenedPiledCardContainer = GetNode<SplitCardContainer>("OpenedPiledCard");
+        Info = GetNode<Label>("Info/Label");
         
         Player = GetNode<PlayerBattleEntity>("Player");
         Enemy = GetNode<BattleEntity>("Enemy");
         GameOverScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/GameOver.tscn");
         GameWinScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/GameWin.tscn");
         SelectRewardCardScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/SelectRewardCard.tscn");
+        CardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/Card.tscn");
+        PiledCardPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/PiledCard.tscn");
+        
         Entities = new [] { Player, Enemy };
         
         RoundHands = new Dictionary<BattleEntity, CompletedHand>();
@@ -118,8 +125,24 @@ public partial class Battle: Node2D
         // RuleCards = new ObservableCollection<BaseCard>();
         HandTierOrderDescend = new ObservableCollection<Enums.HandTier>();
         CurrentState = new ObservableProperty<State>(nameof(CurrentState), this, State.BeforeDealCards);
+        HeatMultiplier = new ObservableProperty<int>(nameof(HeatMultiplier), this, 100);
+        HeatMultiplier.DetailedValueChanged += OnInfoChanged;
+        RoundCount = new ObservableProperty<int>(nameof(RoundCount), this, 0);
+        RoundCount.DetailedValueChanged += OnInfoChanged;
         FieldEffects = new List<BaseFieldEffect>();
         ButtonRoot = GetNode<Node2D>("Buttons");
+        GameMgr.ProgressCounter.DetailedValueChanged += OnInfoChanged;
+        
+        GameMgr.ProgressCounter.FireValueChangeEventsOnInit();
+    }
+    
+    public override void _ExitTree()
+    {
+        base._ExitTree();
+        if (GameMgr != null)
+        {
+            GameMgr.ProgressCounter.DetailedValueChanged -= OnInfoChanged;
+        }
     }
 
     public virtual void Setup(object o)
@@ -152,7 +175,7 @@ public partial class Battle: Node2D
             Margins = Configuration.DefaultContentContainerMargins,
         };
         
-        var engageCardContainerSetupArgs = new SplitCardContainer.SetupArgs
+        var splitCardContainerSetupArgs = new SplitCardContainer.SetupArgs
         {
             CardContainersSetupArgs = new List<CardContainer.SetupArgs>
             {
@@ -163,12 +186,14 @@ public partial class Battle: Node2D
             PivotDirection = Enums.Direction2D8Ways.Neutral,
         };
         
-        EngageCardContainer.Setup(engageCardContainerSetupArgs);
+        EngageCardContainer.Setup(splitCardContainerSetupArgs);
         
-        containerSetupArgs.DefaultCardFaceDirection = Enums.CardFace.Down;
+        OpenedPiledCardContainer.Setup(splitCardContainerSetupArgs);
+        
         containerSetupArgs.ShouldCollectDealtItemAndRuleCards = true;
+        containerSetupArgs.GetCardFaceDirectionFunc = GetCommunityCardContainerCardFaceDirection;
         CommunityCardContainer.Setup(containerSetupArgs);
-        containerSetupArgs.DefaultCardFaceDirection = Enums.CardFace.Up;
+        containerSetupArgs.GetCardFaceDirectionFunc = null;
         containerSetupArgs.ShouldCollectDealtItemAndRuleCards = false;
         
         containerSetupArgs.AllowUseItemCard = true;
@@ -197,14 +222,31 @@ public partial class Battle: Node2D
         Reset();
     }
 
+    public CardNode InstantiateCardNode(BaseCard card, Node parent)
+    {
+        if (card.GetProp<CardPropPiled>() != null)
+        {
+            return Utils.InstantiatePrefab(PiledCardPrefab, parent) as CardNode;
+        }
+        return Utils.InstantiatePrefab(CardPrefab, parent) as CardNode;
+    }
+
     public async void Start()
     {
+        
+        void CallOnBattleStart(IBattleStart battleStart)
+        {
+            battleStart.OnBattleStart();
+        }
+        
         Reset();
         await GameMgr.AwaitAndDisableInput(Dealer.DealInnateCards());
         await GameMgr.AwaitAndDisableInput(NewRound());
         Dealer.Shuffle();
         CurrentState.Value = State.BeforeDealCards;
-        HeatMultiplier = 1.0f;
+        HeatMultiplier.Value = 100;
+        
+        CheckTiming<IBattleStart>(CallOnBattleStart);
     }
     
     public async Task NewRound()
@@ -220,26 +262,35 @@ public partial class Battle: Node2D
             }
             await Task.WhenAll(tasks);
         }
+        void CallOnRoundStart(IRoundStart roundStart)
+        {
+            roundStart.OnRoundStart();
+        }
+        
         foreach (var entity in Entities)
         {
             await entity.RoundReset();
         }
-        
         await RemoveCards(CommunityCardContainer.CardNodes);
         foreach (var cardContainer in EngageCardContainer.CardContainers)
         {
             await RemoveCards(cardContainer.CardNodes);
         }
-        RoundCount++;
-        OnRoundStart?.Invoke(this);
+        RoundCount.Value++;
         RoundHands.Clear();
         RoundEngage = null;
-        HeatMultiplier = KeepHeatMultiplierOnNewRound ? HeatMultiplier : 1.0f;
+        CurrentFaceUpCommunityCardCount = 0;
+        if (!KeepHeatMultiplierOnNewRound)
+        {
+            HeatMultiplier.Value = 100;
+        }
+        OnRoundStart?.Invoke();
+        CheckTiming<IRoundStart>(CallOnRoundStart);
     }
     
     public void Reset()
     {
-        RoundCount = 0;
+        RoundCount.Value = 0;
         CurrentState.Value = State.BeforeDealCards;
         foreach (var entity in Entities)
         {
@@ -255,7 +306,7 @@ public partial class Battle: Node2D
     public async Task DealCards()
     {
         var tasks = new List<Task>();
-        HeatMultiplier += Configuration.AllFaceDownHeatMultiplierAdd;
+        HeatMultiplier.Value += Configuration.AllFaceDownHeatMultiplierAdd;
         foreach (var entity in Entities)
         {
             for (int i = 0; i < entity.DealCardCount; i++)
@@ -270,7 +321,7 @@ public partial class Battle: Node2D
             await Utils.Wait(this, Configuration.AnimateCardTransformInterval);
         }
         await Task.WhenAll(tasks);
-        AfterDealCards?.Invoke(this);
+        AfterDealCards?.Invoke();
     }
 
     public bool CanFlipCards()
@@ -278,8 +329,11 @@ public partial class Battle: Node2D
         if (CommunityCardContainer.ContentNodes.Count - CurrentFaceUpCommunityCardCount > LastFlipCommunityCardCount)
         {
             return true;
+        } 
+        if (CommunityCardContainer.ContentNodes.Count - CurrentFaceUpCommunityCardCount == LastFlipCommunityCardCount && AllowLastFlip)
+        {
+            return true;
         }
-        if (AllowLastFlip) return true;
         return false;
     }
 
@@ -291,11 +345,11 @@ public partial class Battle: Node2D
         int flipCount;
         if (faceUpCommunityCardCount == 0)
         {
-            HeatMultiplier -= Configuration.AllFaceDownHeatMultiplierAdd;
+            HeatMultiplier.Value -= Configuration.AllFaceDownHeatMultiplierAdd;
             flipCount = FirstFlipCommunityCardCount;
         } else if (faceDownCommunityCardCount <= LastFlipCommunityCardCount)
         {
-            HeatMultiplier = Configuration.AllFlipHeatMultiplier;
+            HeatMultiplier.Value = Configuration.AllFlipHeatMultiplier;
             flipCount = Mathf.Min(faceDownCommunityCardCount, LastFlipCommunityCardCount);
         }
         else
@@ -309,6 +363,7 @@ public partial class Battle: Node2D
             {
                 tasks.Add(cardNode.AnimateFlip(Enums.CardFace.Up));
                 flipCount--;
+                CurrentFaceUpCommunityCardCount++;
             }
         }
         await Task.WhenAll(tasks);
@@ -317,7 +372,7 @@ public partial class Battle: Node2D
     public async Task Fold()
     {
         var tasks = new List<Task>();
-        HeatMultiplier = Configuration.FoldHeatMultiplier;
+        HeatMultiplier.Value = Configuration.FoldHeatMultiplier;
         foreach (var cardNode in Player.HoleCardContainer.CardNodes)
         {
             if (cardNode.FaceDirection.Value == Enums.CardFace.Up)
@@ -337,7 +392,7 @@ public partial class Battle: Node2D
 
     public async Task ShowDown()
     {
-        BeforeShowDown?.Invoke(this);
+        BeforeShowDown?.Invoke();
         var tasks = new List<Task>();
         foreach (var entity in Entities)
         {
@@ -378,7 +433,7 @@ public partial class Battle: Node2D
         tasks.Add(GameMgr.BattleLog.LogAndWait(
             Utils._($"Engage: {Player}({playerHand.Tier}) vs {Enemy}({enemyHand.Tier}). {Player} is {Player.RoundRole.Value}. {Enemy} is {Enemy.RoundRole.Value}"),
             Configuration.LogInterval));
-        BeforeEngage?.Invoke(this, RoundEngage);
+        BeforeEngage?.Invoke(RoundEngage);
         tasks.Add(RoundEngage.Resolve());
         await Task.WhenAll(tasks);
         // var endTime = Time.GetTicksUsec();
@@ -389,7 +444,15 @@ public partial class Battle: Node2D
 
     public async Task RoundEnd()
     {
-        OnRoundEnd?.Invoke(this);
+        
+        void CallOnRoundEnd(IRoundEnd roundEnd)
+        {
+            roundEnd.OnRoundEnd();
+        }
+        
+        OnRoundEnd?.Invoke();
+        CheckTiming<IRoundEnd>(CallOnRoundEnd);
+        
         var isPlayerDefeated = Player.IsDefeated();
         var isEnemyDefeated = Enemy.IsDefeated();
         if (isEnemyDefeated)
@@ -440,16 +503,16 @@ public partial class Battle: Node2D
         if (e == Player)
         {
             GD.Print($"You lose");
-            OnPlayerDefeated?.Invoke(this);
+            OnPlayerDefeated?.Invoke();
         }
         else
         {
             GD.Print($"You win");
             Player.Credit.Value += Mathf.Abs(Player.Hp.Value - Player.MaxHp.Value / 2);
             GameMgr.ProgressCounter.Value++;
-            OnEnemyDefeated?.Invoke(this);
+            OnEnemyDefeated?.Invoke();
         }
-        OnBattleFinished?.Invoke(this);
+        OnBattleFinished?.Invoke();
     }
 
     public void InflictBuffOn(BaseBuff buff, BattleEntity target, BattleEntity source, BaseCard sourceCard = null)
@@ -503,7 +566,7 @@ public partial class Battle: Node2D
         var box = boxDef.RandBox;
         var entityDef = box.Rand(GameMgr.Rand);
         Enemy.Setup(BattleEntity.InitArgs(entityDef));
-        OnNewEnemy?.Invoke(this, Enemy);
+        OnNewEnemy?.Invoke(Enemy);
     }
 
     protected void AfterSelectRewardCard()
@@ -517,6 +580,59 @@ public partial class Battle: Node2D
         if (ItemCardContainer.ContentNodes.Count > Player.ItemPocketSize.Value)
         {
             await GameMgr.AwaitAndDisableInput(((CardNode)ItemCardContainer.ContentNodes[0]).AnimateLeaveField());
+        }
+    }
+
+    protected void OnInfoChanged(object sender, ValueChangedEventDetailedArgs<int> args)
+    {
+        UpdateInfo();
+    }
+
+    protected void UpdateInfo()
+    {
+        
+        Info.Text = $"Progress {GameMgr.ProgressCounter.Value}/{Configuration.ProgressCountRequiredToWin}\n" +
+                    $"Round: {RoundCount.Value}\n" +
+                    $"Heat {HeatMultiplier.Value}%";
+    }
+
+    protected Enums.CardFace GetCommunityCardContainerCardFaceDirection(int i)
+    {
+        if (CurrentState.Value >= State.BeforeEngage)
+        {
+            return Enums.CardFace.Up;
+        }
+        if (i < CurrentFaceUpCommunityCardCount)
+        {
+            return Enums.CardFace.Up;
+        }
+        return Enums.CardFace.Down;
+    }
+
+    protected void CheckTiming<T>(Action<T> action)
+    {
+        foreach (var effect in FieldEffects.ToList())
+        {
+            if (effect is T timing)
+            {
+                action(timing);
+            }
+        }
+
+        foreach (var content in ItemCardContainer.Contents.ToList())
+        {
+            if (content is T timing)
+            {
+                action(timing);
+            }
+        }
+        
+        foreach (var content in RuleCardContainer.Contents.ToList())
+        {
+            if (content is T timing)
+            {
+                action(timing);
+            }
         }
     }
 }

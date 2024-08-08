@@ -5,24 +5,24 @@ using XCardGame.Common;
 
 namespace XCardGame.Ui;
 
-public class PiledCardNode: CardNode
+public partial class PiledCardNode: CardNode
 {
-    public CardPile CardPile;
+    public AttachedCardPile CardPile;
 
     public override void _Ready()
     {
         base._Ready();
-        CardPile = GetNode<CardPile>("CardPile");
+        CardPile = GetNode<AttachedCardPile>("CardPile");
     }
-
-    public void OnHoverHandler(BaseContentNode node)
+    
+    public override void Setup(object o)
     {
-        // NYI: add information to side panel
+        base.Setup(o);
+        CardPile.Setup(new AttachedCardPile.SetupArgs
+        {
+            GameMgr = GameMgr,
+            Battle = Battle,
+            TopCardNode = this,
+        });
     }
-
-    public void OnUnHoverHandler(BaseContentNode node)
-    {
-        // NYI: clear side panel
-    }
-
 }

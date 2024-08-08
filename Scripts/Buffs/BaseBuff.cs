@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Godot;
 using XCardGame.Common;
-using XCardGame.TimingInterfaces;
 using XCardGame.Ui;
 
 namespace XCardGame;

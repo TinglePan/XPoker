@@ -1,6 +1,4 @@
-﻿using XCardGame.TimingInterfaces;
-
-namespace XCardGame;
+﻿namespace XCardGame;
 
 public class BaseSingleTurnFieldEffect: BaseFieldEffect, IRoundEnd
 {

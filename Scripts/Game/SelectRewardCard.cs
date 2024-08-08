@@ -28,9 +28,9 @@ public partial class SelectRewardCard: Control
             SelectRewardCard = selectRewardCard;
         }
         
-        public override void OnEnter()
+        public override async Task OnEnter()
         {
-            base.OnEnter();
+            await base.OnEnter();
             SelectRewardCard.ReRollButton.Pressed += SelectRewardCard.ReRoll;
             SelectRewardCard.SkipButton.Pressed += SelectRewardCard.Skip;
             Battle = GameMgr.CurrentBattle;
@@ -40,9 +40,9 @@ public partial class SelectRewardCard: Control
             }
         }
         
-        public override void OnExit()
+        public override async Task OnExit()
         {
-            base.OnExit();
+            await base.OnExit();
             SelectRewardCard.ReRollButton.Pressed -= SelectRewardCard.ReRoll;
             SelectRewardCard.SkipButton.Pressed -= SelectRewardCard.Skip;
             foreach (var cardNode in SelectRewardCard.CardContainer.ContentNodes)

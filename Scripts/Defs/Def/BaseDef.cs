@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json;
 
 namespace XCardGame;
 
@@ -22,13 +24,13 @@ public class BaseDef
         Binder = new CustomSerializationBinder()
     };
     
-    public T Clone<T>()
+    public T Clone<T>() where T: BaseDef
     {
-        using (MemoryStream stream = new MemoryStream())
+        var options = new JsonSerializerOptions
         {
-            Formatter.Serialize(stream, this);
-            stream.Seek(0, SeekOrigin.Begin);
-            return (T)Formatter.Deserialize(stream);
-        }
+            IncludeFields = true,
+        };
+        var json = JsonSerializer.Serialize(this as T, options);
+        return JsonSerializer.Deserialize<T>(json, options);
     }
 }

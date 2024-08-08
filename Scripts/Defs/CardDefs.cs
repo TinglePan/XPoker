@@ -167,7 +167,7 @@ public static class CardDefs
     {
         Name = Utils._("Keep out"),
         ConcreteClassPath = "KeepOutCard",
-        DescriptionTemplate = Utils._("Certain cards do not count. Current rule:\n{}"),
+        DescriptionTemplate = Utils._("Certain cards do not count. Current rule:\n{0}"),
         IconPath = "res://Sprites/Cards/keep_out.png",
         
         IsRule = true,
@@ -183,7 +183,7 @@ public static class CardDefs
     {
         Name = Utils._("Xom"),
         ConcreteClassPath = "XomCard",
-        DescriptionTemplate = Utils._("Random effects that change every turn. Current effects:\n{}"),
+        DescriptionTemplate = Utils._("Random effects that change every turn. Current effects:\n{0}"),
         IconPath = "res://Sprites/Cards/xom.png",
         Rank = Enums.CardRank.Joker,
         Suit = Enums.CardSuit.Joker,

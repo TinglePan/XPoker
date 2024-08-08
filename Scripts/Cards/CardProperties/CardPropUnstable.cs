@@ -1,5 +1,4 @@
 ﻿using XCardGame.Common;
-using XCardGame.TimingInterfaces;
 
 namespace XCardGame.CardProperties;
 

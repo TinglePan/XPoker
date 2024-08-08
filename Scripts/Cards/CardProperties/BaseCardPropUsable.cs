@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using XCardGame.Common;
-using XCardGame.TimingInterfaces;
 using XCardGame.Ui;
 
 namespace XCardGame.CardProperties;
@@ -35,6 +34,7 @@ public abstract class BaseCardPropUsable: BaseCardProp, ICardReset, ICardUse
     public virtual async void Use()
     {
         await CardNode.AnimateSelect(true, Configuration.SelectTweenTime);
+        QueryConfirm();
     }
     
     public virtual void QueryConfirm()

@@ -20,7 +20,6 @@ public class BaseCardSelectTargetInputHandler : BaseSelectTargetInputHandler<Car
         base(gameMgr)
     {
         Helper = new CardInputHandlerHelper(this, originate);
-        Helper.ReBindHandler("Confirm", Confirm);
         SelectTargetCountLimit = selectTargetCountLimit;
     }
 
@@ -29,25 +28,26 @@ public class BaseCardSelectTargetInputHandler : BaseSelectTargetInputHandler<Car
         await Helper.AwaitAndDisableInput(task);
     }
 
-    public override void OnEnter()
+    public override async Task OnEnter()
     {
-        base.OnEnter();
+        await base.OnEnter();
         Helper.OnEnter(Configuration.StandardUsableCardOptionsMenuName);
+        Helper.ReBindHandler("Confirm", Confirm);
     }
 
-    public override async void OnExit()
+    public override async Task OnExit()
     {
-        base.OnExit();
+        await base.OnExit();
         var tasks = new List<Task>();
         tasks.Add(Helper.OriginateCardNode.AnimateSelect(false, Configuration.SelectTweenTime));
         foreach (var cardNode in SelectedNodes)
         {
             tasks.Add(cardNode.AnimateSelect(false, Configuration.SelectTweenTime));
         }
-
+        await Task.WhenAll(tasks);
         SelectedNodes.Clear();
         Helper.OnExit();
-        await Task.WhenAll(tasks);
+        GD.Print("BaseCardSelectTargetInputHandler On Exit");
     }
     
     protected virtual async void Confirm()
@@ -90,9 +90,14 @@ public class BaseCardSelectTargetInputHandlerWithConfirmConstraints : BaseCardSe
         AllowNoTarget = allowNoTarget;
         MustFullTargets = mustFullTargets;
         CustomFilter = customFilter;
+    }
+
+    public override async Task OnEnter()
+    {
+        await base.OnEnter();
         Helper.ReBindHandler("Confirm", Confirm);
     }
-    
+
     protected override async void Confirm()
     {
         if (ReceiveInput && ConstraintFulfilled())

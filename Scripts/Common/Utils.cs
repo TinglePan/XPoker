@@ -23,19 +23,19 @@ public static class Utils
         return res;
     }
 
-    public static Vector2 AddUpSeparatedMultipliers(List<float> multipliers)
+    public static Vector2 AddUpSeparatedMultipliers(List<int> multipliers)
     {
         float positiveMultiplier = 1;
         float negativeMultiplier = 1;
         foreach (var multiplier in multipliers)
         {
-            if (multiplier > 1)
+            if (multiplier > 0)
             {
-                positiveMultiplier += multiplier - 1;
+                positiveMultiplier += (float)multiplier / Configuration.BaseMultiplier;
             }
             else
             {
-                negativeMultiplier *= multiplier;
+                negativeMultiplier *= 1 + (float)multiplier / 100;
             }
         }
         return new Vector2(positiveMultiplier, negativeMultiplier);
@@ -395,7 +395,7 @@ public static class Utils
             case Enums.CardRank.Ace:
                 return "A";
             default:
-                return "_";
+                return "-";
         }
     }
     

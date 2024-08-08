@@ -5,7 +5,7 @@ using XCardGame.Common;
 
 namespace XCardGame.Ui;
 
-public class HMenuButtons: HBoxContainer
+public partial class HMenuButtons: HBoxContainer
 {
 
     public class SetupArgs

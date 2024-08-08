@@ -35,7 +35,7 @@ public class GoldenEyeCard: BaseCard
                     await Utils.Wait(CardNode, Configuration.AnimateCardTransformInterval);
                 }
             }
-            tasks.Add(Card.Battle.Dealer.DealCardPile.TopCard.AnimateReveal(true, Configuration.RevealTweenTime));
+            tasks.Add(Card.Battle.Dealer.DealCardPile.TopCardNode.AnimateReveal(true, Configuration.RevealTweenTime));
             await Task.WhenAll(tasks);
         }
     }

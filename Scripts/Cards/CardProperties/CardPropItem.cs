@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Common;
-using XCardGame.TimingInterfaces;
 using XCardGame.Ui;
 
 namespace XCardGame.CardProperties;
@@ -29,7 +28,7 @@ public class CardPropItem: BaseCardPropUsable, ICardRankChange, IRoundEnd
     public override bool CanUse()
     {
         if (!base.CanUse()) return false;
-        if (CardNode.CurrentContainer.Value is CardContainer { AllowUseItemCard: true }) return false;
+        if (CardNode.CurrentContainer.Value is CardContainer { AllowUseItemCard: false }) return false;
         if (!CardNode.IsEffective.Value && Card.IsEffective.Value) return false;
         return true;
     }

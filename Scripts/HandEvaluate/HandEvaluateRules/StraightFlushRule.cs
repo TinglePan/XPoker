@@ -13,10 +13,10 @@ public class StraightFlushRule: StraightRule
     }
     
     public override void EvaluateAndRecord(List<BaseCard> cards,
-        Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHands, Enums.HandTier? forRank=null)
+        Dictionary<Enums.HandTier,List<CompletedHand>> calculatedHands, Enums.HandTier? forTier=null)
     {
-        forRank ??= Tier;
-        if (calculatedHands.TryGetValue(forRank.Value, out var calculatedHandTier)) return;
+        forTier ??= Tier;
+        if (calculatedHands.TryGetValue(forTier.Value, out var calculatedHandTier)) return;
         base.EvaluateAndRecord(cards, calculatedHands, base.Tier);
         if (calculatedHands.ContainsKey(base.Tier))
         {
@@ -24,7 +24,7 @@ public class StraightFlushRule: StraightRule
             {
                 if (handTier.PrimaryCards.Select(card => card.Suit).Distinct().Count() == 1)
                 {
-                    UpgradeHandTier(handTier, forRank.Value, calculatedHands);
+                    UpgradeHandTier(handTier, forTier.Value, calculatedHands);
                 }
             }
         }

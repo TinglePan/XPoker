@@ -8,7 +8,7 @@
 [node name="Card" instance=ExtResource("1_w7duw")]
 script = ExtResource("1_3ds7k")
 
-[node name="CardPile" type="Node2D" parent="." index="3"]
+[node name="CardPile" type="Node2D" parent="." index="0"]
 script = ExtResource("3_wv441")
 
 [node name="PileImage" type="NinePatchRect" parent="CardPile" index="0"]

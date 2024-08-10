@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Godot;
 using XCardGame.CardProperties;
 using XCardGame.Common;
 using XCardGame.Ui;
@@ -10,24 +12,12 @@ namespace XCardGame;
 
 public class BalaTrollCard: BaseCard
 {
-    public class BalaTrollCardInputHandler : BaseCardSelectTargetInputHandlerWithConfirmConstraints
+    public class BalaTrollCardItemProp : CardPropItemPiled
     {
-        public BalaTrollCardInputHandler(GameMgr gameMgr, CardNode node) : base(gameMgr, node)
+        public CardContainer[] ValidCardContainers;
+        public BalaTrollCardItemProp(BaseCard card, params CardContainer[] validCardContainers) : base(card)
         {
-        }
-
-        protected override IEnumerable<CardNode> GetValidSelectTargets()
-        {
-            return Helper.OriginateCard.GetProp<BalaTrollCardItemProp>().PlayerHoleCardContainer.CardNodes;
-        }
-    }
-    
-    public class BalaTrollCardItemProp : CardPropItem
-    {
-        public CardContainer PlayerHoleCardContainer; 
-        public BalaTrollCardItemProp(BaseCard card, CardContainer playerHoleCardContainer) : base(card)
-        {
-            PlayerHoleCardContainer = playerHoleCardContainer;
+            ValidCardContainers = validCardContainers;
         }
         
         public override bool CanUse()
@@ -52,19 +42,37 @@ public class BalaTrollCard: BaseCard
             await Task.WhenAll(tasks);
             await Task.WhenAll(tasks2);
         }
-
-        protected override BaseInputHandler GetInputHandler()
+        
+        protected override IEnumerable<CardNode> GetValidSelectTargets()
         {
-            return new BalaTrollCardInputHandler(GameMgr, CardNode);
+            foreach (var cardContainer in ValidCardContainers)
+            {
+                foreach (var node in cardContainer.ContentNodes)
+                {
+                    yield return (CardNode)node;
+                }
+            }
         }
     }
 
-    public class BalaTrollCardPiledCardItemReplaceProp : CardPropItemReplace
+    public class BalaTrollCardPiledCardItemSwapProp : CardPropItem
     {
-        public BalaTrollCardPiledCardItemReplaceProp(BaseCard card) : base(card)
+        public BalaTrollCardPiledCardItemSwapProp(BaseCard card) : base(card)
         {
             Cost.Value = 0;
             RankChangePerUse = 0;
+        }
+        
+        public override bool CanUse()
+        {
+            if  (!base.CanUse()) return false;
+            return Battle.CurrentState.Value == Battle.State.BeforeShowDown;
+        }
+    
+        protected override BaseCardSelectTargetInputHandlerWithConfirmConstraints GetInputHandler()
+        {
+            return new BaseCardSelectTargetInputHandlerWithConfirmConstraints(GameMgr, CardNode, selectTargetCountLimit:1,
+                getValidSelectTargetsFunc:GetValidSelectTargets);
         }
         
         public override async Task Effect(List<CardNode> targets)
@@ -84,7 +92,7 @@ public class BalaTrollCard: BaseCard
             await Task.WhenAll(tasks);
         }
 
-        public override List<CardNode> GetValidSelectTargets()
+        protected override IEnumerable<CardNode> GetValidSelectTargets()
         {
             return Battle.Player.HoleCardContainer.CardNodes;
         }
@@ -92,15 +100,16 @@ public class BalaTrollCard: BaseCard
 
     public class BalaTrollCardPiledProp : CardPropPiled
     {
+        public OpenedPiledCard OpenedPiledCard;
         public BalaTrollCardPiledProp(BaseCard card, int cardCount) : base(card, cardCount)
         {
         }
         
         public override async Task Open()
         {
-            await base.Open();
             Battle.OpenedPiledCardContainer.CardContainers[1].OnAddContentNode += OnAddPiledCardNode;
             Battle.OpenedPiledCardContainer.CardContainers[1].OnRemoveContentNode += OnRemovePiledCardNode;
+            await base.Open();
         }
 
         public override async Task Close()
@@ -110,22 +119,33 @@ public class BalaTrollCard: BaseCard
             Battle.OpenedPiledCardContainer.CardContainers[1].OnRemoveContentNode -= OnRemovePiledCardNode;
         }
 
+        public override async void OnEnterField()
+        {
+            var tasks = new List<Task>();
+            for (int i = 0;i < CardCount; i++)
+            {
+                tasks.Add(Battle.Dealer.DrawCardToPile(PiledCardNode.CardPile));
+            }
+            await Task.WhenAll(tasks);
+        }
+
         protected void OnAddPiledCardNode(BaseContentNode node)
         {
             var card = (BaseCard)node.Content.Value;
             var usableProps = card.GetProps<BaseCardPropUsable>();
-            Debug.Assert(usableProps.Count == 2, "More than 2 usable props, not expected");
-            var piledReplaceProp = card.GetProp<BalaTrollCardPiledCardItemReplaceProp>(strict: true);
+            Debug.Assert(usableProps.Count <= 2, "More than 2 usable props, not expected");
+            var piledReplaceProp = card.GetProp<BalaTrollCardPiledCardItemSwapProp>(strict: true);
             if (piledReplaceProp == null)
             {
-                piledReplaceProp = new BalaTrollCardPiledCardItemReplaceProp(card);
-                card.Props.Add(typeof(BalaTrollCardPiledCardItemReplaceProp), piledReplaceProp);
+                piledReplaceProp = new BalaTrollCardPiledCardItemSwapProp(card);
+                card.Props.Add(typeof(BalaTrollCardPiledCardItemSwapProp), piledReplaceProp);
             }
             foreach (var prop in usableProps)
             {
                 prop.Enabled = false;
             }
             piledReplaceProp.Enabled = true;
+            GD.Print($"enabled item swap prop to card {card}");
         }
         
         protected void OnRemovePiledCardNode(BaseContentNode node)
@@ -136,10 +156,11 @@ public class BalaTrollCard: BaseCard
             {
                 prop.Enabled = true;
             }
-            var piledReplaceProp = card.GetProp<BalaTrollCardPiledCardItemReplaceProp>(strict: true);
+            var piledReplaceProp = card.GetProp<BalaTrollCardPiledCardItemSwapProp>(strict: true);
             if (piledReplaceProp != null)
             {
                 piledReplaceProp.Enabled = false;
+                GD.Print($"disabled item swap prop to card {card}");
             }
         }
     }
@@ -150,9 +171,9 @@ public class BalaTrollCard: BaseCard
     
     protected override CardPropItem CreateItemProp()
     {
-        return new BalaTrollCardItemProp(this, Battle.Player.HoleCardContainer);
+        return new BalaTrollCardItemProp(this, Battle.OpenedPiledCardContainer.CardContainers[1]);
     }
-
+    
     protected override CardPropPiled CreatePiledProp()
     {
         return new BalaTrollCardPiledProp(this, Def.PileCardCountMax);

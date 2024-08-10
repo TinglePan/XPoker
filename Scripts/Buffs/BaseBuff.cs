@@ -60,26 +60,9 @@ public class BaseBuff:IContent, IRoundEnd, IStartStopEffect
         IsTemporary = isTemporary;
     }
     
-    public TContentNode Node<TContentNode>(bool strict = true) where TContentNode : BaseContentNode
+    public TContentNode Node<TContentNode>(bool strict = false) where TContentNode : BaseContentNode
     {
-        foreach (var node in Nodes)
-        {
-            if (strict)
-            {
-                if (node is TContentNode contentNode)
-                {
-                    return contentNode;
-                }
-            }
-            else
-            {
-                if (node.GetType().IsAssignableTo(typeof(TContentNode)))
-                {
-                    return (TContentNode)node;
-                }
-            }
-        }
-        return null;
+        return InterfaceContentBoilerPlates.Node<TContentNode>(this, strict);
     }
 
     public virtual void Setup(object o)

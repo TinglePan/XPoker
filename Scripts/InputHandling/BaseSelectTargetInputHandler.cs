@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.Ui;
@@ -9,10 +11,15 @@ public abstract class BaseSelectTargetInputHandler<TTargetNode>: BaseInputHandle
     where TTargetNode: BaseContentNode, ISelect
 {
     public List<TTargetNode> SelectedNodes;
+    public Func<IEnumerable<TTargetNode>> GetValidSelectTargetsFunc;
     
-    public BaseSelectTargetInputHandler(GameMgr gameMgr) : base(gameMgr)
+    protected List<TTargetNode> ValidSelectTargets;
+    
+    public BaseSelectTargetInputHandler(GameMgr gameMgr, Func<IEnumerable<TTargetNode>> getValidSelectTargetsFunc = null) : base(gameMgr)
     {
         SelectedNodes = new List<TTargetNode>();
+        GetValidSelectTargetsFunc = getValidSelectTargetsFunc;
+        ValidSelectTargets = new List<TTargetNode>();
     }
     
     public override async Task OnEnter()
@@ -21,13 +28,14 @@ public abstract class BaseSelectTargetInputHandler<TTargetNode>: BaseInputHandle
         foreach (var selectTarget in GetValidSelectTargets())
         {
             selectTarget.OnMousePressed += OnTargetPressed;
+            ValidSelectTargets.Add(selectTarget);
         }
     }
 
     public override async Task OnExit()
     {
         await base.OnExit();
-        foreach (var selectTarget in GetValidSelectTargets())
+        foreach (var selectTarget in ValidSelectTargets)
         {
             selectTarget.OnMousePressed -= OnTargetPressed;
         }
@@ -35,20 +43,26 @@ public abstract class BaseSelectTargetInputHandler<TTargetNode>: BaseInputHandle
 
     protected virtual IEnumerable<TTargetNode> GetValidSelectTargets()
     {
-        yield break;
+        if (GetValidSelectTargetsFunc != null)
+        {
+            return GetValidSelectTargetsFunc.Invoke();
+        }
+        return Enumerable.Empty<TTargetNode>();
     }
 
-    protected virtual void SelectNode(TTargetNode node)
+    protected virtual Task SelectNode(TTargetNode node)
     {
         node.IsSelected = true;
         node.OnSelected?.Invoke();
         SelectedNodes.Add(node);
+        return Task.CompletedTask;
     }
 
-    protected virtual void UnSelectNode(TTargetNode node)
+    protected virtual Task UnSelectNode(TTargetNode node)
     {
         node.IsSelected = false;
         SelectedNodes.Remove(node);
+        return Task.CompletedTask;
     }
     
     protected void OnTargetPressed(BaseContentNode node, MouseButton mouseButton)

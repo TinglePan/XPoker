@@ -1,4 +1,6 @@
-﻿namespace XCardGame;
+﻿using System.Threading.Tasks;
+
+namespace XCardGame;
 
 public interface IEnterField
 {

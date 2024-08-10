@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using XCardGame.CardProperties;
 using XCardGame.Common;
@@ -8,19 +9,6 @@ namespace XCardGame;
 
 public class CopyCard : BaseCard
 {
-    
-    public class CopyCardInputHandler: BaseCardReplaceInputHandler
-    {
-        public CopyCardInputHandler(GameMgr gameMgr, CardNode node) : base(gameMgr, node)
-        {
-        }
-        
-        protected override IEnumerable<CardNode> GetValidSelectTargets()
-        {
-            return Helper.OriginateCard.GetProp<CopyCardItemReplaceProp>().ValidCardContainers.SelectMany(x => x.CardNodes).Where(x => x.FaceDirection.Value == Enums.CardFace.Up);
-        }
-    }
-
     public class CopyCardItemReplaceProp : CardPropItemReplace
     {
         public List<CardContainer> ValidCardContainers;
@@ -28,16 +16,16 @@ public class CopyCard : BaseCard
         {
             ValidCardContainers = validTargetContainers;
         }
-        
-        public override bool CanUse()
+
+        protected override BaseInputHandler GetInputHandler()
         {
-            if (!base.CanUse()) return false;
-            return Battle.CurrentState.Value == Battle.State.BeforeShowDown;
+            return new BaseCardSelectTargetInputHandlerWithConfirmConstraints(GameMgr, CardNode,
+                selectTargetCountLimit:1, getValidSelectTargetsFunc:GetValidSelectTargets);
         }
 
-        protected override BaseCardReplaceInputHandler GetInputHandler()
+        protected override IEnumerable<CardNode> GetValidSelectTargets()
         {
-            return new CopyCardInputHandler(GameMgr, CardNode);
+            return ValidCardContainers.SelectMany(x => x.CardNodes).Where(x => x.FaceDirection.Value == Enums.CardFace.Up);
         }
     }
     

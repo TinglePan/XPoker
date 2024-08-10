@@ -66,6 +66,23 @@ public class BattleMainInputHandler: BaseInputHandler
                 cardNode.OnMousePressed += OnCardNodePressed;
             }
         }
+        foreach (var cardContainer in Battle.OpenedPiledCardContainer.CardContainers)
+        {
+            cardContainer.ContentNodes.CollectionChanged += OnUsableCardNodesCollectionChanged;
+            foreach (var cardNode in cardContainer.ContentNodes)
+            {
+                cardNode.OnMousePressed += OnCardNodePressed;
+            }
+        }
+
+        foreach (var cardContainer in Battle.EngageCardContainer.CardContainers)
+        {
+            cardContainer.ContentNodes.CollectionChanged += OnUsableCardNodesCollectionChanged;
+            foreach (var cardNode in cardContainer.ContentNodes)
+            {
+                cardNode.OnMousePressed += OnCardNodePressed;
+            }
+        }
     }
     
     public override async Task OnExit()
@@ -80,6 +97,23 @@ public class BattleMainInputHandler: BaseInputHandler
         }
         Battle.CurrentState.DetailedValueChanged -= OnBattleStateChanged;
         foreach (var cardContainer in UsableCardContainers)
+        {
+            cardContainer.ContentNodes.CollectionChanged -= OnUsableCardNodesCollectionChanged;
+            foreach (var cardNode in cardContainer.ContentNodes)
+            {
+                cardNode.OnMousePressed -= OnCardNodePressed;
+            }
+        }
+        foreach (var cardContainer in Battle.OpenedPiledCardContainer.CardContainers)
+        {
+            cardContainer.ContentNodes.CollectionChanged -= OnUsableCardNodesCollectionChanged;
+            foreach (var cardNode in cardContainer.ContentNodes)
+            {
+                cardNode.OnMousePressed -= OnCardNodePressed;
+            }
+        }
+
+        foreach (var cardContainer in Battle.EngageCardContainer.CardContainers)
         {
             cardContainer.ContentNodes.CollectionChanged -= OnUsableCardNodesCollectionChanged;
             foreach (var cardNode in cardContainer.ContentNodes)
@@ -184,10 +218,10 @@ public class BattleMainInputHandler: BaseInputHandler
                     var piledProp = card.GetProp<CardPropPiled>();
                     if (piledProp.IsOpened)
                     {
-                        await piledProp.Close();
+                        await GameMgr.AwaitAndDisableInput(piledProp.Close());
                     } else
                     {
-                        await piledProp.Open();
+                        await GameMgr.AwaitAndDisableInput(piledProp.Open());
                     }
                 } else if (node is CardNode)
                 {

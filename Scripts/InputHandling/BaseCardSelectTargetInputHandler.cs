@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using XCardGame.CardProperties;
@@ -16,8 +17,9 @@ public class BaseCardSelectTargetInputHandler : BaseSelectTargetInputHandler<Car
 
     public int SelectTargetCountLimit;
 
-    public BaseCardSelectTargetInputHandler(GameMgr gameMgr, CardNode originate, int selectTargetCountLimit = -1) :
-        base(gameMgr)
+    public BaseCardSelectTargetInputHandler(GameMgr gameMgr, CardNode originate, int selectTargetCountLimit = -1,
+        Func<IEnumerable<CardNode>> getValidSelectTargetsFunc = null) :
+        base(gameMgr, getValidSelectTargetsFunc)
     {
         Helper = new CardInputHandlerHelper(this, originate);
         SelectTargetCountLimit = selectTargetCountLimit;
@@ -30,22 +32,27 @@ public class BaseCardSelectTargetInputHandler : BaseSelectTargetInputHandler<Car
 
     public override async Task OnEnter()
     {
-        await base.OnEnter();
+        var tasks = new List<Task>();
         Helper.OnEnter(Configuration.StandardUsableCardOptionsMenuName);
         Helper.ReBindHandler("Confirm", Confirm);
+        tasks.Add(base.OnEnter());
+        tasks.Add(Helper.OriginateCardNode.AnimateSelect(true, Configuration.SelectTweenTime));
+        await Task.WhenAll(tasks);
     }
 
     public override async Task OnExit()
     {
-        await base.OnExit();
         var tasks = new List<Task>();
         tasks.Add(Helper.OriginateCardNode.AnimateSelect(false, Configuration.SelectTweenTime));
-        foreach (var cardNode in SelectedNodes)
+        foreach (var cardNode in SelectedNodes.ToList())
         {
-            tasks.Add(cardNode.AnimateSelect(false, Configuration.SelectTweenTime));
+            if (GodotObject.IsInstanceValid(cardNode))
+            {
+                tasks.Add(UnSelectNode(cardNode));
+            }
         }
+        tasks.Add(base.OnExit());
         await Task.WhenAll(tasks);
-        SelectedNodes.Clear();
         Helper.OnExit();
         GD.Print("BaseCardSelectTargetInputHandler On Exit");
     }
@@ -59,21 +66,25 @@ public class BaseCardSelectTargetInputHandler : BaseSelectTargetInputHandler<Car
         }
     }
 
-    protected override async void SelectNode(CardNode node)
+    protected override async Task SelectNode(CardNode node)
     {
         if (SelectTargetCountLimit == 0) return;
+        var tasks = new List<Task>();
         if (SelectTargetCountLimit > 0 && SelectedNodes.Count >= SelectTargetCountLimit)
         {
-            UnSelectNode(SelectedNodes[0]);
+            tasks.Add(UnSelectNode(SelectedNodes[0]));
         }
 
         SelectedNodes.Add(node);
-        await node.AnimateSelect(true, Configuration.SelectTweenTime);
+        GD.Print($"select node {node}");
+        tasks.Add(node.AnimateSelect(true, Configuration.SelectTweenTime));
+        await Task.WhenAll(tasks);
     }
 
-    protected override async void UnSelectNode(CardNode node)
+    protected override async Task UnSelectNode(CardNode node)
     {
         SelectedNodes.Remove(node);
+        GD.Print($"unselect node {node}");
         await node.AnimateSelect(false, Configuration.SelectTweenTime);
     }
 }
@@ -85,7 +96,8 @@ public class BaseCardSelectTargetInputHandlerWithConfirmConstraints : BaseCardSe
     public Func<int, bool> CustomFilter;
     
     public BaseCardSelectTargetInputHandlerWithConfirmConstraints(GameMgr gameMgr, CardNode originate, int selectTargetCountLimit = -1,
-        bool allowNoTarget = false, bool mustFullTargets = false, Func<int, bool> customFilter = null) : base(gameMgr, originate, selectTargetCountLimit)
+        Func<IEnumerable<CardNode>> getValidSelectTargetsFunc = null, bool allowNoTarget = false,
+        bool mustFullTargets = false, Func<int, bool> customFilter = null) : base(gameMgr, originate, selectTargetCountLimit, getValidSelectTargetsFunc)
     {
         AllowNoTarget = allowNoTarget;
         MustFullTargets = mustFullTargets;

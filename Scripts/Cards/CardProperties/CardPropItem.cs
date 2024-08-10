@@ -29,14 +29,14 @@ public class CardPropItem: BaseCardPropUsable, ICardRankChange, IRoundEnd
     {
         if (!base.CanUse()) return false;
         if (CardNode.CurrentContainer.Value is CardContainer { AllowUseItemCard: false }) return false;
-        if (!CardNode.IsEffective.Value && Card.IsEffective.Value) return false;
+        if (!(CardNode.IsEffective.Value && Card.IsEffective.Value)) return false;
         return true;
     }
     
-    public override Task Effect(List<CardNode> targets)
+    public override async Task Effect(List<CardNode> targets)
     {
+        await base.Effect(targets);
         Card.ChangeRank(RankChangePerUse);
-        return Task.CompletedTask;
     }
     
     public async void OnRoundEnd()

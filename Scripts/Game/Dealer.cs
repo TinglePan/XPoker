@@ -142,12 +142,13 @@ public partial class Dealer: Node2D
         {
             if (card.Def.IsInnate)
             {
-                DealCardPile.Cards.Remove(card);
                 if (card.Def.IsItem && Battle.ItemCardContainer.ContentNodes.Count < Battle.Player.ItemPocketSize.Value)
                 {
+                    DealCardPile.Cards.Remove(card);
                     tasks.Add(DealDedicatedCardIntoContainer(card, DealCardPile, Battle.ItemCardContainer));
                 } else if (card.Def.IsRule)
                 {
+                    DealCardPile.Cards.Remove(card);
                     tasks.Add(DealDedicatedCardIntoContainer(card, DealCardPile, Battle.RuleCardContainer));
                 }
             }
@@ -165,6 +166,7 @@ public partial class Dealer: Node2D
     public async Task DrawCardIntoContainer(CardContainer targetContainer, int index = -1, bool collectUsable = true)
     {
         var cardNode = await AnimateDrawCard();
+        Battle.OnDealCard?.Invoke(cardNode);
         await DealDedicatedCardNodeIntoContainer(cardNode, targetContainer, index, collectUsable);
     }
 
@@ -173,13 +175,20 @@ public partial class Dealer: Node2D
     {
         fromPile.Cards.Remove(card);
         var cardNode = fromPile.CreateCardNodeOnPile(card);
+        if (fromPile == DealCardPile)
+        {
+            Battle.OnDealCard?.Invoke(fromPile.CreateCardNodeOnPile(card));
+        }
         await DealDedicatedCardNodeIntoContainer(cardNode, targetContainer, index, collectUsable);
     }
     
     public async Task DealDedicatedCardNodeIntoContainer(CardNode node, CardContainer targetContainer, int index = -1,
         bool collectUsable = true)
     {
-        Battle.OnDealCard?.Invoke(node);
+        if (!Battle.IsFieldContainer((CardContainer)node.CurrentContainer.Value) && Battle.IsFieldContainer(targetContainer))
+        {
+            node.Card.OnEnterField();
+        }
         if (index >= 0)
         {
             targetContainer.ContentNodes.Insert(index, node);
@@ -188,7 +197,10 @@ public partial class Dealer: Node2D
         {
             targetContainer.ContentNodes.Add(node);
         }
+        
         await node.TweenControl.WaitTransformComplete();
+        // node.PrintPosition = false;
+        
         var shouldReDeal = false;
         var reDealIndex = 0;
         if (collectUsable && targetContainer.ShouldCollectDealtItemAndRuleCards)
@@ -204,6 +216,7 @@ public partial class Dealer: Node2D
     public async Task DrawCardAndReplace(CardNode node, bool collectUsable = true)
     {
         var cardNode = await AnimateDrawCard();
+        node.Card.OnEnterField();
         Battle.OnDealCard?.Invoke(cardNode);
         await DealDedicatedCardNodeAndReplace(cardNode, node, collectUsable);
     }
@@ -222,6 +235,10 @@ public partial class Dealer: Node2D
 
     public async Task DealDedicatedCardNodeAndReplace(CardNode node, CardNode replacedNode, bool collectUsable = true)
     {
+        if (!Battle.IsFieldContainer((CardContainer)node.CurrentContainer.Value) && Battle.IsFieldContainer((CardContainer)replacedNode.CurrentContainer.Value))
+        {
+            node.Card.OnEnterField();
+        }
         if (replacedNode.CurrentContainer.Value != null)
         {
             var cardContainer = (CardContainer)replacedNode.CurrentContainer.Value; 
@@ -279,9 +296,13 @@ public partial class Dealer: Node2D
     
     public async Task DealDedicatedCardNodeToPile(CardNode node, BaseCardPile pile)
     {
-        if (node.CurrentContainer != null)
+        if (node.CurrentContainer.Value != null)
         {
             node.CurrentContainer.Value.ContentNodes.Remove(node);
+        }
+        if (!Battle.IsFieldContainer((CardContainer)node.CurrentContainer.Value) && pile is AttachedCardPile)
+        {
+            node.Card.OnEnterField();
         }
         node.Reparent(pile);
         // node.TweenControl.StopAll();

@@ -25,6 +25,7 @@ public class CardPropRule: BaseCardPropUsable, IStartStopEffect
 
     public override async Task Effect(List<CardNode> targets)
     {
+        await base.Effect(targets);
         await CardNode.AnimateTap(!CardNode.IsTapped.Value, Configuration.TapTweenTime);
     }
 

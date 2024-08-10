@@ -4,7 +4,7 @@ using XCardGame.Ui;
 
 namespace XCardGame;
 
-public class AttachedCardPile: BaseCardPile
+public partial class AttachedCardPile: BaseCardPile
 {
     public new class SetupArgs: BaseCardPile.SetupArgs
     {

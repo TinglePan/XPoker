@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 
 namespace XCardGame;
@@ -25,6 +26,7 @@ public partial class InputMgr: Node
     public async void SwitchToInputHandler(BaseInputHandler inputHandler)
     {
         GD.Print($"Switching to new input handler {inputHandler}");
+        // var tasks = new List<Task>();
         if (CurrentInputHandler != null)
         {
             InputHandlerStack.Add(CurrentInputHandler);
@@ -32,6 +34,7 @@ public partial class InputMgr: Node
         }
         CurrentInputHandler = inputHandler;
         await inputHandler.OnEnter();
+        // await Task.WhenAll(tasks);
     }
     
     public async void QuitCurrentInputHandler()

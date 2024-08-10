@@ -21,6 +21,7 @@ public partial class SplitCardContainer: Node2D
 
     public Enums.Direction2D8Ways PivotDirection;
     public int Separation;
+    public bool TweenContainerPosition;
 
 
     public override void _Ready()
@@ -28,6 +29,7 @@ public partial class SplitCardContainer: Node2D
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
         CardContainerPrefab = ResourceCache.Instance.Load<PackedScene>("res://Scenes/CardContainer.tscn");
         CardContainers = new List<CardContainer>();
+        TweenContainerPosition = true;
     }
 
     public void Setup(object o)
@@ -69,14 +71,22 @@ public partial class SplitCardContainer: Node2D
         return size;
     }
     
-    protected void AdjustContainers()
+    protected async void AdjustContainers()
     {
         var pivotOffset = GetPivotOffset();
         for (int i = 0; i < CardContainers.Count; i++)
         {
             var childContainerPivotOffset = GetPivotOffsetOfContainer(i);
             var position = childContainerPivotOffset - pivotOffset;
-            CardContainers[i].AnimateTransform(position, 0, Configuration.AnimateCardTransformInterval);
+            if (TweenContainerPosition)
+            {
+                await CardContainers[i].AnimateTransform(position, 0, Configuration.AnimateCardTransformInterval);
+            }
+            else
+            {
+                CardContainers[i].Position = position;
+            }
+            // GD.Print($"Container 1 is at {CardContainers[1].Position}");
         }
     }
 

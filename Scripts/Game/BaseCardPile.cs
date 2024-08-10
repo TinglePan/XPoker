@@ -103,6 +103,16 @@ public abstract partial class BaseCardPile: Node2D
         return card;
     }
 
+    public List<BaseCard> TakeN(Func<BaseCard, bool> filter)
+    {
+        var res = Cards.Where(filter).ToList();
+        foreach (var card in res)
+        {
+            Cards.Remove(card);
+        }
+        return res;
+    }
+
     public BaseCard Peek(int index = 0)
     {
         if (index >= Cards.Count)

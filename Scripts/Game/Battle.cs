@@ -187,7 +187,9 @@ public partial class Battle: Node2D
         };
         
         EngageCardContainer.Setup(splitCardContainerSetupArgs);
-        
+
+        splitCardContainerSetupArgs.CardContainersSetupArgs[0].AllowUseItemCard = true;
+        splitCardContainerSetupArgs.CardContainersSetupArgs[1].AllowUseItemCard = true;
         OpenedPiledCardContainer.Setup(splitCardContainerSetupArgs);
         
         containerSetupArgs.ShouldCollectDealtItemAndRuleCards = true;
@@ -322,6 +324,15 @@ public partial class Battle: Node2D
         }
         await Task.WhenAll(tasks);
         AfterDealCards?.Invoke();
+    }
+
+    public bool IsFieldContainer(CardContainer container)
+    {
+        if (container == CommunityCardContainer || container == ItemCardContainer || container == RuleCardContainer) return true;
+        if (container == Player.HoleCardContainer || container == Enemy.HoleCardContainer) return true;
+        if (EngageCardContainer.CardContainers.Contains(container)) return true;
+        if (OpenedPiledCardContainer.CardContainers.Contains(container)) return true;
+        return false;
     }
 
     public bool CanFlipCards()

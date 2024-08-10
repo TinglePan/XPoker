@@ -1,4 +1,6 @@
-﻿namespace XCardGame.Common;
+﻿using System;
+
+namespace XCardGame.Common;
 
 public static class Enums
 {
@@ -107,5 +109,24 @@ public static class Enums
         Blessing,
         Neutral,
         Curse
+    }
+
+    [Flags]
+    public enum CardHolderTag
+    {
+        PlayerHoleCardContainer = 1,
+        EnemyHoleCardContainer = 2,
+        HoleCardContainer = 3,
+        
+        CommunityCardContainer = 4,
+        ItemCardContainer = 8,
+        RuleCardContainer = 16,
+        OpenedPiledCardHeadContainer = 32,
+        OpenedPiledCardTailContainer = 64,
+        OpenedPiledCardContainer = 96,
+        
+        DrawPile = 128,
+        DiscardPile = 256,
+        Pile = 384,
     }
 }

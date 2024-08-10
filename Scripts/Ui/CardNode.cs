@@ -39,6 +39,8 @@ public partial class CardNode: BaseContentNode, ISelect
     
     public Vector2 InitPosition;
 
+    // public bool PrintPosition = false;
+
 	public override void _Ready()
 	{
 		base._Ready();
@@ -69,9 +71,9 @@ public partial class CardNode: BaseContentNode, ISelect
 	
 	// public override void _Process(double delta)
 	// {
-	// 	if (TweenControl.IsRunning("position") && CurrentContainer.Value == Battle.CommunityCardContainer)
+	// 	if (PrintPosition)
 	// 	{
-	// 		GD.Print($"{this} position is {Position}");
+	// 		GD.Print($"{this} position is {Position}:{GetParent()}/{GlobalPosition}");
 	// 	}
 	// }
 

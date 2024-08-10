@@ -79,6 +79,7 @@ public static class CardDefs
         
         IsItem = true,
         IsPiled = true,
+        PileCardCountMax = 3,
         ExcludeFromShop = true, 
         ExcludeFromRewards = true,
         IsInnate = true,

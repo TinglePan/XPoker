@@ -32,6 +32,7 @@ public class CardDef: BaseDef
     public bool IsInnate;
     public bool IsExhaust;
     public int Cost;
+    public Enums.CardHolderTag ValidTargets;
     
     // Item
     public int RankChangePerUse;

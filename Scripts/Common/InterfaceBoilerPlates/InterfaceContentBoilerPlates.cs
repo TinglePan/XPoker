@@ -4,15 +4,16 @@ namespace XCardGame.Common;
 
 public static class InterfaceContentBoilerPlates
 {
-    public static TContentNode Node<TContentNode>(IContent content, bool strict = true) where TContentNode : BaseContentNode
+    public static TContentNode Node<TContentNode>(IContent content, bool strict = false) where TContentNode : BaseContentNode
     {
         foreach (var node in content.Nodes)
         {
+            var type = node.GetType();
             if (strict)
             {
-                if (node is TContentNode contentNode)
+                if (type == typeof(TContentNode))
                 {
-                    return contentNode;
+                    return (TContentNode)node;
                 }
             }
             else

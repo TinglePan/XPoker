@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using Godot;
 using hamsterbyte.DeveloperConsole;
 
@@ -15,6 +17,12 @@ public partial class DebugProxy: Node
         base._Ready();
         GameMgr = GetNode<GameMgr>("/root/GameMgr");
         SelectRewardCardScene = ResourceCache.Instance.Load<PackedScene>("res://Scenes/SelectRewardCard.tscn");
+    }
+
+    [ConsoleCommand]
+    public static void LoadDebugCommands()
+    {
+        DC.ChangeContext("/root/BattleScene/DebugProxy");
     }
 
     [ConsoleCommand]
@@ -39,4 +47,20 @@ public partial class DebugProxy: Node
             PassInDefs = defs
         });
     }
+
+    [ConsoleCommand]
+    public void SetTopCard(string cardName)
+    {
+        var fieldInfo = typeof(CardDefs).GetField(cardName, BindingFlags.Static | BindingFlags.Public);
+        if (fieldInfo == null)
+        {
+            GD.PrintErr($"[{cardName}] not found in CardDefs");
+            return;
+        }
+        var cardDef = (CardDef)fieldInfo.GetValue(null);
+        Debug.Assert(cardDef != null, $"[{cardName}] cast failed");
+        var card = CardFactory.CreateInstance(cardDef.ConcreteClassPath, cardDef);
+        GameMgr.CurrentBattle.Dealer.DealCardPile.Cards[0] = card;
+    }
+    
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using XCardGame.CardProperties;
 using XCardGame.Common;
 using XCardGame.Common.HelperBoilerPlates;
@@ -22,16 +23,19 @@ public class BaseUsableCardInputHandler: BaseInputHandler
         
     public override async Task OnEnter()
     {
-        await base.OnEnter();
+        var tasks = new List<Task>();
         Helper.OnEnter(Configuration.StandardUsableCardOptionsMenuName);
         Helper.ReBindHandler("Confirm", Confirm);
+        tasks.Add(base.OnEnter());
+        tasks.Add(Helper.OriginateCardNode.AnimateSelect(true, Configuration.SelectTweenTime));
+        await Task.WhenAll(tasks);
     }
         
     public override async Task OnExit()
     {
-        await base.OnExit();
         await Helper.OriginateCardNode.AnimateSelect(false, Configuration.SelectTweenTime);
         Helper.OnExit();
+        await base.OnExit();
     }
     
     protected async void Confirm()

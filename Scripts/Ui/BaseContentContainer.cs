@@ -185,7 +185,7 @@ public abstract partial class BaseContentContainer: Node2D
         return pivotOffsetFromBottomLeft;
     }
 
-    public async void AnimateTransform(Vector2 position, float rotationDegrees, float animationTime,
+    public async Task AnimateTransform(Vector2 position, float rotationDegrees, float animationTime,
         int priority = 0, Action callback = null,
         TweenControl.ConflictTweenAction conflictTweenAction = TweenControl.ConflictTweenAction.Interrupt)
     {

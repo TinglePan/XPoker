@@ -11,7 +11,13 @@ public class CardPropItemReplace: CardPropItem
     {
         Debug.Assert(RankChangePerUse == 0, "Replace card should not have RankChangePerUse other than 0");
     }
-    
+
+    public override bool CanUse()
+    {
+        if  (!base.CanUse()) return false;
+        return Battle.CurrentState.Value == Battle.State.BeforeShowDown;
+    }
+
     public override async Task Effect(List<CardNode> targets)
     {
         var fromNode = CardNode;
@@ -28,13 +34,14 @@ public class CardPropItemReplace: CardPropItem
         await Task.WhenAll(tasks);
     }
     
-    public virtual List<CardNode> GetValidSelectTargets()
+    protected override BaseInputHandler GetInputHandler()
     {
-        return Card.Battle.CommunityCardContainer.CardNodes;
+        return new BaseCardSelectTargetInputHandlerWithConfirmConstraints(GameMgr, CardNode, selectTargetCountLimit:1,
+            getValidSelectTargetsFunc:GetValidSelectTargets);
     }
     
-    protected override BaseCardReplaceInputHandler GetInputHandler()
+    protected override IEnumerable<CardNode> GetValidSelectTargets()
     {
-        return new BaseCardReplaceInputHandler(GameMgr, CardNode);
+        return Card.Battle.CommunityCardContainer.CardNodes;
     }
 }

@@ -31,10 +31,10 @@ public abstract class BaseCardPropUsable: BaseCardProp, ICardReset, ICardUse
         return true;
     }
 
-    public virtual async void Use()
+    public virtual void Use()
     {
-        await CardNode.AnimateSelect(true, Configuration.SelectTweenTime);
         QueryConfirm();
+        // await CardNode.AnimateSelect(true, Configuration.SelectTweenTime);
     }
     
     public virtual void QueryConfirm()
@@ -51,5 +51,10 @@ public abstract class BaseCardPropUsable: BaseCardProp, ICardReset, ICardUse
     protected virtual BaseInputHandler GetInputHandler()
     {
         return new BaseUsableCardInputHandler(GameMgr, CardNode);
+    }
+    
+    protected virtual IEnumerable<CardNode> GetValidSelectTargets()
+    {
+        yield break;
     }
 }

@@ -81,7 +81,7 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
         }
     }
 
-    public TContentNode Node<TContentNode>(bool strict = true) where TContentNode : BaseContentNode
+    public TContentNode Node<TContentNode>(bool strict = false) where TContentNode : BaseContentNode
     {
         return InterfaceContentBoilerPlates.Node<TContentNode>(this, strict);
     }
@@ -136,7 +136,7 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
         }
     }
 
-    public void OnEnterField()
+    public virtual void OnEnterField()
     {
         OnEnterFieldCallback?.Invoke(this);
         foreach (var prop in Props.Values)
@@ -148,7 +148,7 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
         }
     }
     
-    public void OnLeaveField()
+    public virtual void OnLeaveField()
     {
         Reset();
         OnLeaveFieldCallback?.Invoke(this);
@@ -291,7 +291,6 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
             var prop = CreatePiledProp();
             Props.Add(prop.GetType(), prop);
         }
-        
         if (Def.IsUsable)
         {
             if (Def.IsInnate && GetProp<CardPropInnate>() == null)
@@ -302,8 +301,7 @@ public class BaseCard: IContent, IComparable<BaseCard>, ICardUse, IStartStopEffe
             {
                 var prop = CreateItemProp();
                 Props.Add(prop.GetType(), prop);
-            }
-            if (Def.IsRule && GetProp<CardPropRule>() == null)
+            } else if (Def.IsRule && GetProp<CardPropRule>() == null)
             {
                 var prop = CreateRuleProp();
                 Props.Add(prop.GetType(), prop);

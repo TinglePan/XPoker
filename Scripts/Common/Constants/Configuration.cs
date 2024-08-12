@@ -69,6 +69,7 @@ public static class Configuration
     public static readonly int CautiousMultiplierPerStack = 20;
     public static readonly int AllFaceDownCourageStackBonus = 3;
     public static readonly int TauntedBuffStackOnTaunt = 2;
+    public static readonly int TauntedMultiplierPerStack = 50;
     public static readonly int CourageMultiplierPerStack = 50;
 
     public static readonly int DefaultRequiredHoleCardCountMin = 0;

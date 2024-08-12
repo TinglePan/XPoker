@@ -232,10 +232,18 @@ public partial class BattleEntity: Node
         
         foreach (var buff in BuffContainer.Contents)
         {
-            if (buff is WeakenDeBuff weakenDeBuff)
+            switch (buff)
             {
-                res.Add(-Configuration.WeakenMultiplier);
-                weakenDeBuff.Consume();
+                case WeakenDeBuff weakenDeBuff:
+                    res.Add(-Configuration.WeakenMultiplier);
+                    weakenDeBuff.Consume();
+                    break;
+                case TauntedBuff tauntedBuff:
+                    res.Add(Configuration.TauntedMultiplierPerStack * tauntedBuff.Stack.Value);
+                    break;
+                case CourageBuff courageBuff:
+                    res.Add(Configuration.CourageMultiplierPerStack * courageBuff.Stack.Value);
+                    break;
             }
         }
         return res;
@@ -265,6 +273,9 @@ public partial class BattleEntity: Node
                 case VulnerableDeBuff vulnerableDeBuff:
                     res.Add(Configuration.VulnerableMultiplier);
                     vulnerableDeBuff.Consume();
+                    break;
+                case CautiousBuff cautiousBuff:
+                    res.Add(-Configuration.CautiousMultiplierPerStack * cautiousBuff.Stack.Value);
                     break;
             }
         }

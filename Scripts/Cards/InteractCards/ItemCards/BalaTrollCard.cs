@@ -145,6 +145,7 @@ public class BalaTrollCard: BaseCard
                 prop.Enabled = false;
             }
             piledReplaceProp.Enabled = true;
+            ((CardNode)node).AdjustCostLabel();
             GD.Print($"enabled item swap prop to card {card}");
         }
         
@@ -162,6 +163,7 @@ public class BalaTrollCard: BaseCard
                 piledReplaceProp.Enabled = false;
                 GD.Print($"disabled item swap prop to card {card}");
             }
+            ((CardNode)node).AdjustCostLabel();
         }
     }
     

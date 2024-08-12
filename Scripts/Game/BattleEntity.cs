@@ -186,10 +186,22 @@ public partial class BattleEntity: Node
         buff.Effect();
         BuffContainer.Contents.Add(buff);
     }
+    
+    public BaseBuff GetBuff<T>() where T: BaseBuff
+    {
+        foreach (var content in BuffContainer.Contents)
+        {
+            if (content is T buff)
+            {
+                return buff;
+            }
+        }
+        return null;
+    }
 
     public void RemoveBuff(BaseBuff buff)
     {
-        
+        BuffContainer.Contents.Remove(buff);
     }
 
     public int GetAttackModifier()
@@ -245,7 +257,6 @@ public partial class BattleEntity: Node
     public List<int> GetReceiveDamageMultipliers()
     {
         var res = new List<int>();
-        res.Add(Battle.HeatMultiplier.Value - 100);
         
         foreach (var buff in BuffContainer.Contents)
         {

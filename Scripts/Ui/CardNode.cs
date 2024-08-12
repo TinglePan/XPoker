@@ -285,6 +285,25 @@ public partial class CardNode: BaseContentNode, ISelect
 		InitPosition = Position;
 	}
 
+	public void AdjustCostLabel()
+	{
+		var prop = Card.GetProp<BaseCardPropUsable>();
+		if (prop is { Enabled: true })
+		{
+			if (!CostLabel.Visible)
+			{
+				CostLabel.Show();
+			}
+			prop.Cost.DetailedValueChanged += OnCardCostChanged;
+			prop.Cost.FireValueChangeEventsOnInit();
+		}
+		else
+		{
+			CostLabel.Hide();
+		}
+
+	}
+
 	protected void OnCardFaceChanged(object sender, ValueChangedEventDetailedArgs<Enums.CardFace> args)
 	{
 		if (args.NewValue == Enums.CardFace.Down)
@@ -355,17 +374,7 @@ public partial class CardNode: BaseContentNode, ISelect
 		card.Suit.FireValueChangeEventsOnInit();
 		card.IsNegated.DetailedValueChanged += OnToggleIsNegated;
 		card.IsNegated.FireValueChangeEventsOnInit();
-		if (card.Def.IsUsable)
-		{
-			CostLabel.Show();
-			var prop = card.GetProp<BaseCardPropUsable>();
-			prop.Cost.DetailedValueChanged += OnCardCostChanged;
-			prop.Cost.FireValueChangeEventsOnInit();
-		}
-		else
-		{
-			CostLabel.Hide();
-		}
+		AdjustCostLabel();
 		MainIcon.DisplayName.Value = card.Def.Name;
 		MainIcon.ResetIconPath(card.IconPath);
 		if (IsEffective.Value)

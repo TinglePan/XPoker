@@ -165,6 +165,7 @@ public class BattleMainInputHandler: BaseInputHandler
                     ("Flip", Utils._("Flip"), OnFlipButtonPressed),
                     ("ShowDown", Utils._("Show down"), OnShowDownButtonPressed),
                     ("Fold", Utils._("Fold"), OnFoldButtonPressed),
+                    ("Taunt", Utils._("Taunt"), OnTauntButtonPressed),
                 }
             });
             menu.Hide();
@@ -277,6 +278,10 @@ public class BattleMainInputHandler: BaseInputHandler
     {
         await GameMgr.AwaitAndDisableInput(Battle.DealCards());
         Battle.CurrentState.Value = Battle.State.BeforeShowDown;
+        if (Battle.Enemy.GetBuff<CautiousBuff>() == null)
+        {
+            Menus[Battle.State.BeforeShowDown].Buttons["Taunt"].Show();
+        }
         if (Battle.CanFlipCards())
         {
             Menus[Battle.State.BeforeShowDown].Buttons["Flip"].Show();
@@ -286,6 +291,11 @@ public class BattleMainInputHandler: BaseInputHandler
     protected async void OnFlipButtonPressed()
     {
         await GameMgr.AwaitAndDisableInput(Battle.FlipCards());
+        if (Battle.Enemy.GetBuff<CautiousBuff>() != null)
+        {
+            GameMgr.BattleLog.Log(Utils._("Enemy is cautious. Taunt option is disabled."));
+            Menus[Battle.State.BeforeShowDown].Buttons["Taunt"].Hide();
+        }
         if (!Battle.CanFlipCards())
         {
             Menus[Battle.State.BeforeShowDown].Buttons["Flip"].Hide();
@@ -310,9 +320,16 @@ public class BattleMainInputHandler: BaseInputHandler
         Battle.CurrentState.Value = Battle.State.AfterEngage;
     }
     
+    protected async void OnTauntButtonPressed()
+    {
+        await GameMgr.AwaitAndDisableInput(Battle.Taunt());
+        Battle.CurrentState.Value = Battle.State.BeforeEngage;
+    }
+    
     protected async void OnNextRoundButtonPressed()
     {
         await GameMgr.AwaitAndDisableInput(Battle.RoundEnd());
         Battle.CurrentState.Value = Battle.State.BeforeDealCards;
     }
+    
 }

@@ -66,10 +66,10 @@ public static class Configuration
     public static readonly int CardTapTweenPriority = 2;
     public static readonly int CardMoveTweenPriority = 3;
     
-    public static readonly int BaseHeatMultiplier = 100;
-    public static readonly int AllFlipHeatMultiplier = 75;
-    public static readonly int FoldHeatMultiplier = 50;
-    public static readonly int AllFaceDownHeatMultiplierAdd = 100;
+    public static readonly int CautiousMultiplierPerStack = 20;
+    public static readonly int AllFaceDownCourageStackBonus = 3;
+    public static readonly int TauntedBuffStackOnTaunt = 2;
+    public static readonly int CourageMultiplierPerStack = 50;
 
     public static readonly int DefaultRequiredHoleCardCountMin = 0;
     public static readonly int DefaultRequiredHoleCardCountMax = 2;

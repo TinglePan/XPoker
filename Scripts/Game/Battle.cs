@@ -22,7 +22,6 @@ public partial class Battle: Node2D
         public int FirstFlipCommunityCardCount;
         public bool AllowLastFlip;
         public int LastFlipCommunityCardCount;
-        public bool KeepHeatMultiplierOnNewRound;
         public int RequiredHoleCardCountMin;
         public int RequiredHoleCardCountMax;
         public List<BattleEntity.SetupArgs> EntitySetupArgs;
@@ -80,7 +79,6 @@ public partial class Battle: Node2D
     public int LastFlipCommunityCardCount;
     public int RequiredHoleCardCountMin;
     public int RequiredHoleCardCountMax;
-    public bool KeepHeatMultiplierOnNewRound;
     
     
     public ObservableProperty<int> RoundCount;
@@ -92,7 +90,6 @@ public partial class Battle: Node2D
     
     public List<BaseFieldEffect> FieldEffects;
     public ObservableProperty<State> CurrentState;
-    public ObservableProperty<int> HeatMultiplier;
 
     protected List<EnemyRandBoxDef> AllEnemyRandBoxDefs;
     
@@ -125,8 +122,6 @@ public partial class Battle: Node2D
         // RuleCards = new ObservableCollection<BaseCard>();
         HandTierOrderDescend = new ObservableCollection<Enums.HandTier>();
         CurrentState = new ObservableProperty<State>(nameof(CurrentState), this, State.BeforeDealCards);
-        HeatMultiplier = new ObservableProperty<int>(nameof(HeatMultiplier), this, 100);
-        HeatMultiplier.DetailedValueChanged += OnInfoChanged;
         RoundCount = new ObservableProperty<int>(nameof(RoundCount), this, 0);
         RoundCount.DetailedValueChanged += OnInfoChanged;
         FieldEffects = new List<BaseFieldEffect>();
@@ -154,7 +149,6 @@ public partial class Battle: Node2D
         LastFlipCommunityCardCount = args.LastFlipCommunityCardCount;
         RequiredHoleCardCountMin = args.RequiredHoleCardCountMin;
         RequiredHoleCardCountMax = args.RequiredHoleCardCountMax;
-        KeepHeatMultiplierOnNewRound = args.KeepHeatMultiplierOnNewRound;
         HandEvaluator = new CompletedHandEvaluator(Configuration.CompletedHandCardCount, 
             RequiredHoleCardCountMin, RequiredHoleCardCountMax);
         
@@ -246,7 +240,6 @@ public partial class Battle: Node2D
         await GameMgr.AwaitAndDisableInput(NewRound());
         Dealer.Shuffle();
         CurrentState.Value = State.BeforeDealCards;
-        HeatMultiplier.Value = 100;
         
         CheckTiming<IBattleStart>(CallOnBattleStart);
     }
@@ -282,10 +275,6 @@ public partial class Battle: Node2D
         RoundHands.Clear();
         RoundEngage = null;
         CurrentFaceUpCommunityCardCount = 0;
-        if (!KeepHeatMultiplierOnNewRound)
-        {
-            HeatMultiplier.Value = 100;
-        }
         OnRoundStart?.Invoke();
         CheckTiming<IRoundStart>(CallOnRoundStart);
     }
@@ -308,7 +297,6 @@ public partial class Battle: Node2D
     public async Task DealCards()
     {
         var tasks = new List<Task>();
-        HeatMultiplier.Value += Configuration.AllFaceDownHeatMultiplierAdd;
         foreach (var entity in Entities)
         {
             for (int i = 0; i < entity.DealCardCount; i++)
@@ -356,16 +344,34 @@ public partial class Battle: Node2D
         int flipCount;
         if (faceUpCommunityCardCount == 0)
         {
-            HeatMultiplier.Value -= Configuration.AllFaceDownHeatMultiplierAdd;
             flipCount = FirstFlipCommunityCardCount;
         } else if (faceDownCommunityCardCount <= LastFlipCommunityCardCount)
         {
-            HeatMultiplier.Value = Configuration.AllFlipHeatMultiplier;
             flipCount = Mathf.Min(faceDownCommunityCardCount, LastFlipCommunityCardCount);
+            var buff = new CautiousBuff(flipCount);
+            buff.Setup(new BaseBuff.SetupArgs
+            {
+                GameMgr = GameMgr,
+                Battle = this,
+                Entity = Enemy,
+                InflictedBy = null,
+                InflictedByCard = null,
+            });
+            Enemy.AddBuff(buff);
         }
         else
         {
             flipCount = 1;
+            var buff = new CautiousBuff(1);
+            buff.Setup(new BaseBuff.SetupArgs
+            {
+                GameMgr = GameMgr,
+                Battle = this,
+                Entity = Enemy,
+                InflictedBy = null,
+                InflictedByCard = null,
+            });
+            Enemy.AddBuff(buff);
         }
         foreach (var cardNode in CommunityCardContainer.CardNodes)
         {
@@ -383,7 +389,6 @@ public partial class Battle: Node2D
     public async Task Fold()
     {
         var tasks = new List<Task>();
-        HeatMultiplier.Value = Configuration.FoldHeatMultiplier;
         foreach (var cardNode in Player.HoleCardContainer.CardNodes)
         {
             if (cardNode.FaceDirection.Value == Enums.CardFace.Up)
@@ -401,9 +406,45 @@ public partial class Battle: Node2D
         await Task.WhenAll(tasks);
     }
 
+    public async Task Taunt()
+    {
+        var tasks = new List<Task>();
+        foreach (var cardNode in Enemy.HoleCardContainer.CardNodes)
+        {
+            if (cardNode.FaceDirection.Value == Enums.CardFace.Down)
+            {
+                tasks.Add(cardNode.AnimateFlip(Enums.CardFace.Up));
+            }
+        }
+        var buff = new TauntedBuff(Configuration.TauntedBuffStackOnTaunt);
+        buff.Setup(new BaseBuff.SetupArgs
+        {
+            GameMgr = GameMgr,
+            Battle = this,
+            Entity = Enemy,
+            InflictedBy = null,
+            InflictedByCard = null,
+        });
+        Enemy.AddBuff(buff);
+        await Task.WhenAll(tasks);
+    }
+
     public async Task ShowDown()
     {
         BeforeShowDown?.Invoke();
+        if (CurrentFaceUpCommunityCardCount == 0)
+        {
+            var buff = new CourageBuff(Configuration.AllFaceDownCourageStackBonus);
+            buff.Setup(new BaseBuff.SetupArgs
+            {
+                GameMgr = GameMgr,
+                Battle = this,
+                Entity = Player,
+                InflictedBy = null,
+                InflictedByCard = null,
+            });
+            Player.AddBuff(buff);
+        }
         var tasks = new List<Task>();
         foreach (var entity in Entities)
         {
@@ -601,10 +642,9 @@ public partial class Battle: Node2D
 
     protected void UpdateInfo()
     {
-        
+
         Info.Text = $"Progress {GameMgr.ProgressCounter.Value}/{Configuration.ProgressCountRequiredToWin}\n" +
-                    $"Round: {RoundCount.Value}\n" +
-                    $"Heat {HeatMultiplier.Value}%";
+                    $"Round: {RoundCount.Value}\n";
     }
 
     protected Enums.CardFace GetCommunityCardContainerCardFaceDirection(int i)
